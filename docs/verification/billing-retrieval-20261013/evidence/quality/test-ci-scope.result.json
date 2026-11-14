@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "scripts/ci/test-ci-scope.py"
+  ],
+  "completed_at_utc": "2026-10-13T06:32:23.194623+00:00",
+  "cwd": "/workspace/VA-Studio-billing-retrieval",
+  "duration_seconds": 0.797262,
+  "exit": 0,
+  "head_at_start": "874d57fe1897569a520b4627acd4f34d5c3e6d80",
+  "log_sha256": "59e7848ce6d6866d4bc0004e5096ca24c1fbed0af67d77427232f0ab14908f3d",
+  "runner_sha256": "f677c515014bd920aa1dc71155ba80bc0a531d7e3cc5a479782462c736de656a",
+  "selected_php_files": null,
+  "started_at_utc": "2026-10-13T06:32:22.397177+00:00",
+  "unittest_reported_tests": 27
+}

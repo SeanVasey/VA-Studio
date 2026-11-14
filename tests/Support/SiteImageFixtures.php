@@ -108,13 +108,15 @@ final class SiteImageFixtures
             touch($input);
             chmod($input, 0600);
             imagepng($image, $input);
+            // One malloc arena: FFmpeg 8 (Ubuntu 26.04 runners) runs demux, decode, filter, encode and mux on their own threads,
+            // and a 64 MiB arena reservation per thread exceeds the 512 MiB address-space cap before any pixel is encoded.
             (new Process([
                 config('media.prlimit'), '--cpu=30', '--as=536870912', '--fsize=33554432', '--nofile=64', '--',
                 config('media.ffmpeg'), '-nostdin', '-hide_banner', '-loglevel', 'error', '-xerror', '-n',
                 '-threads', '1', '-filter_threads', '1', '-protocol_whitelist', 'file,pipe', '-f', 'png_pipe', '-i', $input,
                 '-map', '0:v:0', '-map_metadata', '-1', '-frames:v', '1', '-c:v', 'mjpeg', '-threads:v', '1', '-q:v', '3', '-pix_fmt', 'yuvj444p',
                 '-flags:v', '+bitexact', '-fflags', '+bitexact', '-f', 'image2', '-update', '1', $output,
-            ], $directory, ['TMPDIR' => $directory, 'FFREPORT' => false, 'OMP_NUM_THREADS' => '1', 'OPENBLAS_NUM_THREADS' => '1']))
+            ], $directory, ['TMPDIR' => $directory, 'FFREPORT' => false, 'OMP_NUM_THREADS' => '1', 'OPENBLAS_NUM_THREADS' => '1', 'MALLOC_ARENA_MAX' => '1']))
                 ->setTimeout(30)->mustRun();
 
             return (string) file_get_contents($output);
@@ -230,10 +232,13 @@ final class SiteImageFixtures
     /** The size each slot's fixtures use: the slot's own reference size, so every check passes. */
     public const SIZES = ['hero_desktop' => [2400, 890], 'hero_mobile' => [960, 890], 'studio' => [1440, 630], 'share' => [1200, 630]];
 
+    /** Slots that no site release uses, so suites looping over the site release slots leave them out (BL-67 cover art). */
+    public const OTHER_SIZES = ['release_cover' => [1200, 1200]];
+
     /** A processed, ready image for a slot. The caller has bound the testing-only scanner (MediaFixtures::configure()). */
     public static function ready(string $slot, User $uploader, ?string $bytes = null, string $name = 'synthetic-fixture'): SiteImage
     {
-        [$width, $height] = self::SIZES[$slot];
+        [$width, $height] = self::SIZES[$slot] ?? self::OTHER_SIZES[$slot];
         $image = app(SiteImageProcessor::class)->handle(self::quarantined($slot, $bytes ?? self::jpeg($width, $height), $width, $height, $uploader, name: $name)->id);
         if ($image->status !== 'ready') {
             throw new \LogicException('The synthetic site image did not become ready: '.$image->failure_code);

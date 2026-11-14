@@ -1,0 +1,52 @@
+{
+  "tested_source": "1a3844f6be5c205115ca6908684f734d29d663e2",
+  "base": "efa6eea5b007f1f2623c4009c1e9bef737f06bee",
+  "package_records_before": 158,
+  "package_records_after": 158,
+  "content_hash_unchanged": true,
+  "plugin_api_version": [
+    "2.6.0",
+    "2.6.0"
+  ],
+  "added": [],
+  "removed": [],
+  "changed": [
+    {
+      "name": "laravel/framework",
+      "before": {
+        "version": "v13.35.0",
+        "source_reference": "a413a9da94884e5e9d58f4e6612884f712827804",
+        "dist_reference": "a413a9da94884e5e9d58f4e6612884f712827804"
+      },
+      "after": {
+        "version": "v13.36.0",
+        "source_reference": "e5626e38137cf0d82b1e52f15b16283e8442c13c",
+        "dist_reference": "e5626e38137cf0d82b1e52f15b16283e8442c13c"
+      }
+    }
+  ],
+  "changed_field_names_for_framework": [
+    "dist",
+    "require",
+    "require-dev",
+    "source",
+    "time",
+    "version"
+  ],
+  "framework_require_delta": {
+    "laravel/prompts": [
+      "^0.3.11",
+      "^0.3.25"
+    ]
+  },
+  "framework_require_dev_delta": {
+    "orchestra/testbench-core": [
+      "^11.5.0",
+      "^11.6.0"
+    ],
+    "phpstan/phpstan": [
+      "2.2.15",
+      "2.3.1"
+    ]
+  }
+}

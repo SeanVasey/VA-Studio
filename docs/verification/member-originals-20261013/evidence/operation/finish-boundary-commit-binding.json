@@ -1,0 +1,9 @@
+{
+  "commit": "3cc2a0d39ad21a98ca238cffcb76ff7939f18b95",
+  "files": {
+    "app/Domain/Grants/Member/MemberOriginalFinishBoundary.php": "9d6959216f08701de10454b6bcbf20dfd91262aff039d10e9bf36ee514ac43c6",
+    "tests/Feature/ProductionMemberOriginals/MemberOriginalFinishBoundaryTest.php": "a28f0de507fd93debe952739bfaef7638c17a1b8ff1b25f48473c853e3391a3a"
+  },
+  "receipt": "finish-boundary-native-statements.source.json",
+  "whole_inventory_note": "Other uncommitted composition drafts in the inventory were unexecuted and are not asserted to match this commit."
+}

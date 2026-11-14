@@ -1,0 +1,1 @@
+Terminated owned PHP process PID57068 with SIGTERM after original selection proved the shared schema setup failed. Shell exit143. No completed PHPUnit summary; mysql-corrections.xml is incomplete/empty. No passing or executed-case count claimed. Source1a14437e; application46e91e50.

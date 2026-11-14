@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\BillingIntervalOwnershipTest" file="/workspace/VA-Studio-membership-policy-red/tests/Feature/ProductionMembershipBilling/BillingIntervalOwnershipTest.php" tests="1" assertions="1" errors="0" failures="1" skipped="0" time="1.947236">
+    <testcase name="test_both_insert_directions_refuse_every_cross_ledger_endpoint_combination" file="/workspace/VA-Studio-membership-policy-red/tests/Feature/ProductionMembershipBilling/BillingIntervalOwnershipTest.php" line="19" class="Tests\Feature\ProductionMembershipBilling\BillingIntervalOwnershipTest" classname="Tests.Feature.ProductionMembershipBilling.BillingIntervalOwnershipTest" assertions="1" time="1.947236">
+      <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionMembershipBilling\BillingIntervalOwnershipTest::test_both_insert_directions_refuse_every_cross_ledger_endpoint_combination
+One retrieval endpoint cannot belong to both ledgers: production_membership_billing_observations start_start
+
+/workspace/VA-Studio-membership-policy-red/tests/Feature/ProductionMembershipBilling/BillingIntervalOwnershipTest.php:36
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

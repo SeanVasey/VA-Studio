@@ -2,12 +2,14 @@
 
 namespace Tests\Feature\ProductionFreeGrants;
 
+use App\Domain\Delivery\PreparedDeliveryStream;
 use App\Domain\Grants\ProductionFree\ProductionFreeGrantDocuments;
 use App\Domain\Grants\ProductionFree\ProductionFreeGrantDownloads;
 use App\Domain\Grants\ProductionFree\ProductionFreeGrantException;
 use App\Domain\Grants\ProductionFree\ProductionFreeGrantFiles;
 use App\Domain\Grants\ProductionFree\ProductionFreeGrantLibrary;
 use App\Domain\Grants\ProductionFree\ProductionFreeGrants;
+use App\Domain\Grants\ProductionFree\ProductionFreeGrantSpool;
 use App\Domain\Grants\ProductionFree\ProductionFreeGrantTransfer;
 use Tests\Support\ProductionFreeGrantFixtures;
 use Tests\TestCase;
@@ -51,12 +53,14 @@ final class ProductionFreeGrantSpoolResidualTest extends TestCase
         }
         $held = [];
         for ($i = 0; $i < 3; $i++) {
-            $held[] = $this->redeem();
+            $held[] = $this->prepareResidualControl($i);
         }
         $this->assertSame([], glob($this->spool.'/slot-*.snapshot'));
         foreach ($held as $transfer) {
-            $this->assertSame($this->sources->bytes['synthetic-master_wav'], $this->bytes($transfer));
+            $this->assertSame($this->sources->bytes['synthetic-master_wav'], stream_get_contents($transfer->stream()));
+            $transfer->close();
         }
+        $this->assertSame($this->sources->bytes['synthetic-master_wav'], $this->bytes($this->redeem()));
     }
 
     public function test_only_a_regular_single_link_file_at_the_exact_slot_path_is_removed(): void
@@ -105,15 +109,18 @@ final class ProductionFreeGrantSpoolResidualTest extends TestCase
             chmod($sidecar, 0600);
         }
         config(['production-free-grants.spool_slots' => 2]);
-        $first = $this->redeem();
-        $second = $this->redeem();
+        $first = $this->prepareResidualControl(0);
+        $second = $this->prepareResidualControl(1);
         foreach ([0, 1] as $slot) {
             clearstatcache(true, $this->spool.'/slot-'.$slot.'.reserve');
             $this->assertSame(20, filesize($this->spool.'/slot-'.$slot.'.reserve'));
         }
         $this->assertSame([], glob($this->spool.'/slot-*.reserve.*.tmp'));
-        $this->assertSame($this->sources->bytes['synthetic-master_wav'], $this->bytes($first));
-        $this->assertSame($this->sources->bytes['synthetic-master_wav'], $this->bytes($second));
+        foreach ([$first, $second] as $prepared) {
+            $this->assertSame($this->sources->bytes['synthetic-master_wav'], stream_get_contents($prepared->stream()));
+            $prepared->close();
+        }
+        $this->assertSame($this->sources->bytes['synthetic-master_wav'], $this->bytes($this->redeem()));
     }
 
     public function test_a_reservation_sidecar_that_is_not_an_own_regular_file_is_never_reclaimed(): void
@@ -167,6 +174,16 @@ final class ProductionFreeGrantSpoolResidualTest extends TestCase
         $authorization = $downloads->authorize($this->origin['id'], ['originSeal' => $this->seal, 'role' => 'master_wav'], $this->owner['principal'], $this->owner['user']);
 
         return $downloads->redeem($authorization['id'], $authorization['token'], $this->owner['principal'], $this->owner['user']);
+    }
+
+    /** Isolated storage controls use distinct synthetic holders; the final redemption proves domain composition. */
+    private function prepareResidualControl(int $holder): PreparedDeliveryStream
+    {
+        $bytes = $this->sources->bytes['synthetic-master_wav'];
+
+        return (new ProductionFreeGrantSpool)->prepare($this->spool, config('production-free-grants.spool_slots'), 0,
+            hash('sha256', $bytes), strlen($bytes), hrtime(true) + 10_000_000_000,
+            static fn ($output) => fwrite($output, $bytes), hash('sha256', 'synthetic-residual-holder-'.$holder));
     }
 
     private function bytes(ProductionFreeGrantTransfer $transfer): string

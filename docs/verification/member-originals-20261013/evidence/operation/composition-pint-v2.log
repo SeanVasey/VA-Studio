@@ -1,0 +1,1 @@
+{"tool":"pint","result":"fixed","files":[{"path":"tests\/Feature\/ProductionMemberOriginals\/MemberOriginalCompositionTest.php","fixers":["no_unused_imports","ordered_imports"]}]}

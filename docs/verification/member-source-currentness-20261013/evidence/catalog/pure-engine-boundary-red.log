@@ -1,0 +1,19 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-member-catalog-currentness/phpunit.xml
+
+.............................................................[41;37mF[0m    62 / 62 (100%)
+
+Time: 00:00.018, Memory: 24.50 MB
+
+There was 1 failure:
+
+1) Tests\Unit\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused@quote boundary cannot hide nontransactional engine with data ('CREATE TABLE `tracks` (`n` te...'x\'y'')
+Unsupported catalog DDL must not produce a comparison value.
+
+/workspace/VA-Studio-member-catalog-currentness/tests/Unit/MembershipCatalogDefinitionTest.php:100
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 62[0m[37;41m, Assertions: 72[0m[37;41m, Failures: 1[0m[37;41m.[0m

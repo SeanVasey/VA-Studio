@@ -1,0 +1,1020 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: <worktree>/phpunit.xml
+
+Time: 00:01.921, Memory: 69.00 MB
+
+There were 80 errors:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingNativeDedupRaceTest::test_two_retrievals_of_one_invoice_give_one_identity_and_two_ordered_observations
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMembershipBilling\BillingNativeDatabaseIntervalOwnershipRaceTest::test_two_older_snapshots_cannot_claim_the_same_valid_database_interval_across_ledgers
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionCheckoutExemptionAuthorityTest::test_actual_owner_command_freezes_scoped_policy_and_exact_replay_conflicts_preserve_original
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionCheckoutExemptionAuthorityTest.php:22
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\ProductionCheckoutExemptionAuthorityTest::test_unknown_persisted_staff_role_cannot_author_owner_policy#0 with data (2)
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionCheckoutExemptionAuthorityTest.php:22
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+5) Tests\Feature\ProductionCheckoutExemptionAuthorityTest::test_unknown_persisted_staff_role_cannot_author_owner_policy#1 with data ('withdrawn')
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionCheckoutExemptionAuthorityTest.php:22
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+6) Tests\Feature\ProductionCheckoutExemptionAuthorityTest::test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope#0 with data ('disabled')
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionCheckoutExemptionAuthorityTest.php:22
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+7) Tests\Feature\ProductionCheckoutExemptionAuthorityTest::test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope#1 with data ('not_delegated')
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionCheckoutExemptionAuthorityTest.php:22
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+8) Tests\Feature\ProductionCheckoutExemptionAuthorityTest::test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope#2 with data ('not_approved')
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionCheckoutExemptionAuthorityTest.php:22
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+9) Tests\Feature\ProductionCheckoutExemptionAuthorityTest::test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope#3 with data ('wrong_provenance')
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionCheckoutExemptionAuthorityTest.php:22
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+10) Tests\Feature\ProductionCheckoutExemptionAuthorityTest::test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope#4 with data ('wrong_tax_source')
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionCheckoutExemptionAuthorityTest.php:22
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+11) Tests\Feature\ProductionCheckoutExemptionAuthorityTest::test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope#5 with data ('unscoped_qualifier')
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionCheckoutExemptionAuthorityTest.php:22
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+12) Tests\Feature\ProductionCheckoutExemptionAuthorityTest::test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope#6 with data ('expired')
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionCheckoutExemptionAuthorityTest.php:22
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+13) Tests\Feature\ProductionCheckoutExemptionAuthorityTest::test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope#7 with data ('config_race')
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionCheckoutExemptionAuthorityTest.php:22
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+14) Tests\Feature\ProductionMemberGrants\MemberGrantOrdinaryLifecycleTest::test_actual_ordinary_award_reserve_expire_and_release_preserve_consumed_original_history
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionMemberGrants/MemberGrantOrdinaryLifecycleTest.php:26
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+15) Tests\Feature\ProductionMemberGrants\MemberGrantOrdinaryLifecycleTest::test_genuine_pre_honor_confirmation_cannot_activate_at_exact_honor_without_a_prior_terminal
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionMemberGrants/MemberGrantOrdinaryLifecycleTest.php:26
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+16) Tests\Feature\ProductionMemberGrants\MemberGrantActivationIntegrationTest::test_actual_confirmation_creates_one_conserved_graph_and_readback_preserves_exact_rows_and_bytes
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionMemberGrants/MemberGrantActivationIntegrationTest.php:24
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+17) Tests\Feature\ProductionMemberGrants\MemberGrantActivationIntegrationTest::test_independent_confirmations_of_the_same_intent_return_the_first_retained_effect
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionMemberGrants/MemberGrantActivationIntegrationTest.php:24
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+18) Tests\Feature\ProductionMemberGrants\MemberGrantActivationIntegrationTest::test_current_source_withdrawal_during_real_rendering_leaves_no_coupled_effect
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionMemberGrants/MemberGrantActivationIntegrationTest.php:24
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+19) Tests\Feature\ProductionMembershipBilling\MembershipReservationOwnershipTest::test_direct_context_construction_cannot_mutate_even_with_real_source_capabilities
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionMembershipBilling/MembershipReservationOwnershipTest.php:29
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+20) Tests\Feature\ProductionMembershipBilling\MembershipReservationOwnershipTest::test_committing_configuration_change_rolls_back_redemption_and_event
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionMembershipBilling/MembershipReservationOwnershipTest.php:29
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+21) Tests\Feature\ProductionMembershipBilling\MembershipReservationOwnershipTest::test_after_commit_configuration_change_refuses_response_but_preserves_durable_effects
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionMembershipBilling/MembershipReservationOwnershipTest.php:29
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+22) Tests\Feature\ProductionMembershipBilling\MembershipReservationOwnershipTest::test_committing_at_honor_deadline_cannot_commit_new_reservation
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionMembershipBilling/MembershipReservationOwnershipTest.php:29
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+23) Tests\Feature\ProductionMembershipBilling\MembershipReservationOwnershipTest::test_reservation_proof_is_issuer_owned_and_cannot_be_serialized_or_adopted_by_a_new_frame
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionMembershipBilling/MembershipReservationOwnershipTest.php:29
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+24) Tests\Feature\ProductionMembershipBilling\MembershipAwardOwnershipTest::test_direct_context_cannot_write_using_policy_facts_and_only_two_real_capabilities
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionMembershipBilling/MembershipAwardOwnershipTest.php:37
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+25) Tests\Feature\ProductionMembershipBilling\MembershipAwardOwnershipTest::test_invoice_callback_cannot_construct_a_second_context_on_the_owned_rows
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionMembershipBilling/MembershipAwardOwnershipTest.php:37
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+26) Tests\Feature\ProductionMembershipBilling\MembershipAwardOwnershipTest::test_capability_resolution_cannot_remove_a_remaining_capability_before_capture
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionMembershipBilling/MembershipAwardOwnershipTest.php:37
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+27) Tests\Feature\ProductionMembershipBilling\MembershipAwardOwnershipTest::test_transient_capability_rebinding_cannot_make_a_missing_capture_baseline_authoritative
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionMembershipBilling/MembershipAwardOwnershipTest.php:37
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+28) Tests\Feature\ProductionMembershipBilling\MembershipAwardOwnershipTest::test_complete_direct_nonshared_factories_support_one_owned_award
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionMembershipBilling/MembershipAwardOwnershipTest.php:37
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+29) Tests\Feature\ProductionMembershipBilling\MembershipAwardOwnershipTest::test_owned_award_refuses_untracked_capability_aliases_before_writing
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionMembershipBilling/MembershipAwardOwnershipTest.php:37
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+30) Tests\Feature\ProductionMembershipBilling\MembershipAwardDeadlineTest::test_twenty_seconds_before_proof_mint_remains_inside_the_original_admission_deadline
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionMembershipBilling/MembershipAwardDeadlineTest.php:36
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+31) Tests\Feature\ProductionMembershipBilling\MembershipAwardDeadlineTest::test_later_producer_lease_cannot_renew_the_original_operation_deadline
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionMembershipBilling/MembershipAwardDeadlineTest.php:36
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+32) Tests\Feature\ProductionMembershipBilling\MembershipAwardDeadlineTest::test_post_commit_deadline_refuses_a_receipt_without_claiming_the_durable_award_rolled_back
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionMembershipBilling/MembershipAwardDeadlineTest.php:36
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+33) Tests\Feature\ProductionMembershipBilling\MembershipBillingFreshnessTest::test_original_native_window_is_only_returned_for_the_same_issued_customer_frame
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionMembershipBilling/MembershipBillingFreshnessTest.php:38
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+34) Tests\Feature\ProductionMembershipBilling\MembershipBillingFreshnessTest::test_retained_billing_freshness_uses_native_time_independently_of_the_worker_carbon_clock
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionMembershipBilling/MembershipBillingFreshnessTest.php:38
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+35) Tests\Feature\ProductionMembershipBilling\MembershipBillingFreshnessTest::test_owned_context_carries_the_original_cap_through_precommit_and_committed_admission@award before commit with data ('award', false)
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionMembershipBilling/MembershipBillingFreshnessTest.php:38
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+36) Tests\Feature\ProductionMembershipBilling\MembershipBillingFreshnessTest::test_owned_context_carries_the_original_cap_through_precommit_and_committed_admission@award after commit with data ('award', true)
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionMembershipBilling/MembershipBillingFreshnessTest.php:38
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+37) Tests\Feature\ProductionMembershipBilling\MembershipBillingFreshnessTest::test_owned_context_carries_the_original_cap_through_precommit_and_committed_admission@reserve before commit with data ('reserve', false)
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionMembershipBilling/MembershipBillingFreshnessTest.php:38
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+38) Tests\Feature\ProductionMembershipBilling\MembershipBillingFreshnessTest::test_owned_context_carries_the_original_cap_through_precommit_and_committed_admission@reserve after commit with data ('reserve', true)
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionMembershipBilling/MembershipBillingFreshnessTest.php:38
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+39) Tests\Feature\ProductionMembershipBilling\MembershipNativeCatalogCurrentnessTest::test_unrelated_auto_allocated_insert_preserves_original_proof_but_selected_row_change_refuses
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionMembershipBilling/MembershipNativeCatalogCurrentnessTest.php:31
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+40) Tests\Feature\ProductionMembershipBilling\MembershipNativeCatalogCurrentnessTest::test_real_table_comment_change_is_not_erased_by_counter_projection_in_committed_read_only_frame
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionMembershipBilling/MembershipNativeCatalogCurrentnessTest.php:31
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+41) Tests\Feature\ProductionMembershipBilling\MembershipNativeCatalogCurrentnessTest::test_identical_row_local_temporary_shadow_remains_refused_after_a_positive_original_proof
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionMembershipBilling/MembershipNativeCatalogCurrentnessTest.php:31
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+42) Tests\Feature\ProductionMembershipBilling\BillingAwardFenceTest::test_exact_retained_six_table_upgrade_is_idempotent_and_keeps_every_row
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+43) Tests\Feature\ProductionMembershipBilling\BillingAwardFenceTest::test_each_missing_guard_and_empty_owned_seed_recover_without_changing_evidence
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+44) Tests\Feature\ProductionMembershipBilling\BillingAwardFenceTest::test_foreign_successor_shape_refuses_before_creating_any_guard_or_rewriting_rows
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+45) Tests\Feature\ProductionMembershipBilling\BillingAwardFenceTest::test_drifted_event_guard_refuses_before_repairing_a_missing_owned_guard
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+46) Tests\Feature\ProductionMembershipBilling\BillingAwardFenceTest::test_singleton_is_immutable_and_missing_seed_prevents_raw_hint_insertion
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+47) Tests\Feature\ProductionMembershipBilling\BillingAwardFenceTest::test_lock_requires_owned_outer_transaction_and_upgrade_requires_no_transaction
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+48) Tests\Feature\ProductionMembershipBilling\BillingAwardFenceTest::test_sqlite_replay_lock_holds_writer_intent_even_without_a_period_insert
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+49) Tests\Feature\ProductionMemberOriginals\MemberGrantFactsCallbackClosureTest::test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs@current identity_configuration with data ('current', 'identity_configuration')
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+50) Tests\Feature\ProductionMemberOriginals\MemberGrantFactsCallbackClosureTest::test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs@current actor_id_reference with data ('current', 'actor_id_reference')
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+51) Tests\Feature\ProductionMemberOriginals\MemberGrantFactsCallbackClosureTest::test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs@current actor_exists with data ('current', 'actor_exists')
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+52) Tests\Feature\ProductionMemberOriginals\MemberGrantFactsCallbackClosureTest::test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs@committed identity_configuration with data ('committed', 'identity_configuration')
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+53) Tests\Feature\ProductionMemberOriginals\MemberGrantFactsCallbackClosureTest::test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs@committed actor_id_reference with data ('committed', 'actor_id_reference')
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+54) Tests\Feature\ProductionMemberOriginals\MemberGrantFactsCallbackClosureTest::test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs@committed actor_exists with data ('committed', 'actor_exists')
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+55) Tests\Feature\ProductionMembershipBilling\MembershipHistoryFinishBoundaryTest::test_late_configuration_hook_is_refused_before_the_ordinary_shared_finish@award with data ('award')
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionMembershipBilling/MembershipHistoryFinishBoundaryTest.php:30
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+56) Tests\Feature\ProductionMembershipBilling\MembershipHistoryFinishBoundaryTest::test_late_configuration_hook_is_refused_before_the_ordinary_shared_finish@reservation with data ('reservation')
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionMembershipBilling/MembershipHistoryFinishBoundaryTest.php:30
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+57) Tests\Feature\ExclusiveOfferConcurrencyTest::test_independent_connections_preserve_preparation_identity_and_scope_controls#0 with data ('same_offer')
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+58) Tests\Feature\ExclusiveOfferConcurrencyTest::test_independent_connections_preserve_preparation_identity_and_scope_controls#1 with data ('shared_scope_variants')
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+59) Tests\Feature\ExclusiveOfferConcurrencyTest::test_independent_connections_preserve_preparation_identity_and_scope_controls#2 with data ('administrative_block')
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+60) Tests\Feature\OrderPreparationConcurrencyTest::test_real_mysql_contention_commits_only_one_order_and_resource_attempt#0 with data ('same_key')
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+61) Tests\Feature\OrderPreparationConcurrencyTest::test_real_mysql_contention_commits_only_one_order_and_resource_attempt#1 with data ('changed_body')
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+62) Tests\Feature\OrderPreparationConcurrencyTest::test_real_mysql_contention_commits_only_one_order_and_resource_attempt#2 with data ('different_key')
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+63) Tests\Feature\OrderPreparationConcurrencyTest::test_real_mysql_contention_commits_only_one_order_and_resource_attempt#3 with data ('different_quote_same_key')
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+64) Tests\Feature\OrderPreparationConcurrencyTest::test_real_mysql_contention_commits_only_one_order_and_resource_attempt#4 with data ('shared_scope')
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+65) Tests\Feature\OrderPreparationConcurrencyTest::test_real_mysql_contention_commits_only_one_order_and_resource_attempt#5 with data ('expired_replay')
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+66) Tests\Feature\OrderPreparationConcurrencyTest::test_scope_block_committed_before_owner_mutex_acquisition_prevents_both_orders
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+67) Tests\Feature\OrderPreparationConcurrencyTest::test_price_expiry_during_owner_mutex_wait_cannot_create_an_order_or_extend_capacity
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+68) Tests\Feature\TransactionalNotificationConcurrencyTest::test_two_independent_enqueues_share_one_intent_and_the_exact_loser_replays_without_writes
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/TransactionalNotificationConcurrencyTest.php:36
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+69) Tests\Feature\TransactionalNotificationConcurrencyTest::test_two_independent_dispatches_claim_once_and_the_loser_never_invokes_private_storage
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/TransactionalNotificationConcurrencyTest.php:36
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+70) Tests\Feature\TransactionalNotificationConcurrencyTest::test_withdrawal_committed_after_an_exact_user_wait_blocks_every_notification_entrypoint_without_capture@enqueue with data ('enqueue')
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/TransactionalNotificationConcurrencyTest.php:36
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+71) Tests\Feature\TransactionalNotificationConcurrencyTest::test_withdrawal_committed_after_an_exact_user_wait_blocks_every_notification_entrypoint_without_capture@dispatch with data ('dispatch')
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/TransactionalNotificationConcurrencyTest.php:36
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+72) Tests\Feature\TransactionalNotificationConcurrencyTest::test_withdrawal_committed_after_an_exact_user_wait_blocks_every_notification_entrypoint_without_capture@reconcile with data ('reconcile')
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/TransactionalNotificationConcurrencyTest.php:36
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+73) Tests\Feature\TransactionalNotificationConcurrencyTest::test_a_late_completion_waits_for_the_reconciliation_winner_and_cannot_add_an_attempt_audit_or_file_write
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/TransactionalNotificationConcurrencyTest.php:36
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+74) Tests\Feature\SiteScheduleConcurrencyTest::test_scheduler_and_manual_publication_serialize_to_one_consistent_outcome@scheduler takes the lock first with data (0)
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+75) Tests\Feature\SiteScheduleConcurrencyTest::test_scheduler_and_manual_publication_serialize_to_one_consistent_outcome@staff take the lock first with data (1)
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+76) Tests\Feature\SiteScheduleConcurrencyTest::test_overlapping_scheduler_runs_publish_the_schedule_once
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+77) Tests\Feature\SiteScheduleConcurrencyTest::test_scheduler_and_cancellation_serialize_to_one_consistent_outcome@scheduler takes the lock first with data (0)
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+78) Tests\Feature\SiteScheduleConcurrencyTest::test_scheduler_and_cancellation_serialize_to_one_consistent_outcome@staff take the lock first with data (1)
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+79) Tests\Feature\ProductionCheckoutNativeRaceTest::test_competing_assent_waits_on_exact_original_buyer_and_preserves_one_order#0 with data (false)
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionCheckoutNativeRaceTest.php:28
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+80) Tests\Feature\ProductionCheckoutNativeRaceTest::test_competing_assent_waits_on_exact_original_buyer_and_preserves_one_order#1 with data (true)
+LogicException: Disposable test database admission refused.
+
+<worktree>/tests/Support/DisposableTestDatabase.php:79
+<worktree>/tests/Support/DisposableTestDatabase.php:50
+<worktree>/tests/TestCase.php:94
+<worktree>/tests/TestCase.php:39
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:107
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+<worktree>/tests/TestCase.php:28
+<worktree>/tests/Feature/ProductionCheckoutNativeRaceTest.php:28
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 80, Assertions: 0, Errors: 80.

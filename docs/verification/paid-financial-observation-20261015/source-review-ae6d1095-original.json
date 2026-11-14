@@ -1,0 +1,149 @@
+{
+  "DECISION": "APPROVE SOURCE WITH CONDITIONS",
+  "actual_delta": [
+    "app/Domain/Commerce/ProductionFinancialInspection/FinancialExpectation.php",
+    "app/Domain/Commerce/ProductionFinancialInspection/FinancialObservation.php",
+    "docs/verification/paid-financial-observation-20261015/design.md",
+    "tests/Feature/ProductionFinancialInspection/FinancialCandidateTest.php"
+  ],
+  "created_utc": "2026-10-15T13:10:23.639358+00:00",
+  "direct_current_evidence": {
+    "PHP_recorder_observed_OS_exits": [
+      0,
+      0,
+      0
+    ],
+    "case_names": [
+      "test_two_line_v1_uses_original_order_gross_once_and_creates_only_unattested_validation",
+      "test_two_line_tax_v2_preserves_buyer_reviewed_tax_gross_and_its_distinct_source_kind",
+      "test_original_v1_automatic_async_capture_is_admitted_and_other_capture_methods_are_refused",
+      "test_original_tax_automatic_async_capture_is_admitted_and_other_capture_methods_are_refused",
+      "test_charge_transfer_pointer_is_refused_in_either_separate_get",
+      "test_refund_status_sums_and_historical_disputes_remain_separate_from_charge_flags_and_aggregate",
+      "test_malformed_money_subject_status_shape_and_bounded_inputs_are_refused_without_transport_or_sql",
+      "test_default_off_nonliteral_pins_raw_object_parents_and_nonliteral_environment_never_resolve_callbacks",
+      "test_v1_factory_entry_and_late_decryption_withdrawal_refuse_without_owning_frame_cleanup",
+      "test_tax_factory_refuses_disabled_different_reader_and_late_policy_withdrawal_in_the_original_frame",
+      "test_source_frame_end_and_different_reader_cannot_construct_validation_identity",
+      "test_original_row_withdrawal_during_extraction_cannot_return_identity",
+      "test_candidates_and_expectations_refuse_clone_serialize_json_and_unserialize_reconstruction"
+    ],
+    "counts": {
+      "assertions": 351,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 13
+    },
+    "original_launch_identity": {
+      "pid": 218994,
+      "start_ticks": "9026304",
+      "uid": 1000
+    },
+    "receipt_hashes": [
+      {
+        "path": "/workspace/runtime/paid-financial-observation-evidence-20261015/candidate-whole-repaired/result.json",
+        "sha256": "4d147007c092c58838c0bf2bd5e15aeeaded93a0e8856f2a166bfe503636a940"
+      },
+      {
+        "path": "/workspace/runtime/paid-financial-observation-evidence-20261015/candidate-whole-repaired/command.json",
+        "sha256": "7de5603a0a37b2cc836187cf67293d9c50a0e11f45f73e11e7db68e259aee984"
+      },
+      {
+        "path": "/workspace/runtime/paid-financial-observation-evidence-20261015/candidate-whole-repaired/junit.xml",
+        "sha256": "39e4221df49a20daa5a0026a7ba1e8074317cf1a5ad53bfba0c38e624251827c"
+      },
+      {
+        "path": "/workspace/runtime/paid-financial-observation-evidence-20261015/candidate-whole-repaired/supervisor-os-exit.json",
+        "sha256": "9c23cca1659b94cdb940c993ed4147c0b91e8e7c6d1194d4c0547b55c1c4f95a"
+      },
+      {
+        "path": "/workspace/runtime/paid-financial-observation-evidence-20261015/launch-candidate-whole-repaired.json",
+        "sha256": "4e939b84004f37b7aaa59a1ed5fe1504fe66a28318cf634ff18300cfd8ec6e95"
+      }
+    ],
+    "source_HEAD_status_runner_autoload_unchanged": true,
+    "source_input_count": 2430
+  },
+  "narrow_carry": {
+    "exact261Git_and_actual_files_verified": true,
+    "from": "3e6f89222c0832c08bf0205ee79077935b0c4e28",
+    "legacy_whole_two_files": {
+      "assertions": 291,
+      "scope": "Prior-source executed tests; unchanged legacy app/source/helper/config/SQL/lock/SDK plus test bodies. New pure value/normalizer bodies are not called by these legacy files.",
+      "tests": 69
+    },
+    "limits": "No fresh69 execution or whole application/runtime manifest equality claimed at repaired source. Original3e10/331 and f9 red3/7/F1E2/cheap52/F1 stay originals, not repaired passes.",
+    "prior_cheap7": {
+      "scope": "Prior unchanged script/workflow/configuration/source-selection dependencies only; fresh corrected shard52 and pending-suffix local checks remain separate receipts.",
+      "tests": 196
+    },
+    "receipt_sha256": "5d71d1da0de165229e4b368bd5ef7d92023245bfdcb3578b4045f30d92e7ff38",
+    "to": "ae6d109581bac6b685360a5941d6c7819cd5616f"
+  },
+  "open_P0": false,
+  "open_P1": false,
+  "original_red_control_assessment": "Source reading and reported f9 outcomes show genuine async compatibility refusals and transfer acceptance; direct all-original red/cheap receipt reconciliation remains final sealed review work.",
+  "preparation_limits": [
+    "A broad carry JSON print was truncated; the actual entire JSON was then parsed and every261 binding verified. No outcome inferred from the truncated display."
+  ],
+  "preserved_limits": [
+    "All outputs remain unattested input consistency, never authenticated provider/current balance/settlement/refund/dispute/commit/access/rights/inventory authority.",
+    "Original SourceV1/V2/identity/SQL/schema/provider/receipt/profile/SDK/API primitives remain frozen; no new frame/clock/cleanup/provider/binding/I/O is added.",
+    "New policy ships literalfalse; live/account/host/business eligibility/tax allocation/access/exclusive rules and adjacent shared-P2 conditions remain open.",
+    "No new native/schema/census/real-provider/FPM/full-suite claim."
+  ],
+  "prior_REVISE_sha": "3e6f89222c0832c08bf0205ee79077935b0c4e28",
+  "read_commands": [
+    "Read-only exact3e..ae application/test/design delta",
+    "Direct current13/351 JUnit/result/log/PHP/launch-bound OS/stability reconciliation",
+    "Verify all261 narrowed legacy/cheap bindings against both immutable Git sources and actual files"
+  ],
+  "required_next_gates": [
+    "Independent final sealed source/evidence review at actual committed candidate, including originals, source/runtime/loader carries, all cheap/format/audit outcomes and preparation errors.",
+    "Green exact-published-head cheap preflight, full review/check/protection inventory and expected-SHA development merge; actual merge/ledgers afterward."
+  ],
+  "required_source_repairs": [],
+  "resolved_findings": [
+    {
+      "id": "A5-S1",
+      "resolution": "Non-null transfer pointer is now rejected by owned account-ambiguity checks; regression covers both separately supplied Charges."
+    },
+    {
+      "id": "A5-S2",
+      "resolution": "Original execution_context.capture_method is retained in the common expectation tuple, admitted as automatic|automatic_async, and normalized PI method must equal it. No capture method alone proves collected funds; exact succeeded/paid/captured/gross gates remain."
+    }
+  ],
+  "review_kind": "Independent non-author repaired-source and narrow carry gate; not final sealed evidence/merge approval",
+  "reviewed_sha": "ae6d109581bac6b685360a5941d6c7819cd5616f",
+  "reviewer_actions": {
+    "app_test_DB_network_CI_hosted_operations": 0,
+    "tracked_edits": 0,
+    "writes": "Only original runtime reviewer MD/JSON"
+  },
+  "source_hash_bindings": [
+    {
+      "git_blob": "36cf848835067e3ebd3514f849ce97e102da383a",
+      "path": "app/Domain/Commerce/ProductionFinancialInspection/FinancialExpectation.php",
+      "sha256": "04b307b724f6a0fefb34e74a9532055f1a6ebd1fea04f8b4b4549c577a684fea"
+    },
+    {
+      "git_blob": "315ad7317246ad60eaf848d4a17f4f68c51b7975",
+      "path": "app/Domain/Commerce/ProductionFinancialInspection/FinancialObservation.php",
+      "sha256": "92d39f3b0c3340a6e7b6ffba5c7ebae46c603905a58087fd4c7c4e5d23233d9f"
+    },
+    {
+      "git_blob": "5a285fa168774ce3f1eb095db043dc23eb533e9a",
+      "path": "tests/Feature/ProductionFinancialInspection/FinancialCandidateTest.php",
+      "sha256": "8939f6a9a54c292e4b171f48a2c8fd250b79d7a7cdce0c8e30aa86b56a217ba7"
+    }
+  ],
+  "status_at_completion": "?? docs/ops/paid-financial-candidate-runtime.md\n?? docs/verification/paid-financial-observation-20261015/README.md\n?? docs/verification/paid-financial-observation-20261015/source-review-3e6f8922-original.json\n?? docs/verification/paid-financial-observation-20261015/source-review-3e6f8922-original.md\n?? docs/verification/paid-financial-observation-20261015/tested-ae6d1095-recorded-evidence-index.json\n?? docs/verification/paid-financial-observation-20261015/tested-ae6d1095-recorded-evidence.tar.gz\n",
+  "status_limit": "Root-owned untracked packet/documentation assembly is outside the reviewed immutable source; no reviewer shared-file write.",
+  "test_quality": [
+    "New async catalogs run real preparation/save/review before buyer SMTP/accept/payment/reconciliation/source extraction. They neither reflect sources nor rename retained rows. V1 and Tax matching async positive and mismatching automatic negative are meaningful.",
+    "Transfer regression checks both before/after independently; current whole file executes both after the first no longer fails.",
+    "Different Tax reader preserves captured native primary/driver metadata and creates a distinct retained reader; removes an unnecessary global driver getter rather than weakening policy classification.",
+    "Existing normal positive, two-line original gross/tax, source/current-policy callback/frame and bounded money/list/metadata/value reconstruction cases remain in whole13."
+  ]
+}

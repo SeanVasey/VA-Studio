@@ -1,0 +1,784 @@
+{
+  "schema_version": "member-original-evidence-portable-git-v1",
+  "derived_from_root_head": "c2a23b86ab9d6b246387df6338a649061f37adf9",
+  "root_history_commits": 1771,
+  "registry_sha256_at_derivation": "a05589f839d152e2ed33b95422503ef05acd5b4a44e88c8c09d5235f925a1e84",
+  "registry_source_bindings_at_derivation": 42,
+  "scope": "Offline equivalence mapping of original Git-reference observations to commits reachable from the recorded root head. Captured historical hashes are not rewritten or promoted; original absent paths remain absent. No application execution or approval claim.",
+  "canonical_serialization": "UTF-8 bytes of json.dumps(sorted([path, original_git_blob_sha1_or_null] pairs by path), separators=(',', ':'), ensure_ascii=False); no trailing newline. Path-set digest uses the same JSON options on sorted paths.",
+  "resolution_order": [
+    "Require requested path set count and requested_sorted_paths_sha256 to agree with registry-derived union.",
+    "If path is in absent_paths, preserve None even when another root commit contains it.",
+    "If path is in unavailable_paths, fail unavailable without remapping.",
+    "Otherwise use path_overrides[path].reference/path when present, else default_reachable_reference and unchanged path.",
+    "Read the reachable Git blob identity and bytes; verify optional override original_git_blob and original_sha256.",
+    "Rebuild sorted path/blob-or-null pairs and require SHA256 equals original_path_blob_pairs_sha256; when original author objects exist, optionally verify the same digest directly against them.",
+    "Compare captured source hashes with resolved actual bytes exactly as before; historical differences and partial comparisons must remain unchanged."
+  ],
+  "references": [
+    {
+      "original_reference": "10b8cb250438a4f82b3e5657b2c915c4c13a687b",
+      "original_subject": "fix: preserve bounded member renderer timeout and source fixtures",
+      "default_reachable_reference": "8e789888d712a6573ff0d26acb611995b4870d0a",
+      "default_selection": "nearest root-history commit with exactly matching subject",
+      "requested_by": [
+        {
+          "kind": "source_binding",
+          "id": "renderer-E6-E8-old"
+        }
+      ],
+      "requested_paths_count": 2,
+      "original_path_blob_pairs_sha256": "1b974af690d564e39494de719d05ecc0e41c00ca25d1a0765f3dfcecf253ee8c",
+      "effective_fallback_path_blob_pairs_sha256": "1b974af690d564e39494de719d05ecc0e41c00ca25d1a0765f3dfcecf253ee8c",
+      "requested_sorted_paths_sha256": "5e4132b857568f543c63de46b190aceea8096e7a9105b4ea6d2d749385050625",
+      "absent_paths": [],
+      "path_overrides": {},
+      "unavailable_paths": {},
+      "default_identical_present_paths": 2,
+      "all_original_reference_bytes_or_absences_preserved": true
+    },
+    {
+      "original_reference": "15a65e0761382a9ad50c4b279605a644a4eeb285",
+      "original_subject": "Release transient admission fixture before SQLite teardown",
+      "default_reachable_reference": "cff3f695140d2f1797f374f91a35f326a2f834af",
+      "default_selection": "nearest root-history commit with exactly matching subject",
+      "requested_by": [
+        {
+          "kind": "source_binding",
+          "id": "facts-native-old-before"
+        },
+        {
+          "kind": "source_binding",
+          "id": "facts-native-old-after"
+        }
+      ],
+      "requested_paths_count": 10633,
+      "original_path_blob_pairs_sha256": "5d656c0a5f6313edb902715443208d42deba9ddeaec4a8b28d499c8e06159aed",
+      "effective_fallback_path_blob_pairs_sha256": "5d656c0a5f6313edb902715443208d42deba9ddeaec4a8b28d499c8e06159aed",
+      "requested_sorted_paths_sha256": "ae0e6d6c27efaee14ef85359d0b73c737e63c05edc4e5b8f860872a11398147a",
+      "absent_paths": [],
+      "path_overrides": {
+        "docs/handoff/2026-10-07/CLAUDE-PLAN.md": {
+          "reference": "0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371",
+          "path": "docs/handoff/2026-10-07/CLAUDE-PLAN.md",
+          "original_git_blob": "800e3a6422bdc78f598b61541d302fe2a8281815",
+          "original_sha256": "890c040dc921591ff3e5dca6b13a0aa3c4d5cf2b5ce70ed37a0912fcc36704f7"
+        },
+        "docs/handoff/2026-10-07/codex-deferred-20261011.md": {
+          "reference": "0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371",
+          "path": "docs/handoff/2026-10-07/codex-deferred-20261011.md",
+          "original_git_blob": "172a39aa0da26244a13bf61780f8a417997af6df",
+          "original_sha256": "9116880e13d0eabd57dd80984dcb87eecc93931711111d31c646332797ede7ba"
+        },
+        "docs/verification/billing-retrieval-20261013/README.md": {
+          "reference": "0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371",
+          "path": "docs/verification/billing-retrieval-20261013/README.md",
+          "original_git_blob": "44120ceb48a556e5728ae3ae6a30968cf35f5566",
+          "original_sha256": "91d0984a755c637964243c386dc2e65348aee43bc0d7db6d3ff42df36106b66c"
+        }
+      },
+      "unavailable_paths": {},
+      "default_identical_present_paths": 10630,
+      "all_original_reference_bytes_or_absences_preserved": true
+    },
+    {
+      "original_reference": "1d88e9f0b7c744af1008c8dc4b656c735d96dd2d",
+      "original_subject": "feat: define pure member original rendering input and text",
+      "default_reachable_reference": "da253c61ee36943d496df43c70884f6f8a3d0dc2",
+      "default_selection": "nearest root-history commit with exactly matching subject",
+      "requested_by": [
+        {
+          "kind": "source_binding",
+          "id": "renderer-E1-old"
+        }
+      ],
+      "requested_paths_count": 1,
+      "original_path_blob_pairs_sha256": "331c26b5f06606802ecc15ba851bc7b038d8a125f1ab86a5a782ad5f522f7130",
+      "effective_fallback_path_blob_pairs_sha256": "331c26b5f06606802ecc15ba851bc7b038d8a125f1ab86a5a782ad5f522f7130",
+      "requested_sorted_paths_sha256": "0d6579f7ce847039b8ed59255ceb92dc25a597b3fc21e6e354ecc8c9d56d3d00",
+      "absent_paths": [],
+      "path_overrides": {},
+      "unavailable_paths": {},
+      "default_identical_present_paths": 1,
+      "all_original_reference_bytes_or_absences_preserved": true
+    },
+    {
+      "original_reference": "2333b9dae2059e2d79c062f8f635332c67a83acf",
+      "original_subject": "feat: render bounded private member original candidates",
+      "default_reachable_reference": "a0e7a1a2093117ed6428e43a29b930c21faed69f",
+      "default_selection": "nearest root-history commit with exactly matching subject",
+      "requested_by": [
+        {
+          "kind": "source_binding",
+          "id": "renderer-E1-fixed"
+        },
+        {
+          "kind": "source_binding",
+          "id": "renderer-E1-regression_test"
+        }
+      ],
+      "requested_paths_count": 2,
+      "original_path_blob_pairs_sha256": "0eedef1603c7c3b725ebefd65d455f267932b6e5b0f38de4e92c9eaddcde4548",
+      "effective_fallback_path_blob_pairs_sha256": "0eedef1603c7c3b725ebefd65d455f267932b6e5b0f38de4e92c9eaddcde4548",
+      "requested_sorted_paths_sha256": "236e00ae42399fb473bcafc569c77b6363a6157e5c844b83e39588ed9585846c",
+      "absent_paths": [],
+      "path_overrides": {},
+      "unavailable_paths": {},
+      "default_identical_present_paths": 2,
+      "all_original_reference_bytes_or_absences_preserved": true
+    },
+    {
+      "original_reference": "3561eee8351d83aec11af996687f4b2d63ea271c",
+      "original_subject": "Detach captured member schema configuration values",
+      "default_reachable_reference": "910ddf3090a1a9b10eff7861495d37d252ce8e77",
+      "default_selection": "nearest root-history commit with exactly matching subject",
+      "requested_by": [
+        {
+          "kind": "source_binding",
+          "id": "facts-schema-source-detach"
+        }
+      ],
+      "requested_paths_count": 8,
+      "original_path_blob_pairs_sha256": "0940137671d4983a6abbe166473ed44a2f08318febb40c88be915f550d0a24ac",
+      "effective_fallback_path_blob_pairs_sha256": "0940137671d4983a6abbe166473ed44a2f08318febb40c88be915f550d0a24ac",
+      "requested_sorted_paths_sha256": "46975ea2183cd16047798c15a43c1e99230f414b764e37b9945cfa6942819c38",
+      "absent_paths": [],
+      "path_overrides": {},
+      "unavailable_paths": {},
+      "default_identical_present_paths": 8,
+      "all_original_reference_bytes_or_absences_preserved": true
+    },
+    {
+      "original_reference": "3cc2a0d39ad21a98ca238cffcb76ff7939f18b95",
+      "original_subject": "feat: admit callback-free member committed frame completion",
+      "default_reachable_reference": "aa5642fdb4ce381f23746b704555be0bd4a2434f",
+      "default_selection": "nearest root-history commit with exactly matching subject",
+      "requested_by": [
+        {
+          "kind": "source_binding",
+          "id": "operation/finish-boundary-final"
+        },
+        {
+          "kind": "source_binding",
+          "id": "operation/finish-boundary-initial"
+        },
+        {
+          "kind": "source_binding",
+          "id": "operation/finish-boundary-native-statements"
+        },
+        {
+          "kind": "source_binding",
+          "id": "operation/finish-boundary-commit-binding"
+        }
+      ],
+      "requested_paths_count": 1977,
+      "original_path_blob_pairs_sha256": "b47b812da9470f1685e4dd302e3e04604493e7e22ac0f2fc44da3ece0e647b5c",
+      "effective_fallback_path_blob_pairs_sha256": "b47b812da9470f1685e4dd302e3e04604493e7e22ac0f2fc44da3ece0e647b5c",
+      "requested_sorted_paths_sha256": "9151f10b0e08dba87e5a97eb4ab9b14351d81a248a7cb586cad0de3d9f151c2a",
+      "absent_paths": [
+        "app/Domain/Grants/Member/MemberOriginalCandidate.php",
+        "app/Domain/Grants/Member/MemberOriginalCapturePermit.php",
+        "app/Domain/Grants/Member/MemberOriginalConfiguration.php",
+        "app/Domain/Grants/Member/MemberOriginalMaterialization.php",
+        "app/Domain/Grants/Member/MemberOriginalReadyToken.php",
+        "app/Domain/Grants/Member/MemberOriginalSource.php",
+        "app/Domain/Grants/Member/MemberOriginalSourceClaim.php",
+        "app/Domain/Memberships/Production/MembershipMemberCapture.php"
+      ],
+      "path_overrides": {},
+      "unavailable_paths": {},
+      "default_identical_present_paths": 1969,
+      "all_original_reference_bytes_or_absences_preserved": true
+    },
+    {
+      "original_reference": "483793065c3f7a66057907a777f938f608bf7036",
+      "original_subject": "fix: require native member original filesystem streams",
+      "default_reachable_reference": "0bfacbbc0ad970881a0cd8ddb0044d8a69e0fe90",
+      "default_selection": "nearest root-history commit with exactly matching subject",
+      "requested_by": [
+        {
+          "kind": "source_binding",
+          "id": "renderer-final"
+        },
+        {
+          "kind": "source_binding",
+          "id": "renderer-E7-fixed"
+        },
+        {
+          "kind": "source_binding",
+          "id": "renderer-E7-regression_test"
+        },
+        {
+          "kind": "frozen_profiles",
+          "receipt": "renderer/frozen-profiles-inventory.json"
+        },
+        {
+          "kind": "profile_manifest",
+          "path": "resources/contracts/production-member-v1/profile-assets.json"
+        }
+      ],
+      "requested_paths_count": 74,
+      "original_path_blob_pairs_sha256": "ef8078cf2191fb2d3db3d0fb1e3c6f38d52c72cb9ee69960025b73a0b66a41f8",
+      "effective_fallback_path_blob_pairs_sha256": "ef8078cf2191fb2d3db3d0fb1e3c6f38d52c72cb9ee69960025b73a0b66a41f8",
+      "requested_sorted_paths_sha256": "4b142aebda649c22fb6eded17a83a9e2520a42e1fc814e1d6bfc6d924ce7067c",
+      "absent_paths": [],
+      "path_overrides": {},
+      "unavailable_paths": {},
+      "default_identical_present_paths": 74,
+      "all_original_reference_bytes_or_absences_preserved": true
+    },
+    {
+      "original_reference": "5bbebd776ca6cce2be4fd0d427f3baa926c2676d",
+      "original_subject": "feat: compose owned member original preparation and fresh readiness",
+      "default_reachable_reference": "6cabc6dc7e6f45662223ba5d9bef59e47d1b97c6",
+      "default_selection": "nearest root-history commit with exactly matching subject",
+      "requested_by": [
+        {
+          "kind": "source_binding",
+          "id": "operation/composition-frame-issuer-5bbebd77"
+        },
+        {
+          "kind": "source_binding",
+          "id": "operation/composition-frame-issuer-final"
+        },
+        {
+          "kind": "source_binding",
+          "id": "operation/composition-issuer-fixed"
+        },
+        {
+          "kind": "source_binding",
+          "id": "operation/composition-issuer-initial"
+        }
+      ],
+      "requested_paths_count": 2003,
+      "original_path_blob_pairs_sha256": "6bfd7ebbaa1046e40426df12c568e425f1a46a4d15ee5a26682b9b81d8c966ef",
+      "effective_fallback_path_blob_pairs_sha256": "6bfd7ebbaa1046e40426df12c568e425f1a46a4d15ee5a26682b9b81d8c966ef",
+      "requested_sorted_paths_sha256": "1ca9b8bc8bc0c435ce15695b6bc9883bfc947bc11cd9e499411fbc8e02b2a28a",
+      "absent_paths": [],
+      "path_overrides": {},
+      "unavailable_paths": {},
+      "default_identical_present_paths": 2003,
+      "all_original_reference_bytes_or_absences_preserved": true
+    },
+    {
+      "original_reference": "5d6c58da50267a636e393ce3754ef473516923aa",
+      "original_subject": "fix: retain original owner inputs across member facts callbacks",
+      "default_reachable_reference": "790b89b6d1779a0ab1b45f1abf40173fe2592f87",
+      "default_selection": "nearest root-history commit with exactly matching subject",
+      "requested_by": [
+        {
+          "kind": "source_binding",
+          "id": "facts-5d6c58da-final"
+        },
+        {
+          "kind": "source_binding",
+          "id": "facts-timestamp-old-dependencies"
+        }
+      ],
+      "requested_paths_count": 11504,
+      "original_path_blob_pairs_sha256": "7515807f203058787ff078b1db65bced985400a1cedb980f9b097deb4c2c8191",
+      "effective_fallback_path_blob_pairs_sha256": "7515807f203058787ff078b1db65bced985400a1cedb980f9b097deb4c2c8191",
+      "requested_sorted_paths_sha256": "dcaefa0330b22aef7565405195234ee065e66dbe326cab15179b06375cd055b7",
+      "absent_paths": [],
+      "path_overrides": {
+        "app/Domain/Grants/Member/MemberOriginalArtifactAuthority.php": {
+          "reference": "d6b8c79cd8b120aedc365503b1b9267d92df13d5",
+          "path": "app/Domain/Grants/Member/MemberOriginalArtifactAuthority.php",
+          "original_git_blob": "e7e11d3c6e6841d39f9c02be542d9dc11a8defec",
+          "original_sha256": "259d236aa11cf1833256e8ae3f2b5f7d4fab64edfe4ae6e0e85e93ea62126605"
+        },
+        "app/Domain/Grants/Member/MemberOriginalFiles.php": {
+          "reference": "ae57c18a059994e8277aed7bf3dc1729ef4e1ccf",
+          "path": "app/Domain/Grants/Member/MemberOriginalFiles.php",
+          "original_git_blob": "64fcc6553922a1113449cde171da817946dcece5",
+          "original_sha256": "7eefd2c8d63bcab39507525ed5ec3fb89a4e76562df65ee1df86157f3bd26c8a"
+        },
+        "app/Domain/Grants/Member/MemberOriginalFinishBoundary.php": {
+          "reference": "d6b8c79cd8b120aedc365503b1b9267d92df13d5",
+          "path": "app/Domain/Grants/Member/MemberOriginalFinishBoundary.php",
+          "original_git_blob": "ed34754d0eb5d8ee8de12af830bbf394ae21acf2",
+          "original_sha256": "9d6959216f08701de10454b6bcbf20dfd91262aff039d10e9bf36ee514ac43c6"
+        },
+        "app/Domain/Grants/Member/MemberOriginalWorkspace.php": {
+          "reference": "ae57c18a059994e8277aed7bf3dc1729ef4e1ccf",
+          "path": "app/Domain/Grants/Member/MemberOriginalWorkspace.php",
+          "original_git_blob": "e200dcc42d194845ed31bd39802a66582e540d4a",
+          "original_sha256": "7d777b3b2f3793c8e545fc011a495e16a30d45aa91fb661dbd6306dcd7df4a53"
+        },
+        "app/Domain/Memberships/Production/MembershipBillingEvidence.php": {
+          "reference": "d6b8c79cd8b120aedc365503b1b9267d92df13d5",
+          "path": "app/Domain/Memberships/Production/MembershipBillingEvidence.php",
+          "original_git_blob": "cb5bb38c640e367e37f6da26b2a85ad869b883dc",
+          "original_sha256": "aea9c888aee8a16d9731eec5c4c4ac4a7b37992136b9e85d8c0e669e68aef824"
+        },
+        "app/Domain/Memberships/Production/MembershipReservationContext.php": {
+          "reference": "d6b8c79cd8b120aedc365503b1b9267d92df13d5",
+          "path": "app/Domain/Memberships/Production/MembershipReservationContext.php",
+          "original_git_blob": "976107d0e50cbc5b87ec4f0ffa7d5052d062e111",
+          "original_sha256": "d2367d8166262a926e03cfd1e832c406dc1e0e621b0ff5df4c3db80203dfa9f6"
+        },
+        "app/Domain/Memberships/Production/MembershipReservations.php": {
+          "reference": "d6b8c79cd8b120aedc365503b1b9267d92df13d5",
+          "path": "app/Domain/Memberships/Production/MembershipReservations.php",
+          "original_git_blob": "d5571a1a0320077cc612bd48a773b115996e638b",
+          "original_sha256": "5bc1ef19b79102e3a5ca2ff9f420d738f2ee01f67f0c6c3bcd59abd1e9c8a8f7"
+        },
+        "docs/verification/member-originals-20261013/README.md": {
+          "reference": "f364aa65dfd6a6a348db60b38a2c88f8a35c956c",
+          "path": "docs/verification/member-originals-20261013/README.md",
+          "original_git_blob": "afac519ac5b7f4a2d47e77d1aedd4525678b730c",
+          "original_sha256": "90726c66c3566a7cbdb8d55a1997d32aeaad8afbacf889560ed9f50dd066cf9b"
+        },
+        "scripts/ci/database-mysql-selection.json": {
+          "reference": "7da6a07a6384e1096111eda684dfdf694a48b335",
+          "path": "scripts/ci/database-mysql-selection.json",
+          "original_git_blob": "06adc9f8214f81c681e98bb81e06b6cc07406e23",
+          "original_sha256": "a6e943d29564e5ac9c3444c8b43c1e02e5e8682477be22633de42f342740c571"
+        },
+        "scripts/ci/database-mysql-skips.json": {
+          "reference": "7da6a07a6384e1096111eda684dfdf694a48b335",
+          "path": "scripts/ci/database-mysql-skips.json",
+          "original_git_blob": "fddf19825212d064886f5cd3adac3a496b105f8a",
+          "original_sha256": "e69a1971831a49f5dc3db31af96e82963a66bedb958837672e0a357c6684d7f0"
+        },
+        "scripts/ci/database-sqlite-skips.json": {
+          "reference": "7da6a07a6384e1096111eda684dfdf694a48b335",
+          "path": "scripts/ci/database-sqlite-skips.json",
+          "original_git_blob": "614080d3dcdc222e9490cf5b3f27561e14e8d7c0",
+          "original_sha256": "d94f9ecb010fc2e0102b9cc564fe3e54e3c59b77915a0a5f902e33ecaf896a95"
+        },
+        "tests/Feature/ProductionMemberOriginals/MemberOriginalFinishBoundaryTest.php": {
+          "reference": "d6b8c79cd8b120aedc365503b1b9267d92df13d5",
+          "path": "tests/Feature/ProductionMemberOriginals/MemberOriginalFinishBoundaryTest.php",
+          "original_git_blob": "780960ba1620983bfc9dffc15da9f0461f65fc86",
+          "original_sha256": "a28f0de507fd93debe952739bfaef7638c17a1b8ff1b25f48473c853e3391a3a"
+        }
+      },
+      "unavailable_paths": {},
+      "default_identical_present_paths": 11492,
+      "all_original_reference_bytes_or_absences_preserved": true
+    },
+    {
+      "original_reference": "6b76eea88c9be83889d0940bd77fa2c6ab70e2b1",
+      "original_subject": "Pin current member schema against the installed plan",
+      "default_reachable_reference": "2d4f4cd34a4160ec5118d9cac2c9876ce51776ca",
+      "default_selection": "nearest root-history commit with exactly matching subject",
+      "requested_by": [
+        {
+          "kind": "source_binding",
+          "id": "facts-schema-source"
+        }
+      ],
+      "requested_paths_count": 8,
+      "original_path_blob_pairs_sha256": "3e37df1dfb07d47f7e09c02688bd76ee081c95edd81599d9f0ee7a45b4d08240",
+      "effective_fallback_path_blob_pairs_sha256": "3e37df1dfb07d47f7e09c02688bd76ee081c95edd81599d9f0ee7a45b4d08240",
+      "requested_sorted_paths_sha256": "46975ea2183cd16047798c15a43c1e99230f414b764e37b9945cfa6942819c38",
+      "absent_paths": [],
+      "path_overrides": {},
+      "unavailable_paths": {},
+      "default_identical_present_paths": 8,
+      "all_original_reference_bytes_or_absences_preserved": true
+    },
+    {
+      "original_reference": "7edd614497b930c5bc02141537cc7e24dce6fb27",
+      "original_subject": "docs: record C4a merge and member originals implementation contract",
+      "default_reachable_reference": "7edd614497b930c5bc02141537cc7e24dce6fb27",
+      "default_selection": "original reference reachable from root snapshot",
+      "requested_by": [
+        {
+          "kind": "frozen_profiles",
+          "receipt": "renderer/frozen-profiles-inventory.json"
+        }
+      ],
+      "requested_paths_count": 42,
+      "original_path_blob_pairs_sha256": "443d988d0ff1ef0e2ecd00240bb2863d440b2677754b4c5d87572380594eaacd",
+      "effective_fallback_path_blob_pairs_sha256": "443d988d0ff1ef0e2ecd00240bb2863d440b2677754b4c5d87572380594eaacd",
+      "requested_sorted_paths_sha256": "87665f22509626fbcdd041ff7eedb4bcf952b1d1c834bee754ca10eab29560c8",
+      "absent_paths": [],
+      "path_overrides": {},
+      "unavailable_paths": {},
+      "default_identical_present_paths": 42,
+      "all_original_reference_bytes_or_absences_preserved": true
+    },
+    {
+      "original_reference": "98ca4f0a64e82ee49a7d4b310d60a5095214c3c9",
+      "original_subject": "test: verify member I/O admission on separate MySQL handles",
+      "default_reachable_reference": "bc58f4fdc5da4792e02b35221bc08b9733719827",
+      "default_selection": "nearest root-history commit with exactly matching subject",
+      "requested_by": [
+        {
+          "kind": "source_binding",
+          "id": "operation/native-io-final"
+        },
+        {
+          "kind": "source_binding",
+          "id": "operation/native-io-final.commit-binding"
+        }
+      ],
+      "requested_paths_count": 1297,
+      "original_path_blob_pairs_sha256": "6df9d61b44b84a8cde9404d30044b2173baeda0dedebac222750c6246508f012",
+      "effective_fallback_path_blob_pairs_sha256": "6df9d61b44b84a8cde9404d30044b2173baeda0dedebac222750c6246508f012",
+      "requested_sorted_paths_sha256": "b76f62cd3a5e1ee03b880f53b144c244276e4814b20edd1d7e0f3ac877a808f8",
+      "absent_paths": [
+        "app/Domain/Grants/Member/MemberOriginalCandidate.php",
+        "app/Domain/Grants/Member/MemberOriginalCapturePermit.php",
+        "app/Domain/Grants/Member/MemberOriginalConfiguration.php",
+        "app/Domain/Grants/Member/MemberOriginalMaterialization.php",
+        "app/Domain/Grants/Member/MemberOriginalReadyToken.php",
+        "app/Domain/Grants/Member/MemberOriginalSource.php",
+        "app/Domain/Grants/Member/MemberOriginalSourceClaim.php",
+        "app/Domain/Grants/Member/MemberOriginalSourceValues.php",
+        "app/Domain/Memberships/Production/MembershipMemberCapture.php"
+      ],
+      "path_overrides": {
+        "app/Domain/Grants/Member/MemberGrantRenderProfileRegistry.php": {
+          "reference": "9561e4a5500b71910dbefb8873959bc636baf183",
+          "path": "app/Domain/Grants/Member/MemberGrantRenderProfileRegistry.php",
+          "original_git_blob": "12bd919f624d1d9ee8bce59bf51781ab6e5898d6",
+          "original_sha256": "03c3aeb93f9744dadc32b2f71cccc3cc57a032f0a01b6cac8cd87ae639998f94"
+        },
+        "app/Domain/Grants/Member/MemberOriginalRendererProcess.php": {
+          "reference": "9561e4a5500b71910dbefb8873959bc636baf183",
+          "path": "app/Domain/Grants/Member/MemberOriginalRendererProcess.php",
+          "original_git_blob": "9a1bc66f99e8a8074ea605bbb169fcd8194b4736",
+          "original_sha256": "a1d5c9461e2617f6ed933e4cc666e77300e07fcb8eaf47f35e0804d225f82190"
+        },
+        "resources/contracts/production-member-v1/profile-assets.json": {
+          "reference": "9561e4a5500b71910dbefb8873959bc636baf183",
+          "path": "resources/contracts/production-member-v1/profile-assets.json",
+          "original_git_blob": "6620b170c8b871cd7d1f1c3cec756badb9085d3d",
+          "original_sha256": "107619de4ca044fccbaab32cf310d0f8642bd2d43fe0dfc4cf41b5f09af86ef3"
+        },
+        "tests/Support/MemberOriginalRendererFixtures.php": {
+          "reference": "9561e4a5500b71910dbefb8873959bc636baf183",
+          "path": "tests/Support/MemberOriginalRendererFixtures.php",
+          "original_git_blob": "6349f911fe747024171d515367cbf8fe0684a985",
+          "original_sha256": "9ee5ce469a11c312cc8ed8e8b6ecfc14987a754fad2b0531fdf92b2a453f08d7"
+        }
+      },
+      "unavailable_paths": {},
+      "default_identical_present_paths": 1284,
+      "all_original_reference_bytes_or_absences_preserved": true
+    },
+    {
+      "original_reference": "a7265e8c5365421f2110623f685cbc67d21a99b0",
+      "original_subject": "Accept exact catalog microsecond timestamps in member facts",
+      "default_reachable_reference": "c2a23b86ab9d6b246387df6338a649061f37adf9",
+      "default_selection": "nearest root-history commit with exactly matching subject",
+      "requested_by": [
+        {
+          "kind": "source_binding",
+          "id": "facts-a7265e8c-final"
+        }
+      ],
+      "requested_paths_count": 11505,
+      "original_path_blob_pairs_sha256": "b2b7f27535de87d5e83506b4e873187cc706824bf9fbc7eff695fe85ad80a3b6",
+      "effective_fallback_path_blob_pairs_sha256": "b2b7f27535de87d5e83506b4e873187cc706824bf9fbc7eff695fe85ad80a3b6",
+      "requested_sorted_paths_sha256": "66a6549f3f17d5a51a7d01762b006685fe84d8089a2c10e8ecb24845752f711e",
+      "absent_paths": [],
+      "path_overrides": {
+        "app/Domain/Grants/Member/MemberOriginalArtifactAuthority.php": {
+          "reference": "d6b8c79cd8b120aedc365503b1b9267d92df13d5",
+          "path": "app/Domain/Grants/Member/MemberOriginalArtifactAuthority.php",
+          "original_git_blob": "e7e11d3c6e6841d39f9c02be542d9dc11a8defec",
+          "original_sha256": "259d236aa11cf1833256e8ae3f2b5f7d4fab64edfe4ae6e0e85e93ea62126605"
+        },
+        "app/Domain/Grants/Member/MemberOriginalFiles.php": {
+          "reference": "ae57c18a059994e8277aed7bf3dc1729ef4e1ccf",
+          "path": "app/Domain/Grants/Member/MemberOriginalFiles.php",
+          "original_git_blob": "64fcc6553922a1113449cde171da817946dcece5",
+          "original_sha256": "7eefd2c8d63bcab39507525ed5ec3fb89a4e76562df65ee1df86157f3bd26c8a"
+        },
+        "app/Domain/Grants/Member/MemberOriginalFinishBoundary.php": {
+          "reference": "d6b8c79cd8b120aedc365503b1b9267d92df13d5",
+          "path": "app/Domain/Grants/Member/MemberOriginalFinishBoundary.php",
+          "original_git_blob": "ed34754d0eb5d8ee8de12af830bbf394ae21acf2",
+          "original_sha256": "9d6959216f08701de10454b6bcbf20dfd91262aff039d10e9bf36ee514ac43c6"
+        },
+        "app/Domain/Grants/Member/MemberOriginalWorkspace.php": {
+          "reference": "ae57c18a059994e8277aed7bf3dc1729ef4e1ccf",
+          "path": "app/Domain/Grants/Member/MemberOriginalWorkspace.php",
+          "original_git_blob": "e200dcc42d194845ed31bd39802a66582e540d4a",
+          "original_sha256": "7d777b3b2f3793c8e545fc011a495e16a30d45aa91fb661dbd6306dcd7df4a53"
+        },
+        "app/Domain/Memberships/Production/MembershipBillingEvidence.php": {
+          "reference": "d6b8c79cd8b120aedc365503b1b9267d92df13d5",
+          "path": "app/Domain/Memberships/Production/MembershipBillingEvidence.php",
+          "original_git_blob": "cb5bb38c640e367e37f6da26b2a85ad869b883dc",
+          "original_sha256": "aea9c888aee8a16d9731eec5c4c4ac4a7b37992136b9e85d8c0e669e68aef824"
+        },
+        "app/Domain/Memberships/Production/MembershipReservationContext.php": {
+          "reference": "d6b8c79cd8b120aedc365503b1b9267d92df13d5",
+          "path": "app/Domain/Memberships/Production/MembershipReservationContext.php",
+          "original_git_blob": "976107d0e50cbc5b87ec4f0ffa7d5052d062e111",
+          "original_sha256": "d2367d8166262a926e03cfd1e832c406dc1e0e621b0ff5df4c3db80203dfa9f6"
+        },
+        "app/Domain/Memberships/Production/MembershipReservations.php": {
+          "reference": "d6b8c79cd8b120aedc365503b1b9267d92df13d5",
+          "path": "app/Domain/Memberships/Production/MembershipReservations.php",
+          "original_git_blob": "d5571a1a0320077cc612bd48a773b115996e638b",
+          "original_sha256": "5bc1ef19b79102e3a5ca2ff9f420d738f2ee01f67f0c6c3bcd59abd1e9c8a8f7"
+        },
+        "docs/verification/member-originals-20261013/README.md": {
+          "reference": "f364aa65dfd6a6a348db60b38a2c88f8a35c956c",
+          "path": "docs/verification/member-originals-20261013/README.md",
+          "original_git_blob": "afac519ac5b7f4a2d47e77d1aedd4525678b730c",
+          "original_sha256": "90726c66c3566a7cbdb8d55a1997d32aeaad8afbacf889560ed9f50dd066cf9b"
+        },
+        "scripts/ci/database-mysql-selection.json": {
+          "reference": "7da6a07a6384e1096111eda684dfdf694a48b335",
+          "path": "scripts/ci/database-mysql-selection.json",
+          "original_git_blob": "06adc9f8214f81c681e98bb81e06b6cc07406e23",
+          "original_sha256": "a6e943d29564e5ac9c3444c8b43c1e02e5e8682477be22633de42f342740c571"
+        },
+        "scripts/ci/database-mysql-skips.json": {
+          "reference": "7da6a07a6384e1096111eda684dfdf694a48b335",
+          "path": "scripts/ci/database-mysql-skips.json",
+          "original_git_blob": "fddf19825212d064886f5cd3adac3a496b105f8a",
+          "original_sha256": "e69a1971831a49f5dc3db31af96e82963a66bedb958837672e0a357c6684d7f0"
+        },
+        "scripts/ci/database-sqlite-skips.json": {
+          "reference": "7da6a07a6384e1096111eda684dfdf694a48b335",
+          "path": "scripts/ci/database-sqlite-skips.json",
+          "original_git_blob": "614080d3dcdc222e9490cf5b3f27561e14e8d7c0",
+          "original_sha256": "d94f9ecb010fc2e0102b9cc564fe3e54e3c59b77915a0a5f902e33ecaf896a95"
+        },
+        "tests/Feature/ProductionMemberOriginals/MemberOriginalFinishBoundaryTest.php": {
+          "reference": "d6b8c79cd8b120aedc365503b1b9267d92df13d5",
+          "path": "tests/Feature/ProductionMemberOriginals/MemberOriginalFinishBoundaryTest.php",
+          "original_git_blob": "780960ba1620983bfc9dffc15da9f0461f65fc86",
+          "original_sha256": "a28f0de507fd93debe952739bfaef7638c17a1b8ff1b25f48473c853e3391a3a"
+        }
+      },
+      "unavailable_paths": {},
+      "default_identical_present_paths": 11493,
+      "all_original_reference_bytes_or_absences_preserved": true
+    },
+    {
+      "original_reference": "bd3661ec02e3004fef3ae3d8a990e44ef5c6ce08",
+      "original_subject": "feat: author and prove immutable member original facts",
+      "default_reachable_reference": "3b23aa3d4edfc2bbbd0891d9272a9fc3c0ae51e8",
+      "default_selection": "nearest root-history commit with exactly matching subject",
+      "requested_by": [
+        {
+          "kind": "source_binding",
+          "id": "facts-bd3661ec-final"
+        },
+        {
+          "kind": "source_binding",
+          "id": "facts-canary-source-versus-bd3661ec"
+        },
+        {
+          "kind": "source_binding",
+          "id": "facts-authoring-facts-first-source-versus-bd3661ec"
+        },
+        {
+          "kind": "source_binding",
+          "id": "facts-lifetime-correction"
+        },
+        {
+          "kind": "source_binding",
+          "id": "facts-native-fixed-before"
+        },
+        {
+          "kind": "source_binding",
+          "id": "facts-native-fixed-after"
+        }
+      ],
+      "requested_paths_count": 11503,
+      "original_path_blob_pairs_sha256": "a6f09fda7ed1ee155e8f79b8f520d275ceecdb7f3de214041150f9ebec501bf8",
+      "effective_fallback_path_blob_pairs_sha256": "a6f09fda7ed1ee155e8f79b8f520d275ceecdb7f3de214041150f9ebec501bf8",
+      "requested_sorted_paths_sha256": "21dfa244b186f2f252e414c683be7b0f87f8d60915061a5712f13b3cdd7592d8",
+      "absent_paths": [],
+      "path_overrides": {
+        "app/Domain/Grants/Member/MemberOriginalFiles.php": {
+          "reference": "ae57c18a059994e8277aed7bf3dc1729ef4e1ccf",
+          "path": "app/Domain/Grants/Member/MemberOriginalFiles.php",
+          "original_git_blob": "64fcc6553922a1113449cde171da817946dcece5",
+          "original_sha256": "7eefd2c8d63bcab39507525ed5ec3fb89a4e76562df65ee1df86157f3bd26c8a"
+        },
+        "app/Domain/Grants/Member/MemberOriginalWorkspace.php": {
+          "reference": "ae57c18a059994e8277aed7bf3dc1729ef4e1ccf",
+          "path": "app/Domain/Grants/Member/MemberOriginalWorkspace.php",
+          "original_git_blob": "e200dcc42d194845ed31bd39802a66582e540d4a",
+          "original_sha256": "7d777b3b2f3793c8e545fc011a495e16a30d45aa91fb661dbd6306dcd7df4a53"
+        }
+      },
+      "unavailable_paths": {},
+      "default_identical_present_paths": 11501,
+      "all_original_reference_bytes_or_absences_preserved": true
+    },
+    {
+      "original_reference": "c7310cdad4154e662270736a4ecaeeef2e7cf64d",
+      "original_subject": "feat: bound member original workflow and native I/O frames",
+      "default_reachable_reference": "2620ac862380d88feac61fec15f08312f6328248",
+      "default_selection": "nearest root-history commit with exactly matching subject",
+      "requested_by": [
+        {
+          "kind": "source_binding",
+          "id": "operation/budget-io-initial"
+        },
+        {
+          "kind": "source_binding",
+          "id": "operation/io-review-red"
+        },
+        {
+          "kind": "source_binding",
+          "id": "operation/budget-io-commit-binding"
+        }
+      ],
+      "requested_paths_count": 1956,
+      "original_path_blob_pairs_sha256": "441098367bfab67f3575df0e92c8464dc18a065587aea1ab82cfb04a50dacec5",
+      "effective_fallback_path_blob_pairs_sha256": "441098367bfab67f3575df0e92c8464dc18a065587aea1ab82cfb04a50dacec5",
+      "requested_sorted_paths_sha256": "832f67bb052ed945d9404046b1a512a104103b129a1c2b0cea36855c7b52aee3",
+      "absent_paths": [
+        "app/Domain/Grants/Member/MemberOriginalCandidate.php",
+        "app/Domain/Grants/Member/MemberOriginalCapturePermit.php",
+        "app/Domain/Grants/Member/MemberOriginalConfiguration.php",
+        "app/Domain/Grants/Member/MemberOriginalMaterialization.php",
+        "app/Domain/Grants/Member/MemberOriginalReadyToken.php",
+        "app/Domain/Grants/Member/MemberOriginalRenderInput.php",
+        "app/Domain/Grants/Member/MemberOriginalSource.php",
+        "app/Domain/Grants/Member/MemberOriginalSourceClaim.php",
+        "app/Domain/Grants/Member/MemberOriginalSourceValues.php",
+        "app/Domain/Grants/Member/MemberOriginalText.php",
+        "app/Domain/Memberships/Production/MembershipMemberCapture.php",
+        "tests/Support/MemberOriginalRendererFixtures.php",
+        "tests/Unit/MemberOriginalRenderInputTest.php",
+        "tests/Unit/MemberOriginalTextTest.php"
+      ],
+      "path_overrides": {},
+      "unavailable_paths": {},
+      "default_identical_present_paths": 1942,
+      "all_original_reference_bytes_or_absences_preserved": true
+    },
+    {
+      "original_reference": "cd6aefe91c4272203774448c26f0b753106667fa",
+      "original_subject": "fix: keep member PDF transport owned and preserve source line endings",
+      "default_reachable_reference": "01f265e723f21d5161f33eb3c63508f397a584b9",
+      "default_selection": "nearest root-history commit with exactly matching subject",
+      "requested_by": [
+        {
+          "kind": "source_binding",
+          "id": "renderer-E6-E8-fixed"
+        },
+        {
+          "kind": "source_binding",
+          "id": "renderer-E6-E8-regression_test"
+        },
+        {
+          "kind": "source_binding",
+          "id": "renderer-E7-old"
+        }
+      ],
+      "requested_paths_count": 6,
+      "original_path_blob_pairs_sha256": "6509280e8047d524430542e12ca10df7a8603e33d31e5f0882d7bd9212a7c8e3",
+      "effective_fallback_path_blob_pairs_sha256": "6509280e8047d524430542e12ca10df7a8603e33d31e5f0882d7bd9212a7c8e3",
+      "requested_sorted_paths_sha256": "3b8aee175d5e802383204bb847673b3658c3e4c68f5c36007f6bca738f132293",
+      "absent_paths": [],
+      "path_overrides": {},
+      "unavailable_paths": {},
+      "default_identical_present_paths": 6,
+      "all_original_reference_bytes_or_absences_preserved": true
+    },
+    {
+      "original_reference": "cff76302f11661c44a4583d2f20d5e368b0b6aa1",
+      "original_subject": "feat: define detached canonical member original source values",
+      "default_reachable_reference": "1d8bf12e18cf6156901ec942166fd06be4f81eb3",
+      "default_selection": "nearest root-history commit with exactly matching subject",
+      "requested_by": [
+        {
+          "kind": "source_binding",
+          "id": "operation/source-values-final"
+        },
+        {
+          "kind": "source_binding",
+          "id": "operation/source-values-initial"
+        },
+        {
+          "kind": "source_binding",
+          "id": "operation/source-values-commit-binding"
+        }
+      ],
+      "requested_paths_count": 1975,
+      "original_path_blob_pairs_sha256": "82d7c59bd95d80c5e648346b61ce9d458b8fe723bbe76ec37e4710abb282c91c",
+      "effective_fallback_path_blob_pairs_sha256": "82d7c59bd95d80c5e648346b61ce9d458b8fe723bbe76ec37e4710abb282c91c",
+      "requested_sorted_paths_sha256": "a648c226808e629f958d66284f4dab0cdc5fd69c31f32dfb27497ac84b2574cf",
+      "absent_paths": [
+        "app/Domain/Grants/Member/MemberOriginalCandidate.php",
+        "app/Domain/Grants/Member/MemberOriginalCapturePermit.php",
+        "app/Domain/Grants/Member/MemberOriginalConfiguration.php",
+        "app/Domain/Grants/Member/MemberOriginalMaterialization.php",
+        "app/Domain/Grants/Member/MemberOriginalReadyToken.php",
+        "app/Domain/Grants/Member/MemberOriginalSource.php",
+        "app/Domain/Grants/Member/MemberOriginalSourceClaim.php",
+        "app/Domain/Memberships/Production/MembershipMemberCapture.php"
+      ],
+      "path_overrides": {},
+      "unavailable_paths": {},
+      "default_identical_present_paths": 1967,
+      "all_original_reference_bytes_or_absences_preserved": true
+    },
+    {
+      "original_reference": "d3aafa1b1563353fe56a1eef54c4f477a50f0d61",
+      "original_subject": "fix: cover direct PDO and facade identity in member I/O admission",
+      "default_reachable_reference": "8518ae323536ec67f7eb6656a03806088312a50c",
+      "default_selection": "nearest root-history commit with exactly matching subject",
+      "requested_by": [
+        {
+          "kind": "source_binding",
+          "id": "operation/budget-io-final"
+        },
+        {
+          "kind": "source_binding",
+          "id": "operation/budget-io-reviewed"
+        },
+        {
+          "kind": "source_binding",
+          "id": "operation/budget-io-review-binding"
+        }
+      ],
+      "requested_paths_count": 1956,
+      "original_path_blob_pairs_sha256": "2c90b70b694f131540ece466a01a142c47c30eb3a28f667357a1df4ab4d45b89",
+      "effective_fallback_path_blob_pairs_sha256": "2c90b70b694f131540ece466a01a142c47c30eb3a28f667357a1df4ab4d45b89",
+      "requested_sorted_paths_sha256": "832f67bb052ed945d9404046b1a512a104103b129a1c2b0cea36855c7b52aee3",
+      "absent_paths": [
+        "app/Domain/Grants/Member/MemberOriginalCandidate.php",
+        "app/Domain/Grants/Member/MemberOriginalCapturePermit.php",
+        "app/Domain/Grants/Member/MemberOriginalConfiguration.php",
+        "app/Domain/Grants/Member/MemberOriginalMaterialization.php",
+        "app/Domain/Grants/Member/MemberOriginalReadyToken.php",
+        "app/Domain/Grants/Member/MemberOriginalSource.php",
+        "app/Domain/Grants/Member/MemberOriginalSourceClaim.php",
+        "app/Domain/Grants/Member/MemberOriginalSourceValues.php",
+        "app/Domain/Memberships/Production/MembershipMemberCapture.php"
+      ],
+      "path_overrides": {
+        "app/Domain/Grants/Member/MemberOriginalRenderInput.php": {
+          "reference": "e65d310b078963a22ff63c2c2b0ff45f7add5a05",
+          "path": "app/Domain/Grants/Member/MemberOriginalRenderInput.php",
+          "original_git_blob": "9fbd163cd9257a57ad9279e981a31484517ba0b9",
+          "original_sha256": "9da97ef10c5d62ffc78a123b18f5658d13f3cecca1cf9a3261e0fe99850d6ec0"
+        },
+        "tests/Unit/MemberOriginalRenderInputTest.php": {
+          "reference": "e65d310b078963a22ff63c2c2b0ff45f7add5a05",
+          "path": "tests/Unit/MemberOriginalRenderInputTest.php",
+          "original_git_blob": "4a4340caed82e97c5384fc63759b3c36fd39e4b8",
+          "original_sha256": "fa75a512f6dddca0f75096f5393e9839bd3a29dba2e4134d590a2a516ddf888d"
+        }
+      },
+      "unavailable_paths": {},
+      "default_identical_present_paths": 1945,
+      "all_original_reference_bytes_or_absences_preserved": true
+    }
+  ],
+  "summary": {
+    "original_references": 18,
+    "requested_reference_path_pairs": 56452,
+    "default_identical_present_paths": 56369,
+    "path_overrides": 35,
+    "original_absences": 48,
+    "unavailable_paths": 0
+  },
+  "unavailable": []
+}

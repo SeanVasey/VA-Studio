@@ -7,15 +7,21 @@ use App\Domain\Customers\ProductionIdentity\Notifications\IdentityNoticeTranspor
 use App\Domain\Customers\ProductionIdentity\Notifications\LoopbackSmtp;
 use App\Domain\Customers\ProductionIdentity\Notifications\WorkIdentityNotice;
 use App\Domain\Customers\ProductionIdentity\ProductionCustomerSessions;
+use App\Domain\Delivery\PreparedDeliveryStream;
 use App\Domain\Grants\Paid\PaidGrantDocuments;
 use App\Domain\Grants\Paid\PaidGrantDownloads;
+use App\Domain\Grants\Paid\PaidGrantException;
+use App\Domain\Grants\Paid\PaidGrantPrepareStream;
+use App\Domain\Grants\Paid\PaidGrantRequestBudget;
 use App\Domain\Grants\Paid\PaidGrantRequestInstant;
 use App\Domain\Grants\Paid\PaidGrants;
 use App\Http\Middleware\PaidGrantPrivacy;
 use Carbon\CarbonImmutable;
+use Closure;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Database\Events\TransactionCommitted;
+use Illuminate\Database\Events\TransactionCommitting;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
@@ -207,6 +213,200 @@ final class PaidGrantRequestInstantTest extends TestCase
     private function now(): float
     {
         return (float) CarbonImmutable::now('UTC')->format('U.u');
+    }
+
+    public function test_elapsed_identity_work_cannot_start_a_new_download_budget_or_consume_an_attempt(): void
+    {
+        [, $auth] = $this->authorized();
+        // Wall time only positions the synthetic authorization. The callback spends two real monotonic seconds;
+        // the server instant leaves at most 1.5 s of the original observation budget before identity starts.
+        $this->travelTo(CarbonImmutable::parse($auth['expiresAt'], 'UTC')->subSeconds(20));
+        $received = $this->now() - 58.5;
+        $calls = 0;
+        $elapsed = 0;
+        Event::listen(TransactionCommitted::class, function () use (&$calls, &$elapsed): void {
+            if ($calls !== 0 || DB::transactionLevel() !== 0) {
+                return;
+            }
+            $frames = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+            if (array_filter($frames, fn (array $frame): bool => ($frame['class'] ?? null) === ProductionCustomerSessions::class && $frame['function'] === 'principal') === []) {
+                return;
+            }
+            $calls++;
+            $started = \hrtime(true);
+            usleep(2_000_000);
+            $elapsed = \hrtime(true) - $started;
+        });
+
+        $response = $this->redeem($auth, ['REQUEST_TIME_FLOAT' => $received]);
+
+        $this->assertSame(1, $calls, 'The real current-identity callback must run.');
+        $this->assertGreaterThanOrEqual(2_000_000_000, $elapsed, 'Synthetic wall travel is not elapsed-time proof.');
+        $response->assertStatus(410);
+        $this->assertDatabaseCount('paid_redemptions', 0);
+    }
+
+    public function test_a_request_budget_shortened_during_real_preparation_closes_the_snapshot_without_an_attempt(): void
+    {
+        [$f, $auth] = $this->authorized();
+        $budget = PaidGrantRequestBudget::capture($this->now());
+        $prepare = $this->capturePrepared(static fn () => $budget->shortenTo(\hrtime(true) - 1));
+
+        $this->refusedBudget(fn () => (new PaidGrantDownloads)->redeem($auth['id'], $auth['token'], $f['buyer']['principal'], $f['buyer']['user'], $budget->receivedAt, $budget), 410);
+
+        $this->assertSame(1, $prepare->calls);
+        $this->assertInstanceOf(PreparedDeliveryStream::class, $prepare->prepared);
+        $this->assertFalse($prepare->prepared->__debugInfo()['prepared']);
+        $this->assertDatabaseCount('paid_redemptions', 0);
+        // Retain the closed descriptor object while reusing the same buyer's spool lease and authorization.
+        $this->assertSame($this->masterBytes($f), $this->redeem($auth, ['REQUEST_TIME_FLOAT' => $this->now()])->assertOk()->streamedContent());
+        $this->assertSame(2, $prepare->calls);
+        $this->assertDatabaseCount('paid_redemptions', 1);
+    }
+
+    public function test_an_overall_request_refusal_before_bytes_keeps_its_committed_attempt_and_closes_the_snapshot(): void
+    {
+        [$f, $auth] = $this->authorized();
+        $budget = PaidGrantRequestBudget::capture($this->now());
+        $prepare = $this->capturePrepared();
+        $transfer = (new PaidGrantDownloads)->redeem($auth['id'], $auth['token'], $f['buyer']['principal'], $f['buyer']['user'], $budget->receivedAt, $budget);
+        $this->assertSame(1, $prepare->calls);
+        $this->assertTrue($prepare->prepared->__debugInfo()['prepared']);
+        $this->assertDatabaseCount('paid_redemptions', 1);
+        $budget->shortenTo(\hrtime(true) - 1);
+        $budget->shortenTo(\hrtime(true) + 1_000_000_000_000);
+        $bytes = '';
+
+        $this->refusedBudget(function () use ($transfer, &$bytes): void {
+            $transfer->writeTo(function (string $chunk) use (&$bytes): void {
+                $bytes .= $chunk;
+            });
+        }, 410);
+
+        $this->assertSame('', $bytes);
+        $this->assertFalse($prepare->prepared->__debugInfo()['prepared']);
+        $this->assertDatabaseCount('paid_redemptions', 1);
+        // A new authorization can reacquire this buyer's lease; no compensation removes the first attempt.
+        $next = (new PaidGrantDownloads)->authorize($f['batch']['id'], $f['batch']['lines'][0]['id'],
+            ['requestKey' => (string) Str::uuid(), 'originHash' => $f['batch']['lines'][0]['originHash'], 'kind' => 'master_wav', 'nonce' => bin2hex(random_bytes(32))],
+            $f['buyer']['principal'], $f['buyer']['user']);
+        $this->assertSame($this->masterBytes($f), $this->redeem($next, ['REQUEST_TIME_FLOAT' => $this->now()])->assertOk()->streamedContent());
+        $this->assertDatabaseCount('paid_redemptions', 2);
+    }
+
+    public function test_a_budget_cannot_be_paired_with_another_captured_instant(): void
+    {
+        [$f, $auth] = $this->authorized();
+        $budget = PaidGrantRequestBudget::capture($this->now());
+        $other = PaidGrantDownloads::receivedAt($this->now());
+        $this->assertNotSame($other, $budget->receivedAt);
+
+        $this->refusedBudget(fn () => (new PaidGrantDownloads)->redeem($auth['id'], $auth['token'], $f['buyer']['principal'], $f['buyer']['user'], $other, $budget), 503);
+
+        $this->assertDatabaseCount('paid_redemptions', 0);
+    }
+
+    public function test_later_configuration_cannot_enlarge_the_captured_snapshot_phase(): void
+    {
+        config(['paid-grants.snapshot_seconds' => 30]);
+        $budget = PaidGrantRequestBudget::capture($this->now());
+        config(['paid-grants.snapshot_seconds' => 1800]);
+        $deadline = $budget->snapshotDeadline();
+        $this->assertLessThanOrEqual(\hrtime(true) + 30_000_000_000, $deadline);
+        $this->assertGreaterThan(\hrtime(true) + 29_000_000_000, $deadline);
+        $this->expectException(\LogicException::class);
+        serialize($budget);
+    }
+
+    private function capturePrepared(?Closure $after = null): object
+    {
+        $prepare = new class($after) extends PaidGrantPrepareStream
+        {
+            public int $calls = 0;
+
+            public ?PreparedDeliveryStream $prepared = null;
+
+            public function __construct(private readonly ?Closure $after) {}
+
+            public function handle(array $target, ?int $snapshotDeadline = null, ?string $holder = null): PreparedDeliveryStream
+            {
+                $this->calls++;
+                $this->prepared = parent::handle($target, $snapshotDeadline, $holder);
+                if ($this->calls === 1 && $this->after !== null) {
+                    ($this->after)();
+                }
+
+                return $this->prepared;
+            }
+        };
+        app()->instance(PaidGrantPrepareStream::class, $prepare);
+
+        return $prepare;
+    }
+
+    public function test_a_final_committing_callback_cannot_shorten_the_request_and_commit_an_attempt(): void
+    {
+        [$f, $auth] = $this->authorized();
+        $budget = PaidGrantRequestBudget::capture($this->now());
+        $prepare = $this->capturePrepared();
+        $fired = false;
+        Event::listen(TransactionCommitting::class, static function () use ($budget, $prepare, &$fired): void {
+            if (! $fired && $prepare->calls === 1 && DB::transactionLevel() === 1 && DB::table('paid_redemptions')->count() === 1) {
+                $fired = true;
+                $budget->shortenTo(\hrtime(true) - 1);
+            }
+        });
+
+        $this->refusedBudget(fn () => (new PaidGrantDownloads)->redeem($auth['id'], $auth['token'], $f['buyer']['principal'], $f['buyer']['user'], $budget->receivedAt, $budget), 410);
+
+        $this->assertTrue($fired, 'The normal final callback must observe the attempt inside its owned commit frame.');
+        $this->assertSame(0, DB::transactionLevel());
+        $this->assertFalse(DB::connection()->getPdo()->inTransaction());
+        $this->assertFalse($prepare->prepared->__debugInfo()['prepared']);
+        $this->assertDatabaseCount('paid_redemptions', 0);
+        $this->assertSame($this->masterBytes($f), $this->redeem($auth, ['REQUEST_TIME_FLOAT' => $this->now()])->assertOk()->streamedContent());
+        $this->assertDatabaseCount('paid_redemptions', 1);
+    }
+
+    public function test_the_first_chunk_rechecks_the_request_after_the_transfer_clock_callback(): void
+    {
+        [$f, $auth] = $this->authorized();
+        $budget = PaidGrantRequestBudget::capture($this->now());
+        $prepare = $this->capturePrepared();
+        $ticks = 0;
+        $downloads = new PaidGrantDownloads(static function () use ($budget, &$ticks): int {
+            // Construction, before-write check, then the first physical chunk's check.
+            if (++$ticks === 3) {
+                $budget->shortenTo(\hrtime(true) - 1);
+            }
+
+            return \hrtime(true);
+        });
+        $transfer = $downloads->redeem($auth['id'], $auth['token'], $f['buyer']['principal'], $f['buyer']['user'], $budget->receivedAt, $budget);
+        $bytes = '';
+
+        $this->refusedBudget(function () use ($transfer, &$bytes): void {
+            $transfer->writeTo(function (string $chunk) use (&$bytes): void {
+                $bytes .= $chunk;
+            });
+        }, 410);
+
+        $this->assertSame(3, $ticks);
+        $this->assertSame('', $bytes);
+        $this->assertFalse($prepare->prepared->__debugInfo()['prepared']);
+        $this->assertDatabaseCount('paid_redemptions', 1);
+    }
+
+    private function refusedBudget(Closure $operation, int $status): void
+    {
+        try {
+            $operation();
+        } catch (PaidGrantException $error) {
+            $this->assertSame($status, $error->status);
+
+            return;
+        }
+        $this->fail('Expected a paid request budget refusal.');
     }
 
     /** The current-identity proof (`ProductionCustomerSessions::principal`) takes `$seconds` of wall time, once. */

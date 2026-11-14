@@ -1,0 +1,17 @@
+# Actual F2a development merge
+
+PR [#131](https://github.com/SeanVasey/VA-Studio/pull/131) merged at `3b90ce476d4480de850e849d19dfd0a5b40d6835` on 2026-10-16T00:45:10Z, from exact independently approved head `c4a0bbe33ec815e4e90d4d6251b2fdff9e33f787`. Cheap preflight38830830961 passed scope/frontend/backend-quality/aggregate; documentation skipped. Separate final source/sealed-evidence and exact-head documentary carry approve with no P0/P1 or required correction.
+
+Complete current inventory has 6 reviews/4 threads/6 contexts with complete pagination. Every current context passes/skips; repository rules/protection remain unchanged. Expected-SHA merge0 and fetched tree `022b10fc9a68e18e1f77cab2f3cdfc81efe17ca4` equal the approved head, with actual parents recorded.
+
+The earlier two P1 threads were each replied to once/resolved after final4eb8 review. Current owned-fixture P1 r4289377653 and local-focused P2 r4289377661 were independently approved for closure, each replied to once/resolved. New bounded source owns private SQLite file allocation/config/Connection/PDO/canonical file+directory identity/release, remaining owned-memory Guards entrypoints and exact local MySQL declaration without manufactured CI. Query-only restored snapshots remain unregistered destructive targets.
+
+Completed current scopes are separate: wholeSQLite31/722 and disjoint112/1288; native-outer86/1671 (26shared/195+5SQLiteRestore/527+46SQLitecanaries/932+9native/17), partialnativeGuardfourentrypoints4/13, actuallocalexactmarker1/2 and actualCI1/2, eachF0E0S0/exits0. Original oldrestore5/E5, ONEoldnativeadapter1/E1, firstnew31/E1, localmissing/wrong1/E1 and mistakenly expanded15-case selection interruptedPHP-15/emptyXML/NULLcounts remain failed originals; no partial pass. Focused53/Pint4/shard52/cadence14 pass0, while original53/F1 and52/F1 remain. Discovery2432/233of9202/677 is listing only. All56frozenpaths unchanged.
+
+Original271member, eight-member census and112member priorP1 seals remain unchanged. Current12-invocation/156member seal SHA256 `b165eb65c82920b1bbb57bfa00ea244860b7102e4b1bcd17c7902cdda03395b0` retains source/runner/physical-loader bindings and privately hash-bound failed outputs. MySQL8.4.11 owned33524 normal SQLshutdown0/current-start shutdownlogged/socket+PIDgone/datadirretained; firstten-second reconciliation1 and later read-only confirmation retained separately.
+
+Historical genuine backend-preflight38821013983 failure and readiness cancellation38821001027 remain nonpasses; pinned first150 census correction preserves original260 order/samefive/hash/assertions. Local PHP-PATH/CLI preparation failures and corrected commands are retained. Signed hosted-log download errors remain private; no unavailable hosted traceback claim.
+
+Native lifecycle whole4/8/E4 and olddefault1/2/E1 remain failed/open. Only one older dataset timeout is established. FullF2/remaining25counterparts/rawworker/laterhook/whole-nativeGuard/concurrency/performance/provider/host/activation/release and prior frozenP2s remain. No Foundation/GitLab/live/deploy/DNS/cutover/frozen edit. Next: fixed native-only fixture-process calibration and unchanged wholefour lifecycle cases, preserving SQLite90seconds and every assertion/cleanup.
+
+Publication archive:85members/103460bytes, SHA256 `27fec72a1f0b8b253ab4581930c00a429e7164f054f606912a9ee36ab60f8b35`. The current development agenda governs remaining dependency-ready implementation and production preparation.

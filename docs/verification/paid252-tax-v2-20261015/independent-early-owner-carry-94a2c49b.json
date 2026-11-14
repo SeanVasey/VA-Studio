@@ -1,0 +1,23 @@
+{
+  "kind": "Independent bounded source approval carry after exact native expected-status correction",
+  "approved_source_commit": "a051ac2e5044269e415ee147ca7bc3063ca54c5d",
+  "carried_commit": "94a2c49b3236a68d204c86014e80a96e8cf877e8",
+  "decision": "APPROVE BOUNDED SOURCE CARRY; EXECUTION/FINAL EVIDENCE PENDING",
+  "changed_paths": [
+    "tests/Feature/PaidTaxNativeBoundaryTest.php"
+  ],
+  "changed_path_git_blob": "f84ebdf6ac52b419cf5d6e7225af2e61aa4f1c54",
+  "changed_path_sha256": "7dc6429c72c71fe9f97ee58654ad1f2adfbc3bc8e770282d9ca72d04fb2a9b20",
+  "original_report_sha256": "753422223ec4182e84de970a07e95af599f88ac1942aff2ba4a5bbd41825e031",
+  "original_decision_sha256": "044e1e2d41eb9f984214272fce7e298f557752ca0f02952a8a708a52bbe2b7f2",
+  "product_and_other_paths_unchanged": true,
+  "open_p0_p1": false,
+  "required_product_repairs": [],
+  "test_assessment": "Exact409 for shared-producer temporary-users refusal before consumer birth;503 preserved for five owned tables. All row/frame assertions preserved.",
+  "limits": [
+    "No current native pass claimed; a051 original run stopped before race at an incorrect expected status and must remain original.",
+    "No whole SQLite/native Schema/physical/final packet approval.",
+    "All original decision conditions unchanged."
+  ],
+  "actions": "Read-only Git/source/receipt inspection; original runtime artifacts only. No application/test/DB/CI/network execution."
+}

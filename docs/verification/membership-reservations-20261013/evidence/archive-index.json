@@ -1,0 +1,1625 @@
+{
+  "scope": "Final released component/native/style/discovery receipts, including all original failures and setup/probe limitations. No active-run outputs included. Original generated discovery listings omitted; original full digest receipts retained.",
+  "files": [
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/Context-clock-order-red.php",
+      "packet_path": "evidence/integration-and-adapters/Context-clock-order-red.php",
+      "sha256": "fc8fdc31ff99bbdcba5f7abfbfd6d3329c08a93ce655d44d52668e72c308c6b2",
+      "bytes": 27222
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/award-replay-integration-source.json",
+      "packet_path": "evidence/integration-and-adapters/award-replay-integration-source.json",
+      "sha256": "0811b85e5b9a0486d6034c413476c26077016c287ea34cfff22967861ea94cf6",
+      "bytes": 1221
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/award-replay-integration.exit",
+      "packet_path": "evidence/integration-and-adapters/award-replay-integration.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/award-replay-integration.log",
+      "packet_path": "evidence/integration-and-adapters/award-replay-integration.log",
+      "sha256": "d8533a69d29257d68abeec2f778f7e0acfafa1d160e5ec3314714b7bd683980b",
+      "bytes": 315
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/award-replay-integration.sh",
+      "packet_path": "evidence/integration-and-adapters/award-replay-integration.sh",
+      "sha256": "4e24873cf8e5fe1946e2e2ea8a87e598fefcec213d70428f2f7bfbc1c3794e62",
+      "bytes": 953
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/award-replay-integration.xml",
+      "packet_path": "evidence/integration-and-adapters/award-replay-integration.xml",
+      "sha256": "3bd88527abb0811820b950e22024fa172303cb47d1d33d71e28171045ba7e1e1",
+      "bytes": 7207
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/catalog-evidence-clock-bytes-red.php",
+      "packet_path": "evidence/integration-and-adapters/catalog-evidence-clock-bytes-red.php",
+      "sha256": "a0d120cbd876eb3cbaea8fffacb82b1d7c989a8d3cb230ef80520b56c8bf141c",
+      "bytes": 16739
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/catalog-evidence-native-byte-fixed.php",
+      "packet_path": "evidence/integration-and-adapters/catalog-evidence-native-byte-fixed.php",
+      "sha256": "bf2aff1ec55221f3b406ab3a06c1fdaabd6aa77bcd5c199604403de18c520d56",
+      "bytes": 16746
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/context-clock-order-red.exit",
+      "packet_path": "evidence/integration-and-adapters/context-clock-order-red.exit",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/context-clock-order-red.log",
+      "packet_path": "evidence/integration-and-adapters/context-clock-order-red.log",
+      "sha256": "74ff02a46516cd442bc351779464720b44dcdb9de85493e73dbb7eb50de584c4",
+      "bytes": 844
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/context-clock-order-red.result.json",
+      "packet_path": "evidence/integration-and-adapters/context-clock-order-red.result.json",
+      "sha256": "1ac26475bde5d59c7071e80da4e3ad9f33964305af1e66faad1720fb61256132",
+      "bytes": 457
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/context-clock-order-red.source.json",
+      "packet_path": "evidence/integration-and-adapters/context-clock-order-red.source.json",
+      "sha256": "14c11514a6f47af1155598bc15ef5b769a580dd8c292866013ecd54914edf551",
+      "bytes": 162993
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/context-clock-order-red.xml",
+      "packet_path": "evidence/integration-and-adapters/context-clock-order-red.xml",
+      "sha256": "f75bce733a9ff9ccafe1dbed4d67123a58a7a3f87f96c74beccecd368a3e56a4",
+      "bytes": 1386
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/context-clock-regression.md",
+      "packet_path": "evidence/integration-and-adapters/context-clock-regression.md",
+      "sha256": "2ba7eeaa44a97340e474d1c2aeeddb64a919d7b1517ab90459cd36ab01682d62",
+      "bytes": 1333
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-canary.exit",
+      "packet_path": "evidence/integration-and-adapters/eligibility-canary.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-canary.txt",
+      "packet_path": "evidence/integration-and-adapters/eligibility-canary.txt",
+      "sha256": "e47647699bf6614f9785d2baeb327ad9d5c7211b55a11570033135387168a812",
+      "bytes": 311
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-canary.xml",
+      "packet_path": "evidence/integration-and-adapters/eligibility-canary.xml",
+      "sha256": "61b14b659484854332968cae10cbc4c556a4ec1260c8bff32512c1a567763b6e",
+      "bytes": 843
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-clock-bytes-red.exit",
+      "packet_path": "evidence/integration-and-adapters/eligibility-clock-bytes-red.exit",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-clock-bytes-red.sources",
+      "packet_path": "evidence/integration-and-adapters/eligibility-clock-bytes-red.sources",
+      "sha256": "a2ec191c8d2b9516edff90f760aea56028e0b65d84dd0b0e9ae3c15fc6f15e9a",
+      "bytes": 535
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-clock-bytes-red.txt",
+      "packet_path": "evidence/integration-and-adapters/eligibility-clock-bytes-red.txt",
+      "sha256": "df935bfa7d19edda458a54b0cf7e6ab6f7b28f864b7be2816f021852c39999f5",
+      "bytes": 1984
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-clock-bytes-red.xml",
+      "packet_path": "evidence/integration-and-adapters/eligibility-clock-bytes-red.xml",
+      "sha256": "2e0164465def88eb7d8c7276460a9e9b5a701bbc0e2a47705e8d32e17030f44e",
+      "bytes": 3011
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-commands.md",
+      "packet_path": "evidence/integration-and-adapters/eligibility-commands.md",
+      "sha256": "47f7b968b2dcaa21c4b77d64a9d699c9986810005636c816f3c1526887650575",
+      "bytes": 14405
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-pint.exit",
+      "packet_path": "evidence/integration-and-adapters/eligibility-pint.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-pint.txt",
+      "packet_path": "evidence/integration-and-adapters/eligibility-pint.txt",
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "bytes": 33
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-review-final-source/app/Domain/Memberships/Production/CurrentEligibleLicenses.php",
+      "packet_path": "evidence/integration-and-adapters/eligibility-review-final-source/app/Domain/Memberships/Production/CurrentEligibleLicenses.php",
+      "sha256": "afd5d7003138c89e4c75c6da0b090c67bf3986ea26037aca9498b1d90b0cb739",
+      "bytes": 4053
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-review-final-source/app/Domain/Memberships/Production/MembershipCatalogEvidence.php",
+      "packet_path": "evidence/integration-and-adapters/eligibility-review-final-source/app/Domain/Memberships/Production/MembershipCatalogEvidence.php",
+      "sha256": "79cc5e7a443f4af4dd7b002b316090d9d889b14c5ecfdb73e25e3b682ae411a9",
+      "bytes": 16993
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-review-final-source/app/Domain/Memberships/Production/MembershipCatalogSnapshot.php",
+      "packet_path": "evidence/integration-and-adapters/eligibility-review-final-source/app/Domain/Memberships/Production/MembershipCatalogSnapshot.php",
+      "sha256": "28ce2de27e9f145ac05be01602d1d73500f688ba76b5ce08ca9034280281252d",
+      "bytes": 559
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-review-final-source/app/Domain/Memberships/Production/MembershipEligibleLicenseToken.php",
+      "packet_path": "evidence/integration-and-adapters/eligibility-review-final-source/app/Domain/Memberships/Production/MembershipEligibleLicenseToken.php",
+      "sha256": "f06cd99b088aed159f94b4a11bd3f09135409e3e6addc22d9fa34a6122d92bd1",
+      "bytes": 1109
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-review-final-source/app/Domain/Memberships/Production/MembershipLicenseBinding.php",
+      "packet_path": "evidence/integration-and-adapters/eligibility-review-final-source/app/Domain/Memberships/Production/MembershipLicenseBinding.php",
+      "sha256": "c94600ad842654a3025bed18ac87a6cb1c8e3d7045a6cb0c23ae0e7af41888b4",
+      "bytes": 1334
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-review-final-source/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php",
+      "packet_path": "evidence/integration-and-adapters/eligibility-review-final-source/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php",
+      "sha256": "a276e48d4485f04a512cb34550f141de92d9bcbe257a7f282e5accd5b4fd1252",
+      "bytes": 24683
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-review-final.exit",
+      "packet_path": "evidence/integration-and-adapters/eligibility-review-final.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-review-final.source-check",
+      "packet_path": "evidence/integration-and-adapters/eligibility-review-final.source-check",
+      "sha256": "7d31e90fda14e75a0ecce0cd37d5d9c4a382cf33923c218f1c25c02e84d1da75",
+      "bytes": 427
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-review-final.sources",
+      "packet_path": "evidence/integration-and-adapters/eligibility-review-final.sources",
+      "sha256": "1c45d21aee9bf7b657451cf4035193113f5561fe605e1eb1b9de6245692d5b5a",
+      "bytes": 799
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-review-final.txt",
+      "packet_path": "evidence/integration-and-adapters/eligibility-review-final.txt",
+      "sha256": "e58b1ab9762ec3ff190c12ef7f35f1e7d0f4134a9ec5f20300ad2a0e0a8a0eb5",
+      "bytes": 314
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-review-final.xml",
+      "packet_path": "evidence/integration-and-adapters/eligibility-review-final.xml",
+      "sha256": "323973177f61dd705e6c787b26dfee88ed306f2b79546c0326c7e57d5475cbda",
+      "bytes": 7573
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-review-green-source/app/Domain/Memberships/Production/CurrentEligibleLicenses.php",
+      "packet_path": "evidence/integration-and-adapters/eligibility-review-green-source/app/Domain/Memberships/Production/CurrentEligibleLicenses.php",
+      "sha256": "afd5d7003138c89e4c75c6da0b090c67bf3986ea26037aca9498b1d90b0cb739",
+      "bytes": 4053
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-review-green-source/app/Domain/Memberships/Production/MembershipCatalogEvidence.php",
+      "packet_path": "evidence/integration-and-adapters/eligibility-review-green-source/app/Domain/Memberships/Production/MembershipCatalogEvidence.php",
+      "sha256": "79cc5e7a443f4af4dd7b002b316090d9d889b14c5ecfdb73e25e3b682ae411a9",
+      "bytes": 16993
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-review-green-source/app/Domain/Memberships/Production/MembershipCatalogSnapshot.php",
+      "packet_path": "evidence/integration-and-adapters/eligibility-review-green-source/app/Domain/Memberships/Production/MembershipCatalogSnapshot.php",
+      "sha256": "28ce2de27e9f145ac05be01602d1d73500f688ba76b5ce08ca9034280281252d",
+      "bytes": 559
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-review-green-source/app/Domain/Memberships/Production/MembershipEligibleLicenseToken.php",
+      "packet_path": "evidence/integration-and-adapters/eligibility-review-green-source/app/Domain/Memberships/Production/MembershipEligibleLicenseToken.php",
+      "sha256": "f06cd99b088aed159f94b4a11bd3f09135409e3e6addc22d9fa34a6122d92bd1",
+      "bytes": 1109
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-review-green-source/app/Domain/Memberships/Production/MembershipLicenseBinding.php",
+      "packet_path": "evidence/integration-and-adapters/eligibility-review-green-source/app/Domain/Memberships/Production/MembershipLicenseBinding.php",
+      "sha256": "c94600ad842654a3025bed18ac87a6cb1c8e3d7045a6cb0c23ae0e7af41888b4",
+      "bytes": 1334
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-review-green-source/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php",
+      "packet_path": "evidence/integration-and-adapters/eligibility-review-green-source/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php",
+      "sha256": "640d9c7608987a2386f2cb14235f51f02cd7350621e90a5e3b35aa7c1c600faa",
+      "bytes": 24285
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-review-green.exit",
+      "packet_path": "evidence/integration-and-adapters/eligibility-review-green.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-review-green.source-check",
+      "packet_path": "evidence/integration-and-adapters/eligibility-review-green.source-check",
+      "sha256": "7d31e90fda14e75a0ecce0cd37d5d9c4a382cf33923c218f1c25c02e84d1da75",
+      "bytes": 427
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-review-green.sources",
+      "packet_path": "evidence/integration-and-adapters/eligibility-review-green.sources",
+      "sha256": "03040070a1b499d1caa1c4dda5f354ab60d5a73889a4b527ebd33712e32227d2",
+      "bytes": 799
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-review-green.txt",
+      "packet_path": "evidence/integration-and-adapters/eligibility-review-green.txt",
+      "sha256": "fce0b5bbea7f34e6274a55e801d0081626bd7c6e74f399b8a24128ad226f1613",
+      "bytes": 314
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-review-green.xml",
+      "packet_path": "evidence/integration-and-adapters/eligibility-review-green.xml",
+      "sha256": "9557d146c2cd21959c60c1be56d8398e078d88a5c324d8d5eafb2df2750f885f",
+      "bytes": 7573
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-review-pint.exit",
+      "packet_path": "evidence/integration-and-adapters/eligibility-review-pint.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-review-pint.txt",
+      "packet_path": "evidence/integration-and-adapters/eligibility-review-pint.txt",
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "bytes": 33
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-review-red-v2-source/app/Domain/Memberships/Production/CurrentEligibleLicenses.php",
+      "packet_path": "evidence/integration-and-adapters/eligibility-review-red-v2-source/app/Domain/Memberships/Production/CurrentEligibleLicenses.php",
+      "sha256": "bd3307121f3e0b1617203033b7fcc788ab32632fcbafdbb7089f8288dc05a649",
+      "bytes": 3955
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-review-red-v2-source/app/Domain/Memberships/Production/MembershipCatalogEvidence.php",
+      "packet_path": "evidence/integration-and-adapters/eligibility-review-red-v2-source/app/Domain/Memberships/Production/MembershipCatalogEvidence.php",
+      "sha256": "bf2aff1ec55221f3b406ab3a06c1fdaabd6aa77bcd5c199604403de18c520d56",
+      "bytes": 16746
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-review-red-v2-source/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php",
+      "packet_path": "evidence/integration-and-adapters/eligibility-review-red-v2-source/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php",
+      "sha256": "640d9c7608987a2386f2cb14235f51f02cd7350621e90a5e3b35aa7c1c600faa",
+      "bytes": 24285
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-review-red-v2.exit",
+      "packet_path": "evidence/integration-and-adapters/eligibility-review-red-v2.exit",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-review-red-v2.sources",
+      "packet_path": "evidence/integration-and-adapters/eligibility-review-red-v2.sources",
+      "sha256": "596cb6c24388f204ff6ade445d8c70b1ba0142914d9d499c1c7cbc1fcc6bd0eb",
+      "bytes": 405
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-review-red-v2.txt",
+      "packet_path": "evidence/integration-and-adapters/eligibility-review-red-v2.txt",
+      "sha256": "bce05ce5b8bef0bc3e4a63f803b21a5c1e82a515be93bf57e4708a4b2d6ecd0e",
+      "bytes": 2457
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-review-red-v2.xml",
+      "packet_path": "evidence/integration-and-adapters/eligibility-review-red-v2.xml",
+      "sha256": "7510be1a2216c202a3501135969ec2573ecadf63941ddefb626b7ee7c1de4453",
+      "bytes": 3476
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-review-red.exit",
+      "packet_path": "evidence/integration-and-adapters/eligibility-review-red.exit",
+      "sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-review-red.sources",
+      "packet_path": "evidence/integration-and-adapters/eligibility-review-red.sources",
+      "sha256": "f99ea9cdc5b77bb24fb7b6a7a07fd3ea8c435b983d6cb61a4e0e485f91c613f7",
+      "bytes": 405
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-review-red.txt",
+      "packet_path": "evidence/integration-and-adapters/eligibility-review-red.txt",
+      "sha256": "57ee4e189d0a6abb0817c9cfcbb6a1a062c1941a7536550b043cceaf97bdb7e1",
+      "bytes": 3412
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-review-red.xml",
+      "packet_path": "evidence/integration-and-adapters/eligibility-review-red.xml",
+      "sha256": "d47b509c1a22e7fe505b494edc2b7f277d5626bb348c2bc0148fa871f06750ce",
+      "bytes": 3494
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-review-regressions.php",
+      "packet_path": "evidence/integration-and-adapters/eligibility-review-regressions.php",
+      "sha256": "36c6a262fb00da65ad84fac8c237b85eeea9960d9135298220aab8307cfb87ae",
+      "bytes": 23969
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-sqlite-source/app/Domain/Memberships/Production/CurrentEligibleLicenses.php",
+      "packet_path": "evidence/integration-and-adapters/eligibility-sqlite-source/app/Domain/Memberships/Production/CurrentEligibleLicenses.php",
+      "sha256": "bd3307121f3e0b1617203033b7fcc788ab32632fcbafdbb7089f8288dc05a649",
+      "bytes": 3955
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-sqlite-source/app/Domain/Memberships/Production/MembershipCatalogEvidence.php",
+      "packet_path": "evidence/integration-and-adapters/eligibility-sqlite-source/app/Domain/Memberships/Production/MembershipCatalogEvidence.php",
+      "sha256": "bf2aff1ec55221f3b406ab3a06c1fdaabd6aa77bcd5c199604403de18c520d56",
+      "bytes": 16746
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-sqlite-source/app/Domain/Memberships/Production/MembershipCatalogSnapshot.php",
+      "packet_path": "evidence/integration-and-adapters/eligibility-sqlite-source/app/Domain/Memberships/Production/MembershipCatalogSnapshot.php",
+      "sha256": "28ce2de27e9f145ac05be01602d1d73500f688ba76b5ce08ca9034280281252d",
+      "bytes": 559
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-sqlite-source/app/Domain/Memberships/Production/MembershipEligibleLicenseToken.php",
+      "packet_path": "evidence/integration-and-adapters/eligibility-sqlite-source/app/Domain/Memberships/Production/MembershipEligibleLicenseToken.php",
+      "sha256": "f06cd99b088aed159f94b4a11bd3f09135409e3e6addc22d9fa34a6122d92bd1",
+      "bytes": 1109
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-sqlite-source/app/Domain/Memberships/Production/MembershipLicenseBinding.php",
+      "packet_path": "evidence/integration-and-adapters/eligibility-sqlite-source/app/Domain/Memberships/Production/MembershipLicenseBinding.php",
+      "sha256": "c94600ad842654a3025bed18ac87a6cb1c8e3d7045a6cb0c23ae0e7af41888b4",
+      "bytes": 1334
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-sqlite-source/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php",
+      "packet_path": "evidence/integration-and-adapters/eligibility-sqlite-source/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php",
+      "sha256": "5d84404d66d62579c9fd1e1f4928ebe37469ca5c0511465fb62b367f298af01d",
+      "bytes": 19959
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-sqlite.exit",
+      "packet_path": "evidence/integration-and-adapters/eligibility-sqlite.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-sqlite.source-check",
+      "packet_path": "evidence/integration-and-adapters/eligibility-sqlite.source-check",
+      "sha256": "7d31e90fda14e75a0ecce0cd37d5d9c4a382cf33923c218f1c25c02e84d1da75",
+      "bytes": 427
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-sqlite.sources",
+      "packet_path": "evidence/integration-and-adapters/eligibility-sqlite.sources",
+      "sha256": "5835f92bcf7bf5c112a6b7f9e07cf599463ac5222305d1ea6d033f70569d736d",
+      "bytes": 799
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-sqlite.txt",
+      "packet_path": "evidence/integration-and-adapters/eligibility-sqlite.txt",
+      "sha256": "eb93bed0d9735255e5577e935e947cf8a45a8f4223a0edf0d13007301ce67d9f",
+      "bytes": 314
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-sqlite.xml",
+      "packet_path": "evidence/integration-and-adapters/eligibility-sqlite.xml",
+      "sha256": "f1da353c9fa2b125818947e7dc7cd363f5441b368bfcf960f8038070631aa66d",
+      "bytes": 6678
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/entry-commands.md",
+      "packet_path": "evidence/integration-and-adapters/entry-commands.md",
+      "sha256": "024055861a622743524bcebe36876e6d12184238f709a5544c5ae99f47ef5a2e",
+      "bytes": 3738
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/entry-commit.txt",
+      "packet_path": "evidence/integration-and-adapters/entry-commit.txt",
+      "sha256": "664095e827cec8183836f9956d158fa9014c7ca5f08edb9fb034aa2438fd6b4c",
+      "bytes": 41
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/entry-pint.exit",
+      "packet_path": "evidence/integration-and-adapters/entry-pint.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/entry-pint.txt",
+      "packet_path": "evidence/integration-and-adapters/entry-pint.txt",
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "bytes": 33
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/entry-source/app/Domain/Memberships/Production/MembershipReservationObserver.php",
+      "packet_path": "evidence/integration-and-adapters/entry-source/app/Domain/Memberships/Production/MembershipReservationObserver.php",
+      "sha256": "4cd3a202c594ead491b2a12fe90a2fe05f20567af858d562238c4d4ec0558426",
+      "bytes": 4821
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/entry-source/app/Domain/Memberships/Production/MembershipReservationOperations.php",
+      "packet_path": "evidence/integration-and-adapters/entry-source/app/Domain/Memberships/Production/MembershipReservationOperations.php",
+      "sha256": "02955a638879475020d6bc472b061ee9004f57f17bed51ca6e0fd4ab174efd20",
+      "bytes": 7379
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/entry-source/tests/Feature/ProductionMembershipBilling/MembershipReservationEntryTest.php",
+      "packet_path": "evidence/integration-and-adapters/entry-source/tests/Feature/ProductionMembershipBilling/MembershipReservationEntryTest.php",
+      "sha256": "ffa8ca97c2c37acf823bfd75732094dfeeb0d8bae871dccc1477edbdd04c93f2",
+      "bytes": 8788
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/entry-sqlite-v2-source-check.txt",
+      "packet_path": "evidence/integration-and-adapters/entry-sqlite-v2-source-check.txt",
+      "sha256": "a19ea88020cf58d72e55990726f8718b664474c26cb3d499f21705c7774dc0c8",
+      "bytes": 227
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/entry-sqlite-v2.exit",
+      "packet_path": "evidence/integration-and-adapters/entry-sqlite-v2.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/entry-sqlite-v2.txt",
+      "packet_path": "evidence/integration-and-adapters/entry-sqlite-v2.txt",
+      "sha256": "f4bc80f9e92bc5f0b278afd9aad268cd89d5256b1b11a28bd54ee2dfa766c7d8",
+      "bytes": 319
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/entry-sqlite-v2.xml",
+      "packet_path": "evidence/integration-and-adapters/entry-sqlite-v2.xml",
+      "sha256": "4ad24dd1433eb32c008951bb6099008bf6073099e0669f18db782b2657a06779",
+      "bytes": 3052
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/entry-sqlite.exit",
+      "packet_path": "evidence/integration-and-adapters/entry-sqlite.exit",
+      "sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/entry-sqlite.sources",
+      "packet_path": "evidence/integration-and-adapters/entry-sqlite.sources",
+      "sha256": "3163687337a1d7ca6746143844af6f554cef79cd7a516a40ae4bf0d3548cddc8",
+      "bytes": 413
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/entry-sqlite.txt",
+      "packet_path": "evidence/integration-and-adapters/entry-sqlite.txt",
+      "sha256": "e11d5e55efc83c5fde26a496ce7a2d31ab2effaad8552b0e2df585a918c8976a",
+      "bytes": 5605
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/entry-sqlite.xml",
+      "packet_path": "evidence/integration-and-adapters/entry-sqlite.xml",
+      "sha256": "3360901227a265f4c9ffcbd11b2fdf25a0f50e026e0eb3f42a13378a9f3a83b7",
+      "bytes": 8503
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/entry-summary.json",
+      "packet_path": "evidence/integration-and-adapters/entry-summary.json",
+      "sha256": "a1a993169d26637a1186cbf255fa584a005648b1c73ceec8600c115f5d44128e",
+      "bytes": 1265
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/license-binding-unit.exit",
+      "packet_path": "evidence/integration-and-adapters/license-binding-unit.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/license-binding-unit.sources",
+      "packet_path": "evidence/integration-and-adapters/license-binding-unit.sources",
+      "sha256": "8e115cd2807c4238542dac47d1f560f05e6311e38b6f1e1bad6cf872527e1332",
+      "bytes": 239
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/license-binding-unit.txt",
+      "packet_path": "evidence/integration-and-adapters/license-binding-unit.txt",
+      "sha256": "e13b3b7d18b170fd8394227ba1591a3c4ec8e019e59ae013942d4c37698bc657",
+      "bytes": 311
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/license-binding-unit.xml",
+      "packet_path": "evidence/integration-and-adapters/license-binding-unit.xml",
+      "sha256": "2e98378b6b4a82fce58476fb53f2fcff23f86f4d7f1f95124a3fc9c86fdad6a3",
+      "bytes": 2910
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-race-preparation-commands.md",
+      "packet_path": "evidence/integration-and-adapters/native-race-preparation-commands.md",
+      "sha256": "eed24dff3f6c717ad83143f89b2f8e5498638b3a05f3677d36b4af6ed041aec5",
+      "bytes": 2849
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-race-preparation.commit",
+      "packet_path": "evidence/integration-and-adapters/native-race-preparation.commit",
+      "sha256": "8d6c41dec671470b0f1965d7acba99b76ff67298774731cac3c2bf1f29a40ab1",
+      "bytes": 41
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-race-preparation.sources",
+      "packet_path": "evidence/integration-and-adapters/native-race-preparation.sources",
+      "sha256": "39d0981a97b1135e24e61bdcb20d2f771cf3efb2b6410e9f4092c21159704304",
+      "bytes": 267
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/run-focused.py",
+      "packet_path": "evidence/integration-and-adapters/run-focused.py",
+      "sha256": "9a3b4b022ece8c62b1265320651e981fa533a1e23c1512c44be1c576b94036ff",
+      "bytes": 3081
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-policy-evidence/artifact-digests.json",
+      "packet_path": "evidence/policy/artifact-digests.json",
+      "sha256": "e0ec83fe7d1d7a545ba3c7dbeef85ceb1becc514e40b7eb191355e4913720cbe",
+      "bytes": 2185
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-policy-evidence/commands.md",
+      "packet_path": "evidence/policy/commands.md",
+      "sha256": "53449ab392aa72353ced7a6c318841ba8f950f9dc59bc7e80b24ac7f9b477198",
+      "bytes": 4706
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-policy-evidence/commit.txt",
+      "packet_path": "evidence/policy/commit.txt",
+      "sha256": "c4903f5ffed5a07f822979c5f9437d5d3a9860297e514da89ebc3dc804619855",
+      "bytes": 41
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-policy-evidence/diff-check.exit",
+      "packet_path": "evidence/policy/diff-check.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-policy-evidence/diff-check.txt",
+      "packet_path": "evidence/policy/diff-check.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-policy-evidence/pint-final.exit",
+      "packet_path": "evidence/policy/pint-final.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-policy-evidence/pint-final.txt",
+      "packet_path": "evidence/policy/pint-final.txt",
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "bytes": 33
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-policy-evidence/pint.command.json",
+      "packet_path": "evidence/policy/pint.command.json",
+      "sha256": "88448ee3896ce216040fb6946ff69fc67e50917308afa419654210e328b02a63",
+      "bytes": 368
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-policy-evidence/pint.exit",
+      "packet_path": "evidence/policy/pint.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-policy-evidence/pint.txt",
+      "packet_path": "evidence/policy/pint.txt",
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "bytes": 33
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-policy-evidence/policy-lane.patch",
+      "packet_path": "evidence/policy/policy-lane.patch",
+      "sha256": "71cfdee06487bd5694a62173045575a92ef17fee8624b096102717bd02c51a26",
+      "bytes": 37866
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-policy-evidence/results.json",
+      "packet_path": "evidence/policy/results.json",
+      "sha256": "6c2a865031a494e8fb2bad6e4bb5c1f60427703b4566dd1ea6acd2f661d0c621",
+      "bytes": 3331
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-policy-evidence/sqlite-policy-final.exit",
+      "packet_path": "evidence/policy/sqlite-policy-final.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-policy-evidence/sqlite-policy-final.source.json",
+      "packet_path": "evidence/policy/sqlite-policy-final.source.json",
+      "sha256": "c8b9fb7ae90277092e5044efdf712972f8501756700ab0a7a8d6afd7824b06bd",
+      "bytes": 1612
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-policy-evidence/sqlite-policy-final.txt",
+      "packet_path": "evidence/policy/sqlite-policy-final.txt",
+      "sha256": "51002b5a364321d7729e73d47a308dab2a7e66ba8bbcdfa5afaf65c71b0da946",
+      "bytes": 97
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-policy-evidence/sqlite-policy-final.xml",
+      "packet_path": "evidence/policy/sqlite-policy-final.xml",
+      "sha256": "4bda7b4bbabfb97094740ed8292c78b14dff0c39d45218335157922d9836d91b",
+      "bytes": 31736
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-policy-evidence/sqlite-policy.exit",
+      "packet_path": "evidence/policy/sqlite-policy.exit",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-policy-evidence/sqlite-policy.source.json",
+      "packet_path": "evidence/policy/sqlite-policy.source.json",
+      "sha256": "f58d271c60566e344d468242eee96b8a1fd6ed3e8238984ebafec35c292c6bc5",
+      "bytes": 1606
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-policy-evidence/sqlite-policy.txt",
+      "packet_path": "evidence/policy/sqlite-policy.txt",
+      "sha256": "70469637bb251be3263afbe24339852180c727ddd11ad5542506dcaad19e262f",
+      "bytes": 2214
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-policy-evidence/sqlite-policy.xml",
+      "packet_path": "evidence/policy/sqlite-policy.xml",
+      "sha256": "9e2cdfd277dd80b1260fcd63913be3e79635e2accc3c4ecb04c4d9066536cb8c",
+      "bytes": 33980
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-policy-evidence/toolchain.txt",
+      "packet_path": "evidence/policy/toolchain.txt",
+      "sha256": "b32285ac26193266324bf0005ea8bc2b5fa93fb062bf4437d3fd7dfafd4171fe",
+      "bytes": 306
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-policy-evidence/unit-initial.exit",
+      "packet_path": "evidence/policy/unit-initial.exit",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-policy-evidence/unit-initial.source.json",
+      "packet_path": "evidence/policy/unit-initial.source.json",
+      "sha256": "ca1a185e7a636fef7066954e38ed7df90a4f4238592f1394ea1b4fc5fcc8f68c",
+      "bytes": 820
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-policy-evidence/unit-initial.txt",
+      "packet_path": "evidence/policy/unit-initial.txt",
+      "sha256": "b319714c7626574d820c4e0e96e38ff5a325196ca26d710685636bbc57a440dd",
+      "bytes": 2855
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-policy-evidence/unit-initial.xml",
+      "packet_path": "evidence/policy/unit-initial.xml",
+      "sha256": "78f423dfa8b42d0ce16df1ad5c77840f77120ac0082d1298415eb1384c1d3ec4",
+      "bytes": 22076
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-ledger-evidence/artifact-digests.json",
+      "packet_path": "evidence/ledger/artifact-digests.json",
+      "sha256": "f9a12d8de2cfe4eef371d388198b124adb21176053a4419b8f0b4bf19f4a9923",
+      "bytes": 1326
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-ledger-evidence/commands.md",
+      "packet_path": "evidence/ledger/commands.md",
+      "sha256": "b495017b2c761f06b63dad72390e2387046e35f74d0fea220da6d982803e3e0a",
+      "bytes": 5081
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-ledger-evidence/committed-source-check.json",
+      "packet_path": "evidence/ledger/committed-source-check.json",
+      "sha256": "cb63cbc6fa742307026faea7223df3af65bc060029b0ff5602d7be8310ddd33c",
+      "bytes": 375
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-ledger-evidence/ledger-focused-source-check.json",
+      "packet_path": "evidence/ledger/ledger-focused-source-check.json",
+      "sha256": "2f44eef6d9b20f71d446fdda97b200485eb61a23d8979d28a097ba5697964ca0",
+      "bytes": 34
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-ledger-evidence/ledger-focused.exit",
+      "packet_path": "evidence/ledger/ledger-focused.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-ledger-evidence/ledger-focused.sh",
+      "packet_path": "evidence/ledger/ledger-focused.sh",
+      "sha256": "5b860e5bcc3ad45b492bc2750254452b73f30edf0ef9b403f18ee81bafd5bfe9",
+      "bytes": 1359
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-ledger-evidence/ledger-focused.sources.json",
+      "packet_path": "evidence/ledger/ledger-focused.sources.json",
+      "sha256": "454f7ce4abef2bc1fcc1c2b30448f327e1193c835535f99b1f14958e1c638743",
+      "bytes": 1213
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-ledger-evidence/ledger-focused.txt",
+      "packet_path": "evidence/ledger/ledger-focused.txt",
+      "sha256": "949c2610793f1f328d798043d1257bc0e913f2b5029f73e23b16a8f3c64ed8c2",
+      "bytes": 309
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-ledger-evidence/ledger-focused.xml",
+      "packet_path": "evidence/ledger/ledger-focused.xml",
+      "sha256": "4a72b21967d49815333642fe576375563ff89694fc17d8104d16bc920cb38512",
+      "bytes": 19427
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-ledger-evidence/ledger-initial.exit",
+      "packet_path": "evidence/ledger/ledger-initial.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-ledger-evidence/ledger-initial.txt",
+      "packet_path": "evidence/ledger/ledger-initial.txt",
+      "sha256": "afd6d970e01affa0e98b975ce3e401db8e79af03a31f97b9643b70ddc8b4e8f5",
+      "bytes": 308
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-ledger-evidence/ledger-initial.xml",
+      "packet_path": "evidence/ledger/ledger-initial.xml",
+      "sha256": "2440aa3043a3efbcef2911683e062a7e4330c593275a4935440af30bce88e287",
+      "bytes": 15154
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-ledger-evidence/ledger-pint.exit",
+      "packet_path": "evidence/ledger/ledger-pint.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-ledger-evidence/ledger-pint.txt",
+      "packet_path": "evidence/ledger/ledger-pint.txt",
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "bytes": 33
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-ledger-evidence/v1-create-byte-preservation.json",
+      "packet_path": "evidence/ledger/v1-create-byte-preservation.json",
+      "sha256": "a499265239760fac8158f6f2727dd327d4e4a8e7bb4b267270ed529945bc5b8d",
+      "bytes": 206
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-lifecycle-evidence/artifact-digests.json",
+      "packet_path": "evidence/lifecycle/artifact-digests.json",
+      "sha256": "59341c80caa4371af5b12c6f888ebcfdc0e8231922276f87b1dce7826457ea32",
+      "bytes": 1091
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-lifecycle-evidence/commands.md",
+      "packet_path": "evidence/lifecycle/commands.md",
+      "sha256": "138cd92d983fe7e86d01c1fae1548bcc33f66a54850cd285706808a22eb26b6b",
+      "bytes": 3220
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-lifecycle-evidence/commit.txt",
+      "packet_path": "evidence/lifecycle/commit.txt",
+      "sha256": "dfcb5e437cb2ed26fa7bbe9cacb238a564bc384eac5f44d45fea026b7c8c54d0",
+      "bytes": 41
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-lifecycle-evidence/initial-static-checks.json",
+      "packet_path": "evidence/lifecycle/initial-static-checks.json",
+      "sha256": "f7242fe74d9abdf75417cda0015279b0be221e6a853cb3079384633f3aebd99d",
+      "bytes": 1315
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-lifecycle-evidence/lifecycle.patch",
+      "packet_path": "evidence/lifecycle/lifecycle.patch",
+      "sha256": "07b96639553090143bffd611d6f00694d4971de9b6a304f8be1d5f633cf4853f",
+      "bytes": 19827
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-lifecycle-evidence/pint-final.exit",
+      "packet_path": "evidence/lifecycle/pint-final.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-lifecycle-evidence/pint-final.txt",
+      "packet_path": "evidence/lifecycle/pint-final.txt",
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "bytes": 33
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-lifecycle-evidence/results.json",
+      "packet_path": "evidence/lifecycle/results.json",
+      "sha256": "c5bfebcf15f5912f5f03ec177ee4cc8e6d6c47a242cb7a0a5dcc199402221c92",
+      "bytes": 8916
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-lifecycle-evidence/run-lifecycle.py",
+      "packet_path": "evidence/lifecycle/run-lifecycle.py",
+      "sha256": "57b84ce68b929487fba33f5abd13d63d45e1fb01299a54fbc025a96f635eee51",
+      "bytes": 1498
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-lifecycle-evidence/sqlite-initial.exit",
+      "packet_path": "evidence/lifecycle/sqlite-initial.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-lifecycle-evidence/sqlite-initial.source.json",
+      "packet_path": "evidence/lifecycle/sqlite-initial.source.json",
+      "sha256": "8d7d0cec42e7686debca10f250b49204ef22164c9d18c2268c7d014dd2a95739",
+      "bytes": 7837
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-lifecycle-evidence/sqlite-initial.txt",
+      "packet_path": "evidence/lifecycle/sqlite-initial.txt",
+      "sha256": "41ec2ee384c674349c51e61b43ac22ee568bcc53b0a5bed296d8bfcd01fdae4f",
+      "bytes": 96
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-lifecycle-evidence/sqlite-initial.xml",
+      "packet_path": "evidence/lifecycle/sqlite-initial.xml",
+      "sha256": "19cf62c9248f93f4cf52c441b1b8f7e1b5ccefe2318c38b3bf3d83c5465977d9",
+      "bytes": 3129
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/artifact-digests.json",
+      "packet_path": "evidence/selection/artifact-digests.json",
+      "sha256": "63ec17d50077862121733934664a2c2a055b122380f789880bac4537d810fc00",
+      "bytes": 1913
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/commands.md",
+      "packet_path": "evidence/selection/commands.md",
+      "sha256": "2738143407137887834855a768224781e8d14a4913e5bb97f4491ec57e0f7297",
+      "bytes": 4441
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/discovery-census.json",
+      "packet_path": "evidence/selection/discovery-census.json",
+      "sha256": "bc6166fc695b0c612ab7b89f30876e3180e40febc9f46142251b398ecc1f660e",
+      "bytes": 2396
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/discovery-generated-artifacts.json",
+      "packet_path": "evidence/selection/discovery-generated-artifacts.json",
+      "sha256": "b6a902f162b508b18687aee5f4f4736ba371108a50f131bc661e058c6fd9175c",
+      "bytes": 6998
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/discovery-manifest.json",
+      "packet_path": "evidence/selection/discovery-manifest.json",
+      "sha256": "4dc4232a7feab58af2b0010a58326854ef540df89770984b9df14a7093b0254c",
+      "bytes": 19602
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/discovery-source-check.json",
+      "packet_path": "evidence/selection/discovery-source-check.json",
+      "sha256": "952691e80146c3558ff6ede1de1facbeaac38f0d9644a77fdced4bf37524bf7e",
+      "bytes": 37
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/discovery.base",
+      "packet_path": "evidence/selection/discovery.base",
+      "sha256": "6b28a5a41bf65723c78d5f60c1b05cf867ef795060ae393a5f316cd7995a5521",
+      "bytes": 41
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/discovery.exit",
+      "packet_path": "evidence/selection/discovery.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/discovery.sh",
+      "packet_path": "evidence/selection/discovery.sh",
+      "sha256": "a2989e76ca0bd5460d80d3f58d14123f06a849cc9ee1a5f779f251d9ae899204",
+      "bytes": 2160
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/discovery.sources.json",
+      "packet_path": "evidence/selection/discovery.sources.json",
+      "sha256": "d0ba60feb007568bcf5ebae71d806706b850d6d643f5323721d7b3b30f93d5a4",
+      "bytes": 265128
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/discovery.txt",
+      "packet_path": "evidence/selection/discovery.txt",
+      "sha256": "d6768074a65bbf06ab1399bdae5654523e2913821aacb34fc70765094aed2fc5",
+      "bytes": 1982
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/final-defe9580/discovery-census.json",
+      "packet_path": "evidence/selection/final-defe9580/discovery-census.json",
+      "sha256": "bc6166fc695b0c612ab7b89f30876e3180e40febc9f46142251b398ecc1f660e",
+      "bytes": 2396
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/final-defe9580/discovery-generated-artifacts.json",
+      "packet_path": "evidence/selection/final-defe9580/discovery-generated-artifacts.json",
+      "sha256": "b6a902f162b508b18687aee5f4f4736ba371108a50f131bc661e058c6fd9175c",
+      "bytes": 6998
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/final-defe9580/discovery-manifest.json",
+      "packet_path": "evidence/selection/final-defe9580/discovery-manifest.json",
+      "sha256": "4dc4232a7feab58af2b0010a58326854ef540df89770984b9df14a7093b0254c",
+      "bytes": 19602
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/final-defe9580/discovery-source-check.json",
+      "packet_path": "evidence/selection/final-defe9580/discovery-source-check.json",
+      "sha256": "952691e80146c3558ff6ede1de1facbeaac38f0d9644a77fdced4bf37524bf7e",
+      "bytes": 37
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/final-defe9580/discovery.base",
+      "packet_path": "evidence/selection/final-defe9580/discovery.base",
+      "sha256": "6b28a5a41bf65723c78d5f60c1b05cf867ef795060ae393a5f316cd7995a5521",
+      "bytes": 41
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/final-defe9580/discovery.exit",
+      "packet_path": "evidence/selection/final-defe9580/discovery.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/final-defe9580/discovery.sh",
+      "packet_path": "evidence/selection/final-defe9580/discovery.sh",
+      "sha256": "a2989e76ca0bd5460d80d3f58d14123f06a849cc9ee1a5f779f251d9ae899204",
+      "bytes": 2160
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/final-defe9580/discovery.sources.json",
+      "packet_path": "evidence/selection/final-defe9580/discovery.sources.json",
+      "sha256": "d0ba60feb007568bcf5ebae71d806706b850d6d643f5323721d7b3b30f93d5a4",
+      "bytes": 265128
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/final-defe9580/discovery.txt",
+      "packet_path": "evidence/selection/final-defe9580/discovery.txt",
+      "sha256": "d6768074a65bbf06ab1399bdae5654523e2913821aacb34fc70765094aed2fc5",
+      "bytes": 1982
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/initial-565f19d1/discovery-census.json",
+      "packet_path": "evidence/selection/initial-565f19d1/discovery-census.json",
+      "sha256": "074a2996fa72ad843017ea5e3443078b3177d100aeffb6939af9a236af4e2844",
+      "bytes": 2364
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/initial-565f19d1/discovery-generated-artifacts.json",
+      "packet_path": "evidence/selection/initial-565f19d1/discovery-generated-artifacts.json",
+      "sha256": "49f5e50140ed4d0160c1c048ae085fbe75cd6cc40dea8432989e39e816855fff",
+      "bytes": 6998
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/initial-565f19d1/discovery-manifest.json",
+      "packet_path": "evidence/selection/initial-565f19d1/discovery-manifest.json",
+      "sha256": "6891085b0fad3977c1991c9d69bcc98456737ff47ac3214294f3c618ea8a7c0f",
+      "bytes": 19603
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/initial-565f19d1/discovery-source-check.json",
+      "packet_path": "evidence/selection/initial-565f19d1/discovery-source-check.json",
+      "sha256": "952691e80146c3558ff6ede1de1facbeaac38f0d9644a77fdced4bf37524bf7e",
+      "bytes": 37
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/initial-565f19d1/discovery.base",
+      "packet_path": "evidence/selection/initial-565f19d1/discovery.base",
+      "sha256": "952e41ea18b5e0175c5f3abcb2cbc1aa2edb83f746b5c4255a3bdd6eacb99fb8",
+      "bytes": 41
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/initial-565f19d1/discovery.exit",
+      "packet_path": "evidence/selection/initial-565f19d1/discovery.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/initial-565f19d1/discovery.sh",
+      "packet_path": "evidence/selection/initial-565f19d1/discovery.sh",
+      "sha256": "a2989e76ca0bd5460d80d3f58d14123f06a849cc9ee1a5f779f251d9ae899204",
+      "bytes": 2160
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/initial-565f19d1/discovery.sources.json",
+      "packet_path": "evidence/selection/initial-565f19d1/discovery.sources.json",
+      "sha256": "f39626096c940a1fd29630639a4add441c6d1667b5f100ea9534d1bc83b74211",
+      "bytes": 265128
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/initial-565f19d1/discovery.txt",
+      "packet_path": "evidence/selection/initial-565f19d1/discovery.txt",
+      "sha256": "73f8e3b420e230a3455201815aff4b51fb8ab4a7adbb8267adf10bb9bf00c4b7",
+      "bytes": 1982
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/policy-carry-verification.json",
+      "packet_path": "evidence/selection/policy-carry-verification.json",
+      "sha256": "ca501f33c0f3be2858b81391270c83d023d1b3d8f40913572c6c29ec2e53bcec",
+      "bytes": 386
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/policy.base",
+      "packet_path": "evidence/selection/policy.base",
+      "sha256": "952e41ea18b5e0175c5f3abcb2cbc1aa2edb83f746b5c4255a3bdd6eacb99fb8",
+      "bytes": 41
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/policy.patch",
+      "packet_path": "evidence/selection/policy.patch",
+      "sha256": "9cf115e0ed78b512d227c0cf776853d921f1dc9d098b3bc8abc590379af7eb52",
+      "bytes": 3738
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/policy.sources.json",
+      "packet_path": "evidence/selection/policy.sources.json",
+      "sha256": "7e5733b58b9e26fe4f9158799ecc961fca53a13f6cecad33ee80a333cbd2d8da",
+      "bytes": 991
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/test-database-receipts.exit",
+      "packet_path": "evidence/selection/test-database-receipts.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/test-database-receipts.txt",
+      "packet_path": "evidence/selection/test-database-receipts.txt",
+      "sha256": "3b401d9856c9c197b290abaa6b716889f7f2f871545f63a4ee1ad078a22b3b95",
+      "bytes": 161
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/test-gitlab-database-receipts.exit",
+      "packet_path": "evidence/selection/test-gitlab-database-receipts.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/test-gitlab-database-receipts.txt",
+      "packet_path": "evidence/selection/test-gitlab-database-receipts.txt",
+      "sha256": "dd55bd04c54f784971542bd8d07095a078a29520eaac465e041d4c7f6d0b223d",
+      "bytes": 132
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/test-phpunit-shards.exit",
+      "packet_path": "evidence/selection/test-phpunit-shards.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/test-phpunit-shards.txt",
+      "packet_path": "evidence/selection/test-phpunit-shards.txt",
+      "sha256": "e8687c1dffebe26f987d32e56dcaef713525c27cfada9c4217c6c004a8ea4f42",
+      "bytes": 151
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/sqlite-integrated-lifecycle.exit",
+      "packet_path": "evidence/integration-and-adapters/sqlite-integrated-lifecycle.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/sqlite-integrated-lifecycle.log",
+      "packet_path": "evidence/integration-and-adapters/sqlite-integrated-lifecycle.log",
+      "sha256": "5e709a645ec946023bd9097681a09c14d2ae4ec6dd72190213052a99fabb1095",
+      "bytes": 417
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/sqlite-integrated-lifecycle.result.json",
+      "packet_path": "evidence/integration-and-adapters/sqlite-integrated-lifecycle.result.json",
+      "sha256": "68ebfbc0bbb1e43caaf56ffce762095aa13d2a6a5788a639b08a7eba13b6c2e4",
+      "bytes": 247
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/sqlite-integrated-lifecycle.source.json",
+      "packet_path": "evidence/integration-and-adapters/sqlite-integrated-lifecycle.source.json",
+      "sha256": "3be09c21a8f361ad2837a456885ea91ebc15e2bab513de5e76cb666bb847f282",
+      "bytes": 163114
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/sqlite-integrated-lifecycle.xml",
+      "packet_path": "evidence/integration-and-adapters/sqlite-integrated-lifecycle.xml",
+      "sha256": "e652454f9434de38ca983d2efa28ce4d41d76cd4db4cb30d0ad1de50db412156",
+      "bytes": 7162
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/final-pint.exit",
+      "packet_path": "evidence/integration-and-adapters/final-pint.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/final-pint.log",
+      "packet_path": "evidence/integration-and-adapters/final-pint.log",
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "bytes": 33
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/mysql-environment.txt",
+      "packet_path": "evidence/integration-and-adapters/mysql-environment.txt",
+      "sha256": "ad6cadbaa13b6593f2b15b3106d4acba3bc5dbc4cb5ea7d79113ee527523c234",
+      "bytes": 542
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-integrated-canary.exit",
+      "packet_path": "evidence/integration-and-adapters/native-integrated-canary.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-integrated-canary.log",
+      "packet_path": "evidence/integration-and-adapters/native-integrated-canary.log",
+      "sha256": "aa5cb0e74bf7806db8e31025ca8cd9caec68c421820423c321d3fe9b4690ef6f",
+      "bytes": 312
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-integrated-canary.result.json",
+      "packet_path": "evidence/integration-and-adapters/native-integrated-canary.result.json",
+      "sha256": "332b9a80fe530e69678373759a4dc1657771511e53fd29b1a18a91741c4b6226",
+      "bytes": 452
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-integrated-canary.source.json",
+      "packet_path": "evidence/integration-and-adapters/native-integrated-canary.source.json",
+      "sha256": "b9ffb916a1b308eeec0dad2d80ccbecd9e2cac50c0a69fbbae6d868f958baeb7",
+      "bytes": 162806
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-integrated-canary.xml",
+      "packet_path": "evidence/integration-and-adapters/native-integrated-canary.xml",
+      "sha256": "7716d37d307c299d8ef060fcebf08d305db9efc3e6a4f76a96d438af6c64f607",
+      "bytes": 861
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-race-workers/test_different_request_keys_cannot_spend_the_same_last_credit-7fab95bf-646d-45a7-b7ab-ab1363c6cba7.json",
+      "packet_path": "evidence/integration-and-adapters/native-race-workers/test_different_request_keys_cannot_spend_the_same_last_credit-7fab95bf-646d-45a7-b7ab-ab1363c6cba7.json",
+      "sha256": "0745bb98f70532a0b4f76d2320a5ae01833e9d8a937a3103755ed92aa5641c57",
+      "bytes": 5068
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-race-workers/test_same_key_and_intent_return_the_same_retained_reservation_and_event-2a2c8fcc-1583-4557-8bae-a9de74b2617e.json",
+      "packet_path": "evidence/integration-and-adapters/native-race-workers/test_same_key_and_intent_return_the_same_retained_reservation_and_event-2a2c8fcc-1583-4557-8bae-a9de74b2617e.json",
+      "sha256": "12f22f65e41f0ac80470cdfa8d4a2fa47f8230be39929503f9ffb8ef092ab55a",
+      "bytes": 5073
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-reservation-races.exit",
+      "packet_path": "evidence/integration-and-adapters/native-reservation-races.exit",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-reservation-races.log",
+      "packet_path": "evidence/integration-and-adapters/native-reservation-races.log",
+      "sha256": "9d61d1570f351499ca7e8f9bb5a6940a0ad9383f73cb5c005417e16e68bb2a5e",
+      "bytes": 1020
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-reservation-races.result.json",
+      "packet_path": "evidence/integration-and-adapters/native-reservation-races.result.json",
+      "sha256": "5a8c6e0cfafb8e04a25b06180c25eef841abe7e7eb8794d8298c31351b4278c9",
+      "bytes": 454
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-reservation-races.source.json",
+      "packet_path": "evidence/integration-and-adapters/native-reservation-races.source.json",
+      "sha256": "bd6a5c8c085804d9c37b400b08e34dc6c3360e8ccda7c0c8abcad85e21511bd6",
+      "bytes": 162937
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-reservation-races.xml",
+      "packet_path": "evidence/integration-and-adapters/native-reservation-races.xml",
+      "sha256": "2d291d10a8cc3d301f43ea0318b55a55992386dc3e405f0b71db8b64a32bed2e",
+      "bytes": 2051
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-focused-boundaries.exit",
+      "packet_path": "evidence/integration-and-adapters/native-focused-boundaries.exit",
+      "sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-focused-boundaries.log",
+      "packet_path": "evidence/integration-and-adapters/native-focused-boundaries.log",
+      "sha256": "376eae1a49e35c9b9782ddacf6814ff4142fa00534b149f46516683e0a5017fb",
+      "bytes": 800
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-focused-boundaries.result.json",
+      "packet_path": "evidence/integration-and-adapters/native-focused-boundaries.result.json",
+      "sha256": "1955b3149a6463db2c174ea4cebd73fc5b4e0e6f9bb43ab3c1bc30955453db68",
+      "bytes": 246
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-focused-boundaries.source.json",
+      "packet_path": "evidence/integration-and-adapters/native-focused-boundaries.source.json",
+      "sha256": "17c6777d05e5b98002cd29400fe7c649c2e1d4f111cf8a92adb550de7264e84c",
+      "bytes": 163628
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-focused-boundaries.xml",
+      "packet_path": "evidence/integration-and-adapters/native-focused-boundaries.xml",
+      "sha256": "3b35be665e4912f861d942a69f5e58522452a85aadae33ecee0fb362e2f28c1f",
+      "bytes": 3588
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-shadow-fixture-commands.md",
+      "packet_path": "evidence/integration-and-adapters/eligibility-shadow-fixture-commands.md",
+      "sha256": "8956d9ffc6e5899617830e7406cc21ab319caa26826fae228802ad7ebfd7ad00",
+      "bytes": 3787
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-shadow-fixture-pint.exit",
+      "packet_path": "evidence/integration-and-adapters/eligibility-shadow-fixture-pint.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-shadow-fixture-pint.txt",
+      "packet_path": "evidence/integration-and-adapters/eligibility-shadow-fixture-pint.txt",
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "bytes": 33
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-shadow-fixture-syntax.txt",
+      "packet_path": "evidence/integration-and-adapters/eligibility-shadow-fixture-syntax.txt",
+      "sha256": "76ee537096532b6639fc87fd79f7c4c8e9822076e345ea3b131e10dbddfdebb9",
+      "bytes": 110
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-shadow-fixture.sources",
+      "packet_path": "evidence/integration-and-adapters/eligibility-shadow-fixture.sources",
+      "sha256": "aac25916631e9c7c6a0a362938f7d24fc0481f3bf2966d837ea33541d852ddaf",
+      "bytes": 297
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-shadow-sql-probe.exit",
+      "packet_path": "evidence/integration-and-adapters/eligibility-shadow-sql-probe.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-shadow-sql-probe.php",
+      "packet_path": "evidence/integration-and-adapters/eligibility-shadow-sql-probe.php",
+      "sha256": "93a5412b38eb1d12a2f3f34c9a1846fad34bfe4671f7ccf6cd5515cbf4ccf18c",
+      "bytes": 3584
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/eligibility-shadow-sql-probe.txt",
+      "packet_path": "evidence/integration-and-adapters/eligibility-shadow-sql-probe.txt",
+      "sha256": "a5e995c7824ef23c7b0bb38a60fc4d0bf469efb1d8a34cfb6ff471bbc9368db4",
+      "bytes": 257
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-race-contract-commands.md",
+      "packet_path": "evidence/integration-and-adapters/native-race-contract-commands.md",
+      "sha256": "76a30076924b2a4b8d63d4e25a92efaf9cac5ce61965aed6a2d3933834e3e90e",
+      "bytes": 3085
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-race-contract-pint.exit",
+      "packet_path": "evidence/integration-and-adapters/native-race-contract-pint.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-race-contract-pint.txt",
+      "packet_path": "evidence/integration-and-adapters/native-race-contract-pint.txt",
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "bytes": 33
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-race-contract-syntax.exit",
+      "packet_path": "evidence/integration-and-adapters/native-race-contract-syntax.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-race-contract-syntax.txt",
+      "packet_path": "evidence/integration-and-adapters/native-race-contract-syntax.txt",
+      "sha256": "9eb40fe45c39eeb6acc3b9acc5f0caabd3b506069ec556f4efbb9e1378e6a973",
+      "bytes": 111
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-race-contract.sources",
+      "packet_path": "evidence/integration-and-adapters/native-race-contract.sources",
+      "sha256": "c002bc16451792df0df71768409b0a4e77d1996df6987c64d5b6afd6d6bfdee9",
+      "bytes": 148
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-race-workers/test_same_key_and_intent_return_the_same_retained_reservation_and_event-08b39674-93e3-4926-9612-115027583ef7.json",
+      "packet_path": "evidence/integration-and-adapters/native-race-workers/test_same_key_and_intent_return_the_same_retained_reservation_and_event-08b39674-93e3-4926-9612-115027583ef7.json",
+      "sha256": "92dcaadcae7025442dd356d9abdcdee9ddef218dbf8115496fc94cb33ad1092e",
+      "bytes": 5073
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-reservation-races-isolated.exit",
+      "packet_path": "evidence/integration-and-adapters/native-reservation-races-isolated.exit",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-reservation-races-isolated.log",
+      "packet_path": "evidence/integration-and-adapters/native-reservation-races-isolated.log",
+      "sha256": "c6519726228439afb2e3fa96196138fd616b4184f263934e45d486aabbb422d3",
+      "bytes": 1018
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-reservation-races-isolated.result.json",
+      "packet_path": "evidence/integration-and-adapters/native-reservation-races-isolated.result.json",
+      "sha256": "5f66931f52694f3a45b4e65ceb4b09fd8baebfc80ebb3bbd7e9543f504754e13",
+      "bytes": 455
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-reservation-races-isolated.source.json",
+      "packet_path": "evidence/integration-and-adapters/native-reservation-races-isolated.source.json",
+      "sha256": "4558340a5abf44168554f1df807ecbb37d9d37bcf0333805bbb39aa2454d7aa7",
+      "bytes": 163093
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-reservation-races-isolated.xml",
+      "packet_path": "evidence/integration-and-adapters/native-reservation-races-isolated.xml",
+      "sha256": "240c4002495392e275afa64522adfb7a04bd49b408e77eb7fa69893521984ee9",
+      "bytes": 1612
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/run-native-focused.py",
+      "packet_path": "evidence/integration-and-adapters/run-native-focused.py",
+      "sha256": "27c07e75c99b628b99e23d428052d7bfbe783aeef49aa960a56c0f38ed43473d",
+      "bytes": 3331
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/final-45d12994-pint.exit",
+      "packet_path": "evidence/integration-and-adapters/final-45d12994-pint.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/final-45d12994-pint.log",
+      "packet_path": "evidence/integration-and-adapters/final-45d12994-pint.log",
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "bytes": 33
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/final-45d12994-pint.result.json",
+      "packet_path": "evidence/integration-and-adapters/final-45d12994-pint.result.json",
+      "sha256": "bdc5b57e41736d173c8ebcdef24c7657fc321491494d3175d1be35b5f975a66a",
+      "bytes": 61
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/final-45d12994-pint.source.json",
+      "packet_path": "evidence/integration-and-adapters/final-45d12994-pint.source.json",
+      "sha256": "2183f46721e6f67c3f7f66ee42f35b777963e75c7ae13ed45a8b7807442951ac",
+      "bytes": 6370
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-eligibility-final.exit",
+      "packet_path": "evidence/integration-and-adapters/native-eligibility-final.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-eligibility-final.log",
+      "packet_path": "evidence/integration-and-adapters/native-eligibility-final.log",
+      "sha256": "57aed03a4003998346f1d65fabb3a6a34f9b85c1ff8c3b0c4fd40c55e06f0b14",
+      "bytes": 313
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-eligibility-final.result.json",
+      "packet_path": "evidence/integration-and-adapters/native-eligibility-final.result.json",
+      "sha256": "93b22d65047c92fc0ee0a8b1ee43cc9dfc7db81537c64d124834c22b741eaa9c",
+      "bytes": 453
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-eligibility-final.source.json",
+      "packet_path": "evidence/integration-and-adapters/native-eligibility-final.source.json",
+      "sha256": "b466fbf413975cd7b3e26fbc97f6a1fcc1d99e8dc776b43ffcded094178518c8",
+      "bytes": 163028
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-eligibility-final.xml",
+      "packet_path": "evidence/integration-and-adapters/native-eligibility-final.xml",
+      "sha256": "d334d95416777fc108cfddc7f3fe478a12f8e4225f15fddefcb019397c01b6d3",
+      "bytes": 1291
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/final-45d12994/README.md",
+      "packet_path": "evidence/selection/final-45d12994/README.md",
+      "sha256": "fda8b3c6c7d738f968d8c4430f33e5f2186d71368a34de83c4fa218b099e4518",
+      "bytes": 2068
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/final-45d12994/artifact-digests.json",
+      "packet_path": "evidence/selection/final-45d12994/artifact-digests.json",
+      "sha256": "5de86303e62fb8120d0987d7074ca60bccd0bb225ca72b23cad83e3d7b73d223",
+      "bytes": 9714
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/final-45d12994/discovery-census.json",
+      "packet_path": "evidence/selection/final-45d12994/discovery-census.json",
+      "sha256": "b598f21c6cd7da7648b0d8eaf83e988659cea57493add23a384168cce177fce7",
+      "bytes": 2396
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/final-45d12994/discovery-generated-artifacts.json",
+      "packet_path": "evidence/selection/final-45d12994/discovery-generated-artifacts.json",
+      "sha256": "b6a902f162b508b18687aee5f4f4736ba371108a50f131bc661e058c6fd9175c",
+      "bytes": 6998
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/final-45d12994/discovery-manifest.json",
+      "packet_path": "evidence/selection/final-45d12994/discovery-manifest.json",
+      "sha256": "4dc4232a7feab58af2b0010a58326854ef540df89770984b9df14a7093b0254c",
+      "bytes": 19602
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/final-45d12994/discovery-source-check.json",
+      "packet_path": "evidence/selection/final-45d12994/discovery-source-check.json",
+      "sha256": "952691e80146c3558ff6ede1de1facbeaac38f0d9644a77fdced4bf37524bf7e",
+      "bytes": 37
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/final-45d12994/discovery.base",
+      "packet_path": "evidence/selection/final-45d12994/discovery.base",
+      "sha256": "7ec7dd51641337216d5a60eac6514e504c0df11556a253735f4eb09df126cf11",
+      "bytes": 41
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/final-45d12994/discovery.exit",
+      "packet_path": "evidence/selection/final-45d12994/discovery.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/final-45d12994/discovery.sh",
+      "packet_path": "evidence/selection/final-45d12994/discovery.sh",
+      "sha256": "d0aedaa76caade9c6109c599016bf47c987739291711a75fa43a271c835b2591",
+      "bytes": 2277
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/final-45d12994/discovery.sources.json",
+      "packet_path": "evidence/selection/final-45d12994/discovery.sources.json",
+      "sha256": "f198d7803eebc1b14a4dc491c17f03604034eccae07fcd7fa20b64446e0f694e",
+      "bytes": 265128
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/final-45d12994/discovery.txt",
+      "packet_path": "evidence/selection/final-45d12994/discovery.txt",
+      "sha256": "d6768074a65bbf06ab1399bdae5654523e2913821aacb34fc70765094aed2fc5",
+      "bytes": 1982
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/final-45d12994/finalize.exit",
+      "packet_path": "evidence/selection/final-45d12994/finalize.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/final-45d12994/finalize.py",
+      "packet_path": "evidence/selection/final-45d12994/finalize.py",
+      "sha256": "f7d24838551eabf7446d52744e0c92ba1b5a6319f6caa4114df4a8d62568f223",
+      "bytes": 4771
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/final-45d12994/finalize.txt",
+      "packet_path": "evidence/selection/final-45d12994/finalize.txt",
+      "sha256": "f208f93c23734013329fb9fd539f8a5bb4b515e42fcb352708b1fdc8b41a3a97",
+      "bytes": 490
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/final-45d12994/policy-carry-verification.json",
+      "packet_path": "evidence/selection/final-45d12994/policy-carry-verification.json",
+      "sha256": "0fd461fd31f5c745b2829e535dc50df525a44a43d5fefbf72ab9b5b870a98018",
+      "bytes": 1417
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/final-45d12994/setup-command.txt",
+      "packet_path": "evidence/selection/final-45d12994/setup-command.txt",
+      "sha256": "0eca12a885569e937d50ce5f4cdfcaf90a41301067e9f8601a911353fb6353f9",
+      "bytes": 427
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/final-45d12994/source-delta.json",
+      "packet_path": "evidence/selection/final-45d12994/source-delta.json",
+      "sha256": "6a199777a7a8214d6d0c8fdc8bc5aba57a6371b34337a4847497b819f00f92e6",
+      "bytes": 323
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/final-45d12994/worktree-status.txt",
+      "packet_path": "evidence/selection/final-45d12994/worktree-status.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-selection-evidence/commands.md",
+      "packet_path": "evidence/selection/final-45d12994/commands-history.md",
+      "sha256": "11a38dc3f56e64e0bd76bf9cba96e95eeb98a8e70a09c80a3e948487ef3b990b",
+      "bytes": 5997
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-race-workers/test_available_expiry_and_reserve_at_synthetic_equality_conserve_the_allowance-71ac82d9-b0c8-4779-9281-c837ca7862fd.json",
+      "packet_path": "evidence/integration-and-adapters/native-race-workers/test_available_expiry_and_reserve_at_synthetic_equality_conserve_the_allowance-71ac82d9-b0c8-4779-9281-c837ca7862fd.json",
+      "sha256": "dd8f92f28905380ebbd32ac645fa5a17c8910b332f6da68642add4a8c0f3b53e",
+      "bytes": 4790
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-race-workers/test_duplicate_release_at_honor_equality_creates_one_terminal_without_inflation-c01ef043-e094-41f2-af3a-c2b3e7abd58f.json",
+      "packet_path": "evidence/integration-and-adapters/native-race-workers/test_duplicate_release_at_honor_equality_creates_one_terminal_without_inflation-c01ef043-e094-41f2-af3a-c2b3e7abd58f.json",
+      "sha256": "59af6933f3bc72039bee7d47b77f3bdfd72ba1bcc034c2ed974832512e3c8084",
+      "bytes": 8420
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-race-workers/test_release_after_period_expiry_moves_credit_to_expired_and_cannot_resurrect_it-cb3a3fed-9db6-4b0f-95c9-845e7545eb92.json",
+      "packet_path": "evidence/integration-and-adapters/native-race-workers/test_release_after_period_expiry_moves_credit_to_expired_and_cannot_resurrect_it-cb3a3fed-9db6-4b0f-95c9-845e7545eb92.json",
+      "sha256": "bc105150447873a8c9d262c395cb3f5e154f62f3b651c6e0950daab8b5cd779e",
+      "bytes": 8421
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-race-workers/test_same_key_and_intent_return_the_same_retained_reservation_and_event-08adb5b6-7676-402e-930c-7ba2ddc64c9e.json",
+      "packet_path": "evidence/integration-and-adapters/native-race-workers/test_same_key_and_intent_return_the_same_retained_reservation_and_event-08adb5b6-7676-402e-930c-7ba2ddc64c9e.json",
+      "sha256": "2ca59fa50fb5c723ac53bdb12b6d32f0cc832a61e7fa7edb2b614fdbf8e8d490",
+      "bytes": 7638
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-reservation-races-contract.exit",
+      "packet_path": "evidence/integration-and-adapters/native-reservation-races-contract.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-reservation-races-contract.log",
+      "packet_path": "evidence/integration-and-adapters/native-reservation-races-contract.log",
+      "sha256": "3fd9180a0b5a7551470c6c31bf03e4da8c9e9b49f37e83776e9580562e954224",
+      "bytes": 315
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-reservation-races-contract.result.json",
+      "packet_path": "evidence/integration-and-adapters/native-reservation-races-contract.result.json",
+      "sha256": "7c6bae899c21e56b5fe2c6275e58d73c9183c52c6f7a10c9283fbb424f5c964e",
+      "bytes": 458
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-reservation-races-contract.source.json",
+      "packet_path": "evidence/integration-and-adapters/native-reservation-races-contract.source.json",
+      "sha256": "e9ef79ff2647c3293562230d52fa454bdd7a6f1b862e08c924c33f6ec598450d",
+      "bytes": 163093
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-reservation-evidence/native-reservation-races-contract.xml",
+      "packet_path": "evidence/integration-and-adapters/native-reservation-races-contract.xml",
+      "sha256": "8b8e5a4e5584526ab70be519a6ffea4d4bb723cbba6fab0e832cf80ce4b7145b",
+      "bytes": 2219
+    }
+  ]
+}

@@ -26,6 +26,7 @@ use Illuminate\Testing\TestResponse;
 use Livewire\Livewire;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
+use Tests\Support\FilamentNotifications;
 use Tests\Support\LicenseFixtures;
 use Tests\Support\MediaFixtures;
 use Tests\TestCase;
@@ -157,9 +158,7 @@ class SiteContentUnavailableHttpTest extends TestCase
         $this->corruptActiveRelease($actor);
 
         $page = Livewire::test(ListSiteReleases::class)->mountAction('createDraft');
-        $notification = collect(session('filament.claimed_notifications', session('filament.notifications', [])))
-            ->firstWhere('title', 'The published site content is unavailable');
-        $this->assertNotNull($notification);
+        $notification = FilamentNotifications::sole('The published site content is unavailable');
         // A damaged release is recoverable in the panel, so staff are not sent to a needless backup restore.
         $this->assertStringContainsString('Publish or restore an intact release', (string) $notification['body']);
         $this->assertStringNotContainsString('backup', (string) $notification['body']);

@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "gh",
+    "pr",
+    "merge",
+    "122",
+    "--repo",
+    "SeanVasey/VA-Studio",
+    "--merge",
+    "--match-head-commit",
+    "3dc5a5af043a1e254fab895541d93d25223a8a0e"
+  ],
+  "observed_at": "2026-10-15T08:06:38.609186+00:00",
+  "process_exit": 0,
+  "stdout": "",
+  "stderr": ""
+}

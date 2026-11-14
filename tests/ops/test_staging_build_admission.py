@@ -37,6 +37,11 @@ class BuildAdmissionTest(unittest.TestCase):
             release.parent.mkdir()
             evidence = root / "evidence"
             evidence.mkdir()
+            (root / "tmp").mkdir(mode=0o700)
+            # A home left by an earlier build (or planted by the application) must never be reused.
+            stale = root / "tmp" / "build-home"
+            (stale / "composer").mkdir(parents=True)
+            (stale / ".npmrc").write_text("registry=https://planted.invalid/\n")
             candidate = root / "candidate.env"
             candidate.write_text(profile)
             candidate.chmod(0o600)
@@ -49,6 +54,16 @@ if ($profile !== EXPECTED_PROFILE || (fileperms('.env') & 0777) !== 0600) {
     fwrite(STDERR, "Composer hooks booted without the frozen private staging profile\\n");
     exit(23);
 }
+$home = getenv('HOME'); $composerHome = getenv('COMPOSER_HOME');
+if (!is_string($home) || !is_dir($home) || !is_string($composerHome) || !str_starts_with($composerHome, $home . '/')
+    || str_starts_with(realpath($home), realpath(getcwd()))) {
+    fwrite(STDERR, "Composer ran without a private build home outside the release\n");
+    exit(24);
+}
+if ((fileperms($home) & 0777) !== 0700 || array_diff(scandir($home), ['.', '..', 'composer']) !== []) {
+    fwrite(STDERR, "Composer ran with a reused or shared build home\n");
+    exit(26);
+}
 file_put_contents('hook-profile.sha256', hash('sha256', $profile));
 mkdir('vendor/composer', 0755, true);
 file_put_contents('vendor/autoload.php', '<?php');
@@ -56,7 +71,8 @@ file_put_contents('vendor/composer/installed.json', '{}');
 """.replace("EXPECTED_PROFILE", json.dumps(profile)))
             composer.chmod(0o755)
             npm = commands / "npm"
-            npm.write_text('#!/bin/bash\nset -eu\nmkdir -p public/build\nprintf "{}" > public/build/manifest.json\n')
+            npm.write_text('#!/bin/bash\nset -eu\n[ -d "$HOME" ] && [ -n "$npm_config_cache" ] || exit 25\n'
+                           'mkdir -p public/build\nprintf "{}" > public/build/manifest.json\n')
             npm.chmod(0o755)
             config = root / "staging.conf"
             config.write_text("\n".join(name + "=" + shlex.quote(value) for name, value in {
@@ -71,6 +87,7 @@ file_put_contents('vendor/composer/installed.json', '{}');
                                  env={"PATH": str(commands) + ":/usr/bin:/bin", "LC_ALL": "C"},
                                  capture_output=True, text=True)
             self.assertEqual(run.returncode, 0, run.stderr)
+            self.assertEqual([stale], list((root / "tmp").glob("build-home*")), "the per-build home must be removed")
             self.assertEqual((release / "hook-profile.sha256").read_text(), hashlib.sha256(profile.encode()).hexdigest())
             self.assertEqual(candidate.read_text(), profile, "build changed the captured profile")
             self.assertEqual((release / ".env").read_text(), profile)
@@ -98,6 +115,7 @@ file_put_contents('vendor/composer/installed.json', '{}');
             (root / "current").symlink_to(served)
             (root / "private").mkdir()
             (root / "evidence").mkdir()
+            (root / "tmp").mkdir(mode=0o700)
             env = root / "candidate.env"
             env.write_text("APP_DEBUG=false\n")
             (served / ".env").write_text(env.read_text())
@@ -124,6 +142,7 @@ protected_dir() { :; }
 release_step_file() { :; }
 operation_evidence() { :; }
 operation_begin() { :; }
+cmd_space_check() { :; }   # covered by test_staging_backup_offhost.SpaceCheck
 operation_finish() { :; }
 seal_tool() { cp -- "$3" "$4"; }
 chown() { :; }

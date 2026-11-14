@@ -82,7 +82,8 @@ class OrderInquiryTest extends TestCase
         $this->assertSame(['orderInquiryContextSchema' => 1, 'order' => null], $service->ownerContext($this->fixture['inquiry']->public_id, InquiryConversationFixtures::OWNER));
         $order = Fixture::guest();
         $this->refused(fn () => $service->submit($order->public_id, InventoryFixtures::OWNER, InquiryConversationFixtures::OWNER, $this->fixture['body']), 409);
-        $body = Fixture::body();
+        // A listed subject, so the generic path reaches its replay check rather than the closed subject list (BL-50).
+        $body = array_replace(Fixture::body(), ['subject' => 'Order or download help']);
         $service->submit($order->public_id, InventoryFixtures::OWNER, InquiryConversationFixtures::OWNER, $body);
         $this->refused(fn () => app(SubmitInquiry::class)->handle($body, InquiryConversationFixtures::OWNER), 409);
         $this->assertDatabaseCount('customer_inquiries', 2);

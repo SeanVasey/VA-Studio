@@ -1,0 +1,91 @@
+{
+  "composition-canary-initial": {
+    "captured_head": "9d8abd4501b75a2577dc6f72a6a2adb4b6afbf5a",
+    "matching_git_commit": "9d8abd4501b75a2577dc6f72a6a2adb4b6afbf5a",
+    "files": 2006,
+    "all_captured_inputs_match_git": true,
+    "unchanged_during_run": true,
+    "runner": "run-focused.py",
+    "runner_matches_captured_hash": true,
+    "scope": "Complete captured input inventory. The native/runtime environment and unlisted dependencies are not supplied by this Git comparison."
+  },
+  "reservation-wrappers-initial": {
+    "captured_head": "9d8abd4501b75a2577dc6f72a6a2adb4b6afbf5a",
+    "matching_git_commit": "9d8abd4501b75a2577dc6f72a6a2adb4b6afbf5a",
+    "files": 2006,
+    "all_captured_inputs_match_git": true,
+    "unchanged_during_run": true,
+    "runner": "run-focused.py",
+    "runner_matches_captured_hash": true,
+    "scope": "Complete captured input inventory. The native/runtime environment and unlisted dependencies are not supplied by this Git comparison."
+  },
+  "composition-canary-timestamp-fixed": {
+    "captured_head": "43e58632d87977b467f58fde0feeef47b6a89dcc",
+    "matching_git_commit": "43e58632d87977b467f58fde0feeef47b6a89dcc",
+    "files": 2034,
+    "all_captured_inputs_match_git": true,
+    "unchanged_during_run": true,
+    "runner": "run-composed.py",
+    "runner_matches_captured_hash": true,
+    "scope": "Complete captured input inventory. The native/runtime environment and unlisted dependencies are not supplied by this Git comparison."
+  },
+  "retained-deadline-old-bridge-red": {
+    "captured_head": "a082d3b394d071538cc65057074c1d06a7f6c994",
+    "matching_git_commit": "a082d3b394d071538cc65057074c1d06a7f6c994",
+    "files": 2034,
+    "all_captured_inputs_match_git": true,
+    "unchanged_during_run": true,
+    "runner": "run-retained-deadline-overlay.py",
+    "runner_matches_captured_hash": true,
+    "scope": "Complete captured input inventory. The native/runtime environment and unlisted dependencies are not supplied by this Git comparison.",
+    "executed_class_overlay": {
+      "source_commit": "5bbebd776ca6cce2be4fd0d427f3baa926c2676d",
+      "class": "App\\Domain\\Grants\\Member\\MemberOriginalInspection",
+      "path": "/workspace/runtime/member-original-operation-evidence/retained-deadline-old-inspection.php.txt",
+      "sha256": "9e3190d4f4c93e23d2995d4ad58ea4ecfaaffb8c5a2acd991fe9dda1a64ea89f",
+      "verified_against_git": true,
+      "scope": "One exact old class preloaded over the supporting current tree; not a whole old-application run."
+    }
+  },
+  "composition-fifteen-initial": {
+    "captured_head": "a082d3b394d071538cc65057074c1d06a7f6c994",
+    "matching_git_commit": "a082d3b394d071538cc65057074c1d06a7f6c994",
+    "files": 2034,
+    "all_captured_inputs_match_git": true,
+    "unchanged_during_run": true,
+    "runner": "run-composed.py",
+    "runner_matches_captured_hash": true,
+    "scope": "Complete captured input inventory. The native/runtime environment and unlisted dependencies are not supplied by this Git comparison."
+  },
+  "composition-facts-callback-corrected": {
+    "captured_head": "a082d3b394d071538cc65057074c1d06a7f6c994",
+    "matching_git_commit": "2cfd9a0db46a806c0a0bd0c83839b5b584fc3627",
+    "files": 2034,
+    "all_captured_inputs_match_git": true,
+    "unchanged_during_run": true,
+    "runner": "run-composed.py",
+    "runner_matches_captured_hash": true,
+    "scope": "Complete captured input inventory. The native/runtime environment and unlisted dependencies are not supplied by this Git comparison.",
+    "precommit_overlay": "Only MemberOriginalCompositionTest.php differed from captured HEAD; exact tested bytes match this later test-only commit."
+  },
+  "composition-fifteen-final": {
+    "captured_head": "2cfd9a0db46a806c0a0bd0c83839b5b584fc3627",
+    "matching_git_commit": "2cfd9a0db46a806c0a0bd0c83839b5b584fc3627",
+    "files": 2034,
+    "all_captured_inputs_match_git": true,
+    "unchanged_during_run": true,
+    "runner": "run-composed.py",
+    "runner_matches_captured_hash": true,
+    "scope": "Complete captured input inventory. The native/runtime environment and unlisted dependencies are not supplied by this Git comparison."
+  },
+  "reservation-clock-wrapper-final": {
+    "captured_head": "2cfd9a0db46a806c0a0bd0c83839b5b584fc3627",
+    "matching_git_commit": "2cfd9a0db46a806c0a0bd0c83839b5b584fc3627",
+    "files": 2034,
+    "all_captured_inputs_match_git": true,
+    "unchanged_during_run": true,
+    "runner": "run-composed.py",
+    "runner_matches_captured_hash": true,
+    "scope": "Complete captured input inventory. The native/runtime environment and unlisted dependencies are not supplied by this Git comparison."
+  }
+}

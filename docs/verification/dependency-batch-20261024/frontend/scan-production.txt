@@ -1,0 +1,2 @@
+Scanned 14 bundle files for 9 secret names and Stripe key prefixes: no hits.
+exit 0

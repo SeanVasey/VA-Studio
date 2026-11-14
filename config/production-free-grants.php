@@ -6,6 +6,9 @@
  */
 return [
     'enabled' => false,
+    // The customer HTTP mount (routes/production-free-grants.php). Literal false: only an exact boolean true, in local or
+    // testing, registers the routes, and ProductionFreeHttpMount re-checks it on every request. Mounting approves nothing.
+    'http_mounted' => false,
     'version' => 1,
     'family' => 'production-free-origin-v1',
     'purpose' => 'production-free-license-grant-v1',

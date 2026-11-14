@@ -1,0 +1,280 @@
+{
+  "changed_paths_from_d545": [
+    "app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php",
+    "app/Domain/Grants/ProductionFree/ProductionFreeGrantSpool.php",
+    "app/Domain/Grants/ProductionFree/ProductionFreeGrantTransfer.php",
+    "tests/Feature/ProductionFreeGrants/ProductionFreeGrantAccountSpoolProcessTest.php",
+    "tests/Feature/ProductionFreeGrants/ProductionFreeGrantAccountSpoolTest.php",
+    "tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php",
+    "tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php",
+    "tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolResidualTest.php",
+    "tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php",
+    "tests/Feature/ProductionFreeGrants/ProductionFreeGrantTransferDeadlineTest.php"
+  ],
+  "closed_source_groups": [
+    {
+      "id": "D1-S1",
+      "result": "Canonical existing slot locks are scanned beyond the current allocation range; live high-slot account and unknown-holder controls pass after shrink. Allocation remains within the current range; previously held allocations retain their leases until released."
+    },
+    {
+      "id": "D1-S2",
+      "result": "Native nonnegative integer validation precedes every deadline/progress comparison; string, float, negative, null and boolean controls all refuse with the fixed expiry exception and cleanup."
+    }
+  ],
+  "conditions": [
+    "Reconcile the independently requested native MySQL domain counterpart and actual private-server lifecycle before final evidence approval; no native pass is inferred here.",
+    "Seal the final evidence packet, retain every original nonzero run, and obtain an explicit independent final source/evidence decision and publication carry if the final head is docs-only.",
+    "Cheap preflight, complete review inventory/protections and expected-head merge remain development publication gates.",
+    "HTTP mount, first-byte reproof, blocked-callback/send-timeout enforcement, source adapter, fonts, identity host evidence and commercial activation remain open."
+  ],
+  "decision": "APPROVE_SOURCE_WITH_FINAL_EVIDENCE_CONDITIONS",
+  "engineering_quality_verdict": "Pass for the bounded source and reached local controls",
+  "evidence_verdict": "Partial pending the native domain counterpart, final packet and publication gates",
+  "frozen_resource_diff": [],
+  "not_claimed": [
+    "Whole repository or full CI acceptance",
+    "Native MySQL domain pass in this source decision",
+    "Host/provider/customer/renderer/mount/commercial acceptance",
+    "Interrupting a blocked consumer callback",
+    "Instantaneous contraction of already held allocations after a configuration change"
+  ],
+  "observed_tool_exits": {
+    "affected_sqlite": {
+      "exit": 0,
+      "receipt": "/workspace/runtime/free-delivery-progress-evidence-20261015/observed-affected-sqlite-fixed-tool-exit-original.json",
+      "session_id": 76963
+    },
+    "old_shrink_clock": {
+      "exit": 1,
+      "receipt": "/workspace/runtime/free-delivery-progress-evidence-20261015/observed-tool-exit-addendum-original.json",
+      "session_id": 97158
+    },
+    "progress_account_process": {
+      "exit": 0,
+      "receipt": "/workspace/runtime/free-delivery-progress-evidence-20261015/observed-tool-exit-addendum-original.json",
+      "session_id": 21441
+    }
+  },
+  "open_p0": 0,
+  "open_p1": 0,
+  "original_dependency_hashes": {
+    "/workspace/runtime/free-delivery-identity-dependency-review-20261015.md": "f6b9c0552a03aac07ee97ce26cf07d0ddf1226607a575ed89fdbbb88c51076aa",
+    "/workspace/runtime/free-delivery-progress-design-v2-20261015.md": "0c301ab30c316fab4b8ca581b537c087ef8ce929d12a789642df0b9fba4700cd",
+    "/workspace/runtime/free-delivery-progress-evidence-20261015/observed-affected-sqlite-fixed-tool-exit-original.json": "87a9ed7b71b64ff16417170f93c6667dd4c489693fcbc9b3c13fd8d717d21e9a",
+    "/workspace/runtime/free-delivery-progress-evidence-20261015/observed-tool-exit-addendum-original.json": "57a60c242fe8c17240262365982fc76ecf744d65576717efe3b035da4f250e26",
+    "/workspace/runtime/free-delivery-progress-source-review-f1d5fb1f-20261015.json": "857e4875fd6ed923a38ca914472a39cec01931758c3f2638aa14a46efdb605e6",
+    "/workspace/runtime/free-delivery-progress-source-review-f1d5fb1f-20261015.md": "90163b1fe8bcd78c39943f404ca2ccfe746ca49217098b29e9052f56b096c972"
+  },
+  "other_control_assessment": [
+    "Original-start progress, zero-base fixed startup/nonrenewal, reversal, exact boundary, final returning callback and cleanup controls are independent behavior checks.",
+    "Missing, zero or malformed held holders refuse scoped admission; failed fill releases the owned lease and account.",
+    "Actual two-PHP-process controls cover published holder and pending reservation during fill, continued account hold after preparation, normal close, and explicit child exit with owned residual reclamation. They do not establish simultaneous-start contention, forced-kill behavior or a real hosting filesystem.",
+    "Whole affected SQLite controls use three distinct real fixture accounts for global admission; same owner across roles/origins refuses before copying while another fixture account succeeds. Storage-only residual controls are explicitly synthetic holders before an actual domain redemption.",
+    "Healthy transfer beyond authorization TTL uses 50-second returning chunks within the captured progress rate; the below-rate control correctly expects only the first MiB before refusal.",
+    "Only the separately re-reviewed MAIN ProductionCustomerAccess test reference changed. All frozen production-free-v1 resource/profile bytes are unchanged."
+  ],
+  "preparation_errors": [
+    {
+      "kind": "Reviewer mechanical check assumption",
+      "result": "An initial assertion incorrectly compared raw pretty-printed JSON bytes to the runner canonical JSON identity digest. Inspection of runner canonical() resolved the mismatch; the corrected canonical JSON checks all pass. No application test or original receipt changed."
+    }
+  ],
+  "receipts": [
+    {
+      "canonical_identity": {
+        "head": "2e071ef9b4783beb99336968a8b73cd76f7c9cf5",
+        "manifest_sha256": "2ed0dbffa0b41f586d11eba181a838dad2ddf17a064f1024b5236c3ebf43f834",
+        "public_environment_sha256": "c0997a1efc6cfc2c1386d21138bd79f869f3c546f575cebec46697ddb6b25988",
+        "runner_sha256": "d743d55f75bbf0373f19af9beea29bc834b1e98622abc8161c52798b6a45ed41",
+        "runtime_sha256": "21fb1495c36b17fb275d948718145332071d9eb1c83efbe0b5625c7e5ff8cada"
+      },
+      "command_argv": [
+        "php",
+        "-d",
+        "memory_limit=512M",
+        "-r",
+        "require \"vendor/autoload.php\"; exit((new PHPUnit\\TextUI\\Application)->run(json_decode($argv[1], true, 32, JSON_THROW_ON_ERROR)));",
+        "[\"phpunit\", \"--do-not-cache-result\", \"--colors=never\", \"--log-junit\", \"/workspace/runtime/free-delivery-progress-evidence-20261015/progress-account-process-fixed-original/junit.xml\", \"tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php\", \"tests/Feature/ProductionFreeGrants/ProductionFreeGrantAccountSpoolTest.php\", \"tests/Feature/ProductionFreeGrants/ProductionFreeGrantAccountSpoolProcessTest.php\"]"
+      ],
+      "directory": "/workspace/runtime/free-delivery-progress-evidence-20261015/progress-account-process-fixed-original",
+      "junit": {
+        "assertions": 85,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 27
+      },
+      "name": "progress-account-process-fixed-original",
+      "original_byte_hashes": {
+        "command.json": "b16442f4924ec6cfc07549b10ba71bd881fa9549f6933dac5c8bedfeb7f5525f",
+        "junit.xml": "d251f90d9aee74d8f5d12dc4459fec300b6b474f8aa7a405bcfdf4ea1c92bdda",
+        "log.txt": "2885453ed086138d0c2e8b3efb8fdb739190bd9d8f33a4a4e4a0bb58b7bef52b",
+        "process.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "result.json": "783161f711768d6fbc4beb345ea5a30db3f380019ec44bef5fdcdaea293858cf"
+      },
+      "php_process_exit": 0,
+      "recorder_exit": 0,
+      "runtime": {
+        "database": {
+          "database_name": ":memory:",
+          "driver": "sqlite",
+          "version": "3.46.1"
+        },
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors."
+      },
+      "selected_files": [
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantAccountSpoolTest.php",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantAccountSpoolProcessTest.php"
+      ],
+      "source_and_loader_stable": true,
+      "source_input_count": 2460,
+      "source_sha": "2e071ef9b4783beb99336968a8b73cd76f7c9cf5",
+      "verified_physical_loaders": 13,
+      "verified_relevant_source_hashes": {
+        "app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php": "427bea80c5f6b7aa4c531bf36e537105252b372a73a656e25083d8290b1516b0",
+        "app/Domain/Grants/ProductionFree/ProductionFreeGrantSpool.php": "ac3c0fb0055374f9d2ede945d9dc525f84b1ecb68e1073fce65615f86c4e0dc9",
+        "app/Domain/Grants/ProductionFree/ProductionFreeGrantTransfer.php": "95615cd3cf07a2337da13e85adcc2c221c8eda24b696b1478bf1b294d84b8ff9",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantAccountSpoolProcessTest.php": "31784dbc28fa3436ed4edf1aa17450a90b7bbb0a0814ac03b3a856e5bb2b6bbe",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantAccountSpoolTest.php": "9fa08250277dcd21608e41be818d5d97754b495aba68e6c262e632d5b6538875",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php": "d23058018be83c2e34c465c2d2eafdb8baf92cea7c51bcde1c5a97925946b294"
+      }
+    },
+    {
+      "canonical_identity": {
+        "head": "2e071ef9b4783beb99336968a8b73cd76f7c9cf5",
+        "manifest_sha256": "2ed0dbffa0b41f586d11eba181a838dad2ddf17a064f1024b5236c3ebf43f834",
+        "public_environment_sha256": "c0997a1efc6cfc2c1386d21138bd79f869f3c546f575cebec46697ddb6b25988",
+        "runner_sha256": "d743d55f75bbf0373f19af9beea29bc834b1e98622abc8161c52798b6a45ed41",
+        "runtime_sha256": "21fb1495c36b17fb275d948718145332071d9eb1c83efbe0b5625c7e5ff8cada"
+      },
+      "command_argv": [
+        "php",
+        "-d",
+        "memory_limit=512M",
+        "-r",
+        "require \"vendor/autoload.php\"; exit((new PHPUnit\\TextUI\\Application)->run(json_decode($argv[1], true, 32, JSON_THROW_ON_ERROR)));",
+        "[\"phpunit\", \"--do-not-cache-result\", \"--colors=never\", \"--log-junit\", \"/workspace/runtime/free-delivery-progress-evidence-20261015/affected-free-sqlite-fixed-original/junit.xml\", \"tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php\", \"tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolReservationTest.php\", \"tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolResidualTest.php\", \"tests/Feature/ProductionFreeGrants/ProductionFreeGrantTransferDeadlineTest.php\", \"tests/Feature/ProductionFreeGrants/ProductionFreeGrantDeliveryTest.php\", \"tests/Feature/ProductionFreeGrants/ProductionFreeGrantFilesTest.php\", \"tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php\"]"
+      ],
+      "directory": "/workspace/runtime/free-delivery-progress-evidence-20261015/affected-free-sqlite-fixed-original",
+      "junit": {
+        "assertions": 313,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 34
+      },
+      "name": "affected-free-sqlite-fixed-original",
+      "original_byte_hashes": {
+        "command.json": "337fe28dfb73f2e5967875245f0f8cf8148f5089fff0bdfcb67540241f6afc6d",
+        "junit.xml": "2e08112f3be9bd8810c98188c7757327dca088ad7a59f10781938594804b03e4",
+        "log.txt": "b359ffa53c1b4386b669bca0772d9ca2da13a9e9b5bb461cdf8cea178414079a",
+        "process.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "result.json": "c013a09fce98d925e2c66b16ce16fdd83f3062d91ecf48f51ffe1e19fcd54610"
+      },
+      "php_process_exit": 0,
+      "recorder_exit": 0,
+      "runtime": {
+        "database": {
+          "database_name": ":memory:",
+          "driver": "sqlite",
+          "version": "3.46.1"
+        },
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors."
+      },
+      "selected_files": [
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolReservationTest.php",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolResidualTest.php",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantTransferDeadlineTest.php",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantDeliveryTest.php",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantFilesTest.php",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php"
+      ],
+      "source_and_loader_stable": true,
+      "source_input_count": 2460,
+      "source_sha": "2e071ef9b4783beb99336968a8b73cd76f7c9cf5",
+      "verified_physical_loaders": 13,
+      "verified_relevant_source_hashes": {
+        "app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php": "427bea80c5f6b7aa4c531bf36e537105252b372a73a656e25083d8290b1516b0",
+        "app/Domain/Grants/ProductionFree/ProductionFreeGrantSpool.php": "ac3c0fb0055374f9d2ede945d9dc525f84b1ecb68e1073fce65615f86c4e0dc9",
+        "app/Domain/Grants/ProductionFree/ProductionFreeGrantTransfer.php": "95615cd3cf07a2337da13e85adcc2c221c8eda24b696b1478bf1b294d84b8ff9",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantDeliveryTest.php": "ab186f60a91f2b533ee98877e3f12a3ca426a360b8293d3c72c5668d41196203",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantFilesTest.php": "4b1352b255ec6fdee08da51ab99ad4fb9372227f4d4b865d216eb3a98c5ee62c",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php": "642ecc9300b6eb63a39a5764d348a83b324ab7a89cc972abbab7eab39b221133",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolReservationTest.php": "678ab1e5cd4a096badc18f3b113227603639164469674313dea21ee31e5874d8",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolResidualTest.php": "871b9ad5bf865978a7296da7aaab20d5eae8439fdba2985382a37142c660a818",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php": "1e401ef5d72d693fe53a07ceb409f8dc14fcdc2470cdd4325fd2151fac277faa",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantTransferDeadlineTest.php": "e53c70e61945fe2ed47fead27b7ced8ac7008219d699fa136596c3cae380442f"
+      }
+    },
+    {
+      "canonical_identity": {
+        "head": "80c174caa551ff18d619181e38415a80c8597901",
+        "manifest_sha256": "ec522bc5c70a4fe3c97d3e1a8380948f91ff92126ddba18f77f76d9e4624dc70",
+        "public_environment_sha256": "c0997a1efc6cfc2c1386d21138bd79f869f3c546f575cebec46697ddb6b25988",
+        "runner_sha256": "d743d55f75bbf0373f19af9beea29bc834b1e98622abc8161c52798b6a45ed41",
+        "runtime_sha256": "21fb1495c36b17fb275d948718145332071d9eb1c83efbe0b5625c7e5ff8cada"
+      },
+      "command_argv": [
+        "php",
+        "-d",
+        "memory_limit=512M",
+        "-r",
+        "require \"vendor/autoload.php\"; exit((new PHPUnit\\TextUI\\Application)->run(json_decode($argv[1], true, 32, JSON_THROW_ON_ERROR)));",
+        "[\"phpunit\", \"--do-not-cache-result\", \"--colors=never\", \"--log-junit\", \"/workspace/runtime/free-delivery-progress-evidence-20261015/shrink-clock-old-original/junit.xml\", \"tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php\", \"tests/Feature/ProductionFreeGrants/ProductionFreeGrantAccountSpoolTest.php\", \"--filter\", \"reducing_slot_count|clock_values\"]"
+      ],
+      "directory": "/workspace/runtime/free-delivery-progress-evidence-20261015/shrink-clock-old-original",
+      "junit": {
+        "assertions": 7,
+        "errors": 1,
+        "failures": 3,
+        "skipped": 0,
+        "tests": 6
+      },
+      "name": "shrink-clock-old-original",
+      "original_byte_hashes": {
+        "command.json": "9ebe87e57c7c4b567e76535ee485c4b966d9494fcbc9a2f1ff57850a93c31b60",
+        "junit.xml": "d18257fd2363417338c1191798253218cb851b3cecc5c5a450564dfd3c94e028",
+        "log.txt": "567c75b844fbae4d148cdf7c1d44ee80e7f7010af56aa977d0a4b76d2616e62f",
+        "process.exit": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+        "result.json": "ea5c674260cd768feb960f7bb67c8d05334ffbbcfcdb3e9839ebeb89946141ae"
+      },
+      "php_process_exit": 2,
+      "recorder_exit": 1,
+      "runtime": {
+        "database": {
+          "database_name": ":memory:",
+          "driver": "sqlite",
+          "version": "3.46.1"
+        },
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors."
+      },
+      "selected_files": [
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantAccountSpoolTest.php"
+      ],
+      "source_and_loader_stable": true,
+      "source_input_count": 2459,
+      "source_sha": "80c174caa551ff18d619181e38415a80c8597901",
+      "verified_physical_loaders": 13,
+      "verified_relevant_source_hashes": {
+        "app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php": "427bea80c5f6b7aa4c531bf36e537105252b372a73a656e25083d8290b1516b0",
+        "app/Domain/Grants/ProductionFree/ProductionFreeGrantSpool.php": "a58603ad7c43496f081cc52b09a3ffd53bf2544bff55b77567cf17ba0ee15b54",
+        "app/Domain/Grants/ProductionFree/ProductionFreeGrantTransfer.php": "6b0e9aab507010e3afb86b38f97582bada4b3d8563c8d57e86b2e20f4843d050",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantAccountSpoolTest.php": "a322be805672d1cd6840e9c38aae39cd78c3ee614934473f0215cbb23bf1b4c4",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php": "3ba0c8965964097707ac61bc798389f8940f2add961c813befdf144eb1492b3f"
+      }
+    }
+  ],
+  "required_corrections": [],
+  "review_execution": "Read-only Git/source and Python standard-library receipt/hash/XML inspection. No application, database, network, CI or duplicate test execution. Only these reviewer MD/JSON files were created.",
+  "reviewed_sha": "2e071ef9b4783beb99336968a8b73cd76f7c9cf5",
+  "reviewed_utc": "2026-10-15T21:21:47.745575+00:00",
+  "reviewer": "Independent account_features_final_review session; authored no implementation or reached tests",
+  "scope": "D1 returning-write progress and one held snapshot per proved account; repaired source and reached controls, not final sealed packet or release acceptance",
+  "specification_verdict": "Pass for the bounded implemented prerequisites"
+}

@@ -1,0 +1,120 @@
+{
+  "actions_performed": [
+    "Read-only immutableGit delta/status/source/hash/native-policy/check-import consistency verification",
+    "Exclusive reviewer runtime MD/JSON creation"
+  ],
+  "app_db_network_ci_execution": false,
+  "application_test_rerun_required_for_this_docs_delta": false,
+  "approved_final_source_evidence_head": "6fdabe77b839eb821fa418f53057707898f5eb3c",
+  "approved_policy_head": "bd7e29119e718ace3a714fbee580c6e8992eeea7",
+  "byte_original_review_import_sha256": {
+    "account-features-http-policy-review-bd7e2911-20261015-original.json": "7e86cdd794c03d993c24515f11089ef9b5add517ca078f20e8682dfa2de1924f",
+    "account-features-http-policy-review-bd7e2911-20261015-original.md": "2827214c8ef0561a3340c1c59e96d4f0e8a28fc6074a92c3b02e2fcd1efdbc80",
+    "account-features-http-publication-carry-0902be9e-20261015-original.json": "cb952358c908b0c35de777011aee5475153df3fdf029da8047237b303aa8e139",
+    "account-features-http-publication-carry-0902be9e-20261015-original.md": "5880737737cf46763ea06a2b442813829eab9dd71c947e315be15adc8d6e6b43"
+  },
+  "correction_check_imports": [
+    {
+      "argv": [
+        "python3",
+        "scripts/ci/test-phpunit-shards.py"
+      ],
+      "json_sha256": "dca5b3e7dd34238e3b1f9e1fd6b24e837c8adc34479b4db807b601668d058151",
+      "log_sha256": "663dc2be2a2bca05529060a55bff67958d9fc8f49025e3189a516622849d3ad4",
+      "name": "test-phpunit-shards",
+      "process_exit": 0,
+      "tests": 52
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/ci/test-database-receipts.py"
+      ],
+      "json_sha256": "cab51095c7251a6145acb4ea0fa66a34b7ab18df4a8b98089fb98d0237a2ace0",
+      "log_sha256": "9a47840fd7685b6ea4c9494ed4747e5b7d3cdd2ff5468252435bcb9400c2ea5a",
+      "name": "test-database-receipts",
+      "process_exit": 0,
+      "tests": 61
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/ci/test-gitlab-database-receipts.py"
+      ],
+      "json_sha256": "4a70d0658563f7b5a370ac1a8b88d1ebe8c8554a955085abb8d9fbe25e80b9cf",
+      "log_sha256": "e08811a11ff0b5d3c5c525c46355f0a57adaa7321fcd723cafff8cd13adb50ce",
+      "name": "test-gitlab-database-receipts",
+      "process_exit": 0,
+      "tests": 32
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/ci/test-workflow-cadence.py"
+      ],
+      "json_sha256": "45a2844fe9c9d545895b179e0e2dc40391aa1124e28eaec79c197c7b3bb80549",
+      "log_sha256": "dd818658e9c8008cb354da9371485cb574dabd3d7c356cdfa1c694608942fdca",
+      "name": "test-workflow-cadence",
+      "process_exit": 0,
+      "tests": 14
+    }
+  ],
+  "decision": "APPROVE FINAL DOCUMENTATION-ONLY PUBLICATION CARRY",
+  "docs_only_changed_paths": [
+    "docs/handoff/2026-10-07/CLAUDE-PLAN.md",
+    "docs/handoff/2026-10-07/codex-deferred-20261011.md",
+    "docs/verification/account-features-http-20261015/README.md",
+    "docs/verification/account-features-http-20261015/account-features-http-policy-review-bd7e2911-20261015-original.json",
+    "docs/verification/account-features-http-20261015/account-features-http-policy-review-bd7e2911-20261015-original.md",
+    "docs/verification/account-features-http-20261015/account-features-http-publication-carry-0902be9e-20261015-original.json",
+    "docs/verification/account-features-http-20261015/account-features-http-publication-carry-0902be9e-20261015-original.md",
+    "docs/verification/account-features-http-20261015/test-database-receipts-bd7-corrected-original.json",
+    "docs/verification/account-features-http-20261015/test-database-receipts-bd7-corrected-original.log",
+    "docs/verification/account-features-http-20261015/test-gitlab-database-receipts-bd7-corrected-original.json",
+    "docs/verification/account-features-http-20261015/test-gitlab-database-receipts-bd7-corrected-original.log",
+    "docs/verification/account-features-http-20261015/test-phpunit-shards-bd7-corrected-original.json",
+    "docs/verification/account-features-http-20261015/test-phpunit-shards-bd7-corrected-original.log",
+    "docs/verification/account-features-http-20261015/test-workflow-cadence-bd7-corrected-original.json",
+    "docs/verification/account-features-http-20261015/test-workflow-cadence-bd7-corrected-original.log"
+  ],
+  "findings": [],
+  "limits": [
+    "Full Foundation/application/browser matrices",
+    "Physical SAPI/FPM/output handler/host verification and deployment",
+    "Wider native concurrency/performance or whole HTTP latency",
+    "Provider delivery/commercial/legal/launch acceptance, live accounts/payments/import/activation",
+    "Frozen adjacent unwrappedV1/generic/IdentityOriginalCommitWitness metadata and ordinary membership throwing-afterCommitP2"
+  ],
+  "observed_source_status": "",
+  "open_p0": 0,
+  "open_p1": 0,
+  "preparation_errors": [],
+  "recorded_utc": "2026-10-15T20:18:07.474167+00:00",
+  "remaining_gates": [
+    "Green cheap preflight on exact483f; applicable frontend/typecheck/backendquality checks must complete",
+    "Current complete reviews/threads/checks inventory and repository protections with no openP0/P1",
+    "Expected-head-SHA development merge and actual receipt/both ledgers"
+  ],
+  "required_corrections": [],
+  "reviewed_publication_head": "483f037a6b4c35ef29b89adf4b342ba8dc823eab",
+  "reviewer_session": "/root/account_features_final_review",
+  "scoped_correction_checks": 159,
+  "shared_files_modified": false,
+  "source_carry": {
+    "application_ui_test_files_unchanged": 37,
+    "archive_bytes": 14095635,
+    "archive_sha256": "0f2bf4219c5333c4671adbb8a874a969d44868e0cf4c2241055a73e4e534fd60",
+    "physical_loaders_unchanged": 13,
+    "reviewed_native_selection_and_workflows_unchanged": true,
+    "sole_reviewed_changed_input": "scripts/ci/database-mysql-selection.json",
+    "tested_captured_input_count": 2455,
+    "unchanged_inputs": 2454
+  },
+  "status_assessment": "Newest README/both-ledger checkpoints accurately mark final6fd source/evidence andbd7 policy reviews complete, preserve failed0902 scope and pending finalcarry/correctedpreflight/inventory/expectedSHAmerge. No actual merge or whole-native claim.",
+  "status_sha256": {
+    "docs/handoff/2026-10-07/CLAUDE-PLAN.md": "ada3df5d835c210eeeb002d53495d64bf14f1607f44c1016e15d6779a29e509b",
+    "docs/handoff/2026-10-07/codex-deferred-20261011.md": "800aba96088e2522ae7f7051cc2d5171c9a5ef7a34081d5305f5b6fdd74ca524",
+    "docs/verification/account-features-http-20261015/README.md": "7366547ce9c7ea3ee45cdafa63928709c5581c135b4843ed60000eb42431f97d"
+  },
+  "tested_application_test_head": "68d22b7e0db7bf60a5f8e46f3878c205f7289129"
+}

@@ -1,0 +1,20 @@
+{
+  "started_utc": "2026-10-15T20:12:44.941817+00:00",
+  "finished_utc": "2026-10-15T20:12:45.332013+00:00",
+  "argv": [
+    "python3",
+    "scripts/ci/test-phpunit-shards.py"
+  ],
+  "cwd": "/workspace/VA-Studio-tax-v2-committed-read",
+  "source_before": {
+    "head": "0902be9ed5c3202444521d697f79ce8641f1fa89",
+    "status": ""
+  },
+  "source_after": {
+    "head": "0902be9ed5c3202444521d697f79ce8641f1fa89",
+    "status": ""
+  },
+  "process_exit": 1,
+  "log_sha256": "aa966d06a79d2904c2c0ad4d719ee1740b1c92d4af1699abca18611ffeebdee5",
+  "source_unchanged": true
+}

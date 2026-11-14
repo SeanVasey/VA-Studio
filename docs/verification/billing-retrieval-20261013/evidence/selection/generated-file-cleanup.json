@@ -1,0 +1,205 @@
+{
+  "scope": "Cleanup only of the 50 untracked discovery-generated root shard/config/listing/manifest files after packet archive confirmation; no test or application source changed.",
+  "deleted_files": [
+    {
+      "path": "phpunit-ci-mysql-1.xml",
+      "sha256": "2311e1ca32709d0f6ddf0bd2ce33b4dae173266ffbe5504df81a330ba351ac9c"
+    },
+    {
+      "path": "phpunit-ci-mysql-1-tests.xml",
+      "sha256": "a6398268a1ab6576d26e8df66d127343bc351ff94f5a2ac4c5aa8b0f66ca37ee"
+    },
+    {
+      "path": "phpunit-ci-mysql-2.xml",
+      "sha256": "7ecca49535406e74bf1aa6a2e32003313400b7b8ec85aa1f5335584cd2649cfa"
+    },
+    {
+      "path": "phpunit-ci-mysql-2-tests.xml",
+      "sha256": "c76e4ce861903343ba496bfd6f6a2f1a216b719cc8ee36ac76c0011a6d5f317b"
+    },
+    {
+      "path": "phpunit-ci-mysql-3.xml",
+      "sha256": "8db42919ca89a571ac8229abc10d9c9a27c71195fef57df99b916b3e5bd2ef05"
+    },
+    {
+      "path": "phpunit-ci-mysql-3-tests.xml",
+      "sha256": "d4e87add64935bd5852ed5859351f58406ff0a65fe2400d9c3a66eee8af65bb8"
+    },
+    {
+      "path": "phpunit-ci-mysql-4.xml",
+      "sha256": "be5fe55ccd14f5f727e8b363b5c528e1c0560d7df18bb4670c4feaf8d84e43e5"
+    },
+    {
+      "path": "phpunit-ci-mysql-4-tests.xml",
+      "sha256": "138ca0a66e2e6ab726dd57f751778f071417008b2f67855fa071a97884c934cb"
+    },
+    {
+      "path": "phpunit-ci-mysql-5.xml",
+      "sha256": "8f663160c279e55b02450e49f65be4c4f6ae278801dd23b238b7e6e448bb13d8"
+    },
+    {
+      "path": "phpunit-ci-mysql-5-tests.xml",
+      "sha256": "71cf189d65f8ce5fcde05fb6b71040c1c20d785e7a7de7432f72ccea1246d352"
+    },
+    {
+      "path": "phpunit-ci-mysql-6.xml",
+      "sha256": "994245ef4f84c374186e667abb0653b3247a610a368611ddeb57820e725cb977"
+    },
+    {
+      "path": "phpunit-ci-mysql-6-tests.xml",
+      "sha256": "b6ac16d95c16fcd9c75527d960f998551490904837d0845945bcce02a1b09f6c"
+    },
+    {
+      "path": "phpunit-ci-mysql-7.xml",
+      "sha256": "708faa26b9f6dee98f3349a07240616d4b2d7229b1517c2557fa24d785274b12"
+    },
+    {
+      "path": "phpunit-ci-mysql-7-tests.xml",
+      "sha256": "eef73f41258376b5957a3a3fc2dbda3fd73a7b3be4d2b8a3a34771dccde9002c"
+    },
+    {
+      "path": "phpunit-ci-mysql-8.xml",
+      "sha256": "39742747836ca71caa6307a844192b5ac9952df203172949138476b92d99f301"
+    },
+    {
+      "path": "phpunit-ci-mysql-8-tests.xml",
+      "sha256": "92b5d02fbda82be27e73e2d35f719ca83c6f0e0b67330fec363fd6d6da1431a7"
+    },
+    {
+      "path": "phpunit-ci-mysql-9.xml",
+      "sha256": "338b1463ceea300380829179bb54d447094b18dc2a86a5284e1e80d22998e660"
+    },
+    {
+      "path": "phpunit-ci-mysql-9-tests.xml",
+      "sha256": "0ca1c5c47ad0935196d3a8f32aa8a9ed8052300916672538c321e898667d83af"
+    },
+    {
+      "path": "phpunit-ci-mysql-10.xml",
+      "sha256": "a571f0e8dee76cc8773537d7e1825c364ae273f7f914061316d19ebb8dde23a6"
+    },
+    {
+      "path": "phpunit-ci-mysql-10-tests.xml",
+      "sha256": "36d1bf323a5c3d04f63ee047ccd1a8ac493a762f99425139c4a17f08164e0d7a"
+    },
+    {
+      "path": "phpunit-ci-mysql-11.xml",
+      "sha256": "64df4b59cbec4d64ea08177042243bf75657762b7a86156a3d9008bc0a437f47"
+    },
+    {
+      "path": "phpunit-ci-mysql-11-tests.xml",
+      "sha256": "f20401f64359cd83d750ad9c86cab6c039b88814591354023c5c1d88586b42c3"
+    },
+    {
+      "path": "phpunit-ci-mysql-12.xml",
+      "sha256": "b9ef030b8311a618e2e56c31855213c20fa895bc09328c1ee0c5f57200066970"
+    },
+    {
+      "path": "phpunit-ci-mysql-12-tests.xml",
+      "sha256": "a107cbff47e4126a8b9ceb7e4da7556b09d356711844494ee398b0a114a3272e"
+    },
+    {
+      "path": "phpunit-ci-mysql-13.xml",
+      "sha256": "098bdf803ca0d86c15e3b7162a681d23db1523e06cd287146ce285977da734d7"
+    },
+    {
+      "path": "phpunit-ci-mysql-13-tests.xml",
+      "sha256": "3a2f9b0f972a1445d8282b5bb5b24bcecd61ba353a9bb8868fae79163c87ee81"
+    },
+    {
+      "path": "phpunit-ci-mysql-14.xml",
+      "sha256": "6676719b3a76495156c72ea3d9c31b035c33f0b0d40d31cd8e612031154e7d8e"
+    },
+    {
+      "path": "phpunit-ci-mysql-14-tests.xml",
+      "sha256": "af266f7ce53525602d31fb8f07a2707da84366228a5d489e7863b60344ac040d"
+    },
+    {
+      "path": "phpunit-ci-mysql-15.xml",
+      "sha256": "4313a77f4e636890705bac566e34530f4de9342c0f3238220d5071f49a34f828"
+    },
+    {
+      "path": "phpunit-ci-mysql-15-tests.xml",
+      "sha256": "1a48ab482858139b00ef65aad9a5021b3b28ad431de90f5137b48179ecc918e1"
+    },
+    {
+      "path": "phpunit-ci-mysql-16.xml",
+      "sha256": "62d344378f8703b6d754ee013a602ae5ab7cc4eea30e5c49b0b8b2596ea4d249"
+    },
+    {
+      "path": "phpunit-ci-mysql-16-tests.xml",
+      "sha256": "b89505ad2b17f70fbc3d8bb15a39f889890ff5e770dd5d0941b7d625b00861c6"
+    },
+    {
+      "path": "phpunit-ci-mysql-17.xml",
+      "sha256": "6e96cbac152380ac6dbcc56cee0c9890cf7142aaba1c56242f08083e42470172"
+    },
+    {
+      "path": "phpunit-ci-mysql-17-tests.xml",
+      "sha256": "7fe29a3ec48ae14df8eef17c1a9db5484d37db396af23346d70441d34dd81fdf"
+    },
+    {
+      "path": "phpunit-ci-mysql-18.xml",
+      "sha256": "4e017beabec0038ae0031631f0f940dd51e5e5354f3d938b10cd016a75c720e8"
+    },
+    {
+      "path": "phpunit-ci-mysql-18-tests.xml",
+      "sha256": "06d1218f008ec4c9494ec5cdb1380d448cfde61f6d7ef383ae4e196a6e9af2ab"
+    },
+    {
+      "path": "phpunit-ci-mysql-19.xml",
+      "sha256": "ac1ed8ebd9012442a6e0e74a5db05e93bc27c68770b522528e6ce665bacf0b41"
+    },
+    {
+      "path": "phpunit-ci-mysql-19-tests.xml",
+      "sha256": "138f0542d70536fd13ee2a9bffc333919f2507667f35a35c796f944c2efc5623"
+    },
+    {
+      "path": "phpunit-ci-mysql-20.xml",
+      "sha256": "5aa8b438163d33760438cd6a040a1ccaff892e34a3e3afa50e46bf2a970d8c79"
+    },
+    {
+      "path": "phpunit-ci-mysql-20-tests.xml",
+      "sha256": "c58db992b58334ad26a198c4168a4d4a3bc498e0b6ecbdae6cc49fa4002958fa"
+    },
+    {
+      "path": "phpunit-ci-mysql-21.xml",
+      "sha256": "d056b337c3c625011cf8fbb7be7f1fd59bfa7ef0371ca400e10666d5035bb91a"
+    },
+    {
+      "path": "phpunit-ci-mysql-21-tests.xml",
+      "sha256": "02321d7f549f25ca0ddfbb7215b20fd21b0fb623744bd143e071620cb4ad976d"
+    },
+    {
+      "path": "phpunit-ci-mysql-22.xml",
+      "sha256": "d7fc69db6e701fe3601ba7c5a0e60cbb708c07dafff24f17824f7e9b49d1bc8e"
+    },
+    {
+      "path": "phpunit-ci-mysql-22-tests.xml",
+      "sha256": "873c535ea7e0257b563c4af2fd1160e89fb87176ac9d677978df7827f378d026"
+    },
+    {
+      "path": "phpunit-ci-mysql-23.xml",
+      "sha256": "b8dfdb3fa073a29a98e9d9ec536fdd546bfffcdd1897ccd2203f9e73eb464f1a"
+    },
+    {
+      "path": "phpunit-ci-mysql-23-tests.xml",
+      "sha256": "210cb7e040335540a20734f55a33e7ab10c0ddd1fecc5d3cbdf627854133f5eb"
+    },
+    {
+      "path": "phpunit-ci-mysql-24.xml",
+      "sha256": "14df6d631f03f446ab43c53017a23232ed5d209ae1596997d30b4c9e0d101440"
+    },
+    {
+      "path": "phpunit-ci-mysql-24-tests.xml",
+      "sha256": "ea908c0093075e092fa583f6bca0e67c5a8ef2d323722a9f66babff1b44bbe4a"
+    },
+    {
+      "path": "phpunit-ci-mysql-source-tests.xml",
+      "sha256": "55a02ecf44abf9dbe5597cc7ed40a497877d18d8e9511f17ca9578505acfc0f4"
+    },
+    {
+      "path": "phpunit-ci-mysql-manifest.json",
+      "sha256": "42cb41eb2c7c3598490128d8e97ab602e047fb28817c7aef28e6ab72b578c1dc"
+    }
+  ]
+}

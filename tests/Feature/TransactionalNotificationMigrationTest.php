@@ -162,7 +162,7 @@ class TransactionalNotificationMigrationTest extends TestCase
     {
         F::ready();
         $notice = DB::table(self::NOTICES)->sole();
-        $valid = $this->attempt($notice->id);
+        $valid = $this->attemptRow($notice->id);
         foreach ([['public_id' => strtoupper($valid['public_id'])], ['public_id' => $valid['public_id'].' '],
             ['token_hash' => str_repeat('A', 64)], ['token_hash' => str_repeat('a', 64).' '],
             ['number' => 0], ['number' => 2], ['number' => 4], ['state' => 'leased '], ['state' => 'LEASED'],
@@ -174,7 +174,7 @@ class TransactionalNotificationMigrationTest extends TestCase
         }
         DB::table(self::ATTEMPTS)->insert($valid);
         $this->assertDatabaseCount(self::ATTEMPTS, 1);
-        $this->queryRefused(fn () => DB::table(self::ATTEMPTS)->insert($this->attempt($notice->id, 2)));
+        $this->queryRefused(fn () => DB::table(self::ATTEMPTS)->insert($this->attemptRow($notice->id, 2)));
         $this->queryRefused(fn () => DB::table(self::ATTEMPTS)->delete());
     }
 
@@ -213,19 +213,19 @@ class TransactionalNotificationMigrationTest extends TestCase
         F::ready();
         $notice = DB::table(self::NOTICES)->sole();
         for ($number = 1; $number <= 3; $number++) {
-            DB::table(self::ATTEMPTS)->insert($this->attempt($notice->id, $number));
+            DB::table(self::ATTEMPTS)->insert($this->attemptRow($notice->id, $number));
             DB::table(self::ATTEMPTS)->where('number', $number)->update(['state' => 'failed', 'reason' => 'private_storage_refused',
                 'finished_at' => now()->format('Y-m-d H:i:s')]);
         }
         $before = $this->rows();
-        $this->queryRefused(fn () => DB::table(self::ATTEMPTS)->insert($this->attempt($notice->id, 4)));
+        $this->queryRefused(fn () => DB::table(self::ATTEMPTS)->insert($this->attemptRow($notice->id, 4)));
         $this->queryRefused(fn () => DB::table(self::ATTEMPTS)->where('number', 3)->update(['state' => 'leased', 'reason' => null, 'finished_at' => null]));
         $this->assertSame($before, $this->rows());
         $other = F::ready(suffix: 'TWO');
         app(TestTransactionalNotifications::class)->claim($other['notice']['notificationId']);
         $second = DB::table(self::NOTICES)->where('public_id', $other['notice']['notificationId'])->sole();
         DB::table(self::ATTEMPTS)->where('notice_id', $second->id)->update(['state' => 'uncertain', 'reason' => 'capture_unknown', 'finished_at' => now()->format('Y-m-d H:i:s')]);
-        $this->queryRefused(fn () => DB::table(self::ATTEMPTS)->insert($this->attempt($second->id, 2)));
+        $this->queryRefused(fn () => DB::table(self::ATTEMPTS)->insert($this->attemptRow($second->id, 2)));
         $this->queryRefused(fn () => DB::table(self::ATTEMPTS)->where('notice_id', $second->id)->update(['state' => 'accepted', 'reason' => null,
             'receipt_hash' => str_repeat('a', 64), 'finished_at' => now()->format('Y-m-d H:i:s')]));
         DB::table(self::ATTEMPTS)->where('notice_id', $second->id)->update(['state' => 'accepted', 'reason' => 'capture_reconciled',
@@ -243,7 +243,7 @@ class TransactionalNotificationMigrationTest extends TestCase
         }
         $row = (array) DB::table(self::ATTEMPTS)->sole();
         foreach (['id', 'public_id', 'token_hash', 'number'] as $collision) {
-            $new = array_replace($this->attempt($row['notice_id'], 2), ['id' => 100000, 'public_id' => (string) Str::uuid(), 'token_hash' => bin2hex(random_bytes(32)),
+            $new = array_replace($this->attemptRow($row['notice_id'], 2), ['id' => 100000, 'public_id' => (string) Str::uuid(), 'token_hash' => bin2hex(random_bytes(32)),
                 'number' => 2, $collision => $row[$collision]]);
             $this->queryRefused(fn () => $this->replace(self::ATTEMPTS, $new));
             $this->assertSame([$row], $this->rows()[self::ATTEMPTS]);
@@ -374,7 +374,7 @@ class TransactionalNotificationMigrationTest extends TestCase
         $this->assertFalse(Schema::hasTable(self::ATTEMPTS));
     }
 
-    private function attempt(int $noticeId, int $number = 1): array
+    private function attemptRow(int $noticeId, int $number = 1): array
     {
         return ['public_id' => (string) Str::uuid(), 'notice_id' => $noticeId, 'number' => $number,
             'token_hash' => bin2hex(random_bytes(32)), 'started_at' => now()->format('Y-m-d H:i:s'),

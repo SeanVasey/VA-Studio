@@ -1,0 +1,9 @@
+{
+  "old_bin_target": "/workspace/VA-Studio-membership-reservations/vendor/bin",
+  "new_bin_path": "/workspace/VA-Studio-billing-retrieval/vendor/bin",
+  "symlink_after": false,
+  "phpunit_proxy_sha256_before": "1fb9d47c7f192da01d06d1574b85a7e1c02b959cc03a969df1a8c0422abfc574",
+  "phpunit_proxy_sha256_after": "1fb9d47c7f192da01d06d1574b85a7e1c02b959cc03a969df1a8c0422abfc574",
+  "repository_sources_changed": false,
+  "reason": "Shared Composer proxy resolved another worktree autoloader before this worktree phpunit.xml bootstrap."
+}

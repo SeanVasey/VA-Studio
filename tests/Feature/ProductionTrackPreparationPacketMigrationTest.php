@@ -22,16 +22,15 @@ class ProductionTrackPreparationPacketMigrationTest extends TestCase
         // Exact sqlite_master/TEMP/replacement ownership canaries always use this
         // disposable SQLite connection, including under an outer MySQL selection.
         $original = DB::getDefaultConnection();
-        config(['database.connections.production_packet_migration_fixture' => array_replace(config('database.connections.sqlite'), ['database' => ':memory:', 'url' => null]),
-            'app.key' => 'base64:'.base64_encode(str_repeat('k', 32))]);
-        DB::setDefaultConnection('production_packet_migration_fixture');
+        $fixture = $this->createInMemorySqliteFixture()->getName();
+        config(['app.key' => 'base64:'.base64_encode(str_repeat('k', 32))]);
+        DB::setDefaultConnection($fixture);
         Schema::clearResolvedInstance('db.schema');
         $this->beforeApplicationDestroyed(function () use ($original): void {
-            DB::purge('production_packet_migration_fixture');
             DB::setDefaultConnection($original);
             Schema::clearResolvedInstance('db.schema');
         });
-        $this->artisan('migrate:fresh', ['--database' => 'production_packet_migration_fixture', '--force' => true])->assertExitCode(0);
+        $this->artisan('migrate:fresh', ['--database' => $fixture, '--force' => true])->assertExitCode(0);
         $this->assertDatabaseCount('production_buyer_assent_observations', 0);
         Schema::drop('production_buyer_assent_observations');
         $this->fakePrivateMediaStorage();

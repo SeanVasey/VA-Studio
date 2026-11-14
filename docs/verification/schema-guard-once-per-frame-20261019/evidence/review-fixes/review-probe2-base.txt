@@ -1,0 +1,13 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/b5dc44df-c06e-5677-8541-57d7464f9ccc/scratchpad/g1-review/tree-base/phpunit.xml
+
+PROBE2 after membership only proof: users=blocked customer_accounts=blocked quote_owners=ALTERED audit_events=ALTERED production_identity_origins=blocked
+PROBE2 after identity only proof: users=blocked customer_accounts=blocked quote_owners=ALTERED audit_events=ALTERED production_identity_origins=blocked
+.                                                                   1 / 1 (100%)
+
+Time: 04:50.985, Memory: 83.00 MB
+
+OK (1 test, 2 assertions)
+exit=0

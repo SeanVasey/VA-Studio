@@ -1,0 +1,11 @@
+{"mutation": "R1 C1 separation uses batch creators only", "killed": true, "summary": ["FAILURES!", "Tests: 1, Assertions: 6, Failures: 1."]}
+{"mutation": "R2 C3 evaluate against the line own batch, not the newest export", "killed": true, "summary": ["FAILURES!", "Tests: 1, Assertions: 4, Failures: 1."]}
+{"mutation": "R3a C3 no reviewed_evidence_changed blocker", "killed": true, "summary": ["FAILURES!", "Tests: 1, Assertions: 8, Failures: 1."]}
+{"mutation": "R3b C3 classification ignores current evidence", "killed": true, "summary": ["FAILURES!", "Tests: 1, Assertions: 9, Failures: 1."]}
+{"mutation": "R4 C2 unreferenced file name printed raw", "killed": true, "summary": ["FAILURES!", "Tests: 1, Assertions: 2, Failures: 1."]}
+{"mutation": "R5 C2 disposition reason printed raw", "killed": true, "summary": ["FAILURES!", "Tests: 1, Assertions: 91, Failures: 1."]}
+{"mutation": "R5b C2 finding carries the raw source id", "killed": false, "summary": ["OK (37 tests, 364 assertions)"]}
+{"mutation": "R6 C4 attestation not bound or spent", "killed": true, "summary": ["FAILURES!", "Tests: 2, Assertions: 8, Failures: 1."]}
+{"mutation": "R7 C4 staff MFA not required", "killed": true, "summary": ["FAILURES!", "Tests: 1, Assertions: 2, Failures: 1."]}
+{"mutation": "R8 P3-6 address change captured silently", "killed": true, "summary": ["FAILURES!", "Tests: 1, Assertions: 11, Failures: 1."]}
+{"total": 10, "killed": 9}

@@ -1,0 +1,672 @@
+<?php
+
+namespace Tests\Feature\CustomerComms;
+
+use App\Domain\Commerce\ContractIdentity\ContractIdentityStatements;
+use App\Domain\Commerce\ProductionCheckout\Evidence;
+use App\Domain\Customers\CustomerAccess;
+use App\Domain\Customers\DataRights\CustomerDataExportDocument;
+use App\Domain\Customers\DataRights\CustomerDataRights;
+use App\Domain\Customers\DataRights\DataRightsException;
+use App\Domain\Customers\DataRights\PaidGrantExportSection;
+use App\Domain\Customers\DataRights\ProductionCheckoutExportSection;
+use App\Domain\Customers\Models\CustomerAccount;
+use App\Domain\Grants\Paid\PaidGrantDocuments;
+use App\Domain\Grants\Paid\PaidGrantDownloads;
+use App\Domain\Grants\Paid\PaidGrantRecords;
+use App\Domain\Grants\Paid\PaidGrants;
+use App\Domain\Grants\PaidTax\PaidTaxDocuments;
+use App\Domain\Grants\PaidTax\PaidTaxDownloads;
+use App\Domain\Grants\PaidTax\PaidTaxGrants;
+use App\Domain\Grants\PaidTax\PaidTaxRecords;
+use App\Domain\Grants\VaseyLicenseContractTexts;
+use App\Domain\Grants\VaseyLicenseIssuance;
+use App\Support\CanonicalJson;
+use Carbon\CarbonImmutable;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Tests\Support\FinalizationDatabaseMigrations;
+use Tests\Support\PaidGrantDependencyFixtures;
+use Tests\Support\PaidTaxGrantFixtures;
+use Tests\Support\ProductionCheckoutJourneyFixture;
+use Tests\Support\VaseyLicenseIssuanceFixtures;
+use Tests\TestCase;
+
+/**
+ * D-30 before activation: the paid-grant copies of the buyer declarations (V1 paid and V2 paid-tax chains, local and testing
+ * only) and the buyer's exemption attestation enter the requester's export and the deletion's retained list.
+ */
+class PaidGrantDataExportTest extends TestCase
+{
+    use FinalizationDatabaseMigrations;
+    use PaidGrantDependencyFixtures;
+    use PaidTaxGrantFixtures, ProductionCheckoutJourneyFixture {
+        ProductionCheckoutJourneyFixture::identitySetup insteadof PaidTaxGrantFixtures;
+        ProductionCheckoutJourneyFixture::enrollThroughLocalSmtp insteadof PaidTaxGrantFixtures;
+    }
+    use VaseyLicenseIssuanceFixtures;
+
+    private const DECLARATIONS = ['legal_name' => 'Declared synthetic buyer', 'identity_meaning' => 'buyer_declared_legal_name'];
+
+    protected function beforeRefreshingDatabase(): void
+    {
+        $this->preparePaidDependencies();
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->preparePaidTaxFixture();
+        config(['production_checkout.committed_read_receipts_enabled' => true,
+            'production_checkout.committed_read_receipt_version' => 'production-checkout-committed-read-v1',
+            'production_checkout.fresh_checkout_enabled' => true, 'production_checkout.reconciliation_enabled' => true,
+            'paid-grants.rehearsal_enabled' => true,
+            'paid-grants.delivery_policy' => ['schema_version' => 1, 'version' => 'explicit-synthetic-delivery-v1', 'purpose' => 'paid-original-delivery',
+                'provenance' => 'synthetic_rehearsal', 'max_downloads' => 3, 'authorization_seconds' => 60]]);
+    }
+
+    private static function account(array $buyer): int
+    {
+        return (int) $buyer['principal']->durableBinding()['account_id'];
+    }
+
+    /** A V1 paid order with its grant origin and rendered original, through the genuine chain. */
+    private function paidV1(?array $identity = null): array
+    {
+        $f = $identity === null ? $this->payable() : $this->payable(true, $identity);
+        $f['hosted']->initiate($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        $f['gateway']->paid = true;
+        $this->assertSame('verified', $f['hosted']->reconcile($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId'])['paymentStatus']);
+        $f['batch'] = (new PaidGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        $this->assertTrue((new PaidGrantDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user'])['fulfilled']);
+
+        return $f;
+    }
+
+    /** One download authorization of the paid line through the genuine chain, redeemed when asked. */
+    private function download(array $f, string $kind, bool $redeem): void
+    {
+        $downloads = new PaidGrantDownloads;
+        $auth = $downloads->authorize($f['batch']['id'], $f['batch']['lines'][0]['id'], ['requestKey' => (string) Str::uuid(),
+            'originHash' => $f['batch']['lines'][0]['originHash'], 'kind' => $kind, 'nonce' => bin2hex(random_bytes(32))],
+            $f['buyer']['principal'], $f['buyer']['user']);
+        if ($redeem) {
+            $downloads->redeem($auth['id'], $auth['token'], $f['buyer']['principal'], $f['buyer']['user'])->writeTo(static function (string $chunk): void {});
+        }
+    }
+
+    /** Count keys in the order PaidGrantExportSection::counts() reports them. */
+    private static function counts(array $v1, array $tax): array
+    {
+        $keys = ['order_origins', 'grant_origins', 'originals', 'authorizations', 'redemptions'];
+
+        return array_combine(array_map(fn (string $k): string => 'paid_'.$k, $keys), $v1)
+            + array_combine(array_map(fn (string $k): string => 'paid_tax_'.$k, $keys), $tax);
+    }
+
+    /** A V2 paid-tax order with its grant origin; its original is rendered only when asked. */
+    private function paidTax(bool $original = false): array
+    {
+        $f = $this->paidTaxOrder();
+        $f['batch'] = (new PaidTaxGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        if ($original) {
+            $this->assertTrue((new PaidTaxDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user'])['fulfilled']);
+        }
+
+        return $f;
+    }
+
+    public function test_v1_paid_copies_original_and_exemption_basis_export_for_their_buyer_only(): void
+    {
+        $f = $this->paidV1();
+        $this->download($f, 'master_wav', true);
+        $this->download($f, 'contract', false);
+        $other = $this->enrollThroughLocalSmtp('other.buyer@example.test');
+        $account = self::account($f['buyer']);
+
+        $sections = app(PaidGrantExportSection::class)->build($account);
+        // Exact shapes: no storage path, claim, token, request key, provider or staff identifier can appear.
+        $this->assertSame(['id', 'orderId', 'createdAt', 'lines'], array_keys($sections['paidGrantOrders'][0]));
+        $this->assertSame(['id', 'position', 'title', 'buyerDeclarations', 'contractOriginal', 'downloads', 'unusedAuthorizations'], array_keys($sections['paidGrantOrders'][0]['lines'][0]));
+        $this->assertSame(['createdAt', 'sha256', 'sizeBytes'], array_keys($sections['paidGrantOrders'][0]['lines'][0]['contractOriginal']));
+        // Redeemed downloads are exported in full; unused authorizations only as a count per kind.
+        $downloads = $sections['paidGrantOrders'][0]['lines'][0]['downloads'];
+        $this->assertSame([['kind', 'authorizedAt', 'redeemedAt']], array_map('array_keys', $downloads));
+        $this->assertSame(['master_wav'], array_column($downloads, 'kind'));
+        $this->assertIsString($downloads[0]['redeemedAt']);
+        $this->assertSame(['contract' => 1], $sections['paidGrantOrders'][0]['lines'][0]['unusedAuthorizations']);
+        $json = json_encode($sections, JSON_THROW_ON_ERROR);
+        $authorization = (array) DB::table('paid_authorizations')->first();
+        foreach (['storage_path', 'claim_id', 'contracts/paid/', (string) DB::table('paid_originals')->value('claim_id'),
+            $authorization['request_key'], $authorization['token_hash'], $authorization['public_id']] as $absent) {
+            $this->assertStringNotContainsString($absent, $json);
+        }
+        $this->assertSame([], $sections['paidTaxGrantOrders']);
+        $this->assertCount(1, $sections['paidGrantOrders']);
+        $batch = $sections['paidGrantOrders'][0];
+        $this->assertSame([$f['batch']['id'], $f['order']['orderId']], [$batch['id'], $batch['orderId']]);
+        $this->assertMatchesRegularExpression('/\A\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ\z/', $batch['createdAt']);
+        $this->assertCount(1, $batch['lines']);
+        $line = $batch['lines'][0];
+        $this->assertSame([$f['batch']['lines'][0]['id'], 1], [$line['id'], $line['position']]);
+        $this->assertEquals(self::DECLARATIONS, $line['buyerDeclarations']);
+        $manifest = PaidGrantRecords::decode((array) DB::table('paid_originals')->sole());
+        $this->assertSame([$manifest['artifact']['pdf_hash'], $manifest['artifact']['size_bytes']],
+            [$line['contractOriginal']['sha256'], $line['contractOriginal']['sizeBytes']]);
+        $this->assertSame(self::counts([1, 1, 1, 2, 1], [0, 0, 0, 0, 0]), PaidGrantExportSection::counts($account));
+
+        // The buyer's exemption attestation, opened from its seal, with no staff identifier.
+        $bases = app(ProductionCheckoutExportSection::class)->build($account)['productionCheckoutExemptionBases'];
+        $this->assertSame([$f['basis']['public_id']], array_column($bases, 'id'));
+        $this->assertSame('synthetic:buyer-bound-qualification', $bases[0]['attestation']['reference']);
+        $this->assertEqualsCanonicalizing(['qualified_exemption_confirmed', 'reference', 'source_sha256', 'effective_from', 'effective_until'],
+            array_keys($bases[0]['attestation']));
+        $this->assertSame(0, $bases[0]['taxMinor']);
+        $this->assertSame(1, ProductionCheckoutExportSection::counts($account)['production_checkout_exemption_bases']);
+
+        // Another enrolled buyer, and an account with no production identity origin, see nothing of it.
+        $empty = ['paidGrantOrders' => [], 'paidTaxGrantOrders' => []];
+        $this->assertSame($empty, app(PaidGrantExportSection::class)->build(self::account($other)));
+        $this->assertSame($empty, app(PaidGrantExportSection::class)->build(PHP_INT_MAX));
+        $this->assertSame(0, array_sum(PaidGrantExportSection::counts(self::account($other))));
+        $this->assertSame([], app(ProductionCheckoutExportSection::class)->build(self::account($other))['productionCheckoutExemptionBases']);
+        $this->assertSame(0, ProductionCheckoutExportSection::counts(self::account($other))['production_checkout_exemption_bases']);
+    }
+
+    /**
+     * D-30 before activation (P3-c): with V1 contract identity capture on, the paid copy of a v2 declaration (licensee type,
+     * legal name, postal address, statement) exports verbatim to its buyer, exactly as the grant origin froze it.
+     */
+    public function test_a_v1_paid_copy_of_a_v2_declaration_exports_verbatim(): void
+    {
+        config(['production_checkout.contract_identity_v2' => true]);
+        $f = $this->paidV1(['licenseeType' => 'individual', 'legalName' => 'Zoë Émile', 'legalNameConfirmed' => true,
+            'postalAddress' => ['country' => 'US', 'lines' => ['1 Example Street'], 'locality' => 'Springfield', 'region' => 'IA', 'postalCode' => '50000'],
+            'statementVersion' => ContractIdentityStatements::offered()['individual']['statementVersion']]);
+        $account = self::account($f['buyer']);
+
+        $frozen = PaidGrantRecords::decode((array) DB::table('paid_grant_origins')->sole())['source']['buyer_declarations'];
+        $this->assertSame(['buyer-contract-identity-v2', 'individual', 'Zoë Émile'], [$frozen['schema'], $frozen['licensee_type'], $frozen['legal_name']]);
+        $sections = app(PaidGrantExportSection::class)->build($account);
+        $this->assertCount(1, $sections['paidGrantOrders']);
+        $this->assertSame($frozen, $sections['paidGrantOrders'][0]['lines'][0]['buyerDeclarations']);
+        $this->assertSame(self::counts([1, 1, 1, 0, 0], [0, 0, 0, 0, 0]), PaidGrantExportSection::counts($account));
+        // The full export document carries it and stays valid UTF-8 JSON.
+        $json = json_encode(app(PaidGrantExportSection::class)->build($account), JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE);
+        $this->assertStringContainsString('Zoë Émile', $json);
+        $this->assertStringContainsString('1 Example Street', $json);
+    }
+
+    public function test_paid_tax_copies_and_original_export_with_their_declarations(): void
+    {
+        $f = $this->paidTax(true);
+        $account = self::account($f['buyer']);
+
+        $sections = app(PaidGrantExportSection::class)->build($account);
+        $this->assertSame([], $sections['paidGrantOrders']);
+        $this->assertSame([$f['batch']['id']], array_column($sections['paidTaxGrantOrders'], 'id'));
+        $batch = $sections['paidTaxGrantOrders'][0];
+        $this->assertSame($f['order']['orderId'], $batch['orderId']);
+        $this->assertEquals(self::DECLARATIONS, $batch['lines'][0]['buyerDeclarations']);
+        $manifest = PaidTaxRecords::decode((array) DB::table('paid_tax_originals')->sole());
+        $this->assertSame($manifest['artifact']['pdf_hash'], $batch['lines'][0]['contractOriginal']['sha256']);
+        $this->assertSame(self::counts([0, 0, 0, 0, 0], [1, 1, 1, 0, 0]), PaidGrantExportSection::counts($account));
+        $this->assertSame(['id', 'orderId', 'createdAt', 'lines'], array_keys($batch));
+        $this->assertSame(['id', 'position', 'title', 'buyerDeclarations', 'contractOriginal', 'downloads', 'unusedAuthorizations'], array_keys($batch['lines'][0]));
+        $this->assertSame(['createdAt', 'sha256', 'sizeBytes'], array_keys($batch['lines'][0]['contractOriginal']));
+        $json = json_encode($sections, JSON_THROW_ON_ERROR);
+        $row = (array) DB::table('paid_tax_order_origins')->sole();
+        // Provider session, payment and account identifiers are deliberately not exported.
+        foreach (['storage_path', 'contracts/paid-tax-v2/', $row['provider_session_id'], $row['provider_payment_id'], $row['provider_account']] as $absent) {
+            $this->assertStringNotContainsString($absent, $json);
+        }
+    }
+
+    public function test_paid_tax_download_history_exports_and_refuses_misfiled_authorizations(): void
+    {
+        config(['paid-tax-grants.downloads_enabled' => true]);
+        $f = $this->paidTax(true);
+        $line = $f['batch']['lines'][0];
+        $downloads = new PaidTaxDownloads;
+        $authorize = fn (string $kind): array => $downloads->authorize($f['batch']['id'], $line['id'], ['requestKey' => (string) Str::uuid(),
+            'originHash' => $line['originHash'], 'kind' => $kind, 'nonce' => bin2hex(random_bytes(32))], $f['buyer']['principal'], $f['buyer']['user']);
+        $contract = $authorize('contract');
+        $downloads->redeem($f['batch']['id'], $contract['id'], $contract['token'], $f['buyer']['principal'], $f['buyer']['user'])
+            ->writeTo(static function (string $chunk): void {});
+        $authorize('master_wav');
+        $account = self::account($f['buyer']);
+        $exported = fn (): array => app(PaidGrantExportSection::class)->build($account)['paidTaxGrantOrders'][0]['lines'][0]['downloads'];
+        $unused = fn (): array => app(PaidGrantExportSection::class)->build($account)['paidTaxGrantOrders'][0]['lines'][0]['unusedAuthorizations'];
+
+        $sections = app(PaidGrantExportSection::class)->build($account);
+        $history = $sections['paidTaxGrantOrders'][0]['lines'][0]['downloads'];
+        $this->assertSame([['kind', 'authorizedAt', 'redeemedAt']], array_map('array_keys', $history));
+        $this->assertSame(['contract'], array_column($history, 'kind'));
+        $this->assertMatchesRegularExpression('/\A\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ\z/', $history[0]['redeemedAt']);
+        $this->assertSame(['master_wav' => 1], $unused());
+        $this->assertSame(self::counts([0, 0, 0, 0, 0], [1, 1, 1, 2, 1]), PaidGrantExportSection::counts($account));
+        $json = json_encode($sections, JSON_THROW_ON_ERROR);
+        foreach (DB::table('paid_tax_authorizations')->get() as $authorization) {
+            foreach ([$authorization->public_id, $authorization->request_key, $authorization->token_hash, $authorization->request_hash] as $absent) {
+                $this->assertStringNotContainsString($absent, $json);
+            }
+        }
+
+        // Each column or sealed field that binds the authorization to the exported line refuses when it names something else.
+        $this->dropTriggers(['paid_tax_authorizations']);
+        $row = (array) DB::table('paid_tax_authorizations')->orderBy('id')->first();
+        foreach ([['origin_public_id' => '00000000-0000-4000-8000-0000000000ee'], ['batch_public_id' => '00000000-0000-4000-8000-0000000000ee'],
+            ['origin_hash' => str_repeat('b', 64)], ['target' => 'stems_zip'], ['payload_hash' => str_repeat('0', 64)]] as $change) {
+            DB::table('paid_tax_authorizations')->where('id', $row['id'])->update($change);
+            $this->refusesExport($account);
+            DB::table('paid_tax_authorizations')->where('id', $row['id'])->update(array_intersect_key($row, $change));
+            $this->assertCount(1, $exported(), (string) array_key_first($change));
+        }
+        $payload = PaidTaxRecords::decode($row);
+        foreach ([['schema_version' => 'paid-authorization-v1'], ['origin_hash' => str_repeat('a', 64)], ['kind' => 'stems_zip']] as $change) {
+            DB::table('paid_tax_authorizations')->where('id', $row['id'])->update(PaidTaxRecords::encode([...$payload, ...$change]));
+            $this->refusesExport($account);
+            DB::table('paid_tax_authorizations')->where('id', $row['id'])->update(PaidTaxRecords::encode($payload));
+            $this->assertCount(1, $exported(), (string) array_key_first($change));
+        }
+
+        // An unused authorization is counted from its columns, which must still bind it to the exported line.
+        $unusedRow = (array) DB::table('paid_tax_authorizations')->where('target', 'master_wav')->sole();
+        foreach ([['origin_public_id' => '00000000-0000-4000-8000-0000000000ee'], ['batch_public_id' => '00000000-0000-4000-8000-0000000000ee'],
+            ['origin_hash' => str_repeat('b', 64)]] as $change) {
+            DB::table('paid_tax_authorizations')->where('id', $unusedRow['id'])->update($change);
+            $this->refusesExport($account);
+            DB::table('paid_tax_authorizations')->where('id', $unusedRow['id'])->update(array_intersect_key($unusedRow, $change));
+            $this->assertSame(['master_wav' => 1], $unused(), (string) array_key_first($change));
+        }
+
+        // Moved to another account: the requester's export no longer reads it, and the other account's export refuses it.
+        $other = self::account($this->enrollThroughLocalSmtp('other.buyer@example.test'));
+        DB::table('paid_tax_authorizations')->where('id', $row['id'])->update(['account_id' => $other]);
+        $this->assertSame([], $exported());
+        $this->assertSame(['master_wav' => 1], $unused());
+        $this->assertSame([1, 0], [PaidGrantExportSection::counts($account)['paid_tax_authorizations'], PaidGrantExportSection::counts($account)['paid_tax_redemptions']]);
+        $this->assertSame([1, 1], [PaidGrantExportSection::counts($other)['paid_tax_authorizations'], PaidGrantExportSection::counts($other)['paid_tax_redemptions']]);
+        $this->refusesExport($other);
+    }
+
+    public function test_a_paid_copy_whose_seal_or_buyer_binding_does_not_match_refuses_the_export(): void
+    {
+        $f = $this->paidTax();
+        $account = self::account($f['buyer']);
+        $this->dropTriggers(['paid_tax_order_origins', 'paid_tax_grant_origins']);
+        $batchRow = (array) DB::table('paid_tax_order_origins')->sole();
+        $lineRow = (array) DB::table('paid_tax_grant_origins')->sole();
+        $batch = PaidTaxRecords::decode($batchRow);
+        $line = PaidTaxRecords::decode($lineRow);
+        $reseal = function (array $batchBuyer, array $lineBuyer) use ($batch, $line, $batchRow, $lineRow): void {
+            DB::table('paid_tax_order_origins')->where('id', $batchRow['id'])->update(PaidTaxRecords::encode([...$batch, 'original_buyer' => $batchBuyer]));
+            DB::table('paid_tax_grant_origins')->where('id', $lineRow['id'])->update(PaidTaxRecords::encode([...$line, 'source' => [...$line['source'], 'buyer' => $lineBuyer]]));
+        };
+        $buyer = $batch['original_buyer'];
+
+        // A copy filed under another buyer's account: that buyer's export refuses it, and this buyer's export never reads it.
+        $other = $this->enrollThroughLocalSmtp('other.buyer@example.test');
+        DB::table('paid_tax_order_origins')->insert([...$batchRow, 'id' => $batchRow['id'] + 1, 'public_id' => '00000000-0000-4000-8000-000000000001',
+            'order_public_id' => '00000000-0000-4000-8000-000000000002', 'provider_payment_id' => 'misfiled',
+            'account_id' => self::account($other), 'actor_id' => $other['user']->id]);
+        $this->refusesExport(self::account($other));
+        $this->assertSame([$f['batch']['id']], array_column(app(PaidGrantExportSection::class)->build($account)['paidTaxGrantOrders'], 'id'));
+        DB::table('paid_tax_order_origins')->where('id', $batchRow['id'] + 1)->delete();
+
+        // Filed under this account, but the sealed binding (repeated consistently on its line) names another origin or account.
+        $elsewhere = [...$buyer, 'origin_id' => '00000000-0000-4000-8000-0000000000ff'];
+        $reseal($elsewhere, $elsewhere);
+        $this->refusesExport($account);
+        $otherAccount = [...$buyer, 'account_id' => $buyer['account_id'] + 1];
+        $reseal($otherAccount, $otherAccount);
+        $this->refusesExport($account);
+        // The line repeats a different binding from its batch.
+        $reseal($buyer, [...$buyer, 'user_id' => $buyer['user_id'] + 1]);
+        $this->refusesExport($account);
+        // Restored, it exports again; then a broken seal refuses.
+        $reseal($buyer, $buyer);
+        $this->assertCount(1, app(PaidGrantExportSection::class)->build($account)['paidTaxGrantOrders']);
+        DB::table('paid_tax_grant_origins')->where('id', $lineRow['id'])->update(['payload_hash' => str_repeat('0', 64)]);
+        $this->refusesExport($account);
+    }
+
+    public function test_v1_paid_records_that_do_not_match_refuse_the_export(): void
+    {
+        $f = $this->paidV1();
+        $this->download($f, 'contract', true);
+        $account = self::account($f['buyer']);
+        $this->dropTriggers(['paid_order_origins', 'paid_grant_origins', 'paid_originals', 'paid_authorizations']);
+        $restored = fn () => $this->assertCount(1, app(PaidGrantExportSection::class)->build($account)['paidGrantOrders']);
+        $batchRow = (array) DB::table('paid_order_origins')->sole();
+        $lineRow = (array) DB::table('paid_grant_origins')->sole();
+        $batch = PaidGrantRecords::decode($batchRow);
+        $line = PaidGrantRecords::decode($lineRow);
+        $buyer = $batch['original_buyer'];
+
+        // The sealed binding, repeated consistently on its line, names another origin.
+        $elsewhere = [...$buyer, 'origin_id' => '00000000-0000-4000-8000-0000000000ff'];
+        DB::table('paid_order_origins')->update(PaidGrantRecords::encode([...$batch, 'original_buyer' => $elsewhere]));
+        DB::table('paid_grant_origins')->update(PaidGrantRecords::encode([...$line, 'source' => [...$line['source'], 'buyer' => $elsewhere]]));
+        $this->refusesExport($account);
+        DB::table('paid_order_origins')->update(PaidGrantRecords::encode($batch));
+        DB::table('paid_grant_origins')->update(PaidGrantRecords::encode($line));
+        $restored();
+
+        // An original whose manifest names another line.
+        $originalRow = (array) DB::table('paid_originals')->sole();
+        $manifest = PaidGrantRecords::decode($originalRow);
+        DB::table('paid_originals')->update(PaidGrantRecords::encode([...$manifest, 'origin_hash' => str_repeat('a', 64)]));
+        $this->refusesExport($account);
+        DB::table('paid_originals')->update(PaidGrantRecords::encode($manifest));
+        $restored();
+
+        // A download authorization whose seal names another line.
+        $authorizationRow = (array) DB::table('paid_authorizations')->sole();
+        $authorization = PaidGrantRecords::decode($authorizationRow);
+        DB::table('paid_authorizations')->update(PaidGrantRecords::encode([...$authorization, 'origin_hash' => str_repeat('a', 64)]));
+        $this->refusesExport($account);
+        DB::table('paid_authorizations')->update(PaidGrantRecords::encode($authorization));
+        $restored();
+
+        // The order claims more lines than are retained.
+        DB::table('paid_order_origins')->update(['line_count' => 2]);
+        $this->refusesExport($account);
+        DB::table('paid_order_origins')->update(['line_count' => 1]);
+        $restored();
+
+        // Paid orders remain after the account's production origin is gone (foreign keys off only inside this test).
+        $this->dropTriggers(['production_identity_origins']);
+        DB::statement(DB::getDriverName() === 'mysql' ? 'SET FOREIGN_KEY_CHECKS=0' : 'PRAGMA foreign_keys = OFF');
+        try {
+            DB::table('production_identity_origins')->where('account_id', $account)->delete();
+            $this->refusesExport($account);
+        } finally {
+            DB::statement(DB::getDriverName() === 'mysql' ? 'SET FOREIGN_KEY_CHECKS=1' : 'PRAGMA foreign_keys = ON');
+        }
+    }
+
+    public function test_counts_and_export_stay_scoped_when_another_account_has_paid_rows(): void
+    {
+        $f = $this->paidV1();
+        $this->download($f, 'contract', true);
+        $account = self::account($f['buyer']);
+        $other = $this->enrollThroughLocalSmtp('other.buyer@example.test');
+        $otherAccount = self::account($other);
+        $this->dropTriggers(['paid_order_origins', 'paid_grant_origins', 'paid_originals', 'paid_authorizations', 'paid_redemptions']);
+        // A copy of the whole graph filed under the other account.
+        $batch = (array) DB::table('paid_order_origins')->sole();
+        $line = (array) DB::table('paid_grant_origins')->sole();
+        $original = (array) DB::table('paid_originals')->sole();
+        $authorization = (array) DB::table('paid_authorizations')->sole();
+        $redemption = (array) DB::table('paid_redemptions')->sole();
+        DB::table('paid_order_origins')->insert([...$batch, 'id' => $batch['id'] + 1, 'public_id' => '00000000-0000-4000-8000-000000000011',
+            'order_public_id' => '00000000-0000-4000-8000-000000000012', 'account_id' => $otherAccount, 'actor_id' => $other['user']->id]);
+        DB::table('paid_grant_origins')->insert([...$line, 'id' => $line['id'] + 1, 'public_id' => '00000000-0000-4000-8000-000000000013', 'batch_id' => $batch['id'] + 1]);
+        DB::table('paid_originals')->insert([...$original, 'id' => $original['id'] + 1, 'origin_id' => $line['id'] + 1, 'claim_id' => '00000000-0000-4000-8000-000000000014']);
+        DB::table('paid_authorizations')->insert([...$authorization, 'id' => $authorization['id'] + 1, 'public_id' => '00000000-0000-4000-8000-000000000015',
+            'origin_id' => $line['id'] + 1, 'account_id' => $otherAccount, 'token_hash' => str_repeat('c', 64)]);
+        DB::table('paid_redemptions')->insert([...$redemption, 'id' => $redemption['id'] + 1, 'authorization_id' => $authorization['id'] + 1]);
+
+        $this->assertSame(self::counts([1, 1, 1, 1, 1], [0, 0, 0, 0, 0]), PaidGrantExportSection::counts($account));
+        $this->assertSame(self::counts([1, 1, 1, 1, 1], [0, 0, 0, 0, 0]), PaidGrantExportSection::counts($otherAccount));
+        $sections = app(PaidGrantExportSection::class)->build($account);
+        $this->assertSame([$f['batch']['id']], array_column($sections['paidGrantOrders'], 'id'));
+        $this->assertCount(1, $sections['paidGrantOrders'][0]['lines'][0]['downloads']);
+        // The copy's seal still names this buyer, so the other account's export refuses it rather than leaking it.
+        $this->refusesExport($otherAccount);
+    }
+
+    public function test_more_paid_lines_or_downloads_than_the_caps_refuse_before_any_payload_is_opened(): void
+    {
+        $f = $this->paidV1();
+        $this->download($f, 'contract', false);
+        $account = self::account($f['buyer']);
+        $this->dropTriggers(['paid_grant_origins', 'paid_authorizations', 'paid_redemptions']);
+        $authorization = (array) DB::table('paid_authorizations')->sole();
+        $padding = [];
+        for ($i = 1; $i <= PaidGrantExportSection::MAX_DOWNLOADS; $i++) {
+            $padding[] = [...$authorization, 'id' => $authorization['id'] + $i, 'public_id' => sprintf('00000000-0000-4000-8000-%012d', $i),
+                'request_key' => sprintf('00000000-0000-4000-9000-%012d', $i), 'token_hash' => hash('sha256', 'pad'.$i),
+                'payload' => 'x', 'payload_hash' => str_repeat('0', 64)];
+        }
+        foreach (array_chunk($padding, 500) as $chunk) {
+            DB::table('paid_authorizations')->insert($chunk);
+        }
+        // Unused authorizations are not capped by the download domain, so they are only counted: however many a buyer
+        // requests, the export still succeeds (their payloads are never opened, so the unreadable padding passes).
+        $exportedLine = app(PaidGrantExportSection::class)->build($account)['paidGrantOrders'][0]['lines'][0];
+        $this->assertSame([], $exportedLine['downloads']);
+        $this->assertSame(['contract' => PaidGrantExportSection::MAX_DOWNLOADS + 1], $exportedLine['unusedAuthorizations']);
+
+        // Redeemed ones are exported in full and capped: past the cap the export refuses with 413 before opening a payload
+        // (the padding cannot be decoded, so a 503 here would mean a payload was opened first).
+        $redemptions = [];
+        for ($i = 0; $i <= PaidGrantExportSection::MAX_DOWNLOADS; $i++) {
+            $redemptions[] = ['authorization_id' => $authorization['id'] + $i, 'created_at' => '2026-11-08 00:00:00'];
+        }
+        foreach (array_chunk($redemptions, 500) as $chunk) {
+            DB::table('paid_redemptions')->insert($chunk);
+        }
+        $this->refusesExport($account, 413, 'export_too_large');
+        DB::table('paid_redemptions')->delete();
+        DB::table('paid_authorizations')->where('id', '>', $authorization['id'])->delete();
+        $this->assertCount(1, app(PaidGrantExportSection::class)->build($account)['paidGrantOrders']);
+
+        $line = (array) DB::table('paid_grant_origins')->sole();
+        $padding = [];
+        for ($i = 1; $i <= PaidGrantExportSection::MAX_LINES; $i++) {
+            $padding[] = [...$line, 'id' => $line['id'] + $i, 'public_id' => sprintf('00000000-0000-4000-8000-%012d', $i), 'position' => 1 + $i,
+                'line_public_id' => sprintf('00000000-0000-4000-9000-%012d', $i), 'payload' => 'x', 'payload_hash' => str_repeat('0', 64)];
+        }
+        foreach (array_chunk($padding, 50) as $chunk) {
+            DB::table('paid_grant_origins')->insert($chunk);
+        }
+        $this->refusesExport($account, 413, 'export_too_large');
+    }
+
+    public function test_stored_payloads_past_the_byte_budget_refuse_before_any_payload_is_loaded(): void
+    {
+        $f = $this->paidV1();
+        $this->download($f, 'master_wav', true);
+        $account = self::account($f['buyer']);
+        $this->assertCount(1, app(PaidGrantExportSection::class)->build($account)['paidGrantOrders']);
+        $this->dropTriggers(['paid_grant_origins', 'paid_originals', 'paid_authorizations']);
+        $line = (array) DB::table('paid_grant_origins')->sole();
+        $original = (array) DB::table('paid_originals')->sole();
+        $authorization = (array) DB::table('paid_authorizations')->sole();
+        // Each row stays under MySQL's default 64 MiB packet; only their sum passes the budget. Unreadable bytes: a 413
+        // here (not the 503 an opened payload gives) proves the budget is checked before anything is loaded.
+        $half = intdiv(PaidGrantExportSection::MAX_PAYLOAD_BYTES, 2) + 1;
+        DB::table('paid_grant_origins')->where('id', $line['id'])->update(['payload' => str_repeat('x', $half)]);
+        foreach ([['paid_originals', $original], ['paid_authorizations', $authorization]] as [$table, $row]) {
+            // The lines alone stay under the budget; each other sum (originals, redeemed downloads) must count to refuse.
+            DB::table($table)->where('id', $row['id'])->update(['payload' => str_repeat('y', $half)]);
+            $this->refusesExport($account, 413, 'export_too_large');
+            DB::table($table)->where('id', $row['id'])->update(['payload' => $row['payload']]);
+        }
+        DB::table('paid_grant_origins')->where('id', $line['id'])->update(['payload' => $line['payload']]);
+        $this->assertCount(1, app(PaidGrantExportSection::class)->build($account)['paidGrantOrders']);
+    }
+
+    /**
+     * Payload growth (activation blocker of the v2 license wiring): a v2 paid-tax line records its template and renderer
+     * profile by hash, so an account with many v2 lines exports under the unchanged stored-payload budget, and the export
+     * never reads a contract text. With the template inline (#245), each of these lines stored about 520 KiB and their sum
+     * passed the budget.
+     */
+    public function test_many_v2_license_lines_export_under_the_payload_budget_without_reading_contract_texts(): void
+    {
+        $this->enableV2Issuance();
+        $paragraph = "\n\nSynthetic padding paragraph of a long nonbinding license.";
+        $template = self::SYNTHETIC_TEMPLATE.str_repeat($paragraph, intdiv(VaseyLicenseIssuance::TEMPLATE_BYTES - strlen(self::SYNTHETIC_TEMPLATE), strlen($paragraph)));
+        $this->bindSyntheticContractSource($template);
+        config(['production-tax-checkout.contract_identity_v2' => true]);
+        $f = $this->taxOrder('exclusive', 2500, ['licenseeType' => 'individual', 'legalName' => 'Zoë Émile', 'legalNameConfirmed' => true,
+            'postalAddress' => ['country' => 'US', 'lines' => ['1 Example Street'], 'locality' => 'Springfield', 'region' => 'IA', 'postalCode' => '50000'],
+            'statementVersion' => ContractIdentityStatements::offered()['individual']['statementVersion']], self::v2LicenseTerms(), self::v2LicenseContent());
+        self::configureTax(self::SYNTHETIC_PROVIDER);
+        $f['checkout']->initiate($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        $f['transport']->lineTax = 437;
+        $f['transport']->paid = true;
+        $this->assertSame('verified', $f['checkout']->reconcile($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId'])['paymentStatus']);
+        (new PaidTaxGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        $account = self::account($f['buyer']);
+        $batchRow = (array) DB::table('paid_tax_order_origins')->sole();
+        $lineRow = (array) DB::table('paid_tax_grant_origins')->sole();
+        $batch = PaidTaxRecords::decode($batchRow);
+        $line = PaidTaxRecords::decode($lineRow);
+        $this->assertTrue(VaseyLicenseIssuance::selected($line['profile']));
+
+        // The same line with the #245 inline descriptor: this many of them pass the budget on their own.
+        $inline = $line['profile'];
+        $inline['contract']['template'] = $template;
+        $inline['renderer_profile'] = json_decode(VaseyLicenseContractTexts::resolve('renderer_profile', $line['profile']['renderer_profile_sha256']), true);
+        $inlineBytes = strlen(PaidTaxRecords::encode([...$line, 'profile' => $inline])['payload']);
+        $orders = intdiv(PaidGrantExportSection::MAX_PAYLOAD_BYTES, $inlineBytes) + 1;
+        $this->assertLessThanOrEqual(PaidGrantExportSection::MAX_RECORDS, $orders);
+
+        // Re-sealed copies of the genuine order under their own ids: that many orders of one v2 line each.
+        $this->dropTriggers(['paid_tax_order_origins', 'paid_tax_grant_origins']);
+        for ($i = 1; $i < $orders; $i++) {
+            [$batchId, $orderId, $originId] = [(string) Str::uuid(), (string) Str::uuid(), (string) Str::uuid()];
+            $copy = DB::table('paid_tax_order_origins')->insertGetId([...array_diff_key($batchRow, ['id' => true]), 'public_id' => $batchId, 'order_public_id' => $orderId,
+                'provider_payment_id' => 'pad'.$i, ...PaidTaxRecords::encode([...$batch, 'origin_id' => $batchId, 'order_id' => $orderId])]);
+            DB::table('paid_tax_grant_origins')->insert([...array_diff_key($lineRow, ['id' => true]), 'public_id' => $originId, 'batch_id' => $copy,
+                'line_public_id' => (string) Str::uuid(), ...PaidTaxRecords::encode([...$line, 'origin_id' => $originId, 'batch_id' => $batchId])]);
+        }
+        $stored = (int) DB::table('paid_tax_grant_origins')->sum(DB::raw('LENGTH(payload)'));
+        $this->assertGreaterThan(PaidGrantExportSection::MAX_PAYLOAD_BYTES, $orders * $inlineBytes);
+        $this->assertLessThan(intdiv(PaidGrantExportSection::MAX_PAYLOAD_BYTES, 8), $stored);
+
+        $queries = [];
+        DB::listen(function ($query) use (&$queries): void {
+            $queries[] = $query->sql;
+        });
+        $sections = app(PaidGrantExportSection::class)->build($account);
+        $this->assertCount($orders, $sections['paidTaxGrantOrders']);
+        $this->assertSame(array_fill(0, $orders, $line['source']['buyer_declarations']),
+            array_map(fn (array $order): array => $order['lines'][0]['buyerDeclarations'], $sections['paidTaxGrantOrders']));
+        $this->assertSame([], array_values(array_filter($queries, fn (string $sql): bool => str_contains($sql, VaseyLicenseContractTexts::TABLE))));
+        $this->assertStringNotContainsString('Synthetic padding paragraph', json_encode($sections, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE));
+        $this->assertSame(2, DB::table(VaseyLicenseContractTexts::TABLE)->count());
+        $this->assertSame(CanonicalJson::hash($sections), CanonicalJson::hash(app(PaidGrantExportSection::class)->build($account)));
+    }
+
+    public function test_an_exemption_basis_whose_sealed_buyer_does_not_match_refuses_the_export(): void
+    {
+        $f = $this->payable(false);
+        $account = self::account($f['buyer']);
+        $this->dropTriggers(['production_checkout_exemption_bases']);
+        $row = (array) DB::table('production_checkout_exemption_bases')->sole();
+        $body = Evidence::open($row, 'production_checkout_exemption_basis');
+        foreach (['origin_id' => '00000000-0000-4000-8000-0000000000ff', 'account_id' => $body['request']['buyer']['account_id'] + 1] as $key => $value) {
+            $planted = [...$body, 'request' => [...$body['request'], 'buyer' => [...$body['request']['buyer'], $key => $value]]];
+            DB::table('production_checkout_exemption_bases')->where('id', $row['id'])->update(Evidence::seal($planted));
+            $this->assertSame($row['buyer_origin_id'], DB::table('production_checkout_exemption_bases')->value('buyer_origin_id'));
+            $this->refusesBases($account);
+        }
+        DB::table('production_checkout_exemption_bases')->where('id', $row['id'])->update(Evidence::seal($body));
+        $this->assertCount(1, app(ProductionCheckoutExportSection::class)->build($account)['productionCheckoutExemptionBases']);
+        DB::table('production_checkout_exemption_bases')->where('id', $row['id'])->update(['payload_hash' => str_repeat('0', 64)]);
+        $this->refusesBases($account);
+    }
+
+    public function test_more_paid_orders_than_the_cap_refuse_before_any_payload_is_opened(): void
+    {
+        $f = $this->paidTax();
+        $this->dropTriggers(['paid_tax_order_origins']);
+        $row = (array) DB::table('paid_tax_order_origins')->sole();
+        // Padding batches carry unreadable payloads: the cap must refuse on the count alone, before any of them is opened.
+        $padding = [];
+        for ($i = 1; $i <= PaidGrantExportSection::MAX_RECORDS; $i++) {
+            $padding[] = [...$row, 'id' => $row['id'] + $i, 'public_id' => sprintf('00000000-0000-4000-8000-%012d', $i),
+                'order_public_id' => sprintf('00000000-0000-4000-9000-%012d', $i), 'provider_payment_id' => 'pad'.$i,
+                'payload' => 'x', 'payload_hash' => str_repeat('0', 64)];
+        }
+        foreach (array_chunk($padding, 100) as $chunk) {
+            DB::table('paid_tax_order_origins')->insert($chunk);
+        }
+        $this->refusesExport(self::account($f['buyer']), 413, 'export_too_large');
+    }
+
+    public function test_a_missing_paid_table_refuses_instead_of_reporting_no_records(): void
+    {
+        $f = $this->paidTax();
+        // A leaf table: no foreign key references the originals, so it drops alone on MySQL too.
+        DB::getSchemaBuilder()->drop('paid_originals');
+        $this->refusesExport(self::account($f['buyer']));
+        try {
+            PaidGrantExportSection::counts(self::account($f['buyer']));
+            $this->fail('Expected the counts to refuse');
+        } catch (DataRightsException $e) {
+            $this->assertSame([503, 'production_record_unavailable'], [$e->status, $e->reason]);
+        }
+    }
+
+    public function test_the_export_document_carries_the_paid_and_exemption_sections(): void
+    {
+        $f = $this->paidTax();
+        $user = $f['buyer']['user']->fresh();
+        $account = CustomerAccount::findOrFail(self::account($f['buyer']));
+        // The data-rights entry point still admits only test-account sessions (D-30 step 3b), so the document is built directly.
+        config(['customer.test_accounts_enabled' => true]);
+        $principal = app(CustomerAccess::class)->principal($user);
+        $document = app(CustomerDataExportDocument::class)->build($principal, $user, $account, '00000000-0000-4000-8000-0000000000aa', CarbonImmutable::now('UTC'));
+
+        $this->assertSame(3, $document['exportSchema']);
+        $this->assertSame([$f['batch']['id']], array_column($document['paidTaxGrantOrders'], 'id'));
+        $this->assertSame([[], []], [$document['paidGrantOrders'], $document['productionCheckoutExemptionBases']]);
+        $this->assertSame([$f['order']['orderId']], array_column($document['productionTaxCheckoutOrders'], 'id'));
+    }
+
+    public function test_deletion_keeps_every_paid_copy_and_the_exemption_basis(): void
+    {
+        foreach (PaidGrantExportSection::CHAINS as $chain) {
+            foreach ($chain['tables'] as $table) {
+                $this->assertSame('financial_records_years', CustomerDataRights::RETAINED[$table] ?? null, $table);
+            }
+        }
+        $this->assertSame('financial_records_years', CustomerDataRights::RETAINED['production_checkout_exemption_bases'] ?? null);
+        $this->assertArrayHasKey('production_checkout_exemption_bases', ProductionCheckoutExportSection::RECORDS);
+        // The v2 contract texts are license wording shared by every buyer of a version, not customer data: a deletion
+        // neither erases nor lists them, and the export never reads them.
+        $this->assertArrayNotHasKey(VaseyLicenseContractTexts::TABLE, CustomerDataRights::RETAINED);
+        $this->assertArrayNotHasKey(VaseyLicenseContractTexts::TABLE, PaidGrantExportSection::counts(PHP_INT_MAX));
+        $this->assertNotContains(VaseyLicenseContractTexts::TABLE, array_merge(...array_map(fn (array $chain): array => array_values($chain['tables']), array_values(PaidGrantExportSection::CHAINS))));
+    }
+
+    /** The immutability and insert guards are dropped only inside this test's database, to plant rows the application never writes. */
+    private function dropTriggers(array $tables): void
+    {
+        foreach ($tables as $table) {
+            $triggers = DB::getDriverName() === 'mysql'
+                ? array_column(DB::select("SHOW TRIGGERS WHERE `Table` = '".$table."'"), 'Trigger')
+                : array_column(DB::select("SELECT name FROM sqlite_master WHERE type = 'trigger' AND tbl_name = ?", [$table]), 'name');
+            $this->assertNotSame([], $triggers, $table);
+            foreach ($triggers as $trigger) {
+                DB::statement('DROP TRIGGER '.$trigger);
+            }
+        }
+    }
+
+    private function refusesExport(int $account, int $status = 503, string $reason = 'production_record_unavailable'): void
+    {
+        try {
+            app(PaidGrantExportSection::class)->build($account);
+            $this->fail('Expected the export to refuse');
+        } catch (DataRightsException $e) {
+            $this->assertSame([$status, $reason], [$e->status, $e->reason]);
+        }
+    }
+
+    private function refusesBases(int $account): void
+    {
+        try {
+            app(ProductionCheckoutExportSection::class)->build($account);
+            $this->fail('Expected the export to refuse');
+        } catch (DataRightsException $e) {
+            $this->assertSame([503, 'production_record_unavailable'], [$e->status, $e->reason]);
+        }
+    }
+}

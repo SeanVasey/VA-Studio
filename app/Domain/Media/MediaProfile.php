@@ -19,7 +19,13 @@ class MediaProfile
             'artwork' => 'sanitized-png-v1',
         ];
 
-        // Preserve fingerprints of existing WAV/artwork runs.
+        if ($role === 'master_wav') {
+            // Masters also yield the untagged public preview. The key is part of the fingerprint on purpose: a master processed before
+            // it existed gets a NEW run (and the untagged variant) when it is processed again, while its old run keeps the profile it
+            // was judged by. Artwork and stems fingerprints stay as they were.
+            $profile['untagged_preview'] = true;
+        }
+
         return $role === 'stems_zip' ? $profile + app(StemsArchive::class)->policy() : $profile;
     }
 

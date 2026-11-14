@@ -24,6 +24,18 @@ class TestCommerceProfileValidatorTest extends TestCase
         '<ASSENT_TEXT>' => 'I accept these synthetic test-only terms.',
     ];
 
+    /**
+     * The capability flags the profile must state explicitly as false (validator CAPABILITY_FLAGS); unpaid release is optional since
+     * 2026-11-11 and the test refund and dispute lifecycle since 2026-11-12.
+     */
+    private const CAPABILITY_FLAGS = [
+        'VASEY_TEST_SERVICE_PROJECTS_ENABLED', 'VASEY_TEST_FREE_GRANTS_ENABLED', 'VASEY_TEST_CUSTOMER_CONSENT_ENABLED',
+        'VASEY_TEST_REFUND_RESOLUTION_ENABLED',
+        'VASEY_TEST_TRANSACTIONAL_NOTIFICATIONS_ENABLED', 'VASEY_CUSTOMER_DATA_RIGHTS_ENABLED', 'VASEY_TRANSACTIONAL_MAIL_ENABLED',
+        'CONTACT_TEST_ORDER_INQUIRIES_ENABLED', 'CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED',
+        'VASEY_OPERATIVE_FREE_GRANTS_ENABLED', 'VASEY_SUPPORT_ATTACHMENTS_FIXTURE_ENABLED',
+    ];
+
     private string $dir;
 
     protected function setUp(): void
@@ -107,9 +119,9 @@ class TestCommerceProfileValidatorTest extends TestCase
         [$exit, $output, $checks] = $this->validateFile(self::root().'/'.self::TEMPLATE, ['--template']);
 
         $this->assertSame(0, $exit, $output);
-        $this->assertCount(36, $checks);
+        $this->assertCount(41, $checks);
         $this->assertNotContains(false, $checks);
-        $this->assertStringContainsString('RESULT: PASS (0 of 36 checks failed; template mode', $output);
+        $this->assertStringContainsString('RESULT: PASS (0 of 41 checks failed; template mode', $output);
         $this->assertNoSecretPrinted($output);
     }
 
@@ -128,7 +140,7 @@ class TestCommerceProfileValidatorTest extends TestCase
         [$exit, $output, $checks] = $this->validate(self::filled());
 
         $this->assertSame(0, $exit, $output);
-        $this->assertCount(36, $checks);
+        $this->assertCount(41, $checks);
         $this->assertNotContains(false, $checks);
         $this->assertStringContainsString('no Stripe request made', $output);
         $this->assertNoSecretPrinted($output);
@@ -208,7 +220,7 @@ class TestCommerceProfileValidatorTest extends TestCase
             'pricing for another account' => [$json('"account":"acct_StagingSyntheticOnly"', '"account":"acct_OtherSynthetic"'), 'commerce.pricing_zero_test_tax'],
             'pricing window closed' => [$json('"effective_until":"2027-01-01T00:00:00Z"', '"effective_until":"2026-10-02T00:00:00Z"'), 'commerce.pricing'],
             'short inventory hold' => [$json('"ttl_seconds":900', '"ttl_seconds":60'), 'commerce.inventory_ttl_covers_quote'],
-            'exclusive selection enabled' => [$set('VASEY_TEST_EXCLUSIVE_SELECTION_POLICY', '\'{"schema_version":1,"purpose":"test_exclusive_selection","non_exclusive_cutoff":"block_while_reserved","existing_pending":"retain_until_verified_resolution","discounts":"explicit_revision_only"}\''), 'commerce.exclusive_selection_off'],
+            'exclusive selection policy malformed' => [$set('VASEY_TEST_EXCLUSIVE_SELECTION_POLICY', '\'{"schema_version":1,"purpose":"test_exclusive_selection","non_exclusive_cutoff":"allow","existing_pending":"retain_until_verified_resolution","discounts":"explicit_revision_only"}\''), 'commerce.exclusive_selection'],
             'order policy extra field' => [$json('"buyer_identity":"unverified_guest"}\'', '"buyer_identity":"unverified_guest","extra":1}\''), 'commerce.order'],
             'checkout disabled' => [$set('STRIPE_TEST_CHECKOUT_ENABLED', 'false'), 'commerce.checkout'],
             'checkout lifetime changed' => [$json('"provider_lifetime_seconds":3600', '"provider_lifetime_seconds":1800'), 'commerce.checkout'],
@@ -217,9 +229,18 @@ class TestCommerceProfileValidatorTest extends TestCase
             'retained v1 contract policy' => [$json('"version":"test-contract-issuance-v2","profile":"test-buyer-pdf-v2"', '"version":"test-contract-issuance-v1","profile":"test-buyer-pdf-v1"'), 'contracts.issuance_v2'],
             'activation grants downloads' => [$json('"download_access":"disabled"', '"download_access":"enabled"'), 'delivery.activation'],
             'longer delivery authorization' => [$json('"authorization_ttl_seconds":60', '"authorization_ttl_seconds":120'), 'delivery.access'],
+            'v2 delivery policy with v1 range rule' => [$json('"ranges":"single_range_strong_if_range"', '"ranges":"disabled"'), 'delivery.access'],
+            'resume window below the minimum' => [$set('VASEY_TEST_DELIVERY_RESUME_SECONDS_BELOW_512_MIB', '59'), 'delivery.access'],
+            'larger files resume for less time' => [$set('VASEY_TEST_DELIVERY_RESUME_SECONDS_FROM_4_GIB', '3600'), 'delivery.access'],
+            'blank incomplete cap' => [$set('VASEY_TEST_DELIVERY_INCOMPLETE_PER_GRANT_24H', ''), 'delivery.access'],
+            'v2 delivery with cookie sessions' => [$set('SESSION_DRIVER', 'cookie'), 'delivery.v2_session_database'],
+            'v2 delivery with file sessions' => [$set('SESSION_DRIVER', 'file'), 'delivery.v2_session_database'],
             'identity sends mail' => [$set('VASEY_TEST_CUSTOMER_IDENTITY_TRANSPORT', 'mail'), 'customer.identity_private_capture'],
             'production checkout flag' => [$set('PRODUCTION_CHECKOUT_PROVIDER_IO_ENABLED', 'true'), 'boundary.out_of_profile_families_off'],
             'free grants enabled' => [$set('VASEY_TEST_FREE_GRANTS_ENABLED', 'true'), 'boundary.out_of_profile_families_off'],
+            'operative free grants enabled' => [$set('VASEY_OPERATIVE_FREE_GRANTS_ENABLED', 'true'), 'boundary.out_of_profile_families_off'],
+            'discovery sitemap enabled' => [$set('DISCOVERY_SITEMAP_ENABLED', 'true'), 'boundary.out_of_profile_families_off'],
+            'listening v2 promotion enabled' => [$set('VASEY_LISTENING_V2_PROMOTION_ENABLED', 'true'), 'boundary.out_of_profile_families_off'],
             'production checkout key' => [$set('PRODUCTION_CHECKOUT_STRIPE_SECRET_KEY', 'sk_test_SyntheticValidatorKey123456'), 'boundary.no_production_checkout_key'],
             'duplicate key' => [static fn (string $p): string => $p."STRIPE_MODE=test\n", 'profile.unique_keys'],
             'single quote inside json' => [$json('I accept these', 'I\'m accepting these'), 'profile.parse'],
@@ -236,6 +257,261 @@ class TestCommerceProfileValidatorTest extends TestCase
         $this->assertFalse($checks[$check], $output);
         $this->assertStringContainsString('RESULT: FAIL', $output);
         $this->assertNoSecretPrinted($output);
+    }
+
+    public static function capabilityFlags(): array
+    {
+        return array_combine(self::CAPABILITY_FLAGS, array_map(static fn (string $flag): array => [$flag], self::CAPABILITY_FLAGS));
+    }
+
+    /** @return list<string> */
+    private static function failedChecks(array $checks): array
+    {
+        return array_keys(array_filter($checks, static fn (bool $ok): bool => ! $ok));
+    }
+
+    #[DataProvider('capabilityFlags')]
+    public function test_each_capability_flag_must_be_stated_false_and_cannot_be_enabled(string $flag): void
+    {
+        // Absent: refused by the explicit-statement check alone, and the message names the key but no value.
+        [$exit, $output, $checks] = $this->validate((string) preg_replace('/^'.$flag.'=.*\n/m', '', self::filled()));
+        $this->assertSame(1, $exit, $output);
+        $this->assertSame(['profile.capability_flags_explicit'], self::failedChecks($checks), $output);
+        $this->assertStringContainsString('missing or not exactly false: '.$flag.'.', $output);
+
+        // Enabled: refused both as a profile statement and by the real configuration boundary.
+        [$exit, $output, $checks] = $this->validate(self::set(self::filled(), $flag, 'true'));
+        $this->assertSame(1, $exit, $output);
+        $this->assertSame(['profile.capability_flags_explicit', 'boundary.out_of_profile_families_off'], self::failedChecks($checks), $output);
+        $this->assertStringContainsString($flag === 'VASEY_OPERATIVE_FREE_GRANTS_ENABLED' ? 'free-grants.operative_enabled' : 'Enabled outside this profile', $output);
+    }
+
+    public function test_only_false_or_parenthesized_false_counts_as_a_stated_capability_flag(): void
+    {
+        foreach (['false', '(false)', '"false"'] as $accepted) {
+            [$exit, $output, $checks] = $this->validate(self::set(self::filled(), 'VASEY_TEST_FREE_GRANTS_ENABLED', $accepted));
+            $this->assertSame(0, $exit, $accepted.PHP_EOL.$output);
+            $this->assertTrue($checks['profile.capability_flags_explicit'], $accepted);
+        }
+        foreach (['False', '0', 'off', '', '(null)', '"true"'] as $refused) {
+            [$exit, $output, $checks] = $this->validate(self::set(self::filled(), 'VASEY_TEST_FREE_GRANTS_ENABLED', $refused));
+            $this->assertSame(1, $exit, $refused.PHP_EOL.$output);
+            $this->assertFalse($checks['profile.capability_flags_explicit'], $refused);
+        }
+    }
+
+    /** Optional on staging (D-19 amendment, 2026-11-12): the same rule as unpaid release, with the exact automatic-enable policy. */
+    public function test_automatic_delivery_enabling_is_optional_and_admitted_only_with_its_exact_policy(): void
+    {
+        $flag = 'VASEY_TEST_DELIVERY_AUTO_ENABLED';
+        $policy = '\'{"schema_version":1,"purpose":"test_delivery_auto_enable","version":"test-delivery-auto-enable-v1","provider":"stripe",'
+            .'"mode":"test","scope":"ready_orders_never_controlled","lanes":"track_and_sound_kit","holds":"skip_while_refund_dispute_held",'
+            .'"staff_decisions":"final","actor":"system"}\'';
+        $this->assertSame(1, preg_match('/^'.$flag.'=false$/m', self::filled()));
+        foreach (['true', '(true)'] as $on) {
+            [$exit, $output, $checks] = $this->validate(self::set(self::set(self::filled(), $flag, $on), 'VASEY_TEST_DELIVERY_AUTO_POLICY', $policy));
+            $this->assertSame(0, $exit, $on.PHP_EOL.$output);
+            $this->assertTrue($checks['boundary.optional_capabilities_admitted'], $on);
+            $this->assertTrue($checks['boundary.out_of_profile_families_off'], $on);
+        }
+        // On without the policy, or with a changed one (staff decisions not final, holds ignored): refused by the boundary alone.
+        foreach (['', str_replace('"final"', '"overridable"', $policy), str_replace('skip_while_refund_dispute_held', 'ignore', $policy)] as $bad) {
+            $profile = self::set(self::filled(), $flag, 'true');
+            if ($bad !== '') {
+                $profile = self::set($profile, 'VASEY_TEST_DELIVERY_AUTO_POLICY', $bad);
+            }
+            [$exit, $output, $checks] = $this->validate($profile);
+            $this->assertSame(1, $exit, $output);
+            $this->assertSame(['boundary.optional_capabilities_admitted'], self::failedChecks($checks), $output);
+            $this->assertStringContainsString('Optional capability on without an accepted policy (or not a boolean): '.$flag.'.', $output);
+            $this->assertNoSecretPrinted($output);
+        }
+        // Not stated, or stated with anything but a boolean: refused as a statement.
+        [$exit, $output, $checks] = $this->validate((string) preg_replace('/^'.$flag.'=.*\n/m', '', self::filled()));
+        $this->assertSame(1, $exit, $output);
+        $this->assertSame(['profile.optional_flags_explicit'], self::failedChecks($checks), $output);
+        [$exit, $output, $checks] = $this->validate(self::set(self::filled(), $flag, 'yes'));
+        $this->assertSame(1, $exit, $output);
+        $this->assertSame(['profile.optional_flags_explicit', 'boundary.optional_capabilities_admitted'], self::failedChecks($checks));
+    }
+
+    /** Optional on staging (2026-11-11): stated true or false; true passes only with the exact policy the real class accepts. */
+    public function test_unpaid_release_is_optional_and_admitted_only_with_its_exact_policy(): void
+    {
+        $flag = 'VASEY_TEST_UNPAID_RELEASE_ENABLED';
+        $policy = '\'{"schema_version":1,"purpose":"test_unpaid_resource_release","version":"test-unpaid-release-v1","provider":"stripe",'
+            .'"mode":"test","proof":"bound_expired_unpaid_session_and_absent_or_canceled_zero_payment","recovery":"disabled",'
+            .'"resources":"pending_to_released","late_confirmation":"paid_exception_preserve_released","provider_writes":"forbidden"}\'';
+        $this->assertSame(1, preg_match('/^'.$flag.'=false$/m', self::filled()));
+        foreach (['true', '(true)'] as $on) {
+            [$exit, $output, $checks] = $this->validate(self::set(self::set(self::filled(), $flag, $on), 'VASEY_TEST_UNPAID_RELEASE_POLICY', $policy));
+            $this->assertSame(0, $exit, $on.PHP_EOL.$output);
+            $this->assertTrue($checks['boundary.optional_capabilities_admitted'], $on);
+            $this->assertTrue($checks['boundary.out_of_profile_families_off'], $on);
+        }
+        // On without the policy, or with a changed one: refused by the boundary alone.
+        foreach (['', str_replace('forbidden', 'allowed', $policy), str_replace('"recovery":"disabled"', '"recovery":"enabled"', $policy)] as $bad) {
+            $profile = self::set(self::filled(), $flag, 'true');
+            if ($bad !== '') {
+                $profile = self::set($profile, 'VASEY_TEST_UNPAID_RELEASE_POLICY', $bad);
+            }
+            [$exit, $output, $checks] = $this->validate($profile);
+            $this->assertSame(1, $exit, $output);
+            $this->assertSame(['boundary.optional_capabilities_admitted'], self::failedChecks($checks), $output);
+            $this->assertStringContainsString('Optional capability on without an accepted policy (or not a boolean): '.$flag.'.', $output);
+            $this->assertNoSecretPrinted($output);
+        }
+        // Not stated, or stated with anything but a boolean: refused as a statement.
+        [$exit, $output, $checks] = $this->validate((string) preg_replace('/^'.$flag.'=.*\n/m', '', self::filled()));
+        $this->assertSame(1, $exit, $output);
+        $this->assertSame(['profile.optional_flags_explicit'], self::failedChecks($checks), $output);
+        foreach (['yes', '1', ''] as $refused) {
+            [$exit, $output, $checks] = $this->validate(self::set(self::filled(), $flag, $refused));
+            $this->assertSame(1, $exit, $refused.PHP_EOL.$output);
+            $this->assertSame(['profile.optional_flags_explicit', 'boundary.optional_capabilities_admitted'], self::failedChecks($checks), $refused);
+        }
+    }
+
+    /** The four DD-16 values the staging rehearsal must state to turn the test refund and dispute lifecycle on. */
+    private const REFUND_DISPUTE_VALUES = [
+        'VASEY_TEST_REFUND_DISPUTE_REFUND_AUTHORITY' => 'authoritative_provider_operator_review',
+        'VASEY_TEST_REFUND_DISPUTE_PARTIAL_REFUNDS' => 'exact_line_allocation',
+        'VASEY_TEST_REFUND_DISPUTE_DISPUTE_ACCESS' => 'temporarily_block_while_reconciling',
+        'VASEY_TEST_REFUND_DISPUTE_EXCLUSIVE_REOPENING' => 'qualified_operator_review',
+    ];
+
+    /** The filled profile with refund and dispute switched on and the given policy values set (null leaves a key out). */
+    private static function refundDispute(array $values, string $flag = 'true'): string
+    {
+        $profile = self::set(self::filled(), 'VASEY_TEST_REFUND_DISPUTE_ENABLED', $flag);
+        foreach ($values as $key => $value) {
+            if ($value !== null) {
+                $profile = self::set($profile, $key, $value);
+            }
+        }
+
+        return $profile;
+    }
+
+    /**
+     * Optional on staging (Sean's decision, 2026-11-12): stated true or false; true passes only with Stripe test mode, the real
+     * RefundDisputePolicy accepting the configuration and each of the four values equal to its DD-16 choice. The deploy gate applies
+     * the same rule (tests/ops/test_staging_refund_dispute_admission.py).
+     */
+    public function test_refund_and_dispute_is_optional_and_admitted_only_with_the_four_dd16_values(): void
+    {
+        $flag = 'VASEY_TEST_REFUND_DISPUTE_ENABLED';
+        $this->assertSame(1, preg_match('/^'.$flag.'=false$/m', self::filled()));
+        foreach (array_keys(self::REFUND_DISPUTE_VALUES) as $key) {
+            // Shown in the template, commented, with its exact DD-16 value; never set uncommented.
+            $this->assertSame(1, preg_match('/^# '.$key.'='.self::REFUND_DISPUTE_VALUES[$key].'$/m', self::filled()), $key);
+            $this->assertSame(0, preg_match('/^'.$key.'=/m', self::filled()), $key);
+        }
+        foreach (['true', '(true)'] as $on) {
+            [$exit, $output, $checks] = $this->validate(self::refundDispute(self::REFUND_DISPUTE_VALUES, $on));
+            $this->assertSame(0, $exit, $on.PHP_EOL.$output);
+            $this->assertNotContains(false, $checks);
+            $this->assertTrue($checks['boundary.optional_capabilities_admitted'], $on);
+            $this->assertTrue($checks['boundary.out_of_profile_families_off'], $on);
+        }
+        // Off with the values present is still off and passes.
+        [$exit, $output] = $this->validate(self::refundDispute(self::REFUND_DISPUTE_VALUES, 'false'));
+        $this->assertSame(0, $exit, $output);
+        // On with a value missing, blank, unknown, or supported by the class but not the DD-16 choice: refused by the boundary alone.
+        $bad = [];
+        foreach (array_keys(self::REFUND_DISPUTE_VALUES) as $key) {
+            $bad['without '.$key] = [...self::REFUND_DISPUTE_VALUES, $key => null];
+            $bad['blank '.$key] = [...self::REFUND_DISPUTE_VALUES, $key => ''];
+            $bad['unknown '.$key] = [...self::REFUND_DISPUTE_VALUES, $key => 'refund_everything'];
+        }
+        $bad['none'] = [];
+        $bad['operator_review dispute access'] = [...self::REFUND_DISPUTE_VALUES, 'VASEY_TEST_REFUND_DISPUTE_DISPUTE_ACCESS' => 'operator_review'];
+        $bad['remain_sold exclusive'] = [...self::REFUND_DISPUTE_VALUES, 'VASEY_TEST_REFUND_DISPUTE_EXCLUSIVE_REOPENING' => 'remain_sold'];
+        $bad['upper case'] = [...self::REFUND_DISPUTE_VALUES, 'VASEY_TEST_REFUND_DISPUTE_PARTIAL_REFUNDS' => 'EXACT_LINE_ALLOCATION'];
+        foreach ($bad as $name => $values) {
+            [$exit, $output, $checks] = $this->validate(self::refundDispute($values));
+            $this->assertSame(1, $exit, $name.PHP_EOL.$output);
+            $this->assertSame(['boundary.optional_capabilities_admitted'], self::failedChecks($checks), $name.PHP_EOL.$output);
+            $this->assertStringContainsString('Optional capability on without an accepted policy (or not a boolean): '.$flag.'.', $output);
+            $this->assertStringNotContainsString('refund_everything', $output);
+            $this->assertNoSecretPrinted($output);
+        }
+        // On outside Stripe test mode is refused too (beside the profile's own Stripe check).
+        [$exit, $output, $checks] = $this->validate(self::set(self::refundDispute(self::REFUND_DISPUTE_VALUES), 'STRIPE_MODE', 'live'));
+        $this->assertSame(1, $exit, $output);
+        $this->assertFalse($checks['boundary.optional_capabilities_admitted'], $output);
+        // Not stated, or stated with anything but a boolean: refused as a statement.
+        [$exit, $output, $checks] = $this->validate((string) preg_replace('/^'.$flag.'=.*\n/m', '', self::filled()));
+        $this->assertSame(1, $exit, $output);
+        $this->assertSame(['profile.optional_flags_explicit'], self::failedChecks($checks), $output);
+        foreach (['yes', '1', ''] as $refused) {
+            [$exit, $output, $checks] = $this->validate(self::refundDispute(self::REFUND_DISPUTE_VALUES, $refused));
+            $this->assertSame(1, $exit, $refused.PHP_EOL.$output);
+            $this->assertSame(['profile.optional_flags_explicit', 'boundary.optional_capabilities_admitted'], self::failedChecks($checks), $refused);
+        }
+    }
+
+    /**
+     * Optional on staging (the hosted rehearsal sets it by Sean's decision): empty is off, set passes only with the exact shape the
+     * real ExclusiveSelectionPolicy accepts. The staging deploy gate applies the same rule (tests/ops/test_staging_exclusive_selection_admission.py).
+     */
+    public function test_exclusive_selection_is_optional_and_admitted_only_with_its_exact_policy(): void
+    {
+        $key = 'VASEY_TEST_EXCLUSIVE_SELECTION_POLICY';
+        $policy = '\'{"schema_version":1,"purpose":"test_exclusive_selection","non_exclusive_cutoff":"block_while_reserved",'
+            .'"existing_pending":"retain_until_verified_resolution","discounts":"explicit_revision_only"}\'';
+        $this->assertSame(1, preg_match('/^'.$key.'=$/m', self::filled()));
+
+        [$exit, $output, $checks] = $this->validate(self::filled());
+        $this->assertSame(0, $exit, $output);
+        $this->assertTrue($checks['commerce.exclusive_selection']);
+        $this->assertStringContainsString('PASS commerce.exclusive_selection - Optional Exclusive selection is off', $output);
+
+        [$exit, $output, $checks] = $this->validate(self::set(self::filled(), $key, $policy));
+        $this->assertSame(0, $exit, $output);
+        $this->assertNotContains(false, $checks);
+        $this->assertStringContainsString('PASS commerce.exclusive_selection - Optional Exclusive selection is ON', $output);
+        $this->assertStringContainsString('permanently locks its track', $output);
+
+        $changed = [
+            str_replace('block_while_reserved', 'allow', $policy),
+            str_replace('"discounts":"explicit_revision_only"', '"discounts":"explicit_revision_only","extra":1', $policy),
+            str_replace('"schema_version":1', '"schema_version":2', $policy),
+            "'not json'",
+        ];
+        foreach ($changed as $bad) {
+            [$exit, $output, $checks] = $this->validate(self::set(self::filled(), $key, $bad));
+            $this->assertSame(1, $exit, $bad.PHP_EOL.$output);
+            $this->assertSame(['commerce.exclusive_selection'], self::failedChecks($checks), $bad.PHP_EOL.$output);
+            $this->assertStringContainsString('is set but ExclusiveSelectionPolicy::current() refuses it', $output);
+            $this->assertNoSecretPrinted($output);
+        }
+    }
+
+    public function test_a_profile_copied_before_the_capability_lines_existed_is_told_exactly_what_to_add(): void
+    {
+        $old = self::filled();
+        foreach (self::CAPABILITY_FLAGS as $flag) {
+            $old = (string) preg_replace('/^'.$flag.'=.*\n/m', '', $old);
+        }
+        [$exit, $output, $checks] = $this->validate($old);
+
+        $this->assertSame(1, $exit, $output);
+        $this->assertSame(['profile.capability_flags_explicit'], self::failedChecks($checks), $output);
+        foreach (self::CAPABILITY_FLAGS as $flag) {
+            $this->assertStringContainsString($flag, $output);
+        }
+        $this->assertStringContainsString('template section 6', $output);
+    }
+
+    /** The negative path needs a changed config file, so it is proven by mutation in the evidence packet, not here. */
+    public function test_the_production_lanes_are_named_and_closed_in_the_real_configuration(): void
+    {
+        [$exit, $output, $checks] = $this->validate(self::filled());
+
+        $this->assertSame(0, $exit, $output);
+        $this->assertTrue($checks['boundary.production_lanes_closed']);
+        $this->assertStringContainsString('Paid252, Tax255, production customer identity, production free grants', $output);
     }
 
     public function test_a_probe_is_never_attempted_while_any_check_fails(): void

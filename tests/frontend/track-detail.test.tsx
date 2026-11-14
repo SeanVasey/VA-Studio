@@ -17,7 +17,7 @@ it('renders a directly selected track outside the current catalog page and prese
   expect(screen.getByText(`${track.bpm} BPM`)).toBeInTheDocument();
   expect(screen.getByRole('list', { name: 'Track tags' })).toHaveTextContent(track.tags[0]);
   expect(document.querySelectorAll('#licenses')).toHaveLength(1);
-  expect(screen.getByRole('button', { name: `Play ${track.title}` })).toBeDisabled();
+  expect(screen.getByRole('button', { name: `Play preview of ${track.title}` })).toBeDisabled();
   const back = screen.getByRole('link', { name: 'Back to results' });
   expect(back).toHaveAttribute('href', catalogPage.currentUrl);
   await user.click(back);

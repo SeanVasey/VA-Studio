@@ -1,0 +1,10 @@
+{
+  "source": "defe95802e7d09e7df12c61a98c1ebf1caee99c0",
+  "prior_policy_test_source": "565f19d1d19c9a7a513670c169a6c2e181083648",
+  "policy_files_compared": 9,
+  "changed_policy_files": [],
+  "current_driver_branch_census_errors": [],
+  "policy_suites_rerun": false,
+  "selection_only_commit": "a01bdc3673a4b0fd25f25958075201b1290ce888",
+  "integrated_selection_commit": "397a339f"
+}

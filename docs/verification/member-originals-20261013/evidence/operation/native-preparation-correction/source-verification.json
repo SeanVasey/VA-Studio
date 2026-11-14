@@ -1,0 +1,125 @@
+{
+  "runs": {
+    "sqlite-owned-composition": {
+      "author_commit": "9399dd998cc3d972b94f6753e576e2c756438657",
+      "equivalent_root_commit": "32f083d28db0609a52cade793849a8767a855ae3",
+      "complete_input_count": 2034,
+      "all_inputs_match_both_commits": true,
+      "unchanged_during_run": true,
+      "runner": "run-composed.py",
+      "runner_hash_verified": true,
+      "result": {
+        "exit": 0,
+        "seconds": 311.722,
+        "source_count": 2034,
+        "changed_sources": [],
+        "junit": {
+          "name": "CLI Arguments",
+          "tests": "22",
+          "assertions": "509",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "time": "311.446079"
+        }
+      },
+      "cases": {
+        "Tests.Feature.ProductionMemberOriginals.MemberOriginalIssuerOwnershipTest::test_public_budget_and_real_service_assembly_cannot_mint_an_owned_source_workflow": 2,
+        "Tests.Feature.ProductionMemberOriginals.MemberOriginalIssuerOwnershipTest::test_shaped_source_claim_and_materialization_are_refused_by_the_actual_issuer": 5,
+        "Tests.Feature.ProductionMemberOriginals.MemberOriginalIssuerOwnershipTest::test_unregistered_capture_permit_and_context_shape_never_start_an_inspection": 3,
+        "Tests.Feature.ProductionMemberOriginals.MemberOriginalIssuerOwnershipTest::test_a_caller_cannot_select_pending_member_initialization_for_any_context_operation": 6,
+        "Tests.Feature.ProductionMemberOriginals.MemberOriginalIssuerOwnershipTest::test_opaque_value_shapes_refuse_restoration_without_calling_a_constructor": 5,
+        "Tests.Feature.ProductionMemberOriginals.MemberOriginalPreparationIntegrationTest::test_real_authored_sources_prepare_an_exact_repeat_without_original_or_credit_effects": 48,
+        "Tests.Feature.ProductionMemberOriginals.MemberOriginalPreparationIntegrationTest::test_source_withdrawal_during_real_materialization_refuses_fresh_admission_and_leaves_only_a_candidate": 30,
+        "Tests.Feature.ProductionMemberOriginals.MemberOriginalPreparationIntegrationTest::test_after_commit_owner_withdrawal_returns_no_candidate_and_never_starts_the_renderer": 27,
+        "Tests.Feature.ProductionMemberOriginals.MemberOriginalPreparationIntegrationTest::test_returned_candidate_values_cannot_be_reused_as_authority_after_source_withdrawal": 43,
+        "Tests.Feature.ProductionMemberOriginals.MemberOriginalCompositionTest::test_actual_final_frame_readiness_is_issuer_bound_and_its_capture_is_retired_before_return": 30,
+        "Tests.Feature.ProductionMemberOriginals.MemberOriginalCompositionTest::test_original_workflow_budget_can_be_consumed_before_producers_but_never_renewed": 24,
+        "Tests.Feature.ProductionMemberOriginals.MemberOriginalCompositionTest::test_original_physical_cap_is_carried_into_the_fresh_final_commit_boundary": 26,
+        "Tests.Feature.ProductionMemberOriginals.MemberOriginalCompositionTest::test_completed_regular_commit_cannot_renew_the_original_materialization_cap": 24,
+        "Tests.Feature.ProductionMemberOriginals.MemberOriginalCompositionTest::test_facts_callback_cannot_withdraw_catalog_after_reservation_admission": 25,
+        "Tests.Feature.ProductionMemberOriginals.MemberOriginalCompositionTest::test_reservation_callback_cannot_withdraw_member_configuration_before_its_raw_closure": 24,
+        "Tests.Feature.ProductionMemberOriginals.MemberOriginalCompositionTest::test_final_committed_callback_hook_is_refused_before_shared_finish_can_execute_it": 25,
+        "Tests.Feature.ProductionMemberOriginals.MemberOriginalCompositionTest::test_regular_committed_delegate_cannot_replace_the_owned_dispatcher_and_receive_a_source": 25,
+        "Tests.Feature.ProductionMemberOriginals.MemberOriginalCompositionTest::test_last_current_callback_cannot_replace_the_dispatcher_after_observer_admission": 25,
+        "Tests.Feature.ProductionMemberOriginals.MemberOriginalCompositionTest::test_initial_facts_lock_cannot_publish_a_source_after_withdrawing_its_reservation_catalog": 28,
+        "Tests.Feature.ProductionMemberOriginals.MemberOriginalCompositionTest::test_final_facts_lock_cannot_mint_readiness_after_withdrawing_its_reservation_catalog": 28,
+        "Tests.Feature.ProductionMemberOriginals.MemberOriginalRetainedDeadlineTest::test_original_honor_cap_survives_retirement_and_backward_wall_time_before_detached_work": 29,
+        "Tests.Feature.ProductionMemberOriginals.MemberOriginalRetainedDeadlineTest::test_original_invoice_window_expiring_during_shared_finish_refuses_the_source_ticket": 27
+      }
+    },
+    "sqlite-public-reservation-proof": {
+      "author_commit": "9399dd998cc3d972b94f6753e576e2c756438657",
+      "equivalent_root_commit": "32f083d28db0609a52cade793849a8767a855ae3",
+      "complete_input_count": 2034,
+      "all_inputs_match_both_commits": true,
+      "unchanged_during_run": true,
+      "runner": "run-composed.py",
+      "runner_hash_verified": true,
+      "result": {
+        "exit": 0,
+        "seconds": 16.148,
+        "source_count": 2034,
+        "changed_sources": [],
+        "junit": {
+          "name": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationOwnershipTest",
+          "file": "/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMembershipBilling/MembershipReservationOwnershipTest.php",
+          "tests": "1",
+          "assertions": "20",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "time": "15.887464"
+        }
+      },
+      "cases": {
+        "Tests.Feature.ProductionMembershipBilling.MembershipReservationOwnershipTest::test_reservation_proof_is_issuer_owned_and_cannot_be_serialized_or_adopted_by_a_new_frame": 20
+      }
+    },
+    "native-positive-final": {
+      "author_commit": "9399dd998cc3d972b94f6753e576e2c756438657",
+      "equivalent_root_commit": "32f083d28db0609a52cade793849a8767a855ae3",
+      "complete_input_count": 1324,
+      "all_inputs_match_both_commits": true,
+      "unchanged_during_run": true,
+      "runner": "run-native-fixed.py",
+      "runner_hash_verified": true,
+      "result": {
+        "exit": 0,
+        "duration_seconds": 421.294,
+        "changed_sources": [],
+        "junit": {
+          "name": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationIntegrationTest",
+          "file": "/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMemberOriginals/MemberOriginalPreparationIntegrationTest.php",
+          "tests": "1",
+          "assertions": "48",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "time": "421.042574"
+        }
+      },
+      "cases": {
+        "Tests.Feature.ProductionMemberOriginals.MemberOriginalPreparationIntegrationTest::test_real_authored_sources_prepare_an_exact_repeat_without_original_or_credit_effects": 48
+      }
+    }
+  },
+  "static_four_files_match_commit": true,
+  "native_comparison": {
+    "scope": "Same positive/exact-repeat test and supporting fixture bytes: old diagnostic safe refusal at original60s vs uninstrumented corrected success. Diagnostic class overlays are separately retained; timing is not a performance guarantee. Only two application files differ in complete captured native inputs.",
+    "same_selected_test_sha256": "9192bfd6d23f052e5fe0a0423220a05abb8d5d83e7b5b8e97a88bbae185b6304",
+    "same_fixture_sha256": "162496d0060c7e3297b0bef2f7ab820121031478e334202b19c1b7488c2dea2a",
+    "old_supporting_commit": "2cfd9a0db46a806c0a0bd0c83839b5b584fc3627",
+    "fixed_commit": "9399dd998cc3d972b94f6753e576e2c756438657",
+    "changed_captured_inputs": {
+      "app/Domain/Grants/Member/MemberOriginalInspection.php": {
+        "old": "976f961bb6ff90d498c42b71da055a4c1ded9fc397994aa752372835936e2627",
+        "fixed": "fe6ffc866a9f257b7bd98e4cece6e472af3c61c97aeaaf57d4acae27a04eb295"
+      },
+      "app/Domain/Memberships/Production/MembershipReservationContext.php": {
+        "old": "8645feeb3e020f71a66f741e6e45f22a81e0a751898a6305d94e11822325d37a",
+        "fixed": "a02b8246e8e9247c3095a8f90b38a13a45ddd0569441278702277bf398e37624"
+      }
+    }
+  }
+}

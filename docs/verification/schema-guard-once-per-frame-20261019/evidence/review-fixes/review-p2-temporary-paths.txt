@@ -1,0 +1,2 @@
+insert ok; Com before {"Com_create_table":"0","Com_drop_table":"0","Com_insert":"1"} after {"Com_create_table":"1","Com_drop_table":"0","Com_insert":"2"}; savepoint kept; qualified u is TEMPORARY shadow cols=2
+p row committed? 0

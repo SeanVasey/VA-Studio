@@ -8,6 +8,7 @@ use App\Domain\Customers\ProductionFeatures\Models\ProductionListeningLibrary as
 use App\Domain\Customers\ProductionFeatures\ProductionFeatureContext;
 use App\Domain\Customers\ProductionFeatures\ProductionFeatureException;
 use App\Domain\Customers\ProductionFeatures\ProductionFeatureOperation;
+use App\Domain\Customers\ProductionFeatures\ProductionFeaturePreparation;
 use App\Domain\Customers\ProductionFeatures\ProductionFeatureShape;
 use App\Domain\Customers\ProductionIdentity\Features\ProductionAccountFeatureIdentity;
 use App\Domain\Customers\ProductionIdentity\IdentityException;
@@ -18,34 +19,34 @@ use Throwable;
 /** New explicitly bound feature records only; no test principal or historical data adoption. */
 final class ProductionListeningLibrary
 {
-    public function read(ProductionAccountFeatureIdentity $identity): array
+    public function read(ProductionAccountFeatureIdentity $identity, ?ProductionFeaturePreparation $preparation = null): array
     {
-        return $this->run($identity);
+        return $this->run($identity, preparation: $preparation);
     }
 
     /** Called only by the dedicated server-authorized closed-empty-body POST. */
-    public function initialize(ProductionAccountFeatureIdentity $identity): array
+    public function initialize(ProductionAccountFeatureIdentity $identity, ?ProductionFeaturePreparation $preparation = null): array
     {
-        return $this->run($identity, initialize: true);
+        return $this->run($identity, initialize: true, preparation: $preparation);
     }
 
-    public function change(ProductionAccountFeatureIdentity $identity, array $command): array
+    public function change(ProductionAccountFeatureIdentity $identity, array $command, ?ProductionFeaturePreparation $preparation = null): array
     {
         (new ProductionListeningState)->validateCommand($command);
 
-        return $this->run($identity, $command);
+        return $this->run($identity, $command, preparation: $preparation);
     }
 
-    public function export(ProductionAccountFeatureIdentity $identity, int $expectedVersion): array
+    public function export(ProductionAccountFeatureIdentity $identity, int $expectedVersion, ?ProductionFeaturePreparation $preparation = null): array
     {
         if ($expectedVersion < 0 || $expectedVersion > 2147483646) {
             throw new ListeningException;
         }
 
-        return $this->run($identity, expectedExportVersion: $expectedVersion);
+        return $this->run($identity, expectedExportVersion: $expectedVersion, preparation: $preparation);
     }
 
-    private function run(ProductionAccountFeatureIdentity $identity, ?array $command = null, bool $initialize = false, ?int $expectedExportVersion = null): array
+    private function run(ProductionAccountFeatureIdentity $identity, ?array $command = null, bool $initialize = false, ?int $expectedExportVersion = null, ?ProductionFeaturePreparation $preparation = null): array
     {
         if ($identity->feature !== 'listening_library') {
             throw new IdentityException;
@@ -153,7 +154,7 @@ final class ProductionListeningLibrary
                     ...($v2 ? ['notes' => $rules::NOTES, 'noteCharacters' => $rules::NOTE_CHARACTERS, 'noteBytes' => $rules::NOTE_BYTES] : [])]];
 
             return ['initialized' => true, 'library' => $library];
-        });
+        }, $preparation);
     }
 
     private function encrypt(array $state): string

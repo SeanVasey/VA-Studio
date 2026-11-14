@@ -1,0 +1,700 @@
+{
+  "closed_source_groups": [
+    "D1-S1: admission inspects held canonical high slots after allocation shrink, refusing same or unknown account before fill.",
+    "D1-S2: strict native nonnegative integer clock validation precedes comparisons; invalid values produce fixed expiry and cleanup."
+  ],
+  "decision": "APPROVE_BOUNDED_DEVELOPMENT_SOURCE_AND_FINAL_SEALED_EVIDENCE",
+  "engineering_quality_verdict": "Pass for the bounded source and evidence surface",
+  "evidence_verdict": "Pass for the recorded focused scopes; publication gates and release/host scopes remain open",
+  "independent_original_hashes": {
+    "independent/free-delivery-identity-dependency-review-20261015.json": "b364a7fbff00535a90f45ecacea579f8ef58e28b62cc637c0bd989282c406997",
+    "independent/free-delivery-identity-dependency-review-20261015.md": "f6b9c0552a03aac07ee97ce26cf07d0ddf1226607a575ed89fdbbb88c51076aa",
+    "independent/free-delivery-progress-design-20261015.md": "c90c1a9df4e00908a492a5e04d630f5a664cc730687e9ede0e34f7c11d7573bc",
+    "independent/free-delivery-progress-design-review-20261015.json": "ff195434bf84052fad4f2423e676d5e1747accda7a4920f0136590990beb6cc6",
+    "independent/free-delivery-progress-design-review-20261015.md": "3197a1a37f2daf95f77baaa65a7835558455a11e5849ba73f7a3fc497cee6151",
+    "independent/free-delivery-progress-design-review-v2-20261015.json": "348d16a5c672a7e5b86ca5f7a0ea9316be899751b16b38f821cd0f6739e5f393",
+    "independent/free-delivery-progress-design-review-v2-20261015.md": "116eca9febc7b015c2f6ac0f2aeea208b03ec05bc56d18e006802aecfe84df79",
+    "independent/free-delivery-progress-design-v2-20261015.md": "0c301ab30c316fab4b8ca581b537c087ef8ce929d12a789642df0b9fba4700cd",
+    "independent/free-delivery-progress-source-review-2e071ef9-20261015.json": "bcb0efe166ec88562156e7483c862fa26f76261c4dc0d0bb64cc0e67c17597b6",
+    "independent/free-delivery-progress-source-review-2e071ef9-20261015.md": "32c7489481453cafffb2390597d9ce5eece626f4497aa3448860df13a24d1d9f",
+    "independent/free-delivery-progress-source-review-f1d5fb1f-20261015.json": "857e4875fd6ed923a38ca914472a39cec01931758c3f2638aa14a46efdb605e6",
+    "independent/free-delivery-progress-source-review-f1d5fb1f-20261015.md": "90163b1fe8bcd78c39943f404ca2ccfe746ca49217098b29e9052f56b096c972"
+  },
+  "invocations": [
+    {
+      "bundle": "bundle-70bbee3563ef-5b44148625733631",
+      "command": "returning-progress-old-original/command.json",
+      "command_argv": [
+        "php",
+        "-d",
+        "memory_limit=512M",
+        "-r",
+        "require \"vendor/autoload.php\"; exit((new PHPUnit\\TextUI\\Application)->run(json_decode($argv[1], true, 32, JSON_THROW_ON_ERROR)));",
+        "[\"phpunit\", \"--do-not-cache-result\", \"--colors=never\", \"--stop-on-defect\", \"--log-junit\", \"/workspace/runtime/free-delivery-progress-evidence-20261015/returning-progress-old-original/junit.xml\", \"tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php\"]"
+      ],
+      "counts": {
+        "assertions": 1,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "tests": 1
+      },
+      "filter": null,
+      "head": "70bbee3563ef584f8dcbebc34c75135612228217",
+      "name": "returning-progress-old-original",
+      "process_exit": 1,
+      "recorder_exit": 1,
+      "selected_files": [
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php"
+      ],
+      "source_and_loader_stable": true
+    },
+    {
+      "bundle": "bundle-409e979df823-7f9a0199c5bf07f7",
+      "command": "returning-progress-old-complete-original/command.json",
+      "command_argv": [
+        "php",
+        "-d",
+        "memory_limit=512M",
+        "-r",
+        "require \"vendor/autoload.php\"; exit((new PHPUnit\\TextUI\\Application)->run(json_decode($argv[1], true, 32, JSON_THROW_ON_ERROR)));",
+        "[\"phpunit\", \"--do-not-cache-result\", \"--colors=never\", \"--log-junit\", \"/workspace/runtime/free-delivery-progress-evidence-20261015/returning-progress-old-complete-original/junit.xml\", \"tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php\"]"
+      ],
+      "counts": {
+        "assertions": 8,
+        "errors": 0,
+        "failures": 4,
+        "skipped": 0,
+        "tests": 6
+      },
+      "filter": null,
+      "head": "409e979df82327fb7b719436170f472f8b294867",
+      "name": "returning-progress-old-complete-original",
+      "process_exit": 1,
+      "recorder_exit": 1,
+      "selected_files": [
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php"
+      ],
+      "source_and_loader_stable": true
+    },
+    {
+      "bundle": "bundle-c7e92bc2a627-d5f25a9e267664e6",
+      "command": "zero-base-old-original/command.json",
+      "command_argv": [
+        "php",
+        "-d",
+        "memory_limit=512M",
+        "-r",
+        "require \"vendor/autoload.php\"; exit((new PHPUnit\\TextUI\\Application)->run(json_decode($argv[1], true, 32, JSON_THROW_ON_ERROR)));",
+        "[\"phpunit\", \"--do-not-cache-result\", \"--colors=never\", \"--log-junit\", \"/workspace/runtime/free-delivery-progress-evidence-20261015/zero-base-old-original/junit.xml\", \"tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php\", \"--filter\", \"zero_base\"]"
+      ],
+      "counts": {
+        "assertions": 3,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "tests": 2
+      },
+      "filter": "zero_base",
+      "head": "c7e92bc2a62709c477047f7dcdb8b82cced8eeb6",
+      "name": "zero-base-old-original",
+      "process_exit": 1,
+      "recorder_exit": 1,
+      "selected_files": [
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php"
+      ],
+      "source_and_loader_stable": true
+    },
+    {
+      "bundle": "bundle-ca20e35103c8-b5ef6fa223c16c24",
+      "command": "account-spool-old-original/command.json",
+      "command_argv": [
+        "php",
+        "-d",
+        "memory_limit=512M",
+        "-r",
+        "require \"vendor/autoload.php\"; exit((new PHPUnit\\TextUI\\Application)->run(json_decode($argv[1], true, 32, JSON_THROW_ON_ERROR)));",
+        "[\"phpunit\", \"--do-not-cache-result\", \"--colors=never\", \"--log-junit\", \"/workspace/runtime/free-delivery-progress-evidence-20261015/account-spool-old-original/junit.xml\", \"tests/Feature/ProductionFreeGrants/ProductionFreeGrantAccountSpoolTest.php\"]"
+      ],
+      "counts": {
+        "assertions": 6,
+        "errors": 0,
+        "failures": 5,
+        "skipped": 0,
+        "tests": 6
+      },
+      "filter": null,
+      "head": "ca20e35103c85fd0259b2677848f7cceb0a753f5",
+      "name": "account-spool-old-original",
+      "process_exit": 1,
+      "recorder_exit": 1,
+      "selected_files": [
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantAccountSpoolTest.php"
+      ],
+      "source_and_loader_stable": true
+    },
+    {
+      "bundle": "bundle-f1d5fb1f2559-7ecf848ed5ba9f8c",
+      "command": "returning-progress-account-fixed-original/command.json",
+      "command_argv": [
+        "php",
+        "-d",
+        "memory_limit=512M",
+        "-r",
+        "require \"vendor/autoload.php\"; exit((new PHPUnit\\TextUI\\Application)->run(json_decode($argv[1], true, 32, JSON_THROW_ON_ERROR)));",
+        "[\"phpunit\", \"--do-not-cache-result\", \"--colors=never\", \"--log-junit\", \"/workspace/runtime/free-delivery-progress-evidence-20261015/returning-progress-account-fixed-original/junit.xml\", \"tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php\", \"tests/Feature/ProductionFreeGrants/ProductionFreeGrantAccountSpoolTest.php\"]"
+      ],
+      "counts": {
+        "assertions": 33,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 14
+      },
+      "filter": null,
+      "head": "f1d5fb1f25598ceac17b9808d8d96d5c9065d04a",
+      "name": "returning-progress-account-fixed-original",
+      "process_exit": 0,
+      "recorder_exit": 0,
+      "selected_files": [
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantAccountSpoolTest.php"
+      ],
+      "source_and_loader_stable": true
+    },
+    {
+      "bundle": "bundle-f1d5fb1f2559-7ecf848ed5ba9f8c",
+      "command": "affected-free-sqlite-initial-original/command.json",
+      "command_argv": [
+        "php",
+        "-d",
+        "memory_limit=512M",
+        "-r",
+        "require \"vendor/autoload.php\"; exit((new PHPUnit\\TextUI\\Application)->run(json_decode($argv[1], true, 32, JSON_THROW_ON_ERROR)));",
+        "[\"phpunit\", \"--do-not-cache-result\", \"--colors=never\", \"--log-junit\", \"/workspace/runtime/free-delivery-progress-evidence-20261015/affected-free-sqlite-initial-original/junit.xml\", \"tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php\", \"tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolReservationTest.php\", \"tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolResidualTest.php\", \"tests/Feature/ProductionFreeGrants/ProductionFreeGrantTransferDeadlineTest.php\", \"tests/Feature/ProductionFreeGrants/ProductionFreeGrantDeliveryTest.php\", \"tests/Feature/ProductionFreeGrants/ProductionFreeGrantFilesTest.php\", \"tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php\"]"
+      ],
+      "counts": {
+        "assertions": 276,
+        "errors": 4,
+        "failures": 2,
+        "skipped": 0,
+        "tests": 33
+      },
+      "filter": null,
+      "head": "f1d5fb1f25598ceac17b9808d8d96d5c9065d04a",
+      "name": "affected-free-sqlite-initial-original",
+      "process_exit": 2,
+      "recorder_exit": 1,
+      "selected_files": [
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolReservationTest.php",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolResidualTest.php",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantTransferDeadlineTest.php",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantDeliveryTest.php",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantFilesTest.php",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php"
+      ],
+      "source_and_loader_stable": true
+    },
+    {
+      "bundle": "bundle-80c174caa551-295bea0121f46540",
+      "command": "shrink-clock-old-original/command.json",
+      "command_argv": [
+        "php",
+        "-d",
+        "memory_limit=512M",
+        "-r",
+        "require \"vendor/autoload.php\"; exit((new PHPUnit\\TextUI\\Application)->run(json_decode($argv[1], true, 32, JSON_THROW_ON_ERROR)));",
+        "[\"phpunit\", \"--do-not-cache-result\", \"--colors=never\", \"--log-junit\", \"/workspace/runtime/free-delivery-progress-evidence-20261015/shrink-clock-old-original/junit.xml\", \"tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php\", \"tests/Feature/ProductionFreeGrants/ProductionFreeGrantAccountSpoolTest.php\", \"--filter\", \"reducing_slot_count|clock_values\"]"
+      ],
+      "counts": {
+        "assertions": 7,
+        "errors": 1,
+        "failures": 3,
+        "skipped": 0,
+        "tests": 6
+      },
+      "filter": "reducing_slot_count|clock_values",
+      "head": "80c174caa551ff18d619181e38415a80c8597901",
+      "name": "shrink-clock-old-original",
+      "process_exit": 2,
+      "recorder_exit": 1,
+      "selected_files": [
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantAccountSpoolTest.php"
+      ],
+      "source_and_loader_stable": true
+    },
+    {
+      "bundle": "bundle-2e071ef9b478-c86563a5e6ca18da",
+      "command": "progress-account-process-fixed-original/command.json",
+      "command_argv": [
+        "php",
+        "-d",
+        "memory_limit=512M",
+        "-r",
+        "require \"vendor/autoload.php\"; exit((new PHPUnit\\TextUI\\Application)->run(json_decode($argv[1], true, 32, JSON_THROW_ON_ERROR)));",
+        "[\"phpunit\", \"--do-not-cache-result\", \"--colors=never\", \"--log-junit\", \"/workspace/runtime/free-delivery-progress-evidence-20261015/progress-account-process-fixed-original/junit.xml\", \"tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php\", \"tests/Feature/ProductionFreeGrants/ProductionFreeGrantAccountSpoolTest.php\", \"tests/Feature/ProductionFreeGrants/ProductionFreeGrantAccountSpoolProcessTest.php\"]"
+      ],
+      "counts": {
+        "assertions": 85,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 27
+      },
+      "filter": null,
+      "head": "2e071ef9b4783beb99336968a8b73cd76f7c9cf5",
+      "name": "progress-account-process-fixed-original",
+      "process_exit": 0,
+      "recorder_exit": 0,
+      "selected_files": [
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantAccountSpoolTest.php",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantAccountSpoolProcessTest.php"
+      ],
+      "source_and_loader_stable": true
+    },
+    {
+      "bundle": "bundle-2e071ef9b478-c86563a5e6ca18da",
+      "command": "affected-free-sqlite-fixed-original/command.json",
+      "command_argv": [
+        "php",
+        "-d",
+        "memory_limit=512M",
+        "-r",
+        "require \"vendor/autoload.php\"; exit((new PHPUnit\\TextUI\\Application)->run(json_decode($argv[1], true, 32, JSON_THROW_ON_ERROR)));",
+        "[\"phpunit\", \"--do-not-cache-result\", \"--colors=never\", \"--log-junit\", \"/workspace/runtime/free-delivery-progress-evidence-20261015/affected-free-sqlite-fixed-original/junit.xml\", \"tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php\", \"tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolReservationTest.php\", \"tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolResidualTest.php\", \"tests/Feature/ProductionFreeGrants/ProductionFreeGrantTransferDeadlineTest.php\", \"tests/Feature/ProductionFreeGrants/ProductionFreeGrantDeliveryTest.php\", \"tests/Feature/ProductionFreeGrants/ProductionFreeGrantFilesTest.php\", \"tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php\"]"
+      ],
+      "counts": {
+        "assertions": 313,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 34
+      },
+      "filter": null,
+      "head": "2e071ef9b4783beb99336968a8b73cd76f7c9cf5",
+      "name": "affected-free-sqlite-fixed-original",
+      "process_exit": 0,
+      "recorder_exit": 0,
+      "selected_files": [
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolReservationTest.php",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolResidualTest.php",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantTransferDeadlineTest.php",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantDeliveryTest.php",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantFilesTest.php",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php"
+      ],
+      "source_and_loader_stable": true
+    },
+    {
+      "bundle": "bundle-2e071ef9b478-73e741dcd1410212",
+      "command": "account-domain-native-fixed-original/command.json",
+      "command_argv": [
+        "php",
+        "-d",
+        "memory_limit=512M",
+        "-r",
+        "define(\"PHPUNIT_COMPOSER_INSTALL\", getcwd().\"/vendor/autoload.php\"); require \"vendor/autoload.php\"; exit((new PHPUnit\\TextUI\\Application)->run(json_decode($argv[1], true, 32, JSON_THROW_ON_ERROR)));",
+        "[\"phpunit\", \"--do-not-cache-result\", \"--colors=never\", \"--log-junit\", \"/workspace/runtime/free-delivery-progress-evidence-20261015/account-domain-native-fixed-original/junit.xml\", \"tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php\", \"--filter\", \"one_account_is_bounded_across_roles_and_origins\"]"
+      ],
+      "counts": {
+        "assertions": 10,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      "filter": "one_account_is_bounded_across_roles_and_origins",
+      "head": "2e071ef9b4783beb99336968a8b73cd76f7c9cf5",
+      "name": "account-domain-native-fixed-original",
+      "process_exit": 0,
+      "recorder_exit": 0,
+      "selected_files": [
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php"
+      ],
+      "source_and_loader_stable": true
+    }
+  ],
+  "native_discovery": {
+    "corrected_exit": 0,
+    "discovered_cases": 9097,
+    "discovered_files": 673,
+    "fallback_timing_files": 69,
+    "generated_members_hash_verified": 18,
+    "not_database_test_execution": true,
+    "original_bad_prefix_exit": 1,
+    "selected_cases": 2423,
+    "selected_files": 232,
+    "shard_case_counts": [
+      287,
+      288,
+      296,
+      305,
+      296,
+      313,
+      354,
+      284
+    ]
+  },
+  "native_lifecycle": {
+    "mysql-tmp-retry/mysql-server-launch.json": {
+      "argv": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "va-studio-private-mysql-free-delivery-progress-tmp-20261015",
+        "--publish",
+        "127.0.0.1:33522:3306",
+        "--mount",
+        "type=bind,source=/tmp/va-studio-free-delivery-progress-mysql-data-20261015,target=/var/lib/mysql",
+        "--mount",
+        "type=bind,source=/tmp/va-studio-free-delivery-progress-mysql-socket-20261015,target=/var/run/free-delivery-progress",
+        "--env",
+        "MYSQL_ALLOW_EMPTY_PASSWORD=yes",
+        "--env",
+        "MYSQL_ROOT_HOST=%",
+        "mysql:8.4",
+        "--socket=/var/run/free-delivery-progress/mysql.sock",
+        "--default-time-zone=+00:00"
+      ],
+      "process_exit": 0,
+      "recorded_utc": "2026-10-15T21:07:57.589358+00:00",
+      "stderr": "",
+      "stdout": "518f988220b6536381a7329349b70ee539a3b9cd5c1587effc9f5d00326ffa60\n"
+    },
+    "mysql-tmp-retry/mysql-server-ready.json": {
+      "attempts": 1,
+      "container": "va-studio-private-mysql-free-delivery-progress-tmp-20261015",
+      "host_port": 33522,
+      "host_socket": "/tmp/va-studio-free-delivery-progress-mysql-socket-20261015/mysql.sock",
+      "private_datadir": "/tmp/va-studio-free-delivery-progress-mysql-data-20261015",
+      "recorded_utc": "2026-10-15T21:08:57.450492+00:00",
+      "schema": "vaseyaudio_free_delivery_progress",
+      "scope": "New owned synthetic local server; prior datadirs untouched. No provider/host acceptance.",
+      "socket_accessible": true
+    },
+    "mysql-tmp-retry/mysql-server-stop.json": {
+      "argv": [
+        "docker",
+        "stop",
+        "--time",
+        "30",
+        "518f988220b6536381a7329349b70ee539a3b9cd5c1587effc9f5d00326ffa60"
+      ],
+      "process_exit": 0,
+      "recorded_utc": "2026-10-15T21:21:48.377972+00:00",
+      "scope": "Only exact owned successful D1 private server stopped; datadir retained, unrelated containers untouched.",
+      "stderr": "",
+      "stdout": "Flag --time has been deprecated, use --timeout instead\n518f988220b6536381a7329349b70ee539a3b9cd5c1587effc9f5d00326ffa60\n"
+    },
+    "mysql-tmp-retry/mysql-server-version.json": {
+      "argv": [
+        "docker",
+        "exec",
+        "va-studio-private-mysql-free-delivery-progress-tmp-20261015",
+        "mysql",
+        "--socket=/var/run/free-delivery-progress/mysql.sock",
+        "-uroot",
+        "--batch",
+        "--database",
+        "vaseyaudio_free_delivery_progress",
+        "--execute",
+        "SELECT VERSION() AS version, DATABASE() AS database_name, @@session.time_zone AS time_zone, @@session.sql_mode AS sql_mode;"
+      ],
+      "process_exit": 0,
+      "recorded_utc": "2026-10-15T21:08:57.450245+00:00",
+      "stderr": "",
+      "stdout": "version\tdatabase_name\ttime_zone\tsql_mode\n8.4.11\tvaseyaudio_free_delivery_progress\t+00:00\tONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION\n"
+    },
+    "mysql-tmp-retry/mysql-stopped-state.json": {
+      "container_id": "518f988220b6536381a7329349b70ee539a3b9cd5c1587effc9f5d00326ffa60",
+      "datadir_retained": true,
+      "state": {
+        "Dead": false,
+        "Error": "",
+        "ExitCode": 0,
+        "FinishedAt": "2026-10-15T21:21:48.289808849Z",
+        "OOMKilled": false,
+        "Paused": false,
+        "Pid": 0,
+        "Restarting": false,
+        "Running": false,
+        "StartedAt": "2026-10-15T21:07:57.477544736Z",
+        "Status": "exited"
+      },
+      "unrelated_policy_server_running": true
+    }
+  },
+  "not_claimed": [
+    "Whole repository, whole MySQL or Foundation acceptance",
+    "MySQL concurrency",
+    "HTTP mount or termination of blocked callbacks",
+    "Production host/filesystem/sizing/performance/provider verification",
+    "Activation, commercial/legal or cutover readiness",
+    "Resolution of B4 or adjacent frozen-family P2s"
+  ],
+  "observed_foreground_tool_receipts": {
+    "observed-affected-sqlite-fixed-tool-exit-original.json": {
+      "head": "2e071ef9b4783beb99336968a8b73cd76f7c9cf5",
+      "name": "affected-free-sqlite-fixed-original",
+      "scope": "Observed completed foreground tool output, not an inferred exit",
+      "session_id": 76963,
+      "tool_exit": 0
+    },
+    "observed-native-and-census-tool-exits-original.json": {
+      "records": [
+        {
+          "name": "account-domain-native-fixed-original",
+          "session_id": 22243,
+          "tool_exit": 0
+        },
+        {
+          "name": "native-selection-census-original",
+          "tool_exit": 1
+        },
+        {
+          "name": "native-selection-census-corrected-original",
+          "session_id": 89318,
+          "tool_exit": 0
+        }
+      ],
+      "scope": "Observed foreground tool outputs"
+    },
+    "observed-tool-exit-addendum-original.json": {
+      "preparation_errors": [
+        "Two guessed tests/Feature root filenames refused; corrected to actual rg-discovered ProductionFreeGrants paths before editing",
+        "Read glob of nonexistent tests/ProductionFree* returned 2; corrected actual fixture read",
+        "Guessed pr-preflight.yml filename absent; rg discovered preflight.yml",
+        "Guessed email build-final-evidence.py absent; actual runner inspected",
+        "Broad runtime filename inventory encountered permission-denied on prior failed owned MySQL socket directory; no application run affected"
+      ],
+      "records": [
+        {
+          "name": "shrink-clock-old-original",
+          "session_id": 97158,
+          "tool_exit": 1
+        },
+        {
+          "name": "progress-account-process-fixed-original",
+          "session_id": 21441,
+          "tool_exit": 0
+        },
+        {
+          "name": "focused-pint-and-shard-policy-original",
+          "session_id": 46312,
+          "tool_exit": 0
+        }
+      ],
+      "scope": "Observed foreground tool completions; originals retained; not inferred process/supervisor exits"
+    },
+    "observed-tool-exit-originals.json": {
+      "records": [
+        {
+          "name": "returning-progress-old-original",
+          "session_id": 65516,
+          "tool_exit": 1
+        },
+        {
+          "name": "returning-progress-old-complete-original",
+          "session_id": 77155,
+          "tool_exit": 1
+        },
+        {
+          "name": "zero-base-old-original",
+          "session_id": 24054,
+          "tool_exit": 1
+        },
+        {
+          "name": "account-spool-old-original",
+          "session_id": 45060,
+          "tool_exit": 1
+        },
+        {
+          "name": "returning-progress-account-fixed-original",
+          "session_id": 33343,
+          "tool_exit": 0
+        },
+        {
+          "name": "affected-free-sqlite-initial-original",
+          "session_id": 69995,
+          "tool_exit": 1
+        }
+      ],
+      "scope": "Foreground exec session completions observed from actual tool outputs, not fabricated supervisor status"
+    }
+  },
+  "open_p0": 0,
+  "open_p1": 0,
+  "privacy": "Six nonzero original PHP runs retain their raw XML/logs privately: twelve files matched by exact byte size and hash. Public derived outcomes match their actual original XML and remain explicitly labeled derived. Original commands/results/process exits are retained without sanitizing them into invented passes. No live customer/provider/credential inputs are claimed.",
+  "publication_conditions": [
+    "Import this byte-original final source/evidence decision into a docs-only head and obtain explicit independent publication carry at that exact head.",
+    "When importing, replace the README generic statement about imported final evidence/publication decisions with the actual imported final evidence review and accurately pending publication carry/preflight/merge.",
+    "Require cheap preflight and complete current review/thread/check/protection inventory, then expected-head development merge; no Foundation or GitLab dispatch is authorized by this review.",
+    "Keep HTTP mount, first-byte/ff0 composition, blocked callback/send timeout/proxy behavior, source adapter, renderer/fonts, identity/host/legal/activation and full release acceptance open."
+  ],
+  "quality_originals": [
+    {
+      "argv": [
+        "php",
+        "vendor/bin/pint",
+        "--test",
+        "app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php",
+        "app/Domain/Grants/ProductionFree/ProductionFreeGrantSpool.php",
+        "app/Domain/Grants/ProductionFree/ProductionFreeGrantTransfer.php",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantAccountSpoolTest.php",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantAccountSpoolProcessTest.php",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolResidualTest.php",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantTransferDeadlineTest.php"
+      ],
+      "exit": 0,
+      "log_sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "name": "focused-pint",
+      "receipt_sha256": "78eda5bcd98dd7fa405f70fdea63c1fe3d0fd680577c9538133a15e9568ea28c",
+      "source_after": {
+        "head": "2e071ef9b4783beb99336968a8b73cd76f7c9cf5",
+        "status": ""
+      },
+      "source_before": {
+        "head": "2e071ef9b4783beb99336968a8b73cd76f7c9cf5",
+        "status": ""
+      },
+      "source_unchanged": true
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/ci/test-phpunit-shards.py"
+      ],
+      "exit": 0,
+      "log_sha256": "426249c7bc86b2607a2f783a14e97e7b535d8c3130f4214638e099722c96b5b5",
+      "name": "shard-policy",
+      "receipt_sha256": "c7284227a57bb05df7e778ed0952cf80265a5d5ff63de5d2de2631228bcb6b4c",
+      "source_after": {
+        "head": "2e071ef9b4783beb99336968a8b73cd76f7c9cf5",
+        "status": ""
+      },
+      "source_before": {
+        "head": "2e071ef9b4783beb99336968a8b73cd76f7c9cf5",
+        "status": ""
+      },
+      "source_unchanged": true
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/ci/phpunit-shards.py",
+        "--shards=8",
+        "--prefix=/workspace/runtime/free-delivery-progress-evidence-20261015/discovery-native",
+        "--timings=scripts/ci/phpunit-timings-mysql.json",
+        "--mysql-native-selection"
+      ],
+      "exit": 1,
+      "log_sha256": "d64f7d91594664922db7038466e57f6f24102ac2bf69a47f3ef165c3f5f263ef",
+      "name": "native-selection-census",
+      "receipt_sha256": "5bce17bec2e9657bd5ddca5492ab60f6648e64fbf90844a6f08d2c4838528b7b",
+      "source_after": {
+        "head": "2e071ef9b4783beb99336968a8b73cd76f7c9cf5",
+        "status": ""
+      },
+      "source_before": {
+        "head": "2e071ef9b4783beb99336968a8b73cd76f7c9cf5",
+        "status": ""
+      },
+      "source_unchanged": true
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/ci/phpunit-shards.py",
+        "--shards=8",
+        "--prefix=phpunit-ci-mysql",
+        "--timings=scripts/ci/phpunit-timings-mysql.json",
+        "--mysql-native-selection"
+      ],
+      "exit": 0,
+      "log_sha256": "810f4b1f6057d7e654f933044409eaf8292be593317a2aa69cff20bca33edbfb",
+      "name": "native-selection-census-corrected",
+      "receipt_sha256": "a2f588414ccc1e493738342a78ad85f7562cd3ece11725f3b7e62fb6e2f91d78",
+      "source_after": {
+        "head": "2e071ef9b4783beb99336968a8b73cd76f7c9cf5",
+        "status": ""
+      },
+      "source_before": {
+        "head": "2e071ef9b4783beb99336968a8b73cd76f7c9cf5",
+        "status": ""
+      },
+      "source_unchanged": true
+    }
+  ],
+  "required_corrections": [],
+  "review_execution": "Read-only immutable Git blob comparison and Python standard-library archive/hash/XML inspection. No application, database, network, CI or duplicate test execution; only this exclusive MD/JSON report pair created.",
+  "reviewed_sha": "0278a5e7e3ec5362c984e414378d0ef4b389647f",
+  "reviewed_utc": "2026-10-15T21:25:24.218743+00:00",
+  "reviewer": "Independent account_features_final_review session; no implementation or reached tests authored",
+  "scope": "D1 returning-write progress and one held snapshot per proved account, final recorded focused evidence and immutable source carry; development prerequisite only",
+  "seal": {
+    "all_members_verified": true,
+    "all_private_failure_outcomes_match_original_xml": true,
+    "archived_relevant_source_bindings_verified": 61,
+    "bundle_count": 8,
+    "bytes": 1848673,
+    "independent_byte_originals_verified": 12,
+    "index_sha256": "e1e30f665b8bb929e70b2ed48621b934106c2b71e32e3679e79c8231c678be64",
+    "manifest_to_git_hash_bindings_verified": 19671,
+    "member_count": 206,
+    "nonzero_php_invocations": 6,
+    "php_invocations": 10,
+    "physical_loader_hashes_verified": 13,
+    "private_originals_hash_and_size_verified": 12,
+    "runtime_original_member_byte_comparisons": 124,
+    "sha256": "e3bd46d4ce9431ca642d7a7508264ac4ff4d572017365ed55972e26c8af488b6",
+    "source_manifest_input_counts": [
+      2460,
+      2460,
+      2458,
+      2458,
+      2459,
+      2458,
+      2459,
+      2459
+    ],
+    "unique_git_blobs_verified": 2420,
+    "unique_source_heads": 7,
+    "zero_php_invocations": 4
+  },
+  "source_carry": {
+    "application_bootstrap_config_routes_resources_tests_scripts_lockfiles_and_phpunit_config_unchanged_from_tested_source": true,
+    "current_manifest_input_count": 2460,
+    "frozen_production_free_v1_resources_and_profile_unchanged_from_d545": true,
+    "post_test_delta": [
+      ".github/workflows/final-verification.yml",
+      "docs/handoff/2026-10-07/CLAUDE-PLAN.md",
+      "docs/handoff/2026-10-07/codex-deferred-20261011.md",
+      "docs/verification/free-delivery-progress-20261015/README.md",
+      "docs/verification/free-delivery-progress-20261015/focused-evidence-index.json",
+      "docs/verification/free-delivery-progress-20261015/focused-evidence.zip",
+      "docs/verification/free-delivery-progress-20261015/free-delivery-identity-dependency-review-20261015.json",
+      "docs/verification/free-delivery-progress-20261015/free-delivery-identity-dependency-review-20261015.md",
+      "docs/verification/free-delivery-progress-20261015/free-delivery-progress-design-review-20261015.json",
+      "docs/verification/free-delivery-progress-20261015/free-delivery-progress-design-review-20261015.md",
+      "docs/verification/free-delivery-progress-20261015/free-delivery-progress-design-review-v2-20261015.json",
+      "docs/verification/free-delivery-progress-20261015/free-delivery-progress-design-review-v2-20261015.md",
+      "docs/verification/free-delivery-progress-20261015/free-delivery-progress-source-review-2e071ef9-20261015.json",
+      "docs/verification/free-delivery-progress-20261015/free-delivery-progress-source-review-2e071ef9-20261015.md",
+      "docs/verification/free-delivery-progress-20261015/free-delivery-progress-source-review-f1d5fb1f-20261015.json",
+      "docs/verification/free-delivery-progress-20261015/free-delivery-progress-source-review-f1d5fb1f-20261015.md"
+    ],
+    "three_unfrozen_application_files_only": true,
+    "workflow_change": "Comment only: 9069 discovered cases becomes 9097. No execution policy, selection, trigger or protection changes."
+  },
+  "specification_verdict": "Pass for the bounded requested development prerequisites",
+  "test_scope_assessment": "Current 27/85 component, seven-file 34/313 SQLite and selected MySQL 1/10 are separate overlapping scopes; all zero failures/errors/skips. Local native two-process coverage establishes fill/held overlap, reservations, normal close and explicit process exit, not simultaneous-start contention, forced-kill or hosting acceptance.",
+  "tested_source_sha": "2e071ef9b4783beb99336968a8b73cd76f7c9cf5"
+}

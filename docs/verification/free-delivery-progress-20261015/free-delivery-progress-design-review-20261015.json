@@ -1,0 +1,80 @@
+{
+  "current_observed_sha": "409e979df82327fb7b719436170f472f8b294867",
+  "current_observed_status": "",
+  "decision": "REVISE ZERO-BASE FIRST-CHUNK DESIGN BEFORE IMPLEMENTATION",
+  "design_path": "/workspace/runtime/free-delivery-progress-design-20261015.md",
+  "design_sha256": "c90c1a9df4e00908a492a5e04d630f5a664cc730687e9ede0e34f7c11d7573bc",
+  "frozen_profile_hashes": {
+    "resources/contracts/free-v1/profile-assets.json": "570f6a023927228e0ac6def670df603b5b595ffd916acf69bf569fecaeab74c8",
+    "resources/contracts/paid-tax-v2/profile-assets.json": "9cc50e19608a11be4db4648b49aa5ccf234945a63fced68d95f6b42bf2e048b4",
+    "resources/contracts/paid-v1/profile-assets.json": "4a2221b64384c226e72cf16811e31f512a8a8f63c65081a04487ec5f7a573940",
+    "resources/contracts/production-free-v1/profile-assets.json": "b909c5fa80e882d7d6f2ab4bf8b05f315f46695d4a9acb621b0350a02d7f7b1f",
+    "resources/contracts/production-member-v1/profile-assets.json": "caa3218c162ef3c9192785858e6cd9fad89ab828a345466652dda21e74a1c852",
+    "resources/contracts/test-v1/profile-assets.json": "44533c186a3b1350163025256a9ced519a6395ba8001541193d1d51b51688e50",
+    "resources/contracts/test-v2/profile-assets.json": "29e0b1b33abc78ab48c6669579dbb3296eb9e282f2a16b0fb337db8417b68dac"
+  },
+  "immutable_three_file_bindings": {
+    "app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php": {
+      "baseline_sha": "d54522aa1f719780615a90362a2ff57a04395513",
+      "git_blob": "c35ef57508f8feea1a6494ee90d7e39d1c60bb00",
+      "sha256": "57f2a9c8bc3d19938932a5d6356277aa6db3adedecbff75299caf077b90d899e"
+    },
+    "app/Domain/Grants/ProductionFree/ProductionFreeGrantSpool.php": {
+      "baseline_sha": "d54522aa1f719780615a90362a2ff57a04395513",
+      "git_blob": "e204bf3455607389b57d255243373d957768a9d0",
+      "sha256": "c2a7e7f6e00f9bca865b530fe671685a2c1589d931b78db6d85c017fd2bf0c66"
+    },
+    "app/Domain/Grants/ProductionFree/ProductionFreeGrantTransfer.php": {
+      "baseline_sha": "d54522aa1f719780615a90362a2ff57a04395513",
+      "git_blob": "552425736cbfb408eb968743abab4c159a938fda",
+      "sha256": "a5aa57fc619c5b13d1af937215129b7a18175422c82910683f72499179ad824e"
+    }
+  },
+  "implementation_conditions": [
+    "Treat progress as full-chunk consumer acceptance, not network/client receipt. Check original absolute deadline before read/write and after every returning consumer, including final callback; update accepted-byte count only after complete successful acceptance. Refusal/throw closes only owned snapshot/lease and never undoes or retries consumed redemption.",
+    "Capture one original monotonic start with original captured policy before returning domain Transfer; do not recapture/renew at firstwrite/chunk/retry. Validate complete optional timing tuple, numeric rate/grace bounds, clock type/reversal and overflow before arithmetic. Document old trusted direct-constructor compatibility separately from domain-issued full-policy path.",
+    "Holder is a native SHA256 domain-labelled account digest from original retained server-proved auth/binding, independent of origin/role and never supplied by client. Account check and mark publication under global gate plus owned slot precede fill/reservation/redemption. Scan held slots even if configuration shrinks.",
+    "Held all-zero sentinel, missing, malformed or unreadable holder is unknown and refuses scoped admission. Paid holder scan alone accepts all64hex includingzeros, so explicitFree refusal is required. Null trusted callers retain old global behavior, with no account-cap claim.",
+    "Preserve private atomic exact64byte holder sidecars and exact ownership/regular/singlelink/mode/inode checks; never overwrite foreign/symlink/hardlink/nonregular records. Free stale owned wrongsize records may be reclaimed only while native lease proves idle. Preserve existing reservation/free-space accounting and all handles cleanup.",
+    "The held native flock must remain in PreparedDeliveryStream until owned close/destruction/kernel exit. Require real independent-process same-account contention and close/destruction/crash recovery, no pretending SQLite/MySQL establishes POSIX filesystem coordination. ActualDownloads integration verifies original account derivation and no redemption on cap refusal.",
+    "Transfer publicstream/shared PreparedDeliveryStream currently expose direct raw paths; this prerequisite applies to Transfer.writeTo contract only. Mount/first-byte authority/all-entry emission, blocking callback termination/sendtimeout/proxy/per-host/coherentflock/sourceadapter/fonts/identity/native/activation/legal/release conditions remain open, never claim A6-2fullyclosed.",
+    "Do not touch frozen profile members/manifests, shared PreparedDeliveryStream, paid source, schemas/config/provider/HTTP mounts or adjacent B4/V1/generic/OriginalCommitWitness/membership findings. Appropriate focused old/fixed/current evidence, independent final source/evidence review and cheap exacthead publication gates remain required."
+  ],
+  "implementation_or_test_acceptance": false,
+  "inspected_related_source_sha256": {
+    "app/Domain/Delivery/DeliveryAssetFiles.php": "3a3771443bf527d56c4a521c01b9840c847b33a9da23b7ad455c96d52820764c",
+    "app/Domain/Delivery/PreparedDeliveryStream.php": "e976fc7d0803cde84a769d83f1ca28b2449f7c1dcdd7effda0b8bf42e8c12e13",
+    "app/Domain/Grants/Paid/PaidGrantDownloads.php": "987fe025f72d347286f46b9c00eca6fbbfea0396d071e88aada8ee9248fdfd3c",
+    "app/Domain/Grants/Paid/PaidGrantPrepareStream.php": "3fb3f9e02d4fbbc8672406acf1bb9ecf1e5dbb4fceda28bbebab04525c4cbe38",
+    "app/Domain/Grants/ProductionFree/ProductionFreeGrantPolicy.php": "c060049aea8dfefaca8836f076530bdddf54d8f9abcf575bf52b219aa6669e1c",
+    "config/production-free-grants.php": "0facc064a2abedbc3e61f01b7769bcd9fbe725e612e383f2db96eadd74f51f25",
+    "docs/handoff/2026-10-07/CLAUDE-PLAN.md": "735795157477ed8de6bb108bcd79d316a2361b493c5ed85347e0a01b34c9ddd8"
+  },
+  "open_p0": 0,
+  "open_p1": 0,
+  "owned_three_files_absent_from_profile_manifests": true,
+  "preparation_errors": [
+    {
+      "failure": "Initialrg included nonexistent app/Domain/Customers/ProductionFreeGrants and later docs/verification/production-free* glob",
+      "reconciliation": "Actualowned source located under app/Domain/Grants/ProductionFree; originalD1 conditions found inCLAUDEPLAN. Lookup preparation only."
+    }
+  ],
+  "recorded_utc": "2026-10-15T20:56:39.866645+00:00",
+  "required_design_corrections": [
+    {
+      "confidence": "confirmed mathematical consequence of design and actual admitted policy",
+      "id": "D1-D1",
+      "proof": "Proposed threshold graceNs+intdiv(deliveredBytes*1e9,rate) equals0. Before-first-read/write test at positive elapsed therefore refuses every healthy zero-base transfer before delivering a byte.",
+      "required_design_change": "Specify a bounded nonrenewing first-chunk/zero-base rule that preserves original start and original absolute deadline, without editing frozen/out-of-scope policy. Add a healthy zero-base positive and delayed-first/returning-overrun boundaries. An explicit unsupported-policy refusal would need justified compatibility scope rather than silently claiming old supported policy unchanged.",
+      "requirement": "Existing valid zero-base policy must have explicit supported first-chunk semantics; no silent healthy-transfer regression",
+      "severity": "P2",
+      "source": "ProductionFreeGrantPolicy admits transfer_base_seconds from0..600",
+      "trigger": "grace=0; positive elapsed monotonic time before first read; deliveredBytes=0"
+    }
+  ],
+  "reviewed_source_base_sha": "d54522aa1f719780615a90362a2ff57a04395513",
+  "reviewer_app_db_network_ci_execution": false,
+  "reviewer_session": "/root/account_features_final_review",
+  "scope_assessment": "Coherent returning-write progress plus scoped account-held spool cap prerequisites afterzero-base rule clarified; no fullA6-2/mount/host/source/renderer authority claim",
+  "shared_files_modified": false
+}

@@ -1,0 +1,9 @@
+Proved 2423 selected MySQL-native tests in 232 files (of 9069 discovered tests in 670 files) across 8 nonempty shards.
+Shard 1: 287 tests; 28 complete files; estimated 364m 29s.
+Shard 2: 288 tests; 28 complete files; estimated 364m 46s.
+Shard 3: 296 tests; 28 complete files; estimated 364m 40s.
+Shard 4: 305 tests; 28 complete files; estimated 364m 45s.
+Shard 5: 296 tests; 33 complete files; estimated 364m 29s.
+Shard 6: 313 tests; 28 complete files; estimated 364m 38s.
+Shard 7: 354 tests; 31 complete files; estimated 364m 29s.
+Shard 8: 284 tests; 28 complete files; estimated 364m 44s.

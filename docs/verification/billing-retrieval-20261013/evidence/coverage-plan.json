@@ -1,0 +1,72 @@
+{
+  "behavior_reference": "0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371",
+  "scope": "Final local evidence reconciliation against the frozen root reference; independent review and merge preflight are separately owned.",
+  "successful_invocation_precedence": [
+    "records/helpers-final",
+    "records/issuer-final",
+    "records/legacy-transition",
+    "records/award-upgrade-new",
+    "fixture/sqlite-fixtures-initial",
+    "fixture/sqlite-schema-preparation",
+    "fixture/sqlite-cursor",
+    "root/sqlite-historical-migrations",
+    "root/sqlite-award-proof-integration",
+    "root/sqlite-membership-admission-integration",
+    "consumer/unit",
+    "consumer/terminal-restored-green",
+    "schema/sqlite-currentness-final",
+    "schema/mysql-identity-final",
+    "records/native-producer-canary",
+    "records/native-producer-remainder",
+    "schema/mysql-currentness-fixed",
+    "schema/mysql-upgrade-final",
+    "root/native-canaries-final",
+    "root/native-races-final"
+  ],
+  "nonzero_invocations_with_passing_leaves": [
+    "root/sqlite-billing-api-integration",
+    "root/sqlite-hint-job-integration"
+  ],
+  "run_scopes": {
+    "records/helpers-final": "technical_clock_and_record_checks",
+    "consumer/unit": "synthetic_clock_arithmetic",
+    "consumer/terminal-restored-green": "synthetic_cap_context_propagation",
+    "schema/sqlite-currentness-final": "current263_schema_and_upgrade",
+    "schema/mysql-identity-final": "current263_schema_and_upgrade",
+    "schema/mysql-currentness-fixed": "current263_schema_and_upgrade",
+    "records/award-upgrade-new": "current263_genuine_old_writer_replay",
+    "schema/mysql-upgrade-final": "current263_schema_and_upgrade"
+  },
+  "class_scopes": {
+    "Tests\\Feature\\ProductionMembershipBilling\\BillingSchemaPreparationTest": "historical_through262_schema",
+    "Tests\\Feature\\ProductionMembershipBilling\\BillingAwardFenceTest": "historical_through262_schema",
+    "Tests\\Feature\\ProductionMembershipBilling\\BillingIntervalOwnershipTest": "historical_through262_schema",
+    "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalAttemptsLegacyUpgradeTest": "historical_through260_schema",
+    "Tests\\Feature\\ProductionMembership\\MembershipPreparationTest": "adjacent_membership_preparation",
+    "Tests\\Feature\\ProductionMembershipBilling\\MembershipAwardDeadlineTest": "synthetic_admission_clock"
+  },
+  "case_scopes": {
+    "Tests\\Feature\\ProductionMembershipBilling\\BillingSchemaPreparationTest::test_current_database_interval_producers_retain_immutable_versioned_rows_in_every_billing_table": "current263_runtime"
+  },
+  "pending_schema_native_selection": null,
+  "out_of_scope_conditions": [
+    "No real provider credentials, network payment processing, or customer entitlements.",
+    "No production binding/activation, deploy, host verification, backup/restore/failover claim, or C4 grant consume.",
+    "No Foundation CI or GitLab dispatch; local discovery and policy tooling do not establish hosted CI.",
+    "SQLite interrupted prefixes 1\u201319 are distinct from the selected native prefix subset; no all-prefix native claim.",
+    "Synthetic cap arithmetic/offsets and Context narrowing are not physical elapsed-time or wall-clock interruption guarantees."
+  ],
+  "required_root_native_cases": [
+    "Tests\\Feature\\ProductionMembershipBilling\\BillingNativeDatabaseIntervalOwnershipRaceTest::test_two_older_snapshots_cannot_claim_the_same_valid_database_interval_across_ledgers",
+    "Tests\\Feature\\ProductionMembershipBilling\\BillingNativeStaleRetrievalRaceTest::test_a_stale_settled_retrieval_from_a_second_process_is_refused_after_a_newer_reversal",
+    "Tests\\Feature\\ProductionMembershipBilling\\BillingNativeStaleRetrievalRaceTest::test_a_stale_retrieval_whose_worker_clock_runs_ahead_is_still_refused_after_a_newer_reversal",
+    "Tests\\Feature\\ProductionMembershipBilling\\BillingNativeIntervalRetrievalRaceTest::test_a_retrieval_stalled_before_its_reads_appends_the_reversal_and_the_overlapping_older_settled_read_cannot_follow_it",
+    "Tests\\Feature\\ProductionMembershipBilling\\BillingNativeIntervalRetrievalRaceTest::test_a_retrieval_stalled_before_its_reads_is_refused_for_retry_after_an_overlapping_settled_append_and_the_retry_records_the_reversal",
+    "Tests\\Feature\\ProductionMembershipBilling\\MembershipFirstAwardTest::test_owned_award_commits_one_period_and_one_event_and_replays_the_original_result",
+    "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationLifecycleTest::test_real_sources_reserve_once_and_exact_retry_and_award_replay_preserve_the_retained_identity",
+    "Tests\\Feature\\ProductionMembershipBilling\\BillingSchemaPreparationTest::test_current_database_interval_producers_retain_immutable_versioned_rows_in_every_billing_table",
+    "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeAwardRaceTest::test_hint_insert_waits_for_award_fence_then_refuses_committed_receipt_without_undoing_award",
+    "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeAwardRaceTest::test_hint_committed_after_repeatable_read_snapshot_is_seen_by_the_owned_awards_current_reads",
+    "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationClockClosureTest::test_native_committed_clock_callback_owner_withdrawal_refuses_receipt_without_undoing_reservation"
+  ]
+}

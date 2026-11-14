@@ -57,9 +57,17 @@ final readonly class IdentityRows
                 throw new IdentityException;
             }
             // Install-time admission is insufficient: callbacks may introduce temporary aliases after commit.
-            [$present] = (new IdentityMigrationOwnership)->inspect($this->primary, $this->driver);
-            if (in_array(false, $present, true)) {
-                throw new IdentityException;
+            $inspect = function (): void {
+                [$present] = (new IdentityMigrationOwnership)->inspect($this->primary, $this->driver);
+                if (in_array(false, $present, true)) {
+                    throw new IdentityException;
+                }
+            };
+            if ($this->committedFrame === null) {
+                // Complete once per owned membership frame token; complete every time outside one (SchemaProofFrame).
+                SchemaProofFrame::prove($this->primary, 'identity', SchemaProofFrame::identityTables(), $inspect);
+            } else {
+                $inspect();
             }
             // Audit writes are also permanent; the migration's parent inspection covers the other parents.
             if ($this->driver === 'sqlite') {
@@ -103,9 +111,7 @@ final readonly class IdentityRows
                 if ($this->connection->getDatabaseName() !== $this->schema || $this->primary->query('SELECT DATABASE()')->fetchColumn() !== $this->schema) {
                     throw new IdentityException;
                 }
-                $statement = $this->primary->prepare('SELECT TABLE_NAME,TABLE_TYPE,ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=? AND LOWER(TABLE_NAME)=?');
-                $statement->execute([$this->schema, $table]);
-                $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+                $rows = CatalogLease::read($this->primary, CatalogRead::Q2598A65A62C5, [$this->schema, $table]);
                 $shown = $this->primary->query('SHOW CREATE TABLE '.$qualified)->fetch(PDO::FETCH_ASSOC);
                 if (count($rows) !== 1 || $rows[0]['TABLE_NAME'] !== $table || $rows[0]['TABLE_TYPE'] !== 'BASE TABLE' || $rows[0]['ENGINE'] !== 'InnoDB'
                     || ! is_string($shown['Create Table'] ?? null) || str_starts_with($shown['Create Table'], 'CREATE TEMPORARY TABLE ')) {
@@ -129,7 +135,12 @@ final readonly class IdentityRows
     public function rows(string $table, string $where, array $bindings, ?int $limit = null): array
     {
         $this->assertTable($table);
-        $statement = $this->primary->prepare('SELECT * FROM '.$this->table($table).' WHERE '.$where.' ORDER BY id'.($limit === null ? '' : ' LIMIT '.$limit)
+        // The exact schema proof admits this existing unique origin prefix. Keep locking and id ordering, but
+        // prevent an optimizer PRIMARY scan from locking another origin's observations before filtering them.
+        $index = $this->driver === 'mysql' && $this->committedFrame === null
+            && $table === 'production_identity_verifications' && $where === 'origin_id = ?'
+            ? ' FORCE INDEX (`piv_sequence_unique`)' : '';
+        $statement = $this->primary->prepare('SELECT * FROM '.$this->table($table).$index.' WHERE '.$where.' ORDER BY id'.($limit === null ? '' : ' LIMIT '.$limit)
             .($this->driver === 'mysql' && $this->committedFrame === null ? ' FOR UPDATE' : ''));
         $statement->execute($bindings);
 

@@ -1,0 +1,552 @@
+{
+  "scope": "109 final component public artifact hashes verified; planned/historical capsules remain non-executed unless separately bound to a registered invocation. SQLite full eligibility source map equals fixed native candidate map.",
+  "members": [
+    {
+      "original_member": "autoload.exit",
+      "archived_path": "catalog/autoload.exit",
+      "original_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "original_member": "autoload.log",
+      "archived_path": "catalog/autoload.log",
+      "original_sha256": "3a2a4b054cb89b43baa722d996228f1f6fa8a100d794395c879e8963f5160774"
+    },
+    {
+      "original_member": "commands.md",
+      "archived_path": "catalog/commands-final-release.md",
+      "original_sha256": "979d06a2905df67a3c77dc70b9d828aa070bca8e4915edae10da9acaa74d78c9"
+    },
+    {
+      "original_member": "commit-binding.json",
+      "archived_path": "catalog/commit-binding.json",
+      "original_sha256": "c3f79abf525f4b3dbd7f898cc47d11b206a1a3b4ea110b8a9ce7b0d655fedae8"
+    },
+    {
+      "original_member": "diff-check.exit",
+      "archived_path": "catalog/diff-check.exit",
+      "original_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "original_member": "diff-check.log",
+      "archived_path": "catalog/diff-check.log",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original_member": "final-verification.json",
+      "archived_path": "catalog/final-verification.json",
+      "original_sha256": "b58f7319b06d38b5225f772755dcae90aa027e3c76dbbabc8a59228158fc07ac"
+    },
+    {
+      "original_member": "finalize-receipts.py",
+      "archived_path": "catalog/finalize-receipts.py",
+      "original_sha256": "88d6859c7d1c718eb0118bf1a230db0f632a22d1c25334716d093ba5f179a69f"
+    },
+    {
+      "original_member": "native-fixed-five.exit",
+      "archived_path": "catalog/native-fixed-five.exit",
+      "original_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "original_member": "native-fixed-five.log",
+      "archived_path": "catalog/native-fixed-five.log",
+      "original_sha256": "0ea0e782d2178fb262759db8fac98661f8887aedbb2f7e5ad98669f5046b1427"
+    },
+    {
+      "original_member": "native-fixed-five.result.json",
+      "archived_path": "catalog/native-fixed-five.result.json",
+      "original_sha256": "d506e364b8e1c92742cc75ca924bc6a1984cb67ba4ddf3a3d76ad4356bbcb614"
+    },
+    {
+      "original_member": "native-fixed-five.source-check.json",
+      "archived_path": "catalog/native-fixed-five.source-check.json",
+      "original_sha256": "b418eff7c37ab6907762045e62854cecc65e4aa0a462d625aa52dfdf9dd6fc9b"
+    },
+    {
+      "original_member": "native-fixed-five.source.json",
+      "archived_path": "catalog/native-fixed-five.source.json.gz",
+      "original_sha256": "ecc927d447a627fa3539b54d0058f5436fe2fe42efc396b2d62b4a0b6a3351c0"
+    },
+    {
+      "original_member": "native-fixed-five.xml",
+      "archived_path": "catalog/native-fixed-five.xml",
+      "original_sha256": "baa8c75dcf8d47cee413889dfec0149d4297496f6ff79952093afdf18d26ac27"
+    },
+    {
+      "original_member": "native-old-source-red-v2.exit",
+      "archived_path": "catalog/native-old-source-red-v2.exit",
+      "original_sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3"
+    },
+    {
+      "original_member": "native-old-source-red-v2.log",
+      "archived_path": "catalog/native-old-source-red-v2.log",
+      "original_sha256": "67aaea68db288cf34216090c3d86e67ff345bf568fd3e1ce5ff0079df46af896"
+    },
+    {
+      "original_member": "native-old-source-red-v2.result.json",
+      "archived_path": "catalog/native-old-source-red-v2.result.json",
+      "original_sha256": "39f60df780135aa681cebbf5516ac52610f21dd4c57a7409149bb0e59bc424ea"
+    },
+    {
+      "original_member": "native-old-source-red-v2.source-check.json",
+      "archived_path": "catalog/native-old-source-red-v2.source-check.json",
+      "original_sha256": "b418eff7c37ab6907762045e62854cecc65e4aa0a462d625aa52dfdf9dd6fc9b"
+    },
+    {
+      "original_member": "native-old-source-red-v2.source.json",
+      "archived_path": "catalog/native-old-source-red-v2.source.json.gz",
+      "original_sha256": "7068a7d79b1e1feb4e21fb99ef47bcaf819e2c1d60f0f0c782469143c461e5e2"
+    },
+    {
+      "original_member": "native-old-source-red-v2.xml",
+      "archived_path": "catalog/native-old-source-red-v2.xml",
+      "original_sha256": "2639970adb83d3349581e9a11d2ece86a9b924bc7b62d68bece5290d00b51d17"
+    },
+    {
+      "original_member": "native-old-source-red.exit",
+      "archived_path": "catalog/native-old-source-red.exit",
+      "original_sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3"
+    },
+    {
+      "original_member": "native-old-source-red.log",
+      "archived_path": "catalog/native-old-source-red.log",
+      "original_sha256": "7d69d619abd36997cc07d28cc060ec2b649c08f4d79bb3dc29dbd3ac4fb47143"
+    },
+    {
+      "original_member": "native-old-source-red.result.json",
+      "archived_path": "catalog/native-old-source-red.result.json",
+      "original_sha256": "e4fe2ea93e2d9729e3546db7162f0af0ea93252978f59a74aea16d225a61453d"
+    },
+    {
+      "original_member": "native-old-source-red.source-check.json",
+      "archived_path": "catalog/native-old-source-red.source-check.json",
+      "original_sha256": "b418eff7c37ab6907762045e62854cecc65e4aa0a462d625aa52dfdf9dd6fc9b"
+    },
+    {
+      "original_member": "native-old-source-red.source.json",
+      "archived_path": "catalog/native-old-source-red.source.json.gz",
+      "original_sha256": "adef82fc9d70e3b8d36f8cc97de89c4f0adf74b4c4957a05830c8670e615c8d1"
+    },
+    {
+      "original_member": "native-old-source-red.xml",
+      "archived_path": "catalog/native-old-source-red.xml",
+      "original_sha256": "82c79fa59df906688471107daa45c84eb29468b50679492efe6e9cffd381064f"
+    },
+    {
+      "original_member": "native-receipt-pint.exit",
+      "archived_path": "catalog/native-receipt-pint.exit",
+      "original_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "original_member": "native-receipt-pint.log",
+      "archived_path": "catalog/native-receipt-pint.log",
+      "original_sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2"
+    },
+    {
+      "original_member": "native-receipt-syntax.exit",
+      "archived_path": "catalog/native-receipt-syntax.exit",
+      "original_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "original_member": "native-receipt-syntax.log",
+      "archived_path": "catalog/native-receipt-syntax.log",
+      "original_sha256": "dc33aacb8778cba28c2b3207fdc3750922f3b065e0d22bac4bd7ba0b75382a94"
+    },
+    {
+      "original_member": "native-red-plan-a58d.json",
+      "archived_path": "catalog/native-red-plan-a58d.json",
+      "original_sha256": "715f3424e91d659239f9d45b05fcbabad90f18c556703eed9e59e3670a1adc75"
+    },
+    {
+      "original_member": "native-red-plan.json",
+      "archived_path": "catalog/native-red-plan.json",
+      "original_sha256": "401c99227bd219e1e391800c9954e3f7e46fd80282bc3a2b6842fe52404693db"
+    },
+    {
+      "original_member": "native-red-planned-source/app/Domain/Memberships/Production/MembershipCatalogEvidence.php",
+      "archived_path": "catalog/native-red-planned-source/app/Domain/Memberships/Production/MembershipCatalogEvidence.php",
+      "original_sha256": "79cc5e7a443f4af4dd7b002b316090d9d889b14c5ecfdb73e25e3b682ae411a9"
+    },
+    {
+      "original_member": "native-red-planned-source/tests/Feature/ProductionMembershipBilling/MembershipNativeCatalogCurrentnessTest.php",
+      "archived_path": "catalog/native-red-planned-source/tests/Feature/ProductionMembershipBilling/MembershipNativeCatalogCurrentnessTest.php",
+      "original_sha256": "4a76bf71cdb429ddae4a216b4b0ffe09d2b5e33e4849dd776e8bd9c4dc021670"
+    },
+    {
+      "original_member": "native-setup.exit",
+      "archived_path": "catalog/native-setup.exit",
+      "original_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "original_member": "native-setup.json",
+      "archived_path": "catalog/native-setup.json",
+      "original_sha256": "75d2479a087e173dd4141a043f18e3cd13ffe5ba8b00e24e6ac8639d88eeee3f"
+    },
+    {
+      "original_member": "native-setup.log",
+      "archived_path": "catalog/native-setup.log",
+      "original_sha256": "fa3d07402e2b3bd571755ea303a5a20d5d65fceaf616cd6dfdc77d427897a95a"
+    },
+    {
+      "original_member": "native-syntax.exit",
+      "archived_path": "catalog/native-syntax.exit",
+      "original_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "original_member": "native-syntax.log",
+      "archived_path": "catalog/native-syntax.log",
+      "original_sha256": "dc33aacb8778cba28c2b3207fdc3750922f3b065e0d22bac4bd7ba0b75382a94"
+    },
+    {
+      "original_member": "native-test-822a8481.php",
+      "archived_path": "catalog/native-test-822a8481.php",
+      "original_sha256": "a2fdba09f61d8019f8f6757d2a03a272e845055bc8e1df101b32262c0d439185"
+    },
+    {
+      "original_member": "native-test-982f4ea6.php",
+      "archived_path": "catalog/native-test-982f4ea6.php",
+      "original_sha256": "d02bd82587987818ddd96e5c44df6a723be10e194b56b6bf613aa841d1e916bd"
+    },
+    {
+      "original_member": "native-window-pint.exit",
+      "archived_path": "catalog/native-window-pint.exit",
+      "original_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "original_member": "native-window-pint.log",
+      "archived_path": "catalog/native-window-pint.log",
+      "original_sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2"
+    },
+    {
+      "original_member": "native-window-source.json",
+      "archived_path": "catalog/native-window-source.json",
+      "original_sha256": "7875463f2e993dcddc46e52909c35a7939e3122e46852ba63e28b6ec4b88bbeb"
+    },
+    {
+      "original_member": "native-window-syntax.exit",
+      "archived_path": "catalog/native-window-syntax.exit",
+      "original_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "original_member": "native-window-syntax.log",
+      "archived_path": "catalog/native-window-syntax.log",
+      "original_sha256": "dc33aacb8778cba28c2b3207fdc3750922f3b065e0d22bac4bd7ba0b75382a94"
+    },
+    {
+      "original_member": "pint-final-v2.exit",
+      "archived_path": "catalog/pint-final-v2.exit",
+      "original_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "original_member": "pint-final-v2.log",
+      "archived_path": "catalog/pint-final-v2.log",
+      "original_sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2"
+    },
+    {
+      "original_member": "pint-final.exit",
+      "archived_path": "catalog/pint-final.exit",
+      "original_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "original_member": "pint-final.log",
+      "archived_path": "catalog/pint-final.log",
+      "original_sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2"
+    },
+    {
+      "original_member": "pint-fix.exit",
+      "archived_path": "catalog/pint-fix.exit",
+      "original_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "original_member": "pint-fix.log",
+      "archived_path": "catalog/pint-fix.log",
+      "original_sha256": "55c808b145a839f1a82de020be2b9be3d0ee83e8a2cc3cd1a6d1e637e5104129"
+    },
+    {
+      "original_member": "pint-initial.exit",
+      "archived_path": "catalog/pint-initial.exit",
+      "original_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "original_member": "pint-initial.log",
+      "archived_path": "catalog/pint-initial.log",
+      "original_sha256": "97869386c8d716bf346ce0a78090df9d6d69fc156d2a894846e0df33ad635863"
+    },
+    {
+      "original_member": "pure-engine-boundary-green-source/app/Domain/Memberships/Production/MembershipCatalogDefinition.php",
+      "archived_path": "catalog/pure-engine-boundary-green-source/app/Domain/Memberships/Production/MembershipCatalogDefinition.php",
+      "original_sha256": "e72bc203013e553d89d32dbdd92a89e02445e5b4ac35f5e2d06daab9800898f6"
+    },
+    {
+      "original_member": "pure-engine-boundary-green-source/app/Domain/Memberships/Production/MembershipCatalogEvidence.php",
+      "archived_path": "catalog/pure-engine-boundary-green-source/app/Domain/Memberships/Production/MembershipCatalogEvidence.php",
+      "original_sha256": "6b33144f493d1d6304382168b24dfa81adc75c8fc5f0579b5e08afb31a401afd"
+    },
+    {
+      "original_member": "pure-engine-boundary-green-source/composer.lock",
+      "archived_path": "catalog/pure-engine-boundary-green-source/composer.lock",
+      "original_sha256": "ef380eba2d55aa74970f5267f273202ec455334d426460d282c56b30902bcb06"
+    },
+    {
+      "original_member": "pure-engine-boundary-green-source/phpunit.xml",
+      "archived_path": "catalog/pure-engine-boundary-green-source/phpunit.xml",
+      "original_sha256": "493369cfb7feea104da4bec214c2cc6526ca2f1b9d937c50a2961fc59cb61aaf"
+    },
+    {
+      "original_member": "pure-engine-boundary-green-source/tests/Unit/MembershipCatalogDefinitionTest.php",
+      "archived_path": "catalog/pure-engine-boundary-green-source/tests/Unit/MembershipCatalogDefinitionTest.php",
+      "original_sha256": "7c62df85de48a4cbe7a72c851a3cdc59a9ef7553a55f91d99551462a0e76a403"
+    },
+    {
+      "original_member": "pure-engine-boundary-green.exit",
+      "archived_path": "catalog/pure-engine-boundary-green.exit",
+      "original_sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3"
+    },
+    {
+      "original_member": "pure-engine-boundary-green.log",
+      "archived_path": "catalog/pure-engine-boundary-green.log",
+      "original_sha256": "3543f051d7371398f054d108dda4eba96dbe220155b9aeb0eaf9ad26ba792acb"
+    },
+    {
+      "original_member": "pure-engine-boundary-green.result.json",
+      "archived_path": "catalog/pure-engine-boundary-green.result.json",
+      "original_sha256": "57e8d0b9ee182bbf1a7b094325aae06109363c20e37f1a6642b4ed9bcb91a331"
+    },
+    {
+      "original_member": "pure-engine-boundary-green.source.json",
+      "archived_path": "catalog/pure-engine-boundary-green.source.json",
+      "original_sha256": "58ac6ad60e365a4970cbdd6721bfd96a86e45f8497df343245872a0f546f37a0"
+    },
+    {
+      "original_member": "pure-engine-boundary-green.xml",
+      "archived_path": "catalog/pure-engine-boundary-green.xml",
+      "original_sha256": "d3f298c48e7d9f9ce3c85b4a7d3ebc53b3f0f791eba5131ed660e84a9970e493"
+    },
+    {
+      "original_member": "pure-engine-boundary-red-source/app/Domain/Memberships/Production/MembershipCatalogDefinition.php",
+      "archived_path": "catalog/pure-engine-boundary-red-source/app/Domain/Memberships/Production/MembershipCatalogDefinition.php",
+      "original_sha256": "ec0f7e685fe8e0e6a0a8adbf86c480bcd353f2cba27e4b00b97c7c8f65c6f485"
+    },
+    {
+      "original_member": "pure-engine-boundary-red-source/app/Domain/Memberships/Production/MembershipCatalogEvidence.php",
+      "archived_path": "catalog/pure-engine-boundary-red-source/app/Domain/Memberships/Production/MembershipCatalogEvidence.php",
+      "original_sha256": "6b33144f493d1d6304382168b24dfa81adc75c8fc5f0579b5e08afb31a401afd"
+    },
+    {
+      "original_member": "pure-engine-boundary-red-source/composer.lock",
+      "archived_path": "catalog/pure-engine-boundary-red-source/composer.lock",
+      "original_sha256": "ef380eba2d55aa74970f5267f273202ec455334d426460d282c56b30902bcb06"
+    },
+    {
+      "original_member": "pure-engine-boundary-red-source/phpunit.xml",
+      "archived_path": "catalog/pure-engine-boundary-red-source/phpunit.xml",
+      "original_sha256": "493369cfb7feea104da4bec214c2cc6526ca2f1b9d937c50a2961fc59cb61aaf"
+    },
+    {
+      "original_member": "pure-engine-boundary-red-source/tests/Unit/MembershipCatalogDefinitionTest.php",
+      "archived_path": "catalog/pure-engine-boundary-red-source/tests/Unit/MembershipCatalogDefinitionTest.php",
+      "original_sha256": "7c62df85de48a4cbe7a72c851a3cdc59a9ef7553a55f91d99551462a0e76a403"
+    },
+    {
+      "original_member": "pure-engine-boundary-red.exit",
+      "archived_path": "catalog/pure-engine-boundary-red.exit",
+      "original_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "original_member": "pure-engine-boundary-red.log",
+      "archived_path": "catalog/pure-engine-boundary-red.log",
+      "original_sha256": "70ea1104f674011a5bc15b51a7237fe37c77faa9195c175c06c47a8f7df5d689"
+    },
+    {
+      "original_member": "pure-engine-boundary-red.result.json",
+      "archived_path": "catalog/pure-engine-boundary-red.result.json",
+      "original_sha256": "6a6fa06fbf3047a71d1351b4bd5cfc94437443d8aa406d88e78923cf06cdc91b"
+    },
+    {
+      "original_member": "pure-engine-boundary-red.source.json",
+      "archived_path": "catalog/pure-engine-boundary-red.source.json",
+      "original_sha256": "fdf9eeda2f4064a535bc145d357dc742b9538d499ec778d954c9c0e1acd012ad"
+    },
+    {
+      "original_member": "pure-engine-boundary-red.xml",
+      "archived_path": "catalog/pure-engine-boundary-red.xml",
+      "original_sha256": "f83381d7b5ab7471eee6eafb46701b11750a526e1ba04231852b75c917ae23b1"
+    },
+    {
+      "original_member": "pure-final.exit",
+      "archived_path": "catalog/pure-final.exit",
+      "original_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "original_member": "pure-final.log",
+      "archived_path": "catalog/pure-final.log",
+      "original_sha256": "0dacad1c0c9a30ad2d25e906fbc5b723d39aea694d113e65cebcf2ffd568cd5d"
+    },
+    {
+      "original_member": "pure-final.result.json",
+      "archived_path": "catalog/pure-final.result.json",
+      "original_sha256": "9017cb867857750faddbe5fd3c9760045e8edc191d10544cee289715004f7112"
+    },
+    {
+      "original_member": "pure-final.source.json",
+      "archived_path": "catalog/pure-final.source.json",
+      "original_sha256": "4de3405f5c927836e922d20fe55a2f91cf35fe78c9cfe6d5000bcd0c1f187b59"
+    },
+    {
+      "original_member": "pure-final.xml",
+      "archived_path": "catalog/pure-final.xml",
+      "original_sha256": "6bb35588a88a84b35374e0516ad48d0faee6570709c3f328d18b8f8d13acee10"
+    },
+    {
+      "original_member": "pure-initial.exit",
+      "archived_path": "catalog/pure-initial.exit",
+      "original_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "original_member": "pure-initial.log",
+      "archived_path": "catalog/pure-initial.log",
+      "original_sha256": "a4d781b51f801d855639a4431c732e2a26c1946da672181f60938df1cc020d89"
+    },
+    {
+      "original_member": "pure-initial.result.json",
+      "archived_path": "catalog/pure-initial.result.json",
+      "original_sha256": "63da1ea39cf2e84ce5b5670a56803e3247c8830100aecffcaa00dfe7e3355f3e"
+    },
+    {
+      "original_member": "pure-initial.source.json",
+      "archived_path": "catalog/pure-initial.source.json",
+      "original_sha256": "21432103819e30e18c7289d838d4e9d406e50fc6d989872cd89a03a885c8db2b"
+    },
+    {
+      "original_member": "pure-initial.xml",
+      "archived_path": "catalog/pure-initial.xml",
+      "original_sha256": "b4d603f7a9496c22def234a8ecea07b153cfd6873db1c1ae18c98f79e83fb3b0"
+    },
+    {
+      "original_member": "pure-quote-boundary.exit",
+      "archived_path": "catalog/pure-quote-boundary.exit",
+      "original_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "original_member": "pure-quote-boundary.log",
+      "archived_path": "catalog/pure-quote-boundary.log",
+      "original_sha256": "3d92aad24368327ec7fe9d52e2a1f9b4d3ccd6f2f8ceb817b15c086cd2a86586"
+    },
+    {
+      "original_member": "pure-quote-boundary.result.json",
+      "archived_path": "catalog/pure-quote-boundary.result.json",
+      "original_sha256": "04abd400649627d1f0309e000d252b7559fffb9111ce1e2c798cdb4000fcedc1"
+    },
+    {
+      "original_member": "pure-quote-boundary.source.json",
+      "archived_path": "catalog/pure-quote-boundary.source.json",
+      "original_sha256": "ab98dd136524dfa5fd5df1e46b88ee08d5a6655c0744b87b64be153f33be947c"
+    },
+    {
+      "original_member": "pure-quote-boundary.xml",
+      "archived_path": "catalog/pure-quote-boundary.xml",
+      "original_sha256": "53699599ed632007151d9b514e37a6a6f1cd31fce8799cd0424031b03e9dca77"
+    },
+    {
+      "original_member": "quote-ambiguity-probe.log",
+      "archived_path": "catalog/quote-ambiguity-probe.log",
+      "original_sha256": "36df1824fd7ef8801efb1b894f5eb6e6e140ed0d6b120b782213d87ee2631fd0"
+    },
+    {
+      "original_member": "run-native.py",
+      "archived_path": "catalog/run-native.py",
+      "original_sha256": "7ed5291c5db36181d6b5df34c9de8b13a0be9d46d5805414cd79f5b4b0222ccd"
+    },
+    {
+      "original_member": "run-pure.py",
+      "archived_path": "catalog/run-pure.py",
+      "original_sha256": "f90084c6a6586b2158570d27ab24d26ed294c1199b8b570594d2b6cbb5513480"
+    },
+    {
+      "original_member": "run-sqlite.py",
+      "archived_path": "catalog/run-sqlite.py",
+      "original_sha256": "a743c9f1d4d3fe5d69c43bd17853e9899f1d0c5f1974748a4cf723bb509748cf"
+    },
+    {
+      "original_member": "run-static.py",
+      "archived_path": "catalog/run-static.py",
+      "original_sha256": "8fa2c0bbb55b47411badb6f2b24ba73a5335345608f80de185c1f097b6d779d8"
+    },
+    {
+      "original_member": "setup-native.py",
+      "archived_path": "catalog/setup-native.py",
+      "original_sha256": "8cb093a357a42118c0b373976ffa6c21b73294534645b084ca651bc69e0cca69"
+    },
+    {
+      "original_member": "sqlite-eligibility-whole.exit",
+      "archived_path": "catalog/sqlite-eligibility-whole.exit",
+      "original_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "original_member": "sqlite-eligibility-whole.log",
+      "archived_path": "catalog/sqlite-eligibility-whole.log",
+      "original_sha256": "b5858e38276991efbe68c6a6eb3726fc235e26238ee3cac9eacb4641054835aa"
+    },
+    {
+      "original_member": "sqlite-eligibility-whole.result.json",
+      "archived_path": "catalog/sqlite-eligibility-whole.result.json",
+      "original_sha256": "73534712afbe3e9362698294c443c857e158f2f179a8b689ee029d9a0381aa72"
+    },
+    {
+      "original_member": "sqlite-eligibility-whole.source.json",
+      "archived_path": "catalog/sqlite-eligibility-whole.source.json.gz",
+      "original_sha256": "ef2804adbf7bbc71f674343dea8976ad7211728c0d617d264cf6ffdfcbb02cac"
+    },
+    {
+      "original_member": "sqlite-eligibility-whole.xml",
+      "archived_path": "catalog/sqlite-eligibility-whole.xml",
+      "original_sha256": "93270a817ca1c2c61084137f1dbf147db9f1509547464207a428ddd38a5882ed"
+    },
+    {
+      "original_member": "static-final.json",
+      "archived_path": "catalog/static-final.json",
+      "original_sha256": "05dbe32ad5581c14cd84311b1baaf624d184362829bf764be36f87171f574ab0"
+    },
+    {
+      "original_member": "syntax-1.exit",
+      "archived_path": "catalog/syntax-1.exit",
+      "original_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "original_member": "syntax-1.log",
+      "archived_path": "catalog/syntax-1.log",
+      "original_sha256": "4bceb720be022dd39b0759fe5a548398250ed8ca39083835be4415249e2c654f"
+    },
+    {
+      "original_member": "syntax-2.exit",
+      "archived_path": "catalog/syntax-2.exit",
+      "original_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "original_member": "syntax-2.log",
+      "archived_path": "catalog/syntax-2.log",
+      "original_sha256": "fb45595e3e541af438072d014629945accf312fd014d77f24f7e733379a5f97d"
+    },
+    {
+      "original_member": "syntax-3.exit",
+      "archived_path": "catalog/syntax-3.exit",
+      "original_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "original_member": "syntax-3.log",
+      "archived_path": "catalog/syntax-3.log",
+      "original_sha256": "0781f74f40c361e8bc6f7b7ee815143ca12c6a776795898075d44a085abdc5b3"
+    },
+    {
+      "original_member": "syntax-4.exit",
+      "archived_path": "catalog/syntax-4.exit",
+      "original_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "original_member": "syntax-4.log",
+      "archived_path": "catalog/syntax-4.log",
+      "original_sha256": "dc33aacb8778cba28c2b3207fdc3750922f3b065e0d22bac4bd7ba0b75382a94"
+    }
+  ],
+  "sqlite_captured_source_count": 1961,
+  "sqlite_native_source_maps_equal": true
+}

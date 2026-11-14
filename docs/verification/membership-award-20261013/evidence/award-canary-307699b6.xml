@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\MembershipFirstAwardTest" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/MembershipFirstAwardTest.php" tests="1" assertions="15" errors="0" failures="0" skipped="0" time="8.228795">
+    <testcase name="test_owned_award_commits_one_period_and_one_event_and_replays_the_original_result" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/MembershipFirstAwardTest.php" line="35" class="Tests\Feature\ProductionMembershipBilling\MembershipFirstAwardTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipFirstAwardTest" assertions="15" time="8.228795"/>
+  </testsuite>
+</testsuites>

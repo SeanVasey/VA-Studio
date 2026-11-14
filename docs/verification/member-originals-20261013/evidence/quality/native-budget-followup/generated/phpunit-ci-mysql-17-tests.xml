@@ -1,0 +1,203 @@
+<?xml version="1.0"?>
+<testSuite xmlns="https://xml.phpunit.de/testSuite">
+ <tests>
+  <testClass name="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest" file="/workspace/VA-Studio-member-originals/tests/Feature/ProductionFeatures/ProductionFeatureMigrationTest.php">
+   <testMethod id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#0" name="test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history"/>
+   <testMethod id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#1" name="test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history"/>
+   <testMethod id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#2" name="test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history"/>
+   <testMethod id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#3" name="test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history"/>
+   <testMethod id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#4" name="test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history"/>
+   <testMethod id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#5" name="test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history"/>
+   <testMethod id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#6" name="test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history"/>
+   <testMethod id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#7" name="test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history"/>
+   <testMethod id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#8" name="test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history"/>
+   <testMethod id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#9" name="test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history"/>
+   <testMethod id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#10" name="test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history"/>
+   <testMethod id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#11" name="test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history"/>
+   <testMethod id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#12" name="test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history"/>
+   <testMethod id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#13" name="test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history"/>
+   <testMethod id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#14" name="test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history"/>
+   <testMethod id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#15" name="test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history"/>
+   <testMethod id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#16" name="test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history"/>
+   <testMethod id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#17" name="test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history"/>
+   <testMethod id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#18" name="test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history"/>
+   <testMethod id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#19" name="test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history"/>
+   <testMethod id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#20" name="test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history"/>
+   <testMethod id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_exact_complete_graph_can_be_revalidated_without_ddl" name="test_exact_complete_graph_can_be_revalidated_without_ddl"/>
+   <testMethod id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_private_runtime_admission_cannot_install_missing_storage" name="test_private_runtime_admission_cannot_install_missing_storage"/>
+   <testMethod id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_foreign_reserved_key_and_cross_kind_table_name_refuse_before_any_ddl" name="test_foreign_reserved_key_and_cross_kind_table_name_refuse_before_any_ddl"/>
+   <testMethod id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_reserved_target_table_name_on_a_foreign_trigger_refuses_before_any_ddl" name="test_reserved_target_table_name_on_a_foreign_trigger_refuses_before_any_ddl"/>
+   <testMethod id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_missing_identity_or_legacy_guard_is_refused_before_any_ddl" name="test_missing_identity_or_legacy_guard_is_refused_before_any_ddl"/>
+   <testMethod id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_real_migrator_can_resume_an_exact_unlogged_post_create_interruption" name="test_real_migrator_can_resume_an_exact_unlogged_post_create_interruption"/>
+   <testMethod id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_last_framework_ddl_callback_cannot_record_a_graph_with_an_earlier_guard_missing" name="test_last_framework_ddl_callback_cannot_record_a_graph_with_an_earlier_guard_missing"/>
+   <testMethod id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_recorded_gap_and_non_prefix_installation_refuse_without_repair" name="test_recorded_gap_and_non_prefix_installation_refuse_without_repair"/>
+   <testMethod id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_operational_down_refuses_before_queries_and_preserves_all_schema_and_history" name="test_operational_down_refuses_before_queries_and_preserves_all_schema_and_history"/>
+  </testClass>
+  <testClass name="Tests\Feature\ProductionMemberOriginals\MemberGrantNativeCurrentSchemaTest" file="/workspace/VA-Studio-member-originals/tests/Feature/ProductionMemberOriginals/MemberGrantNativeCurrentSchemaTest.php">
+   <testMethod id="Tests\Feature\ProductionMemberOriginals\MemberGrantNativeCurrentSchemaTest::test_actual_show_definitions_and_read_only_frame_are_accepted" name="test_actual_show_definitions_and_read_only_frame_are_accepted"/>
+   <testMethod id="Tests\Feature\ProductionMemberOriginals\MemberGrantNativeCurrentSchemaTest::test_current_definitions_refuse_changes_hidden_by_an_older_rr_dictionary_snapshot#0" name="test_current_definitions_refuse_changes_hidden_by_an_older_rr_dictionary_snapshot"/>
+   <testMethod id="Tests\Feature\ProductionMemberOriginals\MemberGrantNativeCurrentSchemaTest::test_current_definitions_refuse_changes_hidden_by_an_older_rr_dictionary_snapshot#1" name="test_current_definitions_refuse_changes_hidden_by_an_older_rr_dictionary_snapshot"/>
+   <testMethod id="Tests\Feature\ProductionMemberOriginals\MemberGrantNativeCurrentSchemaTest::test_current_definitions_refuse_changes_hidden_by_an_older_rr_dictionary_snapshot#2" name="test_current_definitions_refuse_changes_hidden_by_an_older_rr_dictionary_snapshot"/>
+  </testClass>
+  <testClass name="Tests\Feature\ProductionMemberOriginals\MemberOriginalCompositionTest" file="/workspace/VA-Studio-member-originals/tests/Feature/ProductionMemberOriginals/MemberOriginalCompositionTest.php">
+   <testMethod id="Tests\Feature\ProductionMemberOriginals\MemberOriginalCompositionTest::test_actual_final_frame_readiness_is_issuer_bound_and_its_capture_is_retired_before_return" name="test_actual_final_frame_readiness_is_issuer_bound_and_its_capture_is_retired_before_return"/>
+   <testMethod id="Tests\Feature\ProductionMemberOriginals\MemberOriginalCompositionTest::test_original_workflow_budget_can_be_consumed_before_producers_but_never_renewed" name="test_original_workflow_budget_can_be_consumed_before_producers_but_never_renewed"/>
+   <testMethod id="Tests\Feature\ProductionMemberOriginals\MemberOriginalCompositionTest::test_original_physical_cap_is_carried_into_the_fresh_final_commit_boundary" name="test_original_physical_cap_is_carried_into_the_fresh_final_commit_boundary"/>
+   <testMethod id="Tests\Feature\ProductionMemberOriginals\MemberOriginalCompositionTest::test_completed_regular_commit_cannot_renew_the_original_materialization_cap" name="test_completed_regular_commit_cannot_renew_the_original_materialization_cap"/>
+   <testMethod id="Tests\Feature\ProductionMemberOriginals\MemberOriginalCompositionTest::test_facts_callback_cannot_withdraw_catalog_after_reservation_admission" name="test_facts_callback_cannot_withdraw_catalog_after_reservation_admission"/>
+   <testMethod id="Tests\Feature\ProductionMemberOriginals\MemberOriginalCompositionTest::test_reservation_callback_cannot_withdraw_member_configuration_before_its_raw_closure" name="test_reservation_callback_cannot_withdraw_member_configuration_before_its_raw_closure"/>
+   <testMethod id="Tests\Feature\ProductionMemberOriginals\MemberOriginalCompositionTest::test_final_committed_callback_hook_is_refused_before_shared_finish_can_execute_it" name="test_final_committed_callback_hook_is_refused_before_shared_finish_can_execute_it"/>
+   <testMethod id="Tests\Feature\ProductionMemberOriginals\MemberOriginalCompositionTest::test_regular_committed_delegate_cannot_replace_the_owned_dispatcher_and_receive_a_source" name="test_regular_committed_delegate_cannot_replace_the_owned_dispatcher_and_receive_a_source"/>
+   <testMethod id="Tests\Feature\ProductionMemberOriginals\MemberOriginalCompositionTest::test_last_current_callback_cannot_replace_the_dispatcher_after_observer_admission" name="test_last_current_callback_cannot_replace_the_dispatcher_after_observer_admission"/>
+   <testMethod id="Tests\Feature\ProductionMemberOriginals\MemberOriginalCompositionTest::test_initial_facts_lock_cannot_publish_a_source_after_withdrawing_its_reservation_catalog" name="test_initial_facts_lock_cannot_publish_a_source_after_withdrawing_its_reservation_catalog"/>
+   <testMethod id="Tests\Feature\ProductionMemberOriginals\MemberOriginalCompositionTest::test_final_facts_lock_cannot_mint_readiness_after_withdrawing_its_reservation_catalog" name="test_final_facts_lock_cannot_mint_readiness_after_withdrawing_its_reservation_catalog"/>
+  </testClass>
+  <testClass name="Tests\Feature\ProductionMemberOriginals\MemberOriginalRetainedDeadlineTest" file="/workspace/VA-Studio-member-originals/tests/Feature/ProductionMemberOriginals/MemberOriginalRetainedDeadlineTest.php">
+   <testMethod id="Tests\Feature\ProductionMemberOriginals\MemberOriginalRetainedDeadlineTest::test_original_honor_cap_survives_retirement_and_backward_wall_time_before_detached_work" name="test_original_honor_cap_survives_retirement_and_backward_wall_time_before_detached_work"/>
+   <testMethod id="Tests\Feature\ProductionMemberOriginals\MemberOriginalRetainedDeadlineTest::test_original_invoice_window_expiring_during_shared_finish_refuses_the_source_ticket" name="test_original_invoice_window_expiring_during_shared_finish_refuses_the_source_ticket"/>
+  </testClass>
+  <testClass name="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest" file="/workspace/VA-Studio-member-originals/tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php">
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_fresh_schema_is_owned_without_identity_child_dependencies_and_retry_is_idempotent" name="test_fresh_schema_is_owned_without_identity_child_dependencies_and_retry_is_idempotent"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_bindings_invoices_observations_events_positions_and_attempts_are_immutable" name="test_bindings_invoices_observations_events_positions_and_attempts_are_immutable"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_current_database_interval_producers_retain_immutable_versioned_rows_in_every_billing_table" name="test_current_database_interval_producers_retain_immutable_versioned_rows_in_every_billing_table"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_an_observation_from_an_earlier_or_reused_position_is_refused_by_the_guard_and_the_worker_clock_orders_nothing" name="test_an_observation_from_an_earlier_or_reused_position_is_refused_by_the_guard_and_the_worker_clock_orders_nothing"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_positions_are_issued_only_by_the_database_and_each_backs_one_row_of_its_own_kind" name="test_positions_are_issued_only_by_the_database_and_each_backs_one_row_of_its_own_kind"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_the_end_position_must_be_an_unused_later_retrieval_position_and_a_read_must_begin_after_the_tails_read_ended" name="test_the_end_position_must_be_an_unused_later_retrieval_position_and_a_read_must_begin_after_the_tails_read_ended"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_the_retrieval_start_must_be_a_microsecond_timestamp" name="test_the_retrieval_start_must_be_a_microsecond_timestamp"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_binding_requires_existing_plan_version_of_same_provenance_and_active_verified_owner" name="test_binding_requires_existing_plan_version_of_same_provenance_and_active_verified_owner"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_invoice_identity_is_unique_and_scoped_to_its_binding_account_and_mode" name="test_invoice_identity_is_unique_and_scoped_to_its_binding_account_and_mode"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_observations_are_contiguous_hash_linked_and_settled_requires_period_and_amount" name="test_observations_are_contiguous_hash_linked_and_settled_requires_period_and_amount"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_events_deduplicate_by_provider_event_identity" name="test_events_deduplicate_by_provider_event_identity"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_contiguous_empty_tail_restarts_but_a_data_bearing_unguarded_prefix_is_not_adopted" name="test_contiguous_empty_tail_restarts_but_a_data_bearing_unguarded_prefix_is_not_adopted"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_reserved_guard_name_collision_refuses_and_retains_foreign_marker" name="test_reserved_guard_name_collision_refuses_and_retains_foreign_marker"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_down_refuses_without_mutation" name="test_down_refuses_without_mutation"/>
+  </testClass>
+  <testClass name="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeInstallerTest" file="/workspace/VA-Studio-member-originals/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutNativeInstallerTest.php">
+   <testMethod id="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeInstallerTest::test_native_installer_refuses_before_ddl#drifted guard body" name="test_native_installer_refuses_before_ddl"/>
+   <testMethod id="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeInstallerTest::test_native_installer_refuses_before_ddl#guard recreated under another definer" name="test_native_installer_refuses_before_ddl"/>
+   <testMethod id="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeInstallerTest::test_native_installer_refuses_before_ddl#guard recreated under another SQL mode" name="test_native_installer_refuses_before_ddl"/>
+   <testMethod id="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeInstallerTest::test_native_installer_refuses_before_ddl#interior gap" name="test_native_installer_refuses_before_ddl"/>
+   <testMethod id="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeInstallerTest::test_native_installer_refuses_before_ddl#populated incomplete installation" name="test_native_installer_refuses_before_ddl"/>
+   <testMethod id="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeInstallerTest::test_native_installer_refuses_before_ddl#temporary shadow" name="test_native_installer_refuses_before_ddl"/>
+   <testMethod id="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeInstallerTest::test_native_installer_refuses_before_ddl#foreign view" name="test_native_installer_refuses_before_ddl"/>
+   <testMethod id="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeInstallerTest::test_native_installer_refuses_before_ddl#foreign trigger" name="test_native_installer_refuses_before_ddl"/>
+   <testMethod id="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeInstallerTest::test_native_installer_refuses_before_ddl#foreign routine" name="test_native_installer_refuses_before_ddl"/>
+   <testMethod id="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeInstallerTest::test_native_installer_refuses_before_ddl#foreign key consumer" name="test_native_installer_refuses_before_ddl"/>
+   <testMethod id="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeInstallerTest::test_native_installer_refuses_before_ddl#additional owned index" name="test_native_installer_refuses_before_ddl"/>
+   <testMethod id="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeInstallerTest::test_native_installer_refuses_before_ddl#additional owned guard" name="test_native_installer_refuses_before_ddl"/>
+   <testMethod id="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeInstallerTest::test_native_installer_refuses_before_ddl#column collation drift" name="test_native_installer_refuses_before_ddl"/>
+   <testMethod id="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeInstallerTest::test_native_frozen_v1_installer_reruns_with_tax255_present_and_tables_are_inert" name="test_native_frozen_v1_installer_reruns_with_tax255_present_and_tables_are_inert"/>
+  </testClass>
+  <testClass name="Tests\Feature\ReservePricedQuoteConcurrencyTest" file="/workspace/VA-Studio-member-originals/tests/Feature/ReservePricedQuoteConcurrencyTest.php">
+   <testMethod id="Tests\Feature\ReservePricedQuoteConcurrencyTest::test_both_resources_commit_or_rollback_under_shared_lock_contention#0" name="test_both_resources_commit_or_rollback_under_shared_lock_contention"/>
+   <testMethod id="Tests\Feature\ReservePricedQuoteConcurrencyTest::test_both_resources_commit_or_rollback_under_shared_lock_contention#1" name="test_both_resources_commit_or_rollback_under_shared_lock_contention"/>
+   <testMethod id="Tests\Feature\ReservePricedQuoteConcurrencyTest::test_both_resources_commit_or_rollback_under_shared_lock_contention#2" name="test_both_resources_commit_or_rollback_under_shared_lock_contention"/>
+   <testMethod id="Tests\Feature\ReservePricedQuoteConcurrencyTest::test_both_resources_commit_or_rollback_under_shared_lock_contention#3" name="test_both_resources_commit_or_rollback_under_shared_lock_contention"/>
+   <testMethod id="Tests\Feature\ReservePricedQuoteConcurrencyTest::test_both_resources_commit_or_rollback_under_shared_lock_contention#4" name="test_both_resources_commit_or_rollback_under_shared_lock_contention"/>
+  </testClass>
+  <testClass name="Tests\Feature\SiteImageMigrationTest" file="/workspace/VA-Studio-member-originals/tests/Feature/SiteImageMigrationTest.php">
+   <testMethod id="Tests\Feature\SiteImageMigrationTest::test_empty_tables_roll_back_and_the_migration_runs_again_with_its_guards" name="test_empty_tables_roll_back_and_the_migration_runs_again_with_its_guards"/>
+  </testClass>
+  <testClass name="Tests\Feature\TestOwnerDeliveryMigrationTest" file="/workspace/VA-Studio-member-originals/tests/Feature/TestOwnerDeliveryMigrationTest.php">
+   <testMethod id="Tests\Feature\TestOwnerDeliveryMigrationTest::test_empty_delivery_roundtrip_retains_complete_activation_originals_and_pending_rights" name="test_empty_delivery_roundtrip_retains_complete_activation_originals_and_pending_rights"/>
+   <testMethod id="Tests\Feature\TestOwnerDeliveryMigrationTest::test_control_starts_blocked_with_exact_parent_and_only_versioned_toggles_are_allowed" name="test_control_starts_blocked_with_exact_parent_and_only_versioned_toggles_are_allowed"/>
+   <testMethod id="Tests\Feature\TestOwnerDeliveryMigrationTest::test_authorization_binds_enabled_control_owner_grant_exact_target_and_strict_sixty_second_lifetime" name="test_authorization_binds_enabled_control_owner_grant_exact_target_and_strict_sixty_second_lifetime"/>
+   <testMethod id="Tests\Feature\TestOwnerDeliveryMigrationTest::test_redemption_requires_exact_bytes_matching_target_and_is_single_use_before_expiry" name="test_redemption_requires_exact_bytes_matching_target_and_is_single_use_before_expiry"/>
+   <testMethod id="Tests\Feature\TestOwnerDeliveryMigrationTest::test_blocking_and_reenabling_never_revives_authorizations_from_an_older_control_version" name="test_blocking_and_reenabling_never_revives_authorizations_from_an_older_control_version"/>
+   <testMethod id="Tests\Feature\TestOwnerDeliveryMigrationTest::test_populated_rollback_and_orm_or_sql_changes_cannot_erase_controls_authorizations_or_redemptions" name="test_populated_rollback_and_orm_or_sql_changes_cannot_erase_controls_authorizations_or_redemptions"/>
+   <testMethod id="Tests\Feature\TestOwnerDeliveryMigrationTest::test_storage_contract_hides_private_evidence_and_keeps_relationships_and_restrictive_uniqueness" name="test_storage_contract_hides_private_evidence_and_keeps_relationships_and_restrictive_uniqueness"/>
+  </testClass>
+ </tests>
+ <groups>
+  <group name="default">
+   <test id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#0"/>
+   <test id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#1"/>
+   <test id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#2"/>
+   <test id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#3"/>
+   <test id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#4"/>
+   <test id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#5"/>
+   <test id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#6"/>
+   <test id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#7"/>
+   <test id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#8"/>
+   <test id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#9"/>
+   <test id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#10"/>
+   <test id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#11"/>
+   <test id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#12"/>
+   <test id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#13"/>
+   <test id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#14"/>
+   <test id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#15"/>
+   <test id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#16"/>
+   <test id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#17"/>
+   <test id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#18"/>
+   <test id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#19"/>
+   <test id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history#20"/>
+   <test id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_exact_complete_graph_can_be_revalidated_without_ddl"/>
+   <test id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_private_runtime_admission_cannot_install_missing_storage"/>
+   <test id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_foreign_reserved_key_and_cross_kind_table_name_refuse_before_any_ddl"/>
+   <test id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_reserved_target_table_name_on_a_foreign_trigger_refuses_before_any_ddl"/>
+   <test id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_missing_identity_or_legacy_guard_is_refused_before_any_ddl"/>
+   <test id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_real_migrator_can_resume_an_exact_unlogged_post_create_interruption"/>
+   <test id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_last_framework_ddl_callback_cannot_record_a_graph_with_an_earlier_guard_missing"/>
+   <test id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_recorded_gap_and_non_prefix_installation_refuse_without_repair"/>
+   <test id="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_operational_down_refuses_before_queries_and_preserves_all_schema_and_history"/>
+   <test id="Tests\Feature\ProductionMemberOriginals\MemberGrantNativeCurrentSchemaTest::test_actual_show_definitions_and_read_only_frame_are_accepted"/>
+   <test id="Tests\Feature\ProductionMemberOriginals\MemberGrantNativeCurrentSchemaTest::test_current_definitions_refuse_changes_hidden_by_an_older_rr_dictionary_snapshot#0"/>
+   <test id="Tests\Feature\ProductionMemberOriginals\MemberGrantNativeCurrentSchemaTest::test_current_definitions_refuse_changes_hidden_by_an_older_rr_dictionary_snapshot#1"/>
+   <test id="Tests\Feature\ProductionMemberOriginals\MemberGrantNativeCurrentSchemaTest::test_current_definitions_refuse_changes_hidden_by_an_older_rr_dictionary_snapshot#2"/>
+   <test id="Tests\Feature\ProductionMemberOriginals\MemberOriginalCompositionTest::test_actual_final_frame_readiness_is_issuer_bound_and_its_capture_is_retired_before_return"/>
+   <test id="Tests\Feature\ProductionMemberOriginals\MemberOriginalCompositionTest::test_original_workflow_budget_can_be_consumed_before_producers_but_never_renewed"/>
+   <test id="Tests\Feature\ProductionMemberOriginals\MemberOriginalCompositionTest::test_original_physical_cap_is_carried_into_the_fresh_final_commit_boundary"/>
+   <test id="Tests\Feature\ProductionMemberOriginals\MemberOriginalCompositionTest::test_completed_regular_commit_cannot_renew_the_original_materialization_cap"/>
+   <test id="Tests\Feature\ProductionMemberOriginals\MemberOriginalCompositionTest::test_facts_callback_cannot_withdraw_catalog_after_reservation_admission"/>
+   <test id="Tests\Feature\ProductionMemberOriginals\MemberOriginalCompositionTest::test_reservation_callback_cannot_withdraw_member_configuration_before_its_raw_closure"/>
+   <test id="Tests\Feature\ProductionMemberOriginals\MemberOriginalCompositionTest::test_final_committed_callback_hook_is_refused_before_shared_finish_can_execute_it"/>
+   <test id="Tests\Feature\ProductionMemberOriginals\MemberOriginalCompositionTest::test_regular_committed_delegate_cannot_replace_the_owned_dispatcher_and_receive_a_source"/>
+   <test id="Tests\Feature\ProductionMemberOriginals\MemberOriginalCompositionTest::test_last_current_callback_cannot_replace_the_dispatcher_after_observer_admission"/>
+   <test id="Tests\Feature\ProductionMemberOriginals\MemberOriginalCompositionTest::test_initial_facts_lock_cannot_publish_a_source_after_withdrawing_its_reservation_catalog"/>
+   <test id="Tests\Feature\ProductionMemberOriginals\MemberOriginalCompositionTest::test_final_facts_lock_cannot_mint_readiness_after_withdrawing_its_reservation_catalog"/>
+   <test id="Tests\Feature\ProductionMemberOriginals\MemberOriginalRetainedDeadlineTest::test_original_honor_cap_survives_retirement_and_backward_wall_time_before_detached_work"/>
+   <test id="Tests\Feature\ProductionMemberOriginals\MemberOriginalRetainedDeadlineTest::test_original_invoice_window_expiring_during_shared_finish_refuses_the_source_ticket"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_fresh_schema_is_owned_without_identity_child_dependencies_and_retry_is_idempotent"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_bindings_invoices_observations_events_positions_and_attempts_are_immutable"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_current_database_interval_producers_retain_immutable_versioned_rows_in_every_billing_table"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_an_observation_from_an_earlier_or_reused_position_is_refused_by_the_guard_and_the_worker_clock_orders_nothing"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_positions_are_issued_only_by_the_database_and_each_backs_one_row_of_its_own_kind"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_the_end_position_must_be_an_unused_later_retrieval_position_and_a_read_must_begin_after_the_tails_read_ended"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_the_retrieval_start_must_be_a_microsecond_timestamp"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_binding_requires_existing_plan_version_of_same_provenance_and_active_verified_owner"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_invoice_identity_is_unique_and_scoped_to_its_binding_account_and_mode"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_observations_are_contiguous_hash_linked_and_settled_requires_period_and_amount"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_events_deduplicate_by_provider_event_identity"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_contiguous_empty_tail_restarts_but_a_data_bearing_unguarded_prefix_is_not_adopted"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_reserved_guard_name_collision_refuses_and_retains_foreign_marker"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_down_refuses_without_mutation"/>
+   <test id="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeInstallerTest::test_native_installer_refuses_before_ddl#drifted guard body"/>
+   <test id="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeInstallerTest::test_native_installer_refuses_before_ddl#guard recreated under another definer"/>
+   <test id="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeInstallerTest::test_native_installer_refuses_before_ddl#guard recreated under another SQL mode"/>
+   <test id="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeInstallerTest::test_native_installer_refuses_before_ddl#interior gap"/>
+   <test id="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeInstallerTest::test_native_installer_refuses_before_ddl#populated incomplete installation"/>
+   <test id="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeInstallerTest::test_native_installer_refuses_before_ddl#temporary shadow"/>
+   <test id="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeInstallerTest::test_native_installer_refuses_before_ddl#foreign view"/>
+   <test id="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeInstallerTest::test_native_installer_refuses_before_ddl#foreign trigger"/>
+   <test id="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeInstallerTest::test_native_installer_refuses_before_ddl#foreign routine"/>
+   <test id="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeInstallerTest::test_native_installer_refuses_before_ddl#foreign key consumer"/>
+   <test id="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeInstallerTest::test_native_installer_refuses_before_ddl#additional owned index"/>
+   <test id="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeInstallerTest::test_native_installer_refuses_before_ddl#additional owned guard"/>
+   <test id="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeInstallerTest::test_native_installer_refuses_before_ddl#column collation drift"/>
+   <test id="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeInstallerTest::test_native_frozen_v1_installer_reruns_with_tax255_present_and_tables_are_inert"/>
+   <test id="Tests\Feature\ReservePricedQuoteConcurrencyTest::test_both_resources_commit_or_rollback_under_shared_lock_contention#0"/>
+   <test id="Tests\Feature\ReservePricedQuoteConcurrencyTest::test_both_resources_commit_or_rollback_under_shared_lock_contention#1"/>
+   <test id="Tests\Feature\ReservePricedQuoteConcurrencyTest::test_both_resources_commit_or_rollback_under_shared_lock_contention#2"/>
+   <test id="Tests\Feature\ReservePricedQuoteConcurrencyTest::test_both_resources_commit_or_rollback_under_shared_lock_contention#3"/>
+   <test id="Tests\Feature\ReservePricedQuoteConcurrencyTest::test_both_resources_commit_or_rollback_under_shared_lock_contention#4"/>
+   <test id="Tests\Feature\SiteImageMigrationTest::test_empty_tables_roll_back_and_the_migration_runs_again_with_its_guards"/>
+   <test id="Tests\Feature\TestOwnerDeliveryMigrationTest::test_empty_delivery_roundtrip_retains_complete_activation_originals_and_pending_rights"/>
+   <test id="Tests\Feature\TestOwnerDeliveryMigrationTest::test_control_starts_blocked_with_exact_parent_and_only_versioned_toggles_are_allowed"/>
+   <test id="Tests\Feature\TestOwnerDeliveryMigrationTest::test_authorization_binds_enabled_control_owner_grant_exact_target_and_strict_sixty_second_lifetime"/>
+   <test id="Tests\Feature\TestOwnerDeliveryMigrationTest::test_redemption_requires_exact_bytes_matching_target_and_is_single_use_before_expiry"/>
+   <test id="Tests\Feature\TestOwnerDeliveryMigrationTest::test_blocking_and_reenabling_never_revives_authorizations_from_an_older_control_version"/>
+   <test id="Tests\Feature\TestOwnerDeliveryMigrationTest::test_populated_rollback_and_orm_or_sql_changes_cannot_erase_controls_authorizations_or_redemptions"/>
+   <test id="Tests\Feature\TestOwnerDeliveryMigrationTest::test_storage_contract_hides_private_evidence_and_keeps_relationships_and_restrictive_uniqueness"/>
+  </group>
+ </groups>
+</testSuite>

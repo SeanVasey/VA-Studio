@@ -36,14 +36,57 @@ final class ContractRenderWorkspace
                 throw new \UnexpectedValueException;
             }
             $remaining = 4096;
-            $this->removeContents($this->path, 0, $remaining);
+            self::removeContents($this->path, 0, $remaining);
             if (! @rmdir($this->path)) { throw new \UnexpectedValueException; }
         } catch (Throwable) {
             throw new ContractIssuanceException('storage_failed');
         }
     }
 
-    private function removeContents(string $directory, int $depth, int &$remaining): void
+    /**
+     * Removes the workspaces a killed parent left under `$parent` (as {@see ContractFiles::sweepRendererWorkspaces()} names it)
+     * and nothing else: only direct children named as {@see create()} names them, that are private directories themselves
+     * (never a symbolic link, which is left alone and never followed), owned by `$owner` (the sweeping process's effective
+     * user; another user's entry is left alone) and last modified before `$cutoff`. Their contents
+     * are removed as {@see close()} removes them: a link inside is unlinked, its target never touched.
+     *
+     * @return array{0: int, 1: int} the workspaces removed, and the entries left because they are not workspaces or could not be removed
+     */
+    public static function sweep(string $parent, int $cutoff, int $owner): array
+    {
+        ContractIo::outsideTransactions();
+        clearstatcache(true, $parent);
+        $stat = @lstat($parent);
+        $entries = is_array($stat) && ($stat['mode'] & 0170000) === 0040000 && realpath($parent) === $parent ? @scandir($parent) : false;
+        if (! is_array($entries)) { throw new ContractIssuanceException('storage_failed'); }
+        $removed = $left = 0;
+        foreach ($entries as $name) {
+            if ($name === '.' || $name === '..') { continue; }
+            $path = $parent.'/'.$name;
+            clearstatcache(true, $path);
+            $entry = @lstat($path);
+            if (preg_match('/\A[0-9a-f]{32}\z/D', $name) !== 1 || ! is_array($entry) || ($entry['mode'] & 0177777) !== 0040700
+                || $entry['uid'] !== $owner) {
+                $left++;
+
+                continue;
+            }
+            // A render lasts at most a minute; anything changed since the cutoff may still be in use.
+            if ($entry['mtime'] >= $cutoff) { continue; }
+            try {
+                $remaining = 4096;
+                self::removeContents($path, 0, $remaining);
+                if (! @rmdir($path)) { throw new \UnexpectedValueException; }
+                $removed++;
+            } catch (Throwable) {
+                $left++;
+            }
+        }
+
+        return [$removed, $left];
+    }
+
+    private static function removeContents(string $directory, int $depth, int &$remaining): void
     {
         if ($depth > 16 || realpath($directory) !== $directory) { throw new \UnexpectedValueException; }
         $entries = @scandir($directory);
@@ -56,7 +99,7 @@ final class ContractRenderWorkspace
             $stat = @lstat($path);
             if (! is_array($stat)) { throw new \UnexpectedValueException; }
             if (($stat['mode'] & 0170000) === 0040000) {
-                $this->removeContents($path, $depth + 1, $remaining);
+                self::removeContents($path, $depth + 1, $remaining);
                 if (! @rmdir($path)) { throw new \UnexpectedValueException; }
             } elseif (! @unlink($path)) {
                 // A symbolic link is removed itself; its target is never traversed.

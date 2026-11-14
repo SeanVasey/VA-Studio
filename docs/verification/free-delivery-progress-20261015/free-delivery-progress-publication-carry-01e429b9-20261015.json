@@ -1,0 +1,60 @@
+{
+  "application_and_test_source_unchanged_from_tested_sha": true,
+  "approved_source_evidence_sha": "0278a5e7e3ec5362c984e414378d0ef4b389647f",
+  "archive_sha256_carried": "e3bd46d4ce9431ca642d7a7508264ac4ff4d572017365ed55972e26c8af488b6",
+  "byte_original_import_hashes": {
+    "free-delivery-progress-final-review-0278a5e7-20261015.json": "18868dd96a6e04c02021e122ef62a925285496157ba1ec47b5f4690849b589a1",
+    "free-delivery-progress-final-review-0278a5e7-20261015.md": "488d5209d4e911230133f0f290fc18141be940dbc11c96d6c883a1ee235a480e"
+  },
+  "changed_paths": [
+    "docs/handoff/2026-10-07/CLAUDE-PLAN.md",
+    "docs/handoff/2026-10-07/codex-deferred-20261011.md",
+    "docs/verification/free-delivery-progress-20261015/README.md",
+    "docs/verification/free-delivery-progress-20261015/free-delivery-progress-final-review-0278a5e7-20261015.json",
+    "docs/verification/free-delivery-progress-20261015/free-delivery-progress-final-review-0278a5e7-20261015.md"
+  ],
+  "current_worktree_observation": {
+    "head": "01e429b9f2c2831e575b2e899d6a8ec49f1c8718",
+    "status": ""
+  },
+  "decision": "APPROVE_EXACT_HEAD_DOCUMENTATION_PUBLICATION_CARRY",
+  "open_p0": 0,
+  "open_p1": 0,
+  "publication_and_release_conditions": [
+    "Cheap exact-head preflight, complete current review/thread/check inventory, unchanged protections and expected-head merge remain pending.",
+    "All HTTP/first-byte/ff0, blocked callback/send timeout/proxy, source adapter, renderer/fonts, identity/host/legal/activation and full release conditions remain open."
+  ],
+  "required_corrections": [],
+  "reviewed_sha": "01e429b9f2c2831e575b2e899d6a8ec49f1c8718",
+  "reviewed_utc": "2026-10-15T21:26:33.889896+00:00",
+  "scope": "Five-file docs-only publication carry; unchanged decision originals, corrected review/publication status and ledger appendices",
+  "status_wording": "Completed independent final source/sealed-evidence approval is distinguished from pending exact-head carry, preflight, current inventory and expected-SHA merge. Prior ledgers remain historical.",
+  "tested_application_test_sha": "2e071ef9b4783beb99336968a8b73cd76f7c9cf5",
+  "unchanged_packet": {
+    "focused-evidence-index.json": {
+      "git_blob": "bbdb767fdb576224493239a2636c22480e978f3c",
+      "unchanged_from_approved": true
+    },
+    "focused-evidence.zip": {
+      "git_blob": "3527473aa004a72530aaa669b3673791e4a1242d",
+      "unchanged_from_approved": true
+    }
+  },
+  "unchanged_scopes": [
+    "app",
+    "bootstrap",
+    "config",
+    "routes",
+    "resources",
+    "tests",
+    "scripts",
+    "composer.json",
+    "composer.lock",
+    "package.json",
+    "package-lock.json",
+    "phpunit.xml",
+    ".github",
+    ".gitlab-ci.yml"
+  ],
+  "verification": "Read-only immutable Git diff/blob and byte-original comparison. No repeat packet verification, application/test execution, shared edits, database, network or CI actions; only this exclusive reviewer report pair created."
+}

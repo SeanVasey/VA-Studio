@@ -1,26 +1,5 @@
-import { expect, type Page, type Response } from '@playwright/test';
-
-type LivewirePayload = {
-  components?: {
-    snapshot?: string;
-    calls?: { method?: string; params?: unknown[] }[];
-  }[];
-};
-
-function isNotificationResponse(response: Response, event: 'notificationsSent' | 'notificationClosed', id?: string) {
-  if (!response.url().endsWith('/update') || response.request().method() !== 'POST') return false;
-  const payload = response.request().postDataJSON() as LivewirePayload;
-  return payload.components?.some(component => {
-    const snapshot = JSON.parse(component.snapshot ?? '{}') as { memo?: { name?: string } };
-    if (snapshot.memo?.name !== 'Filament\\Livewire\\Notifications') return false;
-    return component.calls?.some(call => {
-      if (call.method !== '__dispatch' || call.params?.[0] !== event) return false;
-      if (id === undefined) return true;
-      const detail = call.params[1] as { id?: unknown } | undefined;
-      return detail?.id === id;
-    }) ?? false;
-  }) ?? false;
-}
+import { expect, type Page } from '@playwright/test';
+import { isNotificationResponse } from './notification-match';
 
 /** Complete the notification's own server requests before a later document navigation. */
 export async function syncSuccessNotification(
@@ -29,7 +8,7 @@ export async function syncSuccessNotification(
   action: () => Promise<void>,
   assertBeforeClose?: () => Promise<void>,
 ) {
-  // A successful action response dispatches notificationsSent; delivery is a separate Livewire request.
+  // A successful action response hands its notification batch to the browser; delivery (pullNotifications) is a separate Livewire request.
   const [delivered] = await Promise.all([
     page.waitForResponse(response => isNotificationResponse(response, 'notificationsSent')),
     action(),

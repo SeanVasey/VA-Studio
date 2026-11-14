@@ -2,6 +2,9 @@
 
 namespace App\Domain\Commerce\ProductionCheckout;
 
+use App\Domain\Commerce\ContractIdentity\ContractIdentityDeclarationV2;
+use App\Domain\Commerce\ContractIdentity\ContractIdentityStatements;
+use App\Domain\Commerce\ContractIdentity\ContractPrintableSet;
 use App\Domain\Commerce\ProductionPreparation\PreparationSelection;
 use App\Domain\Customers\ProductionCustomerAccess;
 use App\Domain\Customers\ProductionCustomerPrincipal;
@@ -15,14 +18,26 @@ final class ProductionCheckout
 {
     public function __construct(private readonly ProductionCustomerAccess $access) {}
 
+    /**
+     * D-30: what the buyer is shown before the review while contract identity capture is on: the licensee types and each
+     * type's confirmation statement. The review request echoes the displayed `statementVersion`.
+     */
+    public static function contractIdentityOffer(): array
+    {
+        CheckoutException::require(ContractIdentityPolicy::contractIdentityV2(), 'disabled', 503);
+
+        return ['licenseeTypes' => ContractIdentityDeclarationV2::LICENSEE_TYPES, 'statements' => ContractIdentityStatements::offered()];
+    }
+
     public function review(ProductionCustomerPrincipal $principal, User $buyer, int $candidateId, array $items,
         string $basisId, array $buyerDeclarations, string $key): array
     {
-        Evidence::keys($buyerDeclarations, ['legalName']);
-        CheckoutException::require(is_string($buyerDeclarations['legalName']) && strlen($buyerDeclarations['legalName']) <= 255
-            && trim($buyerDeclarations['legalName']) !== '' && mb_check_encoding($buyerDeclarations['legalName'], 'UTF-8')
-            && ! preg_match('/[\x00-\x1f\x7f]/u', $buyerDeclarations['legalName']), 'invalid', 422);
-        $buyerDeclarations = ['legal_name' => trim($buyerDeclarations['legalName']), 'identity_meaning' => 'buyer_declared_legal_name'];
+        $buyerDeclarations = ContractIdentityPolicy::contractIdentityV2()
+            // D-30: the licensee identity a production contract binds, confirmed against the statement version the buyer was
+            // shown. Exclusive has no production path (ExclusiveInventoryGate), so no artist name is admitted here.
+            ? ContractIdentityDeclarationV2::fromDisplayedInput($buyerDeclarations, false, ContractIdentityStatements::current(),
+                ContractPrintableSet::checkout())
+            : self::legacyDeclarations($buyerDeclarations);
         $items = PreparationSelection::items($items);
         $digest = Evidence::key($key);
 
@@ -38,6 +53,7 @@ final class ProductionCheckout
                 $retained = OrderEvidence::review($rows, $existing[0]);
                 CheckoutException::require($retained['row']['request_hash'] === $hash);
                 self::requireOwner($binding, $retained['body']['buyer']);
+                self::retainedIdentity($retained['body']['buyer_declarations']);
                 Evidence::same([$retained['row']], $rows->selector('review', 'buyer_origin_id = ? AND request_key = ?', [$binding['origin_id'], $digest]));
                 OrderEvidence::proveRetained($rows, $retained['raw']);
                 $this->access->proveCurrent($principal, $buyer, $rows->current, $access);
@@ -103,6 +119,7 @@ final class ProductionCheckout
                 $order = OrderEvidence::order($rows, $existing[0]);
                 self::requireOwner($binding, $order['body']['buyer']);
                 CheckoutException::require($order['row']['request_hash'] === $requestHash);
+                self::retainedIdentity($order['body']['buyer_declarations']);
                 $projection = self::orderProjection($order);
                 OrderEvidence::proveRetained($rows, $order['raw']);
                 $this->access->proveCurrent($principal, $buyer, $rows->current, $access);
@@ -113,6 +130,10 @@ final class ProductionCheckout
             $review = OrderEvidence::review($rows, $rows->one('review', $reviewId));
             Evidence::same($binding, $review['body']['buyer']);
             CheckoutException::require($review['body']['review_hash'] === $reviewHash);
+            // The reviewed identity must match the gate now: a flip between review and assent refuses rather than ordering
+            // a contract identity with capture off, or a name-only declaration with capture on.
+            CheckoutException::require(ContractIdentityDeclarationV2::isV2($review['body']['buyer_declarations']) === ContractIdentityPolicy::contractIdentityV2());
+            self::retainedIdentity($review['body']['buyer_declarations']);
             $rows->commandFrame()->capDeadline(hrtime(true) + (int) floor(((float) CarbonImmutable::parse($review['body']['expires_at'], 'UTC')->format('U.u')
                 - (float) CarbonImmutable::now('UTC')->format('U.u')) * 1_000_000_000));
             $current = CurrentPolicy::load($rows->current, $review['row']['candidate_id']);
@@ -176,6 +197,7 @@ final class ProductionCheckout
             $access = $this->access->lock($principal, $buyer, $rows->current);
             $order = OrderEvidence::order($rows, $rows->one('order', $orderId));
             self::requireOwner($this->access->durableBinding($principal), $order['body']['buyer']);
+            self::retainedIdentity($order['body']['buyer_declarations']);
             $projection = self::orderProjection($order);
             OrderEvidence::proveRetained($rows, $order['raw']);
             $this->access->proveCurrent($principal, $buyer, $rows->current, $access);
@@ -194,9 +216,78 @@ final class ProductionCheckout
         }
     }
 
+    /** The original name-only declaration, unchanged while contract identity capture is off. */
+    private static function legacyDeclarations(array $buyerDeclarations): array
+    {
+        Evidence::keys($buyerDeclarations, ['legalName']);
+        CheckoutException::require(is_string($buyerDeclarations['legalName']) && strlen($buyerDeclarations['legalName']) <= 255
+            && trim($buyerDeclarations['legalName']) !== '' && mb_check_encoding($buyerDeclarations['legalName'], 'UTF-8')
+            && ! preg_match('/[\x00-\x1f\x7f]/u', $buyerDeclarations['legalName']), 'invalid', 422);
+
+        return ['legal_name' => trim($buyerDeclarations['legalName']), 'identity_meaning' => 'buyer_declared_legal_name'];
+    }
+
+    /**
+     * D-30 step 8: what `initiate` requires of an order's frozen declarations before any provider call or payment intent.
+     * A v2 declaration is re-verified as everywhere this checkout opens the evidence, whatever the gate. The declaration's
+     * schema must then match the calling checkout's contract identity gate, in both directions (decided 2026-11-08): with the
+     * gate on a name-only order refuses, so a legacy order left unpaid cannot be paid once the gate opens; with the gate off a
+     * v2 order refuses, because the current paid renderers would print every input field. The one exception: a name-only
+     * order already paid while the gate is on is answered by its status (returns true) and never opens or resumes a provider
+     * session. Every refusal is the evidence refusal (`changed`). Reconciliation does not call this: money may already be
+     * captured there, and it always records it; paid-grant finalization holds the order instead (contractIdentityHeld()).
+     */
+    public static function requirePayableIdentity(array $declarations, bool $contractIdentityV2, bool $paid = false): bool
+    {
+        self::retainedIdentity($declarations);
+        $v2 = ContractIdentityDeclarationV2::isV2($declarations);
+        if ($v2 === $contractIdentityV2) {
+            return false;
+        }
+        CheckoutException::require($paid && ! $v2);
+
+        return true;
+    }
+
+    /**
+     * D-30 (decided 2026-11-08): true when an order's frozen v2 declaration no longer verifies against checkout's printable set
+     * (`ContractPrintableSet::verifyRetained()`), so paid-grant finalization must hold its fulfillment for staff (the payment stays recorded). A name-only
+     * declaration is never held here.
+     */
+    public static function contractIdentityHeld(array $declarations): bool
+    {
+        try {
+            self::retainedIdentity($declarations);
+        } catch (CheckoutException) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * OrderEvidence (hash-frozen) proves the review's declarations equal its request's and the order's equal the review's;
+     * a v2 declaration is also re-verified here, where this checkout opens the evidence. Legacy declarations pass untouched.
+     */
+    private static function retainedIdentity(array $declarations): void
+    {
+        if (ContractIdentityDeclarationV2::isV2($declarations)) {
+            ContractPrintableSet::verifyRetained($declarations, false);
+        }
+    }
+
     private static function reviewProjection(array $body): array
     {
-        return ['reviewId' => $body['public_id'], 'reviewHash' => $body['review_hash'], 'expiresAt' => $body['expires_at'],
+        $declarations = $body['buyer_declarations'];
+        // D-30: a contract identity review shows the buyer what the order will bind before they assent; name-only reviews are unchanged.
+        $contractIdentity = ContractIdentityDeclarationV2::isV2($declarations)
+            ? ['contractIdentity' => ['licenseeType' => $declarations['licensee_type'], 'legalName' => $declarations['legal_name'],
+                'representativeName' => $declarations['representative_name'],
+                'postalAddress' => ContractIdentityDeclarationV2::customerAddress($declarations['postal_address']),
+                'statementVersion' => $declarations['legal_name_confirmation']['statement_version']]]
+            : [];
+
+        return $contractIdentity + ['reviewId' => $body['public_id'], 'reviewHash' => $body['review_hash'], 'expiresAt' => $body['expires_at'],
             'buyer' => ['legalName' => $body['buyer_declarations']['legal_name']], 'seller' => $body['seller'], 'amounts' => self::amountProjection($body['amounts']), 'assent' => $body['assent'],
             'licenses' => array_map(fn (array $line): array => ['position' => $line['position'], 'trackId' => $line['track_id'], 'offerRevisionId' => $line['offer_revision_id'],
                 'trackTitle' => $line['offer_snapshot']['product']['title'], 'artist' => $line['offer_snapshot']['product']['artist'],

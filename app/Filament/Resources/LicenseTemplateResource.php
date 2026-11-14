@@ -41,7 +41,7 @@ class LicenseTemplateResource extends OperatorResource
         return $schema->components([
             TextInput::make('name')->required()->maxLength(255),
             TextInput::make('slug')->required()->maxLength(255)->regex('/^[a-z0-9]+(?:-[a-z0-9]+)*$/')->unique(ignoreRecord: true),
-            Select::make('type')->options(['non-exclusive' => 'Non-exclusive', 'exclusive' => 'Exclusive (commerce blocked)', 'free' => 'Free (commerce blocked)'])->required()->default('non-exclusive'),
+            Select::make('type')->options(['non-exclusive' => 'Non-exclusive', 'exclusive' => 'Exclusive (commerce blocked)', 'free' => 'Free (commerce blocked)', 'sound-kit' => 'Sound kit license (not a beat tier)'])->required()->default('non-exclusive'),
         ]);
     }
 

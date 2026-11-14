@@ -10,7 +10,7 @@ use App\Support\CanonicalJson;
 /** Separate free purpose/template over the retained trusted offline fonts and package identities. */
 final class FreeGrantRenderProfile
 {
-    private const MANIFEST_HASH = '570f6a023927228e0ac6def670df603b5b595ffd916acf69bf569fecaeab74c8';
+    private const MANIFEST_HASH = 'f3d3f733b20c4f96e586bbdc465000d3cd489230db9eafb7f31bb8b8d54ca449';
 
     public static function current(?string $root = null): array
     {

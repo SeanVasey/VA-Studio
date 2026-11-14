@@ -2,16 +2,21 @@
 
 namespace App\Support\Diagnostics;
 
+use App\Domain\Contracts\Production\StagingSpecimenSignature;
+use App\Domain\Contracts\Production\VaseyLicenseSignature;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Domain\Media\BoundedMediaProcess;
 use App\Domain\Media\MalwareScanner;
 use App\Domain\Media\PrivateMediaFiles;
+use App\Domain\Media\StagingSellerTag;
 use App\Domain\SiteBuilder\Models\SiteRelease;
+use App\Domain\SiteBuilder\SiteContentSchema;
 use App\Domain\SiteBuilder\SiteImageReferences;
 use App\Models\User;
 use App\Support\Environment\TestEnvironment;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Throwable;
 
 /**
@@ -134,6 +139,20 @@ final class InstallationReport
             && ! str_contains(config('media.tag_path'), '..') && ! str_contains(config('media.tag_path'), '//')
             && is_string(config('media.tag_sha256')) && preg_match('/\A[a-f0-9]{64}\z/D', config('media.tag_sha256')),
             'Seller tag settings are present; file content and audible approval are unverified.', 'Configure the approved private seller tag and its SHA-256 using Media operations.');
+        if (app()->isProduction()) {
+            // Path and, when the file is there, content: the staging placeholder is refused wherever the approved tag is required.
+            $check('production_seller_tag', true, fn () => ! StagingSellerTag::refused(config('media.tag_path'), $this->sellerTagFile()),
+                'The configured seller tag is not the synthetic staging placeholder.',
+                'Production is configured with the synthetic staging seller tag. Install the approved seller tag and set MEDIA_TAG_PATH and MEDIA_TAG_SHA256 to it.');
+        }
+        // Only when a configured signature file is readable and carries the specimen marker; no row otherwise, so a real,
+        // absent or unreadable signature leaves the report exactly as it was. Production requires the real signature.
+        if ($this->signatureIsSpecimen()) {
+            $production = app()->isProduction();
+            $check('license_signature_specimen', $production, fn () => ! $production,
+                'The configured license signature is the staging specimen (STAGING SPECIMEN — NOT A SIGNATURE), not a signature. Sean installs his own on the production host.',
+                'Production is configured with the staging specimen signature. Install Sean\'s signature PNG and set VASEY_LICENSE_SIGNATURE_PATH and VASEY_LICENSE_SIGNATURE_SHA256 to it.');
+        }
         $check('media_queue', false, fn () => in_array(config('queue.default'), ['database', 'redis', 'sqs', 'beanstalkd'], true),
             'An asynchronous queue is selected; worker liveness and recovery are unverified.', 'Select and run the documented asynchronous media queue before processing real uploads.');
         $check('mail_transport', false, fn () => in_array(config('mail.default'), ['smtp', 'ses', 'postmark', 'resend', 'mailgun'], true),
@@ -146,7 +165,7 @@ final class InstallationReport
         // A damaged stored file of an image in the active release is already missing from the live site; each file is hashed.
         $check('site_images', false, function (): bool {
             $release = SiteRelease::find(DB::table('site_publications')->where('id', 1)->value('active_release_id'));
-            if (in_array($release?->schema_version, [3, 4], true) && is_array($release->content)) {
+            if (in_array($release?->schema_version, SiteContentSchema::IMAGE_VERSIONS, true) && is_array($release->content)) {
                 app(SiteImageReferences::class)->verifyFiles($release->content);
             }
 
@@ -184,6 +203,36 @@ final class InstallationReport
         }
 
         return function_exists('posix_geteuid') ? posix_geteuid() : null;
+    }
+
+    /** The configured seller tag as a file in private storage, or null when it is not there to read. */
+    /** True when the configured signature file is a regular private file whose bytes hold the specimen marker. Unreadable reads as false. */
+    private function signatureIsSpecimen(): bool
+    {
+        try {
+            $relative = config('contracts.vasey_license_v1.signature_path');
+            if (! is_string($relative) || preg_match('#\A(?:[A-Za-z0-9_-][A-Za-z0-9._-]*/)*[A-Za-z0-9_-][A-Za-z0-9._-]*\z#', $relative) !== 1) {
+                return false;
+            }
+            $file = rtrim(Storage::disk('local')->path(''), '/').'/'.$relative;
+            if (! is_file($file) || is_link($file)) {
+                return false;
+            }
+            $bytes = file_get_contents($file, false, null, 0, VaseyLicenseSignature::MAX_BYTES);
+
+            return is_string($bytes) && str_contains($bytes, StagingSpecimenSignature::MARKER);
+        } catch (Throwable) {
+            return false;
+        }
+    }
+
+    private function sellerTagFile(): ?string
+    {
+        try {
+            return is_string(config('media.tag_path')) ? app(PrivateMediaFiles::class)->resolve(config('media.tag_path')) : null;
+        } catch (Throwable) {
+            return null;
+        }
     }
 
     private function executable(string $key): bool

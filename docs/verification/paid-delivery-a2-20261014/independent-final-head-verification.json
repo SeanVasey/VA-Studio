@@ -1,0 +1,25 @@
+{
+  "actual_current_source_inputs_equal_captured_and_successor_git": 2339,
+  "app_tests_database_ci_executed": false,
+  "approval_from": "f603f1a75bebc52fa04f25ed713d4f4f8ba89138",
+  "archive_members_unchanged": 160,
+  "archive_sha256": "6745b6426fd90de5763ead2e29af206f6a80d1a1c9b472d0137027dce0f2f896",
+  "changed_files": {
+    "docs/handoff/2026-10-07/CLAUDE-PLAN.md": "M",
+    "docs/handoff/2026-10-07/codex-deferred-20261011.md": "M",
+    "docs/verification/paid-delivery-a2-20261014/README.md": "M",
+    "docs/verification/paid-delivery-a2-20261014/independent-packet-verification.json": "A",
+    "docs/verification/paid-delivery-a2-20261014/independent-review-DECISION.md": "A"
+  },
+  "clean_exact_head_before_after": true,
+  "component_review_notes_unchanged": 6,
+  "copied_receipt_sha256": {
+    "independent-packet-verification.json": "005cf22b344c559f14cf3b292b1124b44c688d3e466206cdb694281f882d9cc2",
+    "independent-review-DECISION.md": "79073aa81c5e72bda6ecdb73c2f60fe58e5d5372af177b56221fb367b547f4be"
+  },
+  "current_loader_hashes_equal_captured": 13,
+  "decision": "APPROVE WITH CONDITIONS",
+  "operative_tests_config_routes_workflows_unchanged": true,
+  "reviewed_successor": "b7e99913a16e3eb408a34767f220f46d16b47620",
+  "route_inputs": 16
+}

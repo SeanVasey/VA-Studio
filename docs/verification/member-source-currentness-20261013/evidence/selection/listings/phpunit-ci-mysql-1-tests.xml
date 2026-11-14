@@ -1,0 +1,181 @@
+<?xml version="1.0"?>
+<testSuite xmlns="https://xml.phpunit.de/testSuite">
+ <tests>
+  <testClass name="Tests\Feature\BulkReplaceLicenseDraftSourceTest" file="/workspace/VA-Studio-member-source-currentness/tests/Feature/BulkReplaceLicenseDraftSourceTest.php">
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_explicit_review_orders_reversed_selection_and_shows_exact_source_changes_without_writes" name="test_explicit_review_orders_reversed_selection_and_shows_exact_source_changes_without_writes"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_each_supported_schema_preserves_raw_terms_dates_lifecycle_and_original_author_exclusion#original" name="test_each_supported_schema_preserves_raw_terms_dates_lifecycle_and_original_author_exclusion"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_each_supported_schema_preserves_raw_terms_dates_lifecycle_and_original_author_exclusion#typed" name="test_each_supported_schema_preserves_raw_terms_dates_lifecycle_and_original_author_exclusion"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_each_supported_schema_preserves_raw_terms_dates_lifecycle_and_original_author_exclusion#scoped" name="test_each_supported_schema_preserves_raw_terms_dates_lifecycle_and_original_author_exclusion"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_each_supported_schema_preserves_raw_terms_dates_lifecycle_and_original_author_exclusion#economic" name="test_each_supported_schema_preserves_raw_terms_dates_lifecycle_and_original_author_exclusion"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_mixed_no_op_and_changed_rows_have_complete_disjoint_results_and_only_one_edit_audit" name="test_mixed_no_op_and_changed_rows_have_complete_disjoint_results_and_only_one_edit_audit"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_invalid_identity_selection_is_refused_without_any_effect#empty" name="test_invalid_identity_selection_is_refused_without_any_effect"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_invalid_identity_selection_is_refused_without_any_effect#associative" name="test_invalid_identity_selection_is_refused_without_any_effect"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_invalid_identity_selection_is_refused_without_any_effect#duplicate" name="test_invalid_identity_selection_is_refused_without_any_effect"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_invalid_identity_selection_is_refused_without_any_effect#unsaved" name="test_invalid_identity_selection_is_refused_without_any_effect"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_invalid_identity_selection_is_refused_without_any_effect#wrong model" name="test_invalid_identity_selection_is_refused_without_any_effect"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_invalid_identity_selection_is_refused_without_any_effect#missing row" name="test_invalid_identity_selection_is_refused_without_any_effect"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_invalid_identity_selection_is_refused_without_any_effect#reparent hint" name="test_invalid_identity_selection_is_refused_without_any_effect"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_count_and_canonical_byte_bounds_refuse_whole_selections_without_truncation" name="test_count_and_canonical_byte_bounds_refuse_whole_selections_without_truncation"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_supplied_source_must_validate_against_each_retained_terms_schema#empty" name="test_supplied_source_must_validate_against_each_retained_terms_schema"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_supplied_source_must_validate_against_each_retained_terms_schema#whitespace" name="test_supplied_source_must_validate_against_each_retained_terms_schema"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_supplied_source_must_validate_against_each_retained_terms_schema#too long" name="test_supplied_source_must_validate_against_each_retained_terms_schema"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_supplied_source_must_validate_against_each_retained_terms_schema#invalid utf8" name="test_supplied_source_must_validate_against_each_retained_terms_schema"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_supplied_source_must_validate_against_each_retained_terms_schema#control" name="test_supplied_source_must_validate_against_each_retained_terms_schema"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_supplied_source_must_validate_against_each_retained_terms_schema#missing typed variables" name="test_supplied_source_must_validate_against_each_retained_terms_schema"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_heterogeneous_drafts_require_one_source_compatible_with_every_target_before_any_save" name="test_heterogeneous_drafts_require_one_source_compatible_with_every_target_before_any_save"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_forged_or_mutated_review_cannot_change_any_selected_draft#schema" name="test_forged_or_mutated_review_cannot_change_any_selected_draft"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_forged_or_mutated_review_cannot_change_any_selected_draft#intent" name="test_forged_or_mutated_review_cannot_change_any_selected_draft"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_forged_or_mutated_review_cannot_change_any_selected_draft#actor string" name="test_forged_or_mutated_review_cannot_change_any_selected_draft"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_forged_or_mutated_review_cannot_change_any_selected_draft#extra top" name="test_forged_or_mutated_review_cannot_change_any_selected_draft"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_forged_or_mutated_review_cannot_change_any_selected_draft#string id" name="test_forged_or_mutated_review_cannot_change_any_selected_draft"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_forged_or_mutated_review_cannot_change_any_selected_draft#float id" name="test_forged_or_mutated_review_cannot_change_any_selected_draft"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_forged_or_mutated_review_cannot_change_any_selected_draft#negative cursor" name="test_forged_or_mutated_review_cannot_change_any_selected_draft"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_forged_or_mutated_review_cannot_change_any_selected_draft#bad hash" name="test_forged_or_mutated_review_cannot_change_any_selected_draft"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_forged_or_mutated_review_cannot_change_any_selected_draft#hash suffix" name="test_forged_or_mutated_review_cannot_change_any_selected_draft"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_forged_or_mutated_review_cannot_change_any_selected_draft#template extra" name="test_forged_or_mutated_review_cannot_change_any_selected_draft"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_forged_or_mutated_review_cannot_change_any_selected_draft#source changed after review" name="test_forged_or_mutated_review_cannot_change_any_selected_draft"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_forged_or_mutated_review_cannot_change_any_selected_draft#before changed" name="test_forged_or_mutated_review_cannot_change_any_selected_draft"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_forged_or_mutated_review_cannot_change_any_selected_draft#after changed" name="test_forged_or_mutated_review_cannot_change_any_selected_draft"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_forged_or_mutated_review_cannot_change_any_selected_draft#terms changed" name="test_forged_or_mutated_review_cannot_change_any_selected_draft"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_forged_or_mutated_review_cannot_change_any_selected_draft#date changed" name="test_forged_or_mutated_review_cannot_change_any_selected_draft"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_forged_or_mutated_review_cannot_change_any_selected_draft#version changed" name="test_forged_or_mutated_review_cannot_change_any_selected_draft"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_forged_or_mutated_review_cannot_change_any_selected_draft#unknown row key" name="test_forged_or_mutated_review_cannot_change_any_selected_draft"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_forged_or_mutated_review_cannot_change_any_selected_draft#missing projection" name="test_forged_or_mutated_review_cannot_change_any_selected_draft"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_review_reordering_duplicate_ids_missing_keys_and_inconsistent_shared_parent_are_refused" name="test_review_reordering_duplicate_ids_missing_keys_and_inconsistent_shared_parent_are_refused"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_any_one_changed_draft_or_parent_invalidates_the_whole_captured_batch_including_aba#legacy edit" name="test_any_one_changed_draft_or_parent_invalidates_the_whole_captured_batch_including_aba"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_any_one_changed_draft_or_parent_invalidates_the_whole_captured_batch_including_aba#legacy ABA" name="test_any_one_changed_draft_or_parent_invalidates_the_whole_captured_batch_including_aba"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_any_one_changed_draft_or_parent_invalidates_the_whole_captured_batch_including_aba#legacy no-op audit" name="test_any_one_changed_draft_or_parent_invalidates_the_whole_captured_batch_including_aba"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_any_one_changed_draft_or_parent_invalidates_the_whole_captured_batch_including_aba#single reviewed edit" name="test_any_one_changed_draft_or_parent_invalidates_the_whole_captured_batch_including_aba"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_any_one_changed_draft_or_parent_invalidates_the_whole_captured_batch_including_aba#template edit" name="test_any_one_changed_draft_or_parent_invalidates_the_whole_captured_batch_including_aba"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_any_one_changed_draft_or_parent_invalidates_the_whole_captured_batch_including_aba#template ABA" name="test_any_one_changed_draft_or_parent_invalidates_the_whole_captured_batch_including_aba"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_one_no_longer_editable_target_refuses_review_and_atomic_apply#reviewed" name="test_one_no_longer_editable_target_refuses_review_and_atomic_apply"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_one_no_longer_editable_target_refuses_review_and_atomic_apply#approved" name="test_one_no_longer_editable_target_refuses_review_and_atomic_apply"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_one_no_longer_editable_target_refuses_review_and_atomic_apply#published" name="test_one_no_longer_editable_target_refuses_review_and_atomic_apply"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_fresh_actor_email_and_required_mfa_guard_private_capture_and_mutation#review / role" name="test_fresh_actor_email_and_required_mfa_guard_private_capture_and_mutation"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_fresh_actor_email_and_required_mfa_guard_private_capture_and_mutation#review / email" name="test_fresh_actor_email_and_required_mfa_guard_private_capture_and_mutation"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_fresh_actor_email_and_required_mfa_guard_private_capture_and_mutation#review / mfa" name="test_fresh_actor_email_and_required_mfa_guard_private_capture_and_mutation"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_fresh_actor_email_and_required_mfa_guard_private_capture_and_mutation#review / unsaved" name="test_fresh_actor_email_and_required_mfa_guard_private_capture_and_mutation"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_fresh_actor_email_and_required_mfa_guard_private_capture_and_mutation#review / customer" name="test_fresh_actor_email_and_required_mfa_guard_private_capture_and_mutation"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_fresh_actor_email_and_required_mfa_guard_private_capture_and_mutation#apply / role" name="test_fresh_actor_email_and_required_mfa_guard_private_capture_and_mutation"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_fresh_actor_email_and_required_mfa_guard_private_capture_and_mutation#apply / email" name="test_fresh_actor_email_and_required_mfa_guard_private_capture_and_mutation"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_fresh_actor_email_and_required_mfa_guard_private_capture_and_mutation#apply / mfa" name="test_fresh_actor_email_and_required_mfa_guard_private_capture_and_mutation"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_fresh_actor_email_and_required_mfa_guard_private_capture_and_mutation#apply / unsaved" name="test_fresh_actor_email_and_required_mfa_guard_private_capture_and_mutation"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_fresh_actor_email_and_required_mfa_guard_private_capture_and_mutation#apply / customer" name="test_fresh_actor_email_and_required_mfa_guard_private_capture_and_mutation"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_authority_withdrawn_during_projection_or_last_audit_rolls_back_before_return#capture role" name="test_authority_withdrawn_during_projection_or_last_audit_rolls_back_before_return"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_authority_withdrawn_during_projection_or_last_audit_rolls_back_before_return#capture MFA" name="test_authority_withdrawn_during_projection_or_last_audit_rolls_back_before_return"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_authority_withdrawn_during_projection_or_last_audit_rolls_back_before_return#last audit role" name="test_authority_withdrawn_during_projection_or_last_audit_rolls_back_before_return"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_authority_withdrawn_during_projection_or_last_audit_rolls_back_before_return#last audit MFA" name="test_authority_withdrawn_during_projection_or_last_audit_rolls_back_before_return"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_after_all_saves_every_row_and_actual_own_audit_identity_are_rechecked#earlier changed row" name="test_after_all_saves_every_row_and_actual_own_audit_identity_are_rechecked"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_after_all_saves_every_row_and_actual_own_audit_identity_are_rechecked#unchanged row" name="test_after_all_saves_every_row_and_actual_own_audit_identity_are_rechecked"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_after_all_saves_every_row_and_actual_own_audit_identity_are_rechecked#template row" name="test_after_all_saves_every_row_and_actual_own_audit_identity_are_rechecked"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_after_all_saves_every_row_and_actual_own_audit_identity_are_rechecked#template cursor" name="test_after_all_saves_every_row_and_actual_own_audit_identity_are_rechecked"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_after_all_saves_every_row_and_actual_own_audit_identity_are_rechecked#earlier newer audit" name="test_after_all_saves_every_row_and_actual_own_audit_identity_are_rechecked"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_after_all_saves_every_row_and_actual_own_audit_identity_are_rechecked#own audit context" name="test_after_all_saves_every_row_and_actual_own_audit_identity_are_rechecked"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_after_all_saves_every_row_and_actual_own_audit_identity_are_rechecked#own audit action" name="test_after_all_saves_every_row_and_actual_own_audit_identity_are_rechecked"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_after_all_saves_every_row_and_actual_own_audit_identity_are_rechecked#own audit actor" name="test_after_all_saves_every_row_and_actual_own_audit_identity_are_rechecked"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_after_all_saves_every_row_and_actual_own_audit_identity_are_rechecked#own audit subject" name="test_after_all_saves_every_row_and_actual_own_audit_identity_are_rechecked"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_later_audit_failure_rolls_back_earlier_draft_and_author_updates" name="test_later_audit_failure_rolls_back_earlier_draft_and_author_updates"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_final_observer_free_batch_proof_follows_all_model_and_authority_callbacks#later version changes earlier row" name="test_final_observer_free_batch_proof_follows_all_model_and_authority_callbacks"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_final_observer_free_batch_proof_follows_all_model_and_authority_callbacks#later version changes no-op row" name="test_final_observer_free_batch_proof_follows_all_model_and_authority_callbacks"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_final_observer_free_batch_proof_follows_all_model_and_authority_callbacks#later version changes template" name="test_final_observer_free_batch_proof_follows_all_model_and_authority_callbacks"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_final_observer_free_batch_proof_follows_all_model_and_authority_callbacks#later version changes earlier actual audit" name="test_final_observer_free_batch_proof_follows_all_model_and_authority_callbacks"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_final_observer_free_batch_proof_follows_all_model_and_authority_callbacks#later actual audit retrieval changes earlier row" name="test_final_observer_free_batch_proof_follows_all_model_and_authority_callbacks"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_final_observer_free_batch_proof_follows_all_model_and_authority_callbacks#final actor retrieval changes earlier row" name="test_final_observer_free_batch_proof_follows_all_model_and_authority_callbacks"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_final_observer_free_batch_proof_follows_all_model_and_authority_callbacks#final actor retrieval withdraws role" name="test_final_observer_free_batch_proof_follows_all_model_and_authority_callbacks"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_final_observer_free_batch_proof_follows_all_model_and_authority_callbacks#capture final version changes earlier row" name="test_final_observer_free_batch_proof_follows_all_model_and_authority_callbacks"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_final_observer_free_batch_proof_follows_all_model_and_authority_callbacks#capture final actor changes earlier row" name="test_final_observer_free_batch_proof_follows_all_model_and_authority_callbacks"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_final_observer_free_batch_proof_follows_all_model_and_authority_callbacks#capture final actor withdraws role" name="test_final_observer_free_batch_proof_follows_all_model_and_authority_callbacks"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_every_parent_and_version_fence_precedes_audit_baselines_and_caller_transactions_are_refused" name="test_every_parent_and_version_fence_precedes_audit_baselines_and_caller_transactions_are_refused"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_bulk_drafts_preserve_real_purchased_original_and_published_license_graphs" name="test_bulk_drafts_preserve_real_purchased_original_and_published_license_graphs"/>
+  </testClass>
+ </tests>
+ <groups>
+  <group name="default">
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_explicit_review_orders_reversed_selection_and_shows_exact_source_changes_without_writes"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_each_supported_schema_preserves_raw_terms_dates_lifecycle_and_original_author_exclusion#original"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_each_supported_schema_preserves_raw_terms_dates_lifecycle_and_original_author_exclusion#typed"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_each_supported_schema_preserves_raw_terms_dates_lifecycle_and_original_author_exclusion#scoped"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_each_supported_schema_preserves_raw_terms_dates_lifecycle_and_original_author_exclusion#economic"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_mixed_no_op_and_changed_rows_have_complete_disjoint_results_and_only_one_edit_audit"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_invalid_identity_selection_is_refused_without_any_effect#empty"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_invalid_identity_selection_is_refused_without_any_effect#associative"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_invalid_identity_selection_is_refused_without_any_effect#duplicate"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_invalid_identity_selection_is_refused_without_any_effect#unsaved"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_invalid_identity_selection_is_refused_without_any_effect#wrong model"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_invalid_identity_selection_is_refused_without_any_effect#missing row"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_invalid_identity_selection_is_refused_without_any_effect#reparent hint"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_count_and_canonical_byte_bounds_refuse_whole_selections_without_truncation"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_supplied_source_must_validate_against_each_retained_terms_schema#empty"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_supplied_source_must_validate_against_each_retained_terms_schema#whitespace"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_supplied_source_must_validate_against_each_retained_terms_schema#too long"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_supplied_source_must_validate_against_each_retained_terms_schema#invalid utf8"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_supplied_source_must_validate_against_each_retained_terms_schema#control"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_supplied_source_must_validate_against_each_retained_terms_schema#missing typed variables"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_heterogeneous_drafts_require_one_source_compatible_with_every_target_before_any_save"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_forged_or_mutated_review_cannot_change_any_selected_draft#schema"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_forged_or_mutated_review_cannot_change_any_selected_draft#intent"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_forged_or_mutated_review_cannot_change_any_selected_draft#actor string"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_forged_or_mutated_review_cannot_change_any_selected_draft#extra top"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_forged_or_mutated_review_cannot_change_any_selected_draft#string id"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_forged_or_mutated_review_cannot_change_any_selected_draft#float id"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_forged_or_mutated_review_cannot_change_any_selected_draft#negative cursor"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_forged_or_mutated_review_cannot_change_any_selected_draft#bad hash"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_forged_or_mutated_review_cannot_change_any_selected_draft#hash suffix"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_forged_or_mutated_review_cannot_change_any_selected_draft#template extra"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_forged_or_mutated_review_cannot_change_any_selected_draft#source changed after review"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_forged_or_mutated_review_cannot_change_any_selected_draft#before changed"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_forged_or_mutated_review_cannot_change_any_selected_draft#after changed"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_forged_or_mutated_review_cannot_change_any_selected_draft#terms changed"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_forged_or_mutated_review_cannot_change_any_selected_draft#date changed"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_forged_or_mutated_review_cannot_change_any_selected_draft#version changed"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_forged_or_mutated_review_cannot_change_any_selected_draft#unknown row key"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_forged_or_mutated_review_cannot_change_any_selected_draft#missing projection"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_review_reordering_duplicate_ids_missing_keys_and_inconsistent_shared_parent_are_refused"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_any_one_changed_draft_or_parent_invalidates_the_whole_captured_batch_including_aba#legacy edit"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_any_one_changed_draft_or_parent_invalidates_the_whole_captured_batch_including_aba#legacy ABA"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_any_one_changed_draft_or_parent_invalidates_the_whole_captured_batch_including_aba#legacy no-op audit"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_any_one_changed_draft_or_parent_invalidates_the_whole_captured_batch_including_aba#single reviewed edit"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_any_one_changed_draft_or_parent_invalidates_the_whole_captured_batch_including_aba#template edit"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_any_one_changed_draft_or_parent_invalidates_the_whole_captured_batch_including_aba#template ABA"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_one_no_longer_editable_target_refuses_review_and_atomic_apply#reviewed"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_one_no_longer_editable_target_refuses_review_and_atomic_apply#approved"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_one_no_longer_editable_target_refuses_review_and_atomic_apply#published"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_fresh_actor_email_and_required_mfa_guard_private_capture_and_mutation#review / role"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_fresh_actor_email_and_required_mfa_guard_private_capture_and_mutation#review / email"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_fresh_actor_email_and_required_mfa_guard_private_capture_and_mutation#review / mfa"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_fresh_actor_email_and_required_mfa_guard_private_capture_and_mutation#review / unsaved"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_fresh_actor_email_and_required_mfa_guard_private_capture_and_mutation#review / customer"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_fresh_actor_email_and_required_mfa_guard_private_capture_and_mutation#apply / role"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_fresh_actor_email_and_required_mfa_guard_private_capture_and_mutation#apply / email"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_fresh_actor_email_and_required_mfa_guard_private_capture_and_mutation#apply / mfa"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_fresh_actor_email_and_required_mfa_guard_private_capture_and_mutation#apply / unsaved"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_fresh_actor_email_and_required_mfa_guard_private_capture_and_mutation#apply / customer"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_authority_withdrawn_during_projection_or_last_audit_rolls_back_before_return#capture role"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_authority_withdrawn_during_projection_or_last_audit_rolls_back_before_return#capture MFA"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_authority_withdrawn_during_projection_or_last_audit_rolls_back_before_return#last audit role"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_authority_withdrawn_during_projection_or_last_audit_rolls_back_before_return#last audit MFA"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_after_all_saves_every_row_and_actual_own_audit_identity_are_rechecked#earlier changed row"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_after_all_saves_every_row_and_actual_own_audit_identity_are_rechecked#unchanged row"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_after_all_saves_every_row_and_actual_own_audit_identity_are_rechecked#template row"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_after_all_saves_every_row_and_actual_own_audit_identity_are_rechecked#template cursor"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_after_all_saves_every_row_and_actual_own_audit_identity_are_rechecked#earlier newer audit"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_after_all_saves_every_row_and_actual_own_audit_identity_are_rechecked#own audit context"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_after_all_saves_every_row_and_actual_own_audit_identity_are_rechecked#own audit action"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_after_all_saves_every_row_and_actual_own_audit_identity_are_rechecked#own audit actor"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_after_all_saves_every_row_and_actual_own_audit_identity_are_rechecked#own audit subject"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_later_audit_failure_rolls_back_earlier_draft_and_author_updates"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_final_observer_free_batch_proof_follows_all_model_and_authority_callbacks#later version changes earlier row"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_final_observer_free_batch_proof_follows_all_model_and_authority_callbacks#later version changes no-op row"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_final_observer_free_batch_proof_follows_all_model_and_authority_callbacks#later version changes template"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_final_observer_free_batch_proof_follows_all_model_and_authority_callbacks#later version changes earlier actual audit"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_final_observer_free_batch_proof_follows_all_model_and_authority_callbacks#later actual audit retrieval changes earlier row"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_final_observer_free_batch_proof_follows_all_model_and_authority_callbacks#final actor retrieval changes earlier row"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_final_observer_free_batch_proof_follows_all_model_and_authority_callbacks#final actor retrieval withdraws role"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_final_observer_free_batch_proof_follows_all_model_and_authority_callbacks#capture final version changes earlier row"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_final_observer_free_batch_proof_follows_all_model_and_authority_callbacks#capture final actor changes earlier row"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_final_observer_free_batch_proof_follows_all_model_and_authority_callbacks#capture final actor withdraws role"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_every_parent_and_version_fence_precedes_audit_baselines_and_caller_transactions_are_refused"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceTest::test_bulk_drafts_preserve_real_purchased_original_and_published_license_graphs"/>
+  </group>
+ </groups>
+</testSuite>

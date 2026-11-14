@@ -10,6 +10,7 @@ use App\Domain\Customers\ProductionFeatures\Models\ProductionConsentState;
 use App\Domain\Customers\ProductionFeatures\ProductionFeatureContext;
 use App\Domain\Customers\ProductionFeatures\ProductionFeatureException;
 use App\Domain\Customers\ProductionFeatures\ProductionFeatureOperation;
+use App\Domain\Customers\ProductionFeatures\ProductionFeaturePreparation;
 use App\Domain\Customers\ProductionFeatures\ProductionFeatureShape;
 use App\Domain\Customers\ProductionIdentity\Features\ProductionAccountFeatureIdentity;
 use App\Domain\Customers\ProductionIdentity\IdentityException;
@@ -21,24 +22,24 @@ use Illuminate\Support\Str;
 /** Explicit current-owner capture. Neither an import promotion nor a provider delivery claim. */
 final class ProductionConsentPreferences
 {
-    public function read(ProductionAccountFeatureIdentity $identity): array
+    public function read(ProductionAccountFeatureIdentity $identity, ?ProductionFeaturePreparation $preparation = null): array
     {
-        return $this->run($identity);
+        return $this->run($identity, preparation: $preparation);
     }
 
-    public function initialize(ProductionAccountFeatureIdentity $identity): array
+    public function initialize(ProductionAccountFeatureIdentity $identity, ?ProductionFeaturePreparation $preparation = null): array
     {
-        return $this->run($identity, initialize: true);
+        return $this->run($identity, initialize: true, preparation: $preparation);
     }
 
-    public function change(ProductionAccountFeatureIdentity $identity, array $command): array
+    public function change(ProductionAccountFeatureIdentity $identity, array $command, ?ProductionFeaturePreparation $preparation = null): array
     {
         $this->command($command);
 
-        return $this->run($identity, $command);
+        return $this->run($identity, $command, preparation: $preparation);
     }
 
-    private function run(ProductionAccountFeatureIdentity $identity, ?array $command = null, bool $initialize = false): array
+    private function run(ProductionAccountFeatureIdentity $identity, ?array $command = null, bool $initialize = false, ?ProductionFeaturePreparation $preparation = null): array
     {
         if ($identity->feature !== 'consent_preferences') {
             throw new IdentityException;
@@ -195,7 +196,7 @@ final class ProductionConsentPreferences
                 'suppression' => ['status' => $withdrawal !== null && ProductionConsentRecords::recipientMatches($binding, $recipient, $withdrawal['recipient_hmac'], $context->configuration()) ? 'pending' : 'not_requested']]]];
 
             return ['initialized' => true, 'preferences' => $projection];
-        });
+        }, $preparation);
     }
 
     private function command(array $command): void

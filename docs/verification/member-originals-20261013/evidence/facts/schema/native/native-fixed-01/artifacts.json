@@ -1,0 +1,42 @@
+{
+  "command.json": {
+    "bytes": 1394,
+    "sha256": "05bb5b3d45c25612c2b37a52b15a3fed6df66a4e11e5731a267b05c8b8637360"
+  },
+  "metadata.json": {
+    "bytes": 686,
+    "sha256": "4fc93f73c54019d5496d51046913bca6fd1de79f27c17d14964e72b16f2427c6"
+  },
+  "phpunit.exit": {
+    "bytes": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "phpunit.log": {
+    "bytes": 299,
+    "sha256": "4fd0d261d58de826c7deae4f3d16b18bab713a72d2489deb2c7c1b3090d7d8ca"
+  },
+  "phpunit.xml": {
+    "bytes": 2390,
+    "sha256": "7bcb9dd9cef7b6c06e257cc02ce09887284a67bd567aee3389b04bbba3ba6408"
+  },
+  "setup.exit": {
+    "bytes": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "setup.log": {
+    "bytes": 758,
+    "sha256": "c82766892eab9b779452d95178e96236c20336f278a0df588f89efd365566745"
+  },
+  "source-after.json": {
+    "bytes": 1858146,
+    "sha256": "8bef7929a9da47c08f6b023f75e47cad312defa3eb36eebae05b8939e7f6807f"
+  },
+  "source-before.json": {
+    "bytes": 1858146,
+    "sha256": "8bef7929a9da47c08f6b023f75e47cad312defa3eb36eebae05b8939e7f6807f"
+  },
+  "verification.json": {
+    "bytes": 1421,
+    "sha256": "eeb4c37013f60620231b8dd220a4c4ef5ac84a450530507d9ad6acb09c7c5d7a"
+  }
+}

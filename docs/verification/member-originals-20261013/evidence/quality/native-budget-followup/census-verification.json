@@ -1,0 +1,21 @@
+{
+  "source_case_identities": 8478,
+  "selected_case_identities": 2145,
+  "duplicate_source_ids": 0,
+  "duplicate_selected_ids": 0,
+  "selected_are_subset": true,
+  "source_added_since_prior": [
+    "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalCompositionTest::test_final_facts_lock_cannot_mint_readiness_after_withdrawing_its_reservation_catalog",
+    "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalCompositionTest::test_initial_facts_lock_cannot_publish_a_source_after_withdrawing_its_reservation_catalog",
+    "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIssuerOwnershipTest::test_a_caller_cannot_select_pending_member_initialization_for_any_context_operation"
+  ],
+  "native_selected_added_since_prior": [
+    "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalCompositionTest::test_final_facts_lock_cannot_mint_readiness_after_withdrawing_its_reservation_catalog",
+    "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalCompositionTest::test_initial_facts_lock_cannot_publish_a_source_after_withdrawing_its_reservation_catalog"
+  ],
+  "native_unselected_additions": [
+    "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIssuerOwnershipTest::test_a_caller_cannot_select_pending_member_initialization_for_any_context_operation"
+  ],
+  "removed_source_or_selected_cases": [],
+  "proof_scope": "PHPUnit list-tests discovery only; no test bodies executed"
+}

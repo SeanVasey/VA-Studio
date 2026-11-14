@@ -1,0 +1,20 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-membership-policy-red/phpunit.xml
+
+[41;37mF[0m                                                                   1 / 1 (100%)
+
+Time: 01:38.821, Memory: 83.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingNativeIntervalOwnershipRaceTest::test_independent_transactions_with_older_snapshots_cannot_share_any_endpoint_across_ledgers
+[{"result":"saved","sqlstate":null,"driver_code":null,"connection_id":24,"pid":90180,"transaction_level":0},{"result":"saved","sqlstate":null,"driver_code":null,"connection_id":25,"pid":90181,"transaction_level":0}]
+Failed asserting that actual size 2 matches expected size 1.
+
+/workspace/VA-Studio-membership-policy-red/tests/Feature/ProductionMembershipBilling/BillingNativeIntervalOwnershipRaceTest.php:37
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 1[0m[37;41m, Assertions: 5[0m[37;41m, Failures: 1[0m[37;41m.[0m

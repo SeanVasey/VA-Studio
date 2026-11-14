@@ -2,16 +2,25 @@
 
 namespace App\Domain\Commerce;
 
+use App\Domain\Catalog\ExclusiveActivationEvidence;
+use App\Domain\Catalog\FamilyRevisionSelection;
 use App\Domain\Catalog\Models\Offer;
 use App\Domain\Catalog\Models\Track;
 use App\Domain\Catalog\PublicationReadiness;
+use App\Domain\Catalog\TrackVisibility;
 use App\Domain\Media\Models\MediaAsset;
-use App\Domain\Media\VerifiedMedia;
 use App\Domain\Media\RecordingAssociation;
+use App\Domain\Media\VerifiedMedia;
 
 /** Resolve and lock authoritative selections; called only inside a database transaction. */
 final class QuoteSelection
 {
+    /** No kit license/deliverable policy exists yet; a technical snapshot cannot enter a payable track line. */
+    public function resolveFamily(FamilyRevisionSelection $selection): never
+    {
+        throw new QuoteException('FAMILY_LICENSE_POLICY_UNSET', 409);
+    }
+
     public function resolve(array $items, bool $freshDigests): array
     {
         // All tracks, then all offers, in stable numeric order; compatible with publication's track-before-offer order.
@@ -21,7 +30,7 @@ final class QuoteSelection
         foreach ($items as $item) {
             $track = $tracks->get($item['trackId']);
             $offer = $offers->get($item['offerId']);
-            if (! $track || $track->status !== 'published' || ! $offer || $offer->track_id !== $track->id || ! $offer->is_active || $offer->current_revision_id !== $item['offerRevisionId']) {
+            if (! $track || ! TrackVisibility::isLive($track->status) || ! $offer || $offer->track_id !== $track->id || ! $offer->is_active || $offer->current_revision_id !== $item['offerRevisionId']) {
                 throw new QuoteException('SELECTION_CHANGED', 409);
             }
             $revision = $offer->currentRevision()->first();
@@ -47,7 +56,7 @@ final class QuoteSelection
             }
             $lines[] = ['track_id' => $track->id, 'offer_id' => $offer->id, 'offer_revision_id' => $revision->id, 'license_version_id' => $revision->license_version_id, 'offer_snapshot_hash' => $revision->snapshot_hash, 'offer_snapshot' => $revision->snapshot];
             if ($revision->snapshot['schema_version'] === 2) {
-                $activation = app(\App\Domain\Catalog\ExclusiveActivationEvidence::class)->current($revision);
+                $activation = app(ExclusiveActivationEvidence::class)->current($revision);
                 $lines[array_key_last($lines)]['exclusive_activation'] = ['id' => $activation->id,
                     'snapshot_hash' => $activation->snapshot_hash, 'snapshot' => $activation->snapshot];
             }

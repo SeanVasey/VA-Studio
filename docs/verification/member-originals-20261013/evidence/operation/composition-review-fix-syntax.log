@@ -1,0 +1,8 @@
+No syntax errors detected in app/Domain/Grants/Member/MemberOriginalInspection.php
+No syntax errors detected in app/Domain/Grants/Member/MemberOriginalObserver.php
+No syntax errors detected in app/Domain/Grants/Member/MemberOriginalSourceCapture.php
+No syntax errors detected in app/Domain/Memberships/Production/MembershipReservationContext.php
+No syntax errors detected in app/Domain/Memberships/Production/MembershipReservations.php
+No syntax errors detected in tests/Feature/ProductionMemberOriginals/MemberOriginalCompositionTest.php
+No syntax errors detected in tests/Feature/ProductionMemberOriginals/MemberOriginalRetainedDeadlineTest.php
+No syntax errors detected in tests/Support/MemberOriginalCommittedClock.php

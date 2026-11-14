@@ -27,13 +27,75 @@ lands, the stage that depends on it stays blocked whatever the environment conta
 | A2: Paid252 consumer and whole-order delivery | S3 | `docs/handoff/2026-10-07/owners/paid-delivery-native-operations.md` |
 | A3: Tax255 (`automatic_tax`, SourceV2, V2 consumer) | S3 unless every order qualifies for declared exemption; that alternative itself needs the exemption-authoring step in §6 (a reviewed owner allowlist commit plus `PRODUCTION_CHECKOUT_EXEMPTION_AUTHORING_ENABLED`), because every new order's review requires a `basis_public_id` | CLAUDE-PLAN §3 A3; `HostedCheckout::prepare()`, `TaxExemptions::basis()` |
 | No live webhook receiver. `VerifyStripeWebhook` refuses production environments and any mode other than test; production checkout reconciles only by authoritative retrieval | S3 webhook drills | `app/Domain/Commerce/Payments/VerifyStripeWebhook.php`; `vasey:stripe-preflight` check `production_webhook_receiver` |
-| Production checkout isn't registered: `ProductionCheckoutServiceProvider` isn't in `bootstrap/providers.php` and `routes/production-checkout.php` isn't mounted, so the env flags have no HTTP effect yet | S2b production-checkout test funds (not the test checkout chain), S3 | root composition step |
+| **Code composed, default-off (lane PCC).** `ProductionCheckoutServiceProvider` is registered by `AppServiceProvider` and `routes/production-checkout.php` is required by `routes/web.php` only when `ProductionCheckoutMount` admits: the code literal `production_checkout.mounted` (shipped `false`) and an environment of `local`, `testing` or `production` (staging never mounts). `ProductionCheckoutPrivacy` is prepended globally and answers an unmounted or withdrawn route with the private 404 before any SQL. Still blocking: the literal is false and `ops/production/validate-runtime.php` holds it (`holds.production_checkout_mounted`), so mounting is a reviewed change to both, with Sean's authorization | S2b production-checkout test funds (not the test checkout chain), S3 | `app/Http/ProductionCheckout/ProductionCheckoutMount.php`; `docs/verification/production-checkout-pcc-20261029/` |
+| **One production chain (DD-14, BL-45).** v1 sells through the tax-calculating chain (Tax V2, `ProductionTaxCheckout`, mount `production-tax-checkout.http_mounted`); S2 and S3 rehearse that chain, not the tax-refusing `ProductionCheckout` chain (`production_checkout.mounted`) described in the rows above, which stays a frozen, default-off alternative. Both mounts remain the literal `false`. `ProductionChainExclusivity` is the fail-closed guard: when both literals are `true`, `ProductionCheckoutMount` and `TaxHttpMount` (for the checkout key) both refuse, so neither registers a provider or routes and stale routes answer the private 404, in every environment. The guard reads the tax mount through the same `PaidTaxConfiguration::read` as `TaxHttpMount` (nested or flat dotted key). It covers the mount/composition layer only: the policy flags of the two chains are not made exclusive (the reconcile command is refused by the mount check when both literals are `true`). `ops/production/validate-runtime.php` holds both literals false (`holds.production_checkout_mounted`, `holds.production_tax_checkout_http_mounted`). Flipping either literal is still a reviewed change with Sean's authorization | S2, S3 | `app/Http/ProductionCheckout/ProductionChainExclusivity.php`; `tests/Feature/ProductionCheckoutComposition/ProductionChainExclusivityTest.php` |
 | `ExecutionContextV1` refuses `funds_mode=test` outside `local`/`testing`. The test checkout/processing policies no longer refuse a staging host: since PR #68 at `d8aba146` they admit `APP_ENV=staging` through `App\Support\Environment\TestEnvironment`, which requires staff MFA and refuses live mode (corrected 2026-10-10; `docs/private-server-readiness.md`, "First sale and cutover remain separate gates") | Production-checkout test funds on a staging host (S2b) | `ExecutionContextV1::make`; `TestEnvironment::admitsTestCommerce` in `CheckoutPolicy`, `PaymentProcessingPolicy` |
-| There is no operator command for production reconciliation (only `HostedCheckout::reconcile` behind HTTP) | S2b production-checkout test funds (not the test checkout chain), S3 recovery drills | `app/Domain/Commerce/ProductionCheckout/HostedCheckout.php` |
-| A5: refunds and disputes (T21) | S3 refunds | CLAUDE-PLAN §3 A5 |
+| **Closed in code (lane PCC):** `vasey:production-checkout-reconcile {order} [--session=]` retrieves and retains one order's provider state through the reconcile route's persistence (retrieval only, idempotent, buyer-independent). It refuses unless the mount admits and `PRODUCTION_CHECKOUT_OPERATOR_RECONCILIATION_ENABLED`, `..._RECONCILIATION_ENABLED` and `..._PROVIDER_IO_ENABLED` are true, all held false in production by the validator. No sweep mode yet | S2b production-checkout test funds (not the test checkout chain), S3 recovery drills | `app/Console/Commands/ReconcileProductionCheckout.php`, `HostedCheckout::operatorReconcile` |
+| A5: refunds and disputes (T21). The A5 mechanism exists for the test chain only; production checkout's `FinancialReadPlan` output is **not** wired into its ledger (lane PCC pushed it back: the ledger keys rows by test-chain `orders.id` and acts on test-chain grants, and `FinancialReadPlan` is pinned to Stripe test mode; it needs a schema decision and a production read path) | S3 refunds | CLAUDE-PLAN §3 A5; `docs/verification/production-checkout-pcc-20261029/` |
+| Exclusive inventory in production checkout. The chain sells non-exclusive v1 only and refuses exclusive or scoped inventory in every case; since lane PCC it consults `ExclusivityAuthority::storeMaySellExclusives()` first (`exclusivity_authority` while the store is not the single authority). Selling exclusives in production needs a production exclusive consumer and U-08 | Exclusive live sales | `app/Domain/Commerce/ProductionCheckout/ExclusiveInventoryGate.php` |
 | Production entitlements, delivery, identity, contracts and refunds are still test-only | S3 | `vasey:commerce-readiness` `implementation` checks (all `blocked`) |
 | Memberships C2–C5 and Billing259 | Membership sales | CLAUDE-PLAN §3 Phase C |
 | F3: one manual Foundation CI on the final integrated `expected_sha` | S3 | AGENTS.md CI cost policy |
+
+### Production admissions and proxy trust (lane PCC, PCC-a)
+
+These are configuration switches inside reviewed code; none of them activates commerce.
+
+- **Real mail.** The preflight production profile requires `MAIL_MAILER=log` unless the candidate file sets
+  `VASEY_PRODUCTION_REAL_MAIL_ADMITTED=true`; it then requires `MAIL_MAILER=smtp`, `MAIL_SCHEME=smtps` on port 465, a provider
+  host, credentials and a sender address (shapes only), and admits the `PRODUCTION_IDENTITY_SMTP_*` values, which otherwise must
+  stay blank. Production identity SMTP still composes nothing until the `$enabled` literal in `config/production-identity-smtp.php`
+  is flipped in a reviewed change; the validator refuses composed settings without the flag (`holds.production_identity_smtp`).
+- **Stripe live mode.** `STRIPE_MODE=test` is required unless `VASEY_PRODUCTION_LIVE_STRIPE_ADMITTED=true`, which requires
+  `STRIPE_MODE=live`. The validator then admits an `sk_live_` value only as `PRODUCTION_CHECKOUT_STRIPE_SECRET_KEY` and funds
+  mode only blank or `live`; restricted and publishable live keys stay refused everywhere. Every `PRODUCTION_CHECKOUT_*_ENABLED`
+  switch stays held false, so admitting live credentials is not activating checkout.
+- Either flag accepts only `true` or `false` (or unset); any other value blocks. Staging refuses both (preflight, the capability
+  boundary and the staging deploy gate), and `config/production-runtime.php` must agree with the file
+  (`runtime.production_admissions`).
+- **`trustProxies` is configured.** `App\Http\Middleware\ExplicitTrustProxies` replaces the framework middleware: it trusts only the
+  reviewed `TRUSTED_PROXIES` list (blank, so none, by default), never a wildcard or the framework's `.on-forge.com` catch-all, and
+  honours only `X-Forwarded-For`, `-Proto` and `-Port`. The validator refuses a permissive or malformed list (`runtime.trusted_proxies`).
+
+### Pre-launch capability hold (approved by Sean, 2026-10-18)
+
+Three of these flags have no environment gate in the application, so on production nothing but the validator stops a host
+`.env` that sets one to `true`; the fourth, V2 listening promotion, is held as defence in depth (see its row).
+`ops/production/validate-runtime.php` refuses each unless it is false. It names the four environment keys (`PRE_LAUNCH_HOLDS`
+in that file) and reads each flag's config key from `scripts/ops/capability-boundary.php`, so the hold cannot check a stale
+key; a boundary that is missing, or no longer holds one of the keys, is refused as `runtime.unavailable`.
+A flag in the candidate file passes only as `false` or `(false)`, in any
+letter case and quoted or not; a blank or any other value fails, a key written with no `=` is refused as well (the runtime
+would read it as unset; refusing it fails closed), and an unset flag is allowed because the configuration default is false. The
+effective configuration must also read strictly `false`, so a renamed or removed config key fails closed. A refusal prints
+only the identifier below, never the value.
+
+| Flag | Config key | Identifier on refusal | Why it is held |
+| --- | --- | --- | --- |
+| `VASEY_OPERATIVE_FREE_GRANTS_ENABLED` | `free-grants.operative_enabled` | `holds.vasey_operative_free_grants_enabled` | no environment gate; admits once an adapter is bound by other code, and none is bound today |
+| `CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED` | `inquiries.operator_notifications_enabled` | `holds.contact_inquiry_operator_notifications_enabled` | a default-off mail alert transport ships (FP-013): `true` binds it once an inquiry operator is configured, and it emails that operator a plain-text alert with an inquiry reference when the order-ready mail configuration is admitted too. The transport also refuses production in code unless the literal `inquiries.operator_alert_mail_production_admitted` is `true`; that literal and this hold are lifted in the same reviewed change (`docs/contact-inquiries.md`) |
+| `DISCOVERY_SITEMAP_ENABLED` | `discovery-sitemap.enabled` | `holds.discovery_sitemap_enabled` | the build chain is not environment-gated and the public index serves track sitemaps in production |
+| `VASEY_LISTENING_V2_PROMOTION_ENABLED` | `customer-listening.v2_promotion_enabled` | `holds.vasey_listening_v2_promotion_enabled` | a one-way data promotion; turning it off afterwards does not undo it. Its only consumer needs a customer session, which only the test customer access path creates (local, testing, staging), and the production listening lane does not read it, so this hold is defence in depth |
+
+**Lifting a hold** is a reviewed change to `ops/production/validate-runtime.php` (remove that one entry), made together with
+Sean's explicit authorization for that activation. Setting the flag on the host first does not work: the validator refuses the
+candidate environment, and the deploy stops. Because a deploy validates the candidate `.env` with the served release's
+validator before it builds, lifting takes two steps: deploy the validator change with the flag still false, then set the flag
+and let the deploy refresh the environment. `PRE_LAUNCH_HOLDS` in `tests/ops/test_production_runtime_validator.py` changes
+with the validator and the boundary. `VASEY_STAGING_SYNTHETIC_CATALOG_ENABLED` is not in this list because its command
+already refuses production by itself.
+
+**Off through launch (decision register, 2026-11-10).** The same validator refuses `VASEY_TEST_SERVICE_INVOICING_ENABLED`
+(BL-70, Stripe test-mode service invoicing; no production path), `VASEY_TEST_UNPAID_RELEASE_ENABLED` (test unpaid release,
+optional on staging since 2026-11-11; no production path), `VASEY_TEST_REFUND_DISPUTE_ENABLED` (the test refund and dispute
+lifecycle, optional on staging since 2026-11-12; refused in production in code as well) and `REPORTING_MARKETING_SEGMENT_ENABLED`
+(DD-44) by the rule above: it is named in `LAUNCH_OFF_HOLDS`, its config key comes from
+`CapabilityBoundary::PRODUCTION_LAUNCH_OFF_FLAGS` (not a staged flag, so the staging gates are unchanged) and a refusal is
+`holds.reporting_marketing_segment_enabled`. It also refuses the DD-50 membership code literals unless they read strictly
+`false`: `production-memberships.enabled` (`holds.production_memberships_enabled`), `production-memberships.http_mounted`
+(`holds.production_memberships_http_mounted`, the literal `MembershipHttpMount` reads) and `member-grants.enabled`
+(`holds.member_grants_enabled`). Lifting any of them is a reviewed change to the validator with Sean's authorization
+(`docs/production-cleanup-ledger.md`, PCL-23 and PCL-25).
 
 ## 2. Inputs only Sean can supply
 
@@ -51,7 +113,9 @@ of them has a value here.
 | Legal pages (privacy, terms) | S3 | `docs/legal/` (open adoption gap) |
 | Production host, region, topology, backups, incident owner (U-02) and storage choice (U-03) | S1 | `ops/private-server/env.example` inputs; this packet's S1 commands |
 | Storefront origin and DNS plan | S1 staging subdomain, S3 cutover | `APP_URL`, `PRODUCTION_CHECKOUT_RETURN_ORIGIN`; cutover runbook DNS section |
-| Sender domain, DNS (SPF/DKIM/DMARC) and SMTP provider | Customer identity and notices | `config/production-identity-smtp.php` `settings` (a code change), `MAIL_*` |
+
+The decided values for the machine-policy rows above (currency DD-11, refund and dispute DD-16, exclusive reservation and late payment DD-17, account-first identity DD-42, and the approved assent text and seller name in `docs/legal/TERMS.md` appendix A.8) are pinned by `tests/Unit/DecidedMachinePolicyConformanceTest.php` against `MachinePolicyV1` and the decision register, using synthetic account, origin and hash values. The test commits no production value and approves nothing; the account id, return origin, tax strategy and ceiling, storage, delivery and retention choices still come from the host. DD-42 is conditionally superseded by SQ-08 (open question Q-1): the policy accepts both `verified_account` and `verified_guest_claim`, and the test pins only the decided `verified_account`.
+| Sender domain, DNS (SPF/DKIM/DMARC) and SMTP provider | Customer identity and notices | `PRODUCTION_IDENTITY_SMTP_*` and `MAIL_*` (host secret store), `VASEY_PRODUCTION_REAL_MAIL_ADMITTED=true`, and flipping the `$enabled` literal in `config/production-identity-smtp.php` (a reviewed code change) |
 | BeatStars exports | Migration (D2) | Content onboarding packet |
 | Review lifetime (30–3600 s) | S2b production-checkout test funds, S3 | `PRODUCTION_CHECKOUT_REVIEW_LIFETIME_SECONDS` |
 
@@ -184,11 +248,19 @@ php artisan migrate:status
 # backup-restore-proof.md steps 1-4 all passing, recorded as the line result=RESTORE_VERIFIED in
 # <BACKUP_DIR>/RESTORE_CHECK (ops/staging/backup.sh restore-check writes it; by hand, the operator writes it
 # only after step 4's last check passes). <BACKUP_DIR> is operator-only (0700), so the operator runs the
-# check. The preview is evidence only, never a gate: on a fresh schema migration 2026_10_01_000032 throws
-# under --pretend because its trigger self-checks return nothing, and --pretend also creates the migrations
-# table. <EVIDENCE_DIR> is this stage's evidence directory (§7).
+# check. There is no `migrate --pretend` preview: identity migrations (2026_10_07_247000 onwards) run DDL through
+# the raw PDO, which pretend mode cannot intercept, so a preview would really change the schema; on a fresh schema
+# 2026_10_01_000032 also throws under --pretend, and --pretend creates the migrations table. <EVIDENCE_DIR> is this
+# stage's evidence directory (§7).
+# Migrate only with every writer quiesced, as above, never beside live member operations. An owned membership frame
+# holds shared metadata locks on users, customer_accounts, quote_owners, audit_events and the production_identity_*
+# and membership tables until it commits or rolls back. The 60 s application deadline is sampled between work;
+# it does not interrupt blocking SQL or bound the time needed for rollback/cleanup. DDL on one of those tables waits
+# behind an open frame, and while it waits MySQL queues every later read and write of that table from other
+# sessions behind it, so logins and audit writes stall too. The same holds for any manual or hotfix DDL: quiesce
+# first, or run it with a short `SET SESSION lock_wait_timeout` so a queued statement gives up instead of stalling
+# the site (docs/verification/schema-guard-once-per-frame-20261019, "New metadata locks").
 grep -qx 'result=RESTORE_VERIFIED' <BACKUP_DIR>/RESTORE_CHECK || { echo 'no verified pre-migration backup: nothing applied; host stays in maintenance'; exit 1; }   # operator
-php artisan migrate --pretend > <EVIDENCE_DIR>/migrate-pretend.txt 2>&1 || echo 'migration preview failed: recorded as evidence, not a gate'   # review the SQL it did print
 php artisan migrate --force || { echo 'migration failed: host stays in maintenance; restore from the backup before retrying'; exit 1; }
 php artisan config:cache || exit 1
 php artisan vasey:doctor || exit 1
@@ -279,7 +351,8 @@ fi
    archive with it: the backup captured database and private storage as one moment, and an
    upload, contract or media job that wrote the bind-mounted private root after the snapshot
    would otherwise leave the earlier database with a later tree (orphaned files, missing
-   references). With writers still stopped, extract `private.tar` into a fresh directory as
+   references). With writers still stopped, extract `private.tar` (or, for a set whose private store is a
+   `private/` tree, the 2026-11-11 kit format, stream that tree with `tar` as in the staging runbook's case B) into a fresh directory as
    the application user and verify it exactly as the backup procedure's step 4 does (digest,
    manifest, names, modes, ownership); then replace the *contents* of
    `<PERSISTENT_ROOT>/private` while keeping that directory object in place: every release's

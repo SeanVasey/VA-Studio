@@ -1,0 +1,153 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-membership-award/phpunit.xml
+
+[41;37mF[0m[41;37mF[0m[41;37mF[0m[41;37mF[0m[41;37mF[0m[41;37mF[0m[41;37mF[0m[41;37mF[0m[41;37mF[0m[41;37mF[0m[41;37mF[0m                                                       11 / 11 (100%)
+
+Time: 00:00.407, Memory: 65.00 MB
+
+There were 11 failures:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingPaidTimeTest::test_projection_retains_only_the_documented_payment_timestamp
+Failed asserting that null is identical to Array &0 [
+    'paid_at' => 1791331200,
+].
+
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingPaidTimeTest.php:19
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMembershipBilling\BillingPaidTimeTest::test_a_late_retrieval_keeps_the_actual_on_time_payment_fact
+Failed asserting that null is identical to 'membership-paid-invoice-v2'.
+
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingPaidTimeTest.php:26
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionMembershipBilling\BillingPaidTimeTest::test_missing_or_invalid_payment_time_cannot_settle@missing with data ([])
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+-    0 => 'refused',
+-    1 => 'payment_time',
++    0 => 'settled',
++    1 => null,
+ ]
+
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingPaidTimeTest.php:44
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\ProductionMembershipBilling\BillingPaidTimeTest::test_missing_or_invalid_payment_time_cannot_settle@null with data ([null])
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+-    0 => 'refused',
+-    1 => 'payment_time',
++    0 => 'settled',
++    1 => null,
+ ]
+
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingPaidTimeTest.php:44
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+5) Tests\Feature\ProductionMembershipBilling\BillingPaidTimeTest::test_missing_or_invalid_payment_time_cannot_settle@string with data (['1791331200'])
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+-    0 => 'refused',
+-    1 => 'payment_time',
++    0 => 'settled',
++    1 => null,
+ ]
+
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingPaidTimeTest.php:44
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+6) Tests\Feature\ProductionMembershipBilling\BillingPaidTimeTest::test_missing_or_invalid_payment_time_cannot_settle@zero with data ([0])
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+-    0 => 'refused',
+-    1 => 'payment_time',
++    0 => 'settled',
++    1 => null,
+ ]
+
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingPaidTimeTest.php:44
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+7) Tests\Feature\ProductionMembershipBilling\BillingPaidTimeTest::test_missing_or_invalid_payment_time_cannot_settle@negative with data ([-1])
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+-    0 => 'refused',
+-    1 => 'payment_time',
++    0 => 'settled',
++    1 => null,
+ ]
+
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingPaidTimeTest.php:44
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+8) Tests\Feature\ProductionMembershipBilling\BillingPaidTimeTest::test_missing_or_invalid_payment_time_cannot_settle@out_of_range with data ([253402300800])
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+-    0 => 'refused',
+-    1 => 'payment_time',
++    0 => 'settled',
++    1 => null,
+ ]
+
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingPaidTimeTest.php:44
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+9) Tests\Feature\ProductionMembershipBilling\BillingPaidTimeTest::test_missing_or_invalid_payment_time_cannot_settle@fractional with data ([1791331200.5])
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+-    0 => 'refused',
+-    1 => 'payment_time',
++    0 => 'settled',
++    1 => null,
+ ]
+
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingPaidTimeTest.php:44
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+10) Tests\Feature\ProductionMembershipBilling\BillingPaidTimeTest::test_missing_or_invalid_payment_time_cannot_settle@after_retrieval with data ([1791334801])
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+-    0 => 'refused',
+-    1 => 'payment_time',
++    0 => 'settled',
++    1 => null,
+ ]
+
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingPaidTimeTest.php:44
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+11) Tests\Feature\ProductionMembershipBilling\BillingPaidTimeTest::test_an_explicit_prepayment_is_not_relabelled_as_the_service_start
+Failed asserting that null is identical to '2026-10-06 00:00:00'.
+
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingPaidTimeTest.php:52
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 11[0m[37;41m, Assertions: 13[0m[37;41m, Failures: 11[0m[37;41m.[0m

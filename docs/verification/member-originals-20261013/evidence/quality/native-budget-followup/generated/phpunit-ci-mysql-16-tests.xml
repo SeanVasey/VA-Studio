@@ -1,0 +1,217 @@
+<?xml version="1.0"?>
+<testSuite xmlns="https://xml.phpunit.de/testSuite">
+ <tests>
+  <testClass name="Tests\Feature\OrderPreparationMigrationTest" file="/workspace/VA-Studio-member-originals/tests/Feature/OrderPreparationMigrationTest.php">
+   <testMethod id="Tests\Feature\OrderPreparationMigrationTest::test_empty_order_tables_roundtrip_without_changing_existing_pending_inventory_and_pricing" name="test_empty_order_tables_roundtrip_without_changing_existing_pending_inventory_and_pricing"/>
+   <testMethod id="Tests\Feature\OrderPreparationMigrationTest::test_new_foreign_keys_reject_orphan_evidence_with_enforcement_enabled" name="test_new_foreign_keys_reject_orphan_evidence_with_enforcement_enabled"/>
+  </testClass>
+  <testClass name="Tests\Feature\ProductDraftConcurrencyTest" file="/workspace/VA-Studio-member-originals/tests/Feature/ProductDraftConcurrencyTest.php">
+   <testMethod id="Tests\Feature\ProductDraftConcurrencyTest::test_native_product_wait_serializes_competing_draft_changes#edit vs edit" name="test_native_product_wait_serializes_competing_draft_changes"/>
+   <testMethod id="Tests\Feature\ProductDraftConcurrencyTest::test_native_product_wait_serializes_competing_draft_changes#edit vs history" name="test_native_product_wait_serializes_competing_draft_changes"/>
+   <testMethod id="Tests\Feature\ProductDraftConcurrencyTest::test_native_product_wait_serializes_competing_draft_changes#history vs edit" name="test_native_product_wait_serializes_competing_draft_changes"/>
+   <testMethod id="Tests\Feature\ProductDraftConcurrencyTest::test_required_mfa_withdrawn_during_actor_wait_refuses_product_operation#create" name="test_required_mfa_withdrawn_during_actor_wait_refuses_product_operation"/>
+   <testMethod id="Tests\Feature\ProductDraftConcurrencyTest::test_required_mfa_withdrawn_during_actor_wait_refuses_product_operation#edit" name="test_required_mfa_withdrawn_during_actor_wait_refuses_product_operation"/>
+   <testMethod id="Tests\Feature\ProductDraftConcurrencyTest::test_required_mfa_withdrawn_during_actor_wait_refuses_product_operation#history selection" name="test_required_mfa_withdrawn_during_actor_wait_refuses_product_operation"/>
+   <testMethod id="Tests\Feature\ProductDraftConcurrencyTest::test_required_mfa_withdrawn_during_actor_wait_refuses_product_operation#inspect" name="test_required_mfa_withdrawn_during_actor_wait_refuses_product_operation"/>
+   <testMethod id="Tests\Feature\ProductDraftConcurrencyTest::test_required_mfa_withdrawn_during_actor_wait_refuses_product_operation#choices" name="test_required_mfa_withdrawn_during_actor_wait_refuses_product_operation"/>
+   <testMethod id="Tests\Feature\ProductDraftConcurrencyTest::test_source_lock_captures_metadata_committed_while_creator_waits" name="test_source_lock_captures_metadata_committed_while_creator_waits"/>
+  </testClass>
+  <testClass name="Tests\Feature\ProductionCheckoutNativeRaceTest" file="/workspace/VA-Studio-member-originals/tests/Feature/ProductionCheckoutNativeRaceTest.php">
+   <testMethod id="Tests\Feature\ProductionCheckoutNativeRaceTest::test_competing_assent_waits_on_exact_original_buyer_and_preserves_one_order#0" name="test_competing_assent_waits_on_exact_original_buyer_and_preserves_one_order"/>
+   <testMethod id="Tests\Feature\ProductionCheckoutNativeRaceTest::test_competing_assent_waits_on_exact_original_buyer_and_preserves_one_order#1" name="test_competing_assent_waits_on_exact_original_buyer_and_preserves_one_order"/>
+  </testClass>
+  <testClass name="Tests\Feature\ReviewedOfferDraftConcurrencyTest" file="/workspace/VA-Studio-member-originals/tests/Feature/ReviewedOfferDraftConcurrencyTest.php">
+   <testMethod id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#edit / worker 0 first" name="test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#edit / worker 1 first" name="test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#legacy / worker 0 first" name="test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#legacy / worker 1 first" name="test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#publish / worker 0 first" name="test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#publish / worker 1 first" name="test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#deactivate / worker 0 first" name="test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#deactivate / worker 1 first" name="test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#role / worker 0 first" name="test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#role / worker 1 first" name="test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#email / worker 0 first" name="test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#email / worker 1 first" name="test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#mfa / worker 0 first" name="test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#mfa / worker 1 first" name="test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders"/>
+  </testClass>
+  <testClass name="Tests\Feature\ServiceSupportAttachmentsTest" file="/workspace/VA-Studio-member-originals/tests/Feature/ServiceSupportAttachmentsTest.php">
+   <testMethod id="Tests\Feature\ServiceSupportAttachmentsTest::test_current_buyer_and_operator_use_actual_pipeline_without_exposing_or_changing_source" name="test_current_buyer_and_operator_use_actual_pipeline_without_exposing_or_changing_source"/>
+   <testMethod id="Tests\Feature\ServiceSupportAttachmentsTest::test_withdrawal_closes_intake_and_pending_scan_but_keeps_owned_ready_original_and_exact_replay" name="test_withdrawal_closes_intake_and_pending_scan_but_keeps_owned_ready_original_and_exact_replay"/>
+   <testMethod id="Tests\Feature\ServiceSupportAttachmentsTest::test_account_withdrawal_during_scanner_work_cannot_complete_or_read_claim" name="test_account_withdrawal_during_scanner_work_cannot_complete_or_read_claim"/>
+   <testMethod id="Tests\Feature\ServiceSupportAttachmentsTest::test_credential_change_during_storage_preparation_cannot_delete_retained_original" name="test_credential_change_during_storage_preparation_cannot_delete_retained_original"/>
+   <testMethod id="Tests\Feature\ServiceSupportAttachmentsTest::test_final_staff_source_query_cannot_withdraw_fixture_policy_and_return_private_projection" name="test_final_staff_source_query_cannot_withdraw_fixture_policy_and_return_private_projection"/>
+   <testMethod id="Tests\Feature\ServiceSupportAttachmentsTest::test_changed_graph_requires_current_version_for_new_intake_but_retains_old_manifest" name="test_changed_graph_requires_current_version_for_new_intake_but_retains_old_manifest"/>
+   <testMethod id="Tests\Feature\ServiceSupportAttachmentsTest::test_terminal_customer_stamp_resolution_cannot_withdraw_credential_and_return_private_projection" name="test_terminal_customer_stamp_resolution_cannot_withdraw_credential_and_return_private_projection"/>
+   <testMethod id="Tests\Feature\ServiceSupportAttachmentsTest::test_terminal_service_policy_resolution_cannot_withdraw_account_and_return_private_projection" name="test_terminal_service_policy_resolution_cannot_withdraw_account_and_return_private_projection"/>
+  </testClass>
+  <testClass name="Tests\Feature\SupportAttachmentsTest" file="/workspace/VA-Studio-member-originals/tests/Feature/SupportAttachmentsTest.php">
+   <testMethod id="Tests\Feature\SupportAttachmentsTest::test_owned_intake_scan_download_delete_preserves_encrypted_manifest_and_source_history" name="test_owned_intake_scan_download_delete_preserves_encrypted_manifest_and_source_history"/>
+   <testMethod id="Tests\Feature\SupportAttachmentsTest::test_archival_closes_new_intake_and_process_but_preserves_ready_original_and_exact_replay" name="test_archival_closes_new_intake_and_process_but_preserves_ready_original_and_exact_replay"/>
+   <testMethod id="Tests\Feature\SupportAttachmentsTest::test_wrong_owner_source_and_revoked_operator_cannot_read_or_mutate" name="test_wrong_owner_source_and_revoked_operator_cannot_read_or_mutate"/>
+   <testMethod id="Tests\Feature\SupportAttachmentsTest::test_scanner_failure_is_truthful_and_explicit_retry_is_fenced" name="test_scanner_failure_is_truthful_and_explicit_retry_is_fenced"/>
+   <testMethod id="Tests\Feature\SupportAttachmentsTest::test_changed_private_original_never_becomes_ready_or_downloadable" name="test_changed_private_original_never_becomes_ready_or_downloadable"/>
+   <testMethod id="Tests\Feature\SupportAttachmentsTest::test_unknown_intake_ack_exact_replay_retains_one_file_and_one_manifest" name="test_unknown_intake_ack_exact_replay_retains_one_file_and_one_manifest"/>
+   <testMethod id="Tests\Feature\SupportAttachmentsTest::test_archive_and_owner_change_during_scanner_io_cannot_finish_claim" name="test_archive_and_owner_change_during_scanner_io_cannot_finish_claim"/>
+   <testMethod id="Tests\Feature\SupportAttachmentsTest::test_disabled_policy_and_production_environment_refuse_all_effects" name="test_disabled_policy_and_production_environment_refuse_all_effects"/>
+   <testMethod id="Tests\Feature\SupportAttachmentsTest::test_archive_executable_and_oversize_bytes_are_refused" name="test_archive_executable_and_oversize_bytes_are_refused"/>
+   <testMethod id="Tests\Feature\SupportAttachmentsTest::test_file_copy_handoff_ambiguity_retains_bounded_receiving_intent_and_exact_retry" name="test_file_copy_handoff_ambiguity_retains_bounded_receiving_intent_and_exact_retry"/>
+   <testMethod id="Tests\Feature\SupportAttachmentsTest::test_deleted_request_replay_and_changed_file_never_restore_or_replace_bytes" name="test_deleted_request_replay_and_changed_file_never_restore_or_replace_bytes"/>
+   <testMethod id="Tests\Feature\SupportAttachmentsTest::test_unknown_scanner_claim_ack_requires_current_status_and_explicit_fenced_retry" name="test_unknown_scanner_claim_ack_requires_current_status_and_explicit_fenced_retry"/>
+   <testMethod id="Tests\Feature\SupportAttachmentsTest::test_expired_scanner_worker_cannot_overwrite_later_winner" name="test_expired_scanner_worker_cannot_overwrite_later_winner"/>
+   <testMethod id="Tests\Feature\SupportAttachmentsTest::test_expiry_closes_access_and_explicit_deletion_retains_manifest" name="test_expiry_closes_access_and_explicit_deletion_retains_manifest"/>
+   <testMethod id="Tests\Feature\SupportAttachmentsTest::test_last_staff_query_policy_withdrawal_refuses_before_retaining_or_mutating" name="test_last_staff_query_policy_withdrawal_refuses_before_retaining_or_mutating"/>
+   <testMethod id="Tests\Feature\SupportAttachmentsTest::test_missing_real_scanner_and_wrong_digest_remain_quarantined_failures" name="test_missing_real_scanner_and_wrong_digest_remain_quarantined_failures"/>
+   <testMethod id="Tests\Feature\SupportAttachmentsTest::test_three_snapshot_slots_are_bounded_and_source_inode_links_are_refused" name="test_three_snapshot_slots_are_bounded_and_source_inode_links_are_refused"/>
+   <testMethod id="Tests\Feature\SupportAttachmentsTest::test_scanner_policy_change_during_io_cannot_promote_old_claim" name="test_scanner_policy_change_during_io_cannot_promote_old_claim"/>
+   <testMethod id="Tests\Feature\SupportAttachmentsTest::test_temporary_source_and_manifest_shadows_refuse_without_private_projection" name="test_temporary_source_and_manifest_shadows_refuse_without_private_projection"/>
+   <testMethod id="Tests\Feature\SupportAttachmentsTest::test_real_immutable_manifest_and_tombstone_guards_refuse_updates_and_deletion" name="test_real_immutable_manifest_and_tombstone_guards_refuse_updates_and_deletion"/>
+   <testMethod id="Tests\Feature\SupportAttachmentsTest::test_terminal_dto_encrypter_policy_withdrawal_cannot_commit_or_remove_original" name="test_terminal_dto_encrypter_policy_withdrawal_cannot_commit_or_remove_original"/>
+   <testMethod id="Tests\Feature\SupportAttachmentsTest::test_terminal_dto_encrypter_row_mutation_cannot_return_stale_ready_state" name="test_terminal_dto_encrypter_row_mutation_cannot_return_stale_ready_state"/>
+   <testMethod id="Tests\Feature\SupportAttachmentsTest::test_storage_preparation_revoking_operator_cannot_authorize_a_tombstone" name="test_storage_preparation_revoking_operator_cannot_authorize_a_tombstone"/>
+   <testMethod id="Tests\Feature\SupportAttachmentsTest::test_positive_tombstone_authorizes_exact_cleanup_after_commit_callback_revokes_actor" name="test_positive_tombstone_authorizes_exact_cleanup_after_commit_callback_revokes_actor"/>
+   <testMethod id="Tests\Feature\SupportAttachmentsTest::test_unknown_tombstone_commit_never_erases_before_explicit_current_authorized_retry" name="test_unknown_tombstone_commit_never_erases_before_explicit_current_authorized_retry"/>
+   <testMethod id="Tests\Feature\SupportAttachmentsTest::test_changed_bytes_after_tombstone_commit_leave_truthful_pending_cleanup_and_never_erase_unknown_content" name="test_changed_bytes_after_tombstone_commit_leave_truthful_pending_cleanup_and_never_erase_unknown_content"/>
+   <testMethod id="Tests\Feature\SupportAttachmentsTest::test_storage_configuration_change_after_tombstone_commit_preserves_exact_original_pending_cleanup" name="test_storage_configuration_change_after_tombstone_commit_preserves_exact_original_pending_cleanup"/>
+   <testMethod id="Tests\Feature\SupportAttachmentsTest::test_terminal_inquiry_panel_callback_cannot_withdraw_intake_and_finish_scan" name="test_terminal_inquiry_panel_callback_cannot_withdraw_intake_and_finish_scan"/>
+  </testClass>
+  <testClass name="Tests\Feature\TestOrderFinalizationMigrationTest" file="/workspace/VA-Studio-member-originals/tests/Feature/TestOrderFinalizationMigrationTest.php">
+   <testMethod id="Tests\Feature\TestOrderFinalizationMigrationTest::test_empty_finalization_migration_roundtrip_retains_existing_encrypted_evidence_and_pending_bindings" name="test_empty_finalization_migration_roundtrip_retains_existing_encrypted_evidence_and_pending_bindings"/>
+   <testMethod id="Tests\Feature\TestOrderFinalizationMigrationTest::test_populated_rollback_refuses_before_changing_any_evidence_or_guards" name="test_populated_rollback_refuses_before_changing_any_evidence_or_guards"/>
+   <testMethod id="Tests\Feature\TestOrderFinalizationMigrationTest::test_entire_finalization_graph_is_append_only_in_models_and_direct_sql#0" name="test_entire_finalization_graph_is_append_only_in_models_and_direct_sql"/>
+   <testMethod id="Tests\Feature\TestOrderFinalizationMigrationTest::test_entire_finalization_graph_is_append_only_in_models_and_direct_sql#1" name="test_entire_finalization_graph_is_append_only_in_models_and_direct_sql"/>
+   <testMethod id="Tests\Feature\TestOrderFinalizationMigrationTest::test_entire_finalization_graph_is_append_only_in_models_and_direct_sql#2" name="test_entire_finalization_graph_is_append_only_in_models_and_direct_sql"/>
+   <testMethod id="Tests\Feature\TestOrderFinalizationMigrationTest::test_entire_finalization_graph_is_append_only_in_models_and_direct_sql#3" name="test_entire_finalization_graph_is_append_only_in_models_and_direct_sql"/>
+   <testMethod id="Tests\Feature\TestOrderFinalizationMigrationTest::test_model_casts_relationships_and_private_fields_preserve_the_storage_contract" name="test_model_casts_relationships_and_private_fields_preserve_the_storage_contract"/>
+   <testMethod id="Tests\Feature\TestOrderFinalizationMigrationTest::test_finalization_rejects_incoherent_payment_attempt_time_mode_policy_and_reason" name="test_finalization_rejects_incoherent_payment_attempt_time_mode_policy_and_reason"/>
+   <testMethod id="Tests\Feature\TestOrderFinalizationMigrationTest::test_confirmed_at_exact_cutoff_can_only_be_an_exception_and_cannot_be_before_checkout_intent" name="test_confirmed_at_exact_cutoff_can_only_be_an_exception_and_cannot_be_before_checkout_intent"/>
+   <testMethod id="Tests\Feature\TestOrderFinalizationMigrationTest::test_paid_exception_cannot_create_grants_entitlements_or_paid_contract_work" name="test_paid_exception_cannot_create_grants_entitlements_or_paid_contract_work"/>
+   <testMethod id="Tests\Feature\TestOrderFinalizationMigrationTest::test_grants_cannot_mix_orders_revisions_licenses_or_scopes" name="test_grants_cannot_mix_orders_revisions_licenses_or_scopes"/>
+   <testMethod id="Tests\Feature\TestOrderFinalizationMigrationTest::test_pending_entitlements_reject_wrong_assets_hashes_roles_sizes_or_activation" name="test_pending_entitlements_reject_wrong_assets_hashes_roles_sizes_or_activation"/>
+   <testMethod id="Tests\Feature\TestOrderFinalizationMigrationTest::test_outbox_rejects_private_or_extra_payload_fields_and_incoherent_effect_bindings" name="test_outbox_rejects_private_or_extra_payload_fields_and_incoherent_effect_bindings"/>
+   <testMethod id="Tests\Feature\TestOrderFinalizationMigrationTest::test_resource_consumption_requires_matching_paid_attempt_and_preserves_original_binding" name="test_resource_consumption_requires_matching_paid_attempt_and_preserves_original_binding"/>
+   <testMethod id="Tests\Feature\TestOrderFinalizationMigrationTest::test_sql_foreign_keys_restrict_every_new_reference_and_effect_indexes_are_unique" name="test_sql_foreign_keys_restrict_every_new_reference_and_effect_indexes_are_unique"/>
+  </testClass>
+  <testClass name="Tests\Feature\TestUnpaidReleaseMigrationTest" file="/workspace/VA-Studio-member-originals/tests/Feature/TestUnpaidReleaseMigrationTest.php">
+   <testMethod id="Tests\Feature\TestUnpaidReleaseMigrationTest::test_unproved_release_and_all_released_resource_rewrites_are_refused" name="test_unproved_release_and_all_released_resource_rewrites_are_refused"/>
+   <testMethod id="Tests\Feature\TestUnpaidReleaseMigrationTest::test_proof_and_events_refuse_raw_mutation_deletion_and_replace_with_recursive_triggers_off" name="test_proof_and_events_refuse_raw_mutation_deletion_and_replace_with_recursive_triggers_off"/>
+   <testMethod id="Tests\Feature\TestUnpaidReleaseMigrationTest::test_populated_down_preserves_every_guard_and_resource" name="test_populated_down_preserves_every_guard_and_resource"/>
+   <testMethod id="Tests\Feature\TestUnpaidReleaseMigrationTest::test_empty_roundtrip_restores_legacy_guards_and_preserves_existing_pending_order" name="test_empty_roundtrip_restores_legacy_guards_and_preserves_existing_pending_order"/>
+   <testMethod id="Tests\Feature\TestUnpaidReleaseMigrationTest::test_temporary_shadow_and_foreign_guard_refuse_before_any_ddl" name="test_temporary_shadow_and_foreign_guard_refuse_before_any_ddl"/>
+   <testMethod id="Tests\Feature\TestUnpaidReleaseMigrationTest::test_foreign_empty_work_table_shape_is_retained_before_rollback_ddl" name="test_foreign_empty_work_table_shape_is_retained_before_rollback_ddl"/>
+  </testClass>
+  <testClass name="Tests\Feature\UuidByteGuardMigrationTest" file="/workspace/VA-Studio-member-originals/tests/Feature/UuidByteGuardMigrationTest.php">
+   <testMethod id="Tests\Feature\UuidByteGuardMigrationTest::test_uuid_predicates_count_stored_bytes_and_preserve_existing_format_policies" name="test_uuid_predicates_count_stored_bytes_and_preserve_existing_format_policies"/>
+   <testMethod id="Tests\Feature\UuidByteGuardMigrationTest::test_request_and_render_claim_writes_reject_nul_tails_and_blob_values_while_nullable_states_remain_valid" name="test_request_and_render_claim_writes_reject_nul_tails_and_blob_values_while_nullable_states_remain_valid"/>
+   <testMethod id="Tests\Feature\UuidByteGuardMigrationTest::test_receipt_claims_keep_nullable_states_length_only_policy_and_mysql_character_coercion" name="test_receipt_claims_keep_nullable_states_length_only_policy_and_mysql_character_coercion"/>
+   <testMethod id="Tests\Feature\UuidByteGuardMigrationTest::test_populated_upgrade_retains_originals_and_canonical_identifiers_without_weakening_lifecycle_guards" name="test_populated_upgrade_retains_originals_and_canonical_identifiers_without_weakening_lifecycle_guards"/>
+   <testMethod id="Tests\Feature\UuidByteGuardMigrationTest::test_preflight_reports_a_retained_request_uuid_with_no_rewrite_or_partial_installation" name="test_preflight_reports_a_retained_request_uuid_with_no_rewrite_or_partial_installation"/>
+   <testMethod id="Tests\Feature\UuidByteGuardMigrationTest::test_preflight_reports_a_retained_nullable_claim_with_no_rewrite" name="test_preflight_reports_a_retained_nullable_claim_with_no_rewrite"/>
+   <testMethod id="Tests\Feature\UuidByteGuardMigrationTest::test_partial_installation_retries_verify_the_expected_trigger_set_and_down_preserves_original_guards" name="test_partial_installation_retries_verify_the_expected_trigger_set_and_down_preserves_original_guards"/>
+   <testMethod id="Tests\Feature\UuidByteGuardMigrationTest::test_retry_refuses_a_same_named_unrelated_trigger_without_replacing_it" name="test_retry_refuses_a_same_named_unrelated_trigger_without_replacing_it"/>
+   <testMethod id="Tests\Feature\UuidByteGuardMigrationTest::test_rollback_preflights_late_guard_drift_before_any_drop_and_preserves_all_retained_rows" name="test_rollback_preflights_late_guard_drift_before_any_drop_and_preserves_all_retained_rows"/>
+   <testMethod id="Tests\Feature\UuidByteGuardMigrationTest::test_rollback_refuses_a_late_differently_cased_guard_without_adopting_or_dropping_it" name="test_rollback_refuses_a_late_differently_cased_guard_without_adopting_or_dropping_it"/>
+   <testMethod id="Tests\Feature\UuidByteGuardMigrationTest::test_rollback_retries_missing_guards_without_dropping_original_or_temporary_guards" name="test_rollback_retries_missing_guards_without_dropping_original_or_temporary_guards"/>
+  </testClass>
+ </tests>
+ <groups>
+  <group name="default">
+   <test id="Tests\Feature\OrderPreparationMigrationTest::test_empty_order_tables_roundtrip_without_changing_existing_pending_inventory_and_pricing"/>
+   <test id="Tests\Feature\OrderPreparationMigrationTest::test_new_foreign_keys_reject_orphan_evidence_with_enforcement_enabled"/>
+   <test id="Tests\Feature\ProductDraftConcurrencyTest::test_native_product_wait_serializes_competing_draft_changes#edit vs edit"/>
+   <test id="Tests\Feature\ProductDraftConcurrencyTest::test_native_product_wait_serializes_competing_draft_changes#edit vs history"/>
+   <test id="Tests\Feature\ProductDraftConcurrencyTest::test_native_product_wait_serializes_competing_draft_changes#history vs edit"/>
+   <test id="Tests\Feature\ProductDraftConcurrencyTest::test_required_mfa_withdrawn_during_actor_wait_refuses_product_operation#create"/>
+   <test id="Tests\Feature\ProductDraftConcurrencyTest::test_required_mfa_withdrawn_during_actor_wait_refuses_product_operation#edit"/>
+   <test id="Tests\Feature\ProductDraftConcurrencyTest::test_required_mfa_withdrawn_during_actor_wait_refuses_product_operation#history selection"/>
+   <test id="Tests\Feature\ProductDraftConcurrencyTest::test_required_mfa_withdrawn_during_actor_wait_refuses_product_operation#inspect"/>
+   <test id="Tests\Feature\ProductDraftConcurrencyTest::test_required_mfa_withdrawn_during_actor_wait_refuses_product_operation#choices"/>
+   <test id="Tests\Feature\ProductDraftConcurrencyTest::test_source_lock_captures_metadata_committed_while_creator_waits"/>
+   <test id="Tests\Feature\ProductionCheckoutNativeRaceTest::test_competing_assent_waits_on_exact_original_buyer_and_preserves_one_order#0"/>
+   <test id="Tests\Feature\ProductionCheckoutNativeRaceTest::test_competing_assent_waits_on_exact_original_buyer_and_preserves_one_order#1"/>
+   <test id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#edit / worker 0 first"/>
+   <test id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#edit / worker 1 first"/>
+   <test id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#legacy / worker 0 first"/>
+   <test id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#legacy / worker 1 first"/>
+   <test id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#publish / worker 0 first"/>
+   <test id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#publish / worker 1 first"/>
+   <test id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#deactivate / worker 0 first"/>
+   <test id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#deactivate / worker 1 first"/>
+   <test id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#role / worker 0 first"/>
+   <test id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#role / worker 1 first"/>
+   <test id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#email / worker 0 first"/>
+   <test id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#email / worker 1 first"/>
+   <test id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#mfa / worker 0 first"/>
+   <test id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#mfa / worker 1 first"/>
+   <test id="Tests\Feature\ServiceSupportAttachmentsTest::test_current_buyer_and_operator_use_actual_pipeline_without_exposing_or_changing_source"/>
+   <test id="Tests\Feature\ServiceSupportAttachmentsTest::test_withdrawal_closes_intake_and_pending_scan_but_keeps_owned_ready_original_and_exact_replay"/>
+   <test id="Tests\Feature\ServiceSupportAttachmentsTest::test_account_withdrawal_during_scanner_work_cannot_complete_or_read_claim"/>
+   <test id="Tests\Feature\ServiceSupportAttachmentsTest::test_credential_change_during_storage_preparation_cannot_delete_retained_original"/>
+   <test id="Tests\Feature\ServiceSupportAttachmentsTest::test_final_staff_source_query_cannot_withdraw_fixture_policy_and_return_private_projection"/>
+   <test id="Tests\Feature\ServiceSupportAttachmentsTest::test_changed_graph_requires_current_version_for_new_intake_but_retains_old_manifest"/>
+   <test id="Tests\Feature\ServiceSupportAttachmentsTest::test_terminal_customer_stamp_resolution_cannot_withdraw_credential_and_return_private_projection"/>
+   <test id="Tests\Feature\ServiceSupportAttachmentsTest::test_terminal_service_policy_resolution_cannot_withdraw_account_and_return_private_projection"/>
+   <test id="Tests\Feature\SupportAttachmentsTest::test_owned_intake_scan_download_delete_preserves_encrypted_manifest_and_source_history"/>
+   <test id="Tests\Feature\SupportAttachmentsTest::test_archival_closes_new_intake_and_process_but_preserves_ready_original_and_exact_replay"/>
+   <test id="Tests\Feature\SupportAttachmentsTest::test_wrong_owner_source_and_revoked_operator_cannot_read_or_mutate"/>
+   <test id="Tests\Feature\SupportAttachmentsTest::test_scanner_failure_is_truthful_and_explicit_retry_is_fenced"/>
+   <test id="Tests\Feature\SupportAttachmentsTest::test_changed_private_original_never_becomes_ready_or_downloadable"/>
+   <test id="Tests\Feature\SupportAttachmentsTest::test_unknown_intake_ack_exact_replay_retains_one_file_and_one_manifest"/>
+   <test id="Tests\Feature\SupportAttachmentsTest::test_archive_and_owner_change_during_scanner_io_cannot_finish_claim"/>
+   <test id="Tests\Feature\SupportAttachmentsTest::test_disabled_policy_and_production_environment_refuse_all_effects"/>
+   <test id="Tests\Feature\SupportAttachmentsTest::test_archive_executable_and_oversize_bytes_are_refused"/>
+   <test id="Tests\Feature\SupportAttachmentsTest::test_file_copy_handoff_ambiguity_retains_bounded_receiving_intent_and_exact_retry"/>
+   <test id="Tests\Feature\SupportAttachmentsTest::test_deleted_request_replay_and_changed_file_never_restore_or_replace_bytes"/>
+   <test id="Tests\Feature\SupportAttachmentsTest::test_unknown_scanner_claim_ack_requires_current_status_and_explicit_fenced_retry"/>
+   <test id="Tests\Feature\SupportAttachmentsTest::test_expired_scanner_worker_cannot_overwrite_later_winner"/>
+   <test id="Tests\Feature\SupportAttachmentsTest::test_expiry_closes_access_and_explicit_deletion_retains_manifest"/>
+   <test id="Tests\Feature\SupportAttachmentsTest::test_last_staff_query_policy_withdrawal_refuses_before_retaining_or_mutating"/>
+   <test id="Tests\Feature\SupportAttachmentsTest::test_missing_real_scanner_and_wrong_digest_remain_quarantined_failures"/>
+   <test id="Tests\Feature\SupportAttachmentsTest::test_three_snapshot_slots_are_bounded_and_source_inode_links_are_refused"/>
+   <test id="Tests\Feature\SupportAttachmentsTest::test_scanner_policy_change_during_io_cannot_promote_old_claim"/>
+   <test id="Tests\Feature\SupportAttachmentsTest::test_temporary_source_and_manifest_shadows_refuse_without_private_projection"/>
+   <test id="Tests\Feature\SupportAttachmentsTest::test_real_immutable_manifest_and_tombstone_guards_refuse_updates_and_deletion"/>
+   <test id="Tests\Feature\SupportAttachmentsTest::test_terminal_dto_encrypter_policy_withdrawal_cannot_commit_or_remove_original"/>
+   <test id="Tests\Feature\SupportAttachmentsTest::test_terminal_dto_encrypter_row_mutation_cannot_return_stale_ready_state"/>
+   <test id="Tests\Feature\SupportAttachmentsTest::test_storage_preparation_revoking_operator_cannot_authorize_a_tombstone"/>
+   <test id="Tests\Feature\SupportAttachmentsTest::test_positive_tombstone_authorizes_exact_cleanup_after_commit_callback_revokes_actor"/>
+   <test id="Tests\Feature\SupportAttachmentsTest::test_unknown_tombstone_commit_never_erases_before_explicit_current_authorized_retry"/>
+   <test id="Tests\Feature\SupportAttachmentsTest::test_changed_bytes_after_tombstone_commit_leave_truthful_pending_cleanup_and_never_erase_unknown_content"/>
+   <test id="Tests\Feature\SupportAttachmentsTest::test_storage_configuration_change_after_tombstone_commit_preserves_exact_original_pending_cleanup"/>
+   <test id="Tests\Feature\SupportAttachmentsTest::test_terminal_inquiry_panel_callback_cannot_withdraw_intake_and_finish_scan"/>
+   <test id="Tests\Feature\TestOrderFinalizationMigrationTest::test_empty_finalization_migration_roundtrip_retains_existing_encrypted_evidence_and_pending_bindings"/>
+   <test id="Tests\Feature\TestOrderFinalizationMigrationTest::test_populated_rollback_refuses_before_changing_any_evidence_or_guards"/>
+   <test id="Tests\Feature\TestOrderFinalizationMigrationTest::test_entire_finalization_graph_is_append_only_in_models_and_direct_sql#0"/>
+   <test id="Tests\Feature\TestOrderFinalizationMigrationTest::test_entire_finalization_graph_is_append_only_in_models_and_direct_sql#1"/>
+   <test id="Tests\Feature\TestOrderFinalizationMigrationTest::test_entire_finalization_graph_is_append_only_in_models_and_direct_sql#2"/>
+   <test id="Tests\Feature\TestOrderFinalizationMigrationTest::test_entire_finalization_graph_is_append_only_in_models_and_direct_sql#3"/>
+   <test id="Tests\Feature\TestOrderFinalizationMigrationTest::test_model_casts_relationships_and_private_fields_preserve_the_storage_contract"/>
+   <test id="Tests\Feature\TestOrderFinalizationMigrationTest::test_finalization_rejects_incoherent_payment_attempt_time_mode_policy_and_reason"/>
+   <test id="Tests\Feature\TestOrderFinalizationMigrationTest::test_confirmed_at_exact_cutoff_can_only_be_an_exception_and_cannot_be_before_checkout_intent"/>
+   <test id="Tests\Feature\TestOrderFinalizationMigrationTest::test_paid_exception_cannot_create_grants_entitlements_or_paid_contract_work"/>
+   <test id="Tests\Feature\TestOrderFinalizationMigrationTest::test_grants_cannot_mix_orders_revisions_licenses_or_scopes"/>
+   <test id="Tests\Feature\TestOrderFinalizationMigrationTest::test_pending_entitlements_reject_wrong_assets_hashes_roles_sizes_or_activation"/>
+   <test id="Tests\Feature\TestOrderFinalizationMigrationTest::test_outbox_rejects_private_or_extra_payload_fields_and_incoherent_effect_bindings"/>
+   <test id="Tests\Feature\TestOrderFinalizationMigrationTest::test_resource_consumption_requires_matching_paid_attempt_and_preserves_original_binding"/>
+   <test id="Tests\Feature\TestOrderFinalizationMigrationTest::test_sql_foreign_keys_restrict_every_new_reference_and_effect_indexes_are_unique"/>
+   <test id="Tests\Feature\TestUnpaidReleaseMigrationTest::test_unproved_release_and_all_released_resource_rewrites_are_refused"/>
+   <test id="Tests\Feature\TestUnpaidReleaseMigrationTest::test_proof_and_events_refuse_raw_mutation_deletion_and_replace_with_recursive_triggers_off"/>
+   <test id="Tests\Feature\TestUnpaidReleaseMigrationTest::test_populated_down_preserves_every_guard_and_resource"/>
+   <test id="Tests\Feature\TestUnpaidReleaseMigrationTest::test_empty_roundtrip_restores_legacy_guards_and_preserves_existing_pending_order"/>
+   <test id="Tests\Feature\TestUnpaidReleaseMigrationTest::test_temporary_shadow_and_foreign_guard_refuse_before_any_ddl"/>
+   <test id="Tests\Feature\TestUnpaidReleaseMigrationTest::test_foreign_empty_work_table_shape_is_retained_before_rollback_ddl"/>
+   <test id="Tests\Feature\UuidByteGuardMigrationTest::test_uuid_predicates_count_stored_bytes_and_preserve_existing_format_policies"/>
+   <test id="Tests\Feature\UuidByteGuardMigrationTest::test_request_and_render_claim_writes_reject_nul_tails_and_blob_values_while_nullable_states_remain_valid"/>
+   <test id="Tests\Feature\UuidByteGuardMigrationTest::test_receipt_claims_keep_nullable_states_length_only_policy_and_mysql_character_coercion"/>
+   <test id="Tests\Feature\UuidByteGuardMigrationTest::test_populated_upgrade_retains_originals_and_canonical_identifiers_without_weakening_lifecycle_guards"/>
+   <test id="Tests\Feature\UuidByteGuardMigrationTest::test_preflight_reports_a_retained_request_uuid_with_no_rewrite_or_partial_installation"/>
+   <test id="Tests\Feature\UuidByteGuardMigrationTest::test_preflight_reports_a_retained_nullable_claim_with_no_rewrite"/>
+   <test id="Tests\Feature\UuidByteGuardMigrationTest::test_partial_installation_retries_verify_the_expected_trigger_set_and_down_preserves_original_guards"/>
+   <test id="Tests\Feature\UuidByteGuardMigrationTest::test_retry_refuses_a_same_named_unrelated_trigger_without_replacing_it"/>
+   <test id="Tests\Feature\UuidByteGuardMigrationTest::test_rollback_preflights_late_guard_drift_before_any_drop_and_preserves_all_retained_rows"/>
+   <test id="Tests\Feature\UuidByteGuardMigrationTest::test_rollback_refuses_a_late_differently_cased_guard_without_adopting_or_dropping_it"/>
+   <test id="Tests\Feature\UuidByteGuardMigrationTest::test_rollback_retries_missing_guards_without_dropping_original_or_temporary_guards"/>
+  </group>
+ </groups>
+</testSuite>

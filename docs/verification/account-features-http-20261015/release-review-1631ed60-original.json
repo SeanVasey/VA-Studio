@@ -1,0 +1,64 @@
+{
+  "decision": "APPROVE COMPONENT SOURCE WITH EXECUTION/INTEGRATION CONDITIONS",
+  "reviewed_sha": "1631ed60c2bb7241efced1de0fda54bd4e7119f7",
+  "prior_reviewed_sha": "9187362e9d4fb9a988b02620203f1b1eb31eef8d",
+  "observed_utc": "2026-10-15T18:10:36.273430+00:00",
+  "clean_at_initial_review_observation": true,
+  "scope": "Narrow final original-release/preparation component closure; not integrated HTTP/UI/final development approval",
+  "source_sha256": {
+    "app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php": "116d84d8e99d32129e3145a97d367bceb8acda4a4419cdc51292b267e72fa11e",
+    "app/Domain/Customers/ProductionFeatures/ProductionFeatureBookkeeping.php": "8fd8be1604e0583d602eada48a9edad2c9e4818b112f48e7231019b06a44c107",
+    "app/Domain/Customers/ProductionFeatures/ProductionFeatureTransactionObserver.php": "895d46a26dc1cf1bee82d03a02d2324df726e1fd09c1b7b2b98e0cc414211c3b",
+    "app/Domain/Customers/ProductionFeatures/ProductionFeatureTransaction.php": "9e4a75e45eaedf26087bfba495467aa28866206c8872ff26d75bf2e4f7f241f8",
+    "app/Domain/Customers/ProductionFeatures/ProductionFeatureContext.php": "11dc94281a5417295baa72a6e6c541f2fed8bed6b9503f65ef9860d06d88249e",
+    "app/Domain/Customers/ProductionFeatures/ProductionFeaturePreparation.php": "06598d8698b4635cb742ccd019bfadbac214e811997b10a0462a8494f8d98c77",
+    "app/Domain/Customers/ProductionFeatures/ProductionFeatureRelease.php": "40942d2808abd9d16cf13266f6c63d69f19d043dc8fe0ae460bc301a3209c9b4",
+    "tests/Feature/ProductionFeatures/ProductionFeatureReleaseTest.php": "b01af65f1af4d74af5f2259323d5b146acd699b93bf60dc5089ab26d5506c6d5"
+  },
+  "application_delta_from_918": [
+    "app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php"
+  ],
+  "unchanged_component_body_carry": {
+    "app/Domain/Customers/ProductionFeatures/ProductionFeatureBookkeeping.php": true,
+    "app/Domain/Customers/ProductionFeatures/ProductionFeatureTransactionObserver.php": true,
+    "app/Domain/Customers/ProductionFeatures/ProductionFeatureTransaction.php": true,
+    "app/Domain/Customers/ProductionFeatures/ProductionFeatureContext.php": true,
+    "app/Domain/Customers/ProductionFeatures/ProductionFeaturePreparation.php": true,
+    "app/Domain/Customers/ProductionFeatures/ProductionFeatureRelease.php": true
+  },
+  "closed_conditions": [
+    "Original prestart birth guard, exact callback-free root/descendant bookkeeping and post-start continuity fence",
+    "Birth-only/inactive retained tail and raw standard-record metadata handling",
+    "Callback-owned associative hook keys/order preserved; raw property written only when the owned tail is removed"
+  ],
+  "required_component_source_corrections": [],
+  "open_component_P0_P1": [],
+  "remaining_component_P2": [],
+  "control_assessment": "Actual beforeStarting callback replaces hook storage with a foreign associative closure map. The tail refuses before PDO begin; exact raw map and idle PDO/depth are asserted. The added case was unexecuted at this review.",
+  "execution_scope": {
+    "whole_component_918": "Parent-reconciled completed23/212/F0/E0/S0 PHP/recorder/observedOS0 with unchanged source; remains original918 evidence.",
+    "new_163_case": "Unexecuted; planned with integrated tests, no fresh whole163 claim.",
+    "carry_limit": "Only Operation hook removal and the new test differ in this correction; no whole-runtime/manifest equality or fresh native claim.",
+    "reviewer_app_DB_network_CI_execution": false
+  },
+  "conditions": [
+    "Execute/reconcile the new hook-preservation control with initial integrated tests; original23/212 remains918 evidence, not current163 whole-selection evidence.",
+    "Independently review actual kernel epoch/response/request-auth-session/privacy/routes/UI integration and genuine send-path controls.",
+    "Obtain scoped native ownership/current closure and final coherent sealed evidence, exact-head cheap preflight/inventory/expected-SHA development merge.",
+    "Preserve original ten-second deadline, immediate non-HTTP closure, default-false mount and frozen adjacent scopes."
+  ],
+  "preparation_error": {
+    "path": "/workspace/runtime/account-features-http-release-component-review-1631ed60-preparation-error-20261015.txt",
+    "sha256": "ecce0a51859c8964af7a161c1f7e9d6097617b5fb6e29295edf5f5c70c7456a5",
+    "original_exit": 1,
+    "outcome": "Exact-current-head assertion rejected after author progressed to clean952; no artifact written or application invocation. Corrected assembly binds immutable reviewed163 bodies.",
+    "later_author_head_observed": "952fb9e3a2d0d96f28ee80aa33ddc6078a3335c5",
+    "approval_carry_to_later_head": false
+  },
+  "commands": [
+    "Exact163 head/status and scoped918..163 app/test diff",
+    "Immutable Git-body carry/hash assertions and exclusive runtime artifact creation",
+    "Single read-only head/status reconciliation after preparation assertion"
+  ],
+  "shared_edits": false
+}

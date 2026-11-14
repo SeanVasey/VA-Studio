@@ -1,0 +1,735 @@
+{
+  "scope": "Each named captured executable/resource-input selection compared with the explicit integrated target. Differences remain visible; a byte comparison is not a rerun. External probes remain separately identified. Documentation-only inventory entries are excluded from this final carry comparison.",
+  "integrated_tested_source": "ec90cc1a097db8925d87689d0ac62fdff0165c5a",
+  "comparisons": [
+    {
+      "run": "renderer/lane-combined-final",
+      "binding": "renderer-final",
+      "original_reference": "483793065c3f7a66057907a777f938f608bf7036",
+      "captured_paths": 32,
+      "selected_input_paths": 32,
+      "all_selected_inputs_match_final": false,
+      "differences": [
+        {
+          "path": "app/Domain/Grants/Member/MemberGrantDocumentValues.php",
+          "category": "application",
+          "captured_sha256": "1289cabe04f1ef0eae2db703824551589b3074b0d0940555ca2c529212a2b3e2",
+          "final_sha256": "5371b90f0a74bb9f2d3bc010aec651b7fe7016eee16d8557e395fb27b85463b0"
+        },
+        {
+          "path": "tests/Unit/ProductionMemberOriginals/MemberGrantDocumentsTest.php",
+          "category": "test/fixture",
+          "captured_sha256": "7a3ec26b7c82b7f9e533fde5a7dacb72fd69c624d2f07b39fe13db5d147f477c",
+          "final_sha256": "85cfe24650ebc67bb8485a76475d3a4352f4453fdffde751ff1ccc7b7c55e842"
+        }
+      ]
+    },
+    {
+      "run": "facts/facts-review/fixed",
+      "binding": "facts-5d6c58da-final",
+      "original_reference": "5d6c58da50267a636e393ce3754ef473516923aa",
+      "captured_paths": 11504,
+      "selected_input_paths": 2378,
+      "all_selected_inputs_match_final": false,
+      "differences": [
+        {
+          "path": ".github/workflows/final-verification.yml",
+          "category": "config/resource/tooling",
+          "captured_sha256": "1ffbddb38f50997ae6bc990b178d71df76e5308cd51f3e50683826128423f47b",
+          "final_sha256": "1658872ac03968525a7f0f13719018dc50cfc2951eb91ed2e2b0e0f5334aa62b"
+        },
+        {
+          "path": ".gitlab-ci.yml",
+          "category": "config/resource/tooling",
+          "captured_sha256": "49b06da921c0d503ed55da17ad73571ab93d9bd2e6b4665ad346b6fa5e171ffd",
+          "final_sha256": "da0df87f5320c26f9e11d70f15ff04e9036d466b3b5d8bed63ebb854a0bbf8ea"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberGrantDocumentValues.php",
+          "category": "application",
+          "captured_sha256": "8da46f30b9bc511ec92728d717e1e255fd15445e9261999d789ac76ff7037179",
+          "final_sha256": "5371b90f0a74bb9f2d3bc010aec651b7fe7016eee16d8557e395fb27b85463b0"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalArtifactAuthority.php",
+          "category": "application",
+          "captured_sha256": "259d236aa11cf1833256e8ae3f2b5f7d4fab64edfe4ae6e0e85e93ea62126605",
+          "final_sha256": "ee6c66d601b47819a3d94433c462667ee3af2d4398322f174644427afe4ab87e"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalFiles.php",
+          "category": "application",
+          "captured_sha256": "7eefd2c8d63bcab39507525ed5ec3fb89a4e76562df65ee1df86157f3bd26c8a",
+          "final_sha256": "da13ccc2d5353fddd22e531d6a717ecc230485a4893629d14d4b2f46c2eeccbe"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalFinishBoundary.php",
+          "category": "application",
+          "captured_sha256": "9d6959216f08701de10454b6bcbf20dfd91262aff039d10e9bf36ee514ac43c6",
+          "final_sha256": "7d31293a272fd32f9598cace3f28dacd471c49e891e4d9fb0fd5b587c4c45996"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalWorkspace.php",
+          "category": "application",
+          "captured_sha256": "7d777b3b2f3793c8e545fc011a495e16a30d45aa91fb661dbd6306dcd7df4a53",
+          "final_sha256": "8ff2ac6250fa990ea0c675af81f544d1e44b89b26f84afd405cf5fc8a8fcd231"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipBillingEvidence.php",
+          "category": "application",
+          "captured_sha256": "aea9c888aee8a16d9731eec5c4c4ac4a7b37992136b9e85d8c0e669e68aef824",
+          "final_sha256": "7ba5b6e56d2511cc1b4fd277b83204d33fbe01eea650b86be02af79fd763e189"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipReservationContext.php",
+          "category": "application",
+          "captured_sha256": "d2367d8166262a926e03cfd1e832c406dc1e0e621b0ff5df4c3db80203dfa9f6",
+          "final_sha256": "a02b8246e8e9247c3095a8f90b38a13a45ddd0569441278702277bf398e37624"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipReservations.php",
+          "category": "application",
+          "captured_sha256": "5bc1ef19b79102e3a5ca2ff9f420d738f2ee01f67f0c6c3bcd59abd1e9c8a8f7",
+          "final_sha256": "491df724395f74fe91a066b56e77e7811e678734138b0b1a5c8fb5912caa11b2"
+        },
+        {
+          "path": "scripts/ci/database-mysql-selection.json",
+          "category": "config/resource/tooling",
+          "captured_sha256": "a6e943d29564e5ac9c3444c8b43c1e02e5e8682477be22633de42f342740c571",
+          "final_sha256": "f792c2b2fef6430c7a1fac36f71e2ca3869473397eb30ad8396172cb91d55845"
+        },
+        {
+          "path": "scripts/ci/database-sqlite-skips.json",
+          "category": "config/resource/tooling",
+          "captured_sha256": "d94f9ecb010fc2e0102b9cc564fe3e54e3c59b77915a0a5f902e33ecaf896a95",
+          "final_sha256": "eb18afd1403b2f4270fa3304fa3da28e52eae5b987fe8eaa497f780c7bffe914"
+        },
+        {
+          "path": "tests/Feature/ProductionMemberOriginals/MemberOriginalFinishBoundaryTest.php",
+          "category": "test/fixture",
+          "captured_sha256": "a28f0de507fd93debe952739bfaef7638c17a1b8ff1b25f48473c853e3391a3a",
+          "final_sha256": "e2b0c01c7b14f3c3008c80737a92ad29d0a824a79790b5687b52e4df0391f70c"
+        }
+      ]
+    },
+    {
+      "run": "facts/timestamp-compatibility/fixed",
+      "binding": "facts-a7265e8c-final",
+      "original_reference": "a7265e8c5365421f2110623f685cbc67d21a99b0",
+      "captured_paths": 11505,
+      "selected_input_paths": 2379,
+      "all_selected_inputs_match_final": false,
+      "differences": [
+        {
+          "path": ".github/workflows/final-verification.yml",
+          "category": "config/resource/tooling",
+          "captured_sha256": "1ffbddb38f50997ae6bc990b178d71df76e5308cd51f3e50683826128423f47b",
+          "final_sha256": "1658872ac03968525a7f0f13719018dc50cfc2951eb91ed2e2b0e0f5334aa62b"
+        },
+        {
+          "path": ".gitlab-ci.yml",
+          "category": "config/resource/tooling",
+          "captured_sha256": "49b06da921c0d503ed55da17ad73571ab93d9bd2e6b4665ad346b6fa5e171ffd",
+          "final_sha256": "da0df87f5320c26f9e11d70f15ff04e9036d466b3b5d8bed63ebb854a0bbf8ea"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalArtifactAuthority.php",
+          "category": "application",
+          "captured_sha256": "259d236aa11cf1833256e8ae3f2b5f7d4fab64edfe4ae6e0e85e93ea62126605",
+          "final_sha256": "ee6c66d601b47819a3d94433c462667ee3af2d4398322f174644427afe4ab87e"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalFiles.php",
+          "category": "application",
+          "captured_sha256": "7eefd2c8d63bcab39507525ed5ec3fb89a4e76562df65ee1df86157f3bd26c8a",
+          "final_sha256": "da13ccc2d5353fddd22e531d6a717ecc230485a4893629d14d4b2f46c2eeccbe"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalFinishBoundary.php",
+          "category": "application",
+          "captured_sha256": "9d6959216f08701de10454b6bcbf20dfd91262aff039d10e9bf36ee514ac43c6",
+          "final_sha256": "7d31293a272fd32f9598cace3f28dacd471c49e891e4d9fb0fd5b587c4c45996"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalWorkspace.php",
+          "category": "application",
+          "captured_sha256": "7d777b3b2f3793c8e545fc011a495e16a30d45aa91fb661dbd6306dcd7df4a53",
+          "final_sha256": "8ff2ac6250fa990ea0c675af81f544d1e44b89b26f84afd405cf5fc8a8fcd231"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipBillingEvidence.php",
+          "category": "application",
+          "captured_sha256": "aea9c888aee8a16d9731eec5c4c4ac4a7b37992136b9e85d8c0e669e68aef824",
+          "final_sha256": "7ba5b6e56d2511cc1b4fd277b83204d33fbe01eea650b86be02af79fd763e189"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipReservationContext.php",
+          "category": "application",
+          "captured_sha256": "d2367d8166262a926e03cfd1e832c406dc1e0e621b0ff5df4c3db80203dfa9f6",
+          "final_sha256": "a02b8246e8e9247c3095a8f90b38a13a45ddd0569441278702277bf398e37624"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipReservations.php",
+          "category": "application",
+          "captured_sha256": "5bc1ef19b79102e3a5ca2ff9f420d738f2ee01f67f0c6c3bcd59abd1e9c8a8f7",
+          "final_sha256": "491df724395f74fe91a066b56e77e7811e678734138b0b1a5c8fb5912caa11b2"
+        },
+        {
+          "path": "scripts/ci/database-mysql-selection.json",
+          "category": "config/resource/tooling",
+          "captured_sha256": "a6e943d29564e5ac9c3444c8b43c1e02e5e8682477be22633de42f342740c571",
+          "final_sha256": "f792c2b2fef6430c7a1fac36f71e2ca3869473397eb30ad8396172cb91d55845"
+        },
+        {
+          "path": "scripts/ci/database-sqlite-skips.json",
+          "category": "config/resource/tooling",
+          "captured_sha256": "d94f9ecb010fc2e0102b9cc564fe3e54e3c59b77915a0a5f902e33ecaf896a95",
+          "final_sha256": "eb18afd1403b2f4270fa3304fa3da28e52eae5b987fe8eaa497f780c7bffe914"
+        },
+        {
+          "path": "tests/Feature/ProductionMemberOriginals/MemberOriginalFinishBoundaryTest.php",
+          "category": "test/fixture",
+          "captured_sha256": "a28f0de507fd93debe952739bfaef7638c17a1b8ff1b25f48473c853e3391a3a",
+          "final_sha256": "e2b0c01c7b14f3c3008c80737a92ad29d0a824a79790b5687b52e4df0391f70c"
+        }
+      ]
+    },
+    {
+      "run": "facts/schema/native/native-fixed-01",
+      "binding": "facts-native-fixed-before",
+      "original_reference": "bd3661ec02e3004fef3ae3d8a990e44ef5c6ce08",
+      "captured_paths": 11503,
+      "selected_input_paths": 2377,
+      "all_selected_inputs_match_final": false,
+      "differences": [
+        {
+          "path": ".github/workflows/final-verification.yml",
+          "category": "config/resource/tooling",
+          "captured_sha256": "1ffbddb38f50997ae6bc990b178d71df76e5308cd51f3e50683826128423f47b",
+          "final_sha256": "1658872ac03968525a7f0f13719018dc50cfc2951eb91ed2e2b0e0f5334aa62b"
+        },
+        {
+          "path": ".gitlab-ci.yml",
+          "category": "config/resource/tooling",
+          "captured_sha256": "49b06da921c0d503ed55da17ad73571ab93d9bd2e6b4665ad346b6fa5e171ffd",
+          "final_sha256": "da0df87f5320c26f9e11d70f15ff04e9036d466b3b5d8bed63ebb854a0bbf8ea"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberGrantDocumentValues.php",
+          "category": "application",
+          "captured_sha256": "8da46f30b9bc511ec92728d717e1e255fd15445e9261999d789ac76ff7037179",
+          "final_sha256": "5371b90f0a74bb9f2d3bc010aec651b7fe7016eee16d8557e395fb27b85463b0"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalArtifactAuthority.php",
+          "category": "application",
+          "captured_sha256": "259d236aa11cf1833256e8ae3f2b5f7d4fab64edfe4ae6e0e85e93ea62126605",
+          "final_sha256": "ee6c66d601b47819a3d94433c462667ee3af2d4398322f174644427afe4ab87e"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalFiles.php",
+          "category": "application",
+          "captured_sha256": "7eefd2c8d63bcab39507525ed5ec3fb89a4e76562df65ee1df86157f3bd26c8a",
+          "final_sha256": "da13ccc2d5353fddd22e531d6a717ecc230485a4893629d14d4b2f46c2eeccbe"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalFinishBoundary.php",
+          "category": "application",
+          "captured_sha256": "9d6959216f08701de10454b6bcbf20dfd91262aff039d10e9bf36ee514ac43c6",
+          "final_sha256": "7d31293a272fd32f9598cace3f28dacd471c49e891e4d9fb0fd5b587c4c45996"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalWorkspace.php",
+          "category": "application",
+          "captured_sha256": "7d777b3b2f3793c8e545fc011a495e16a30d45aa91fb661dbd6306dcd7df4a53",
+          "final_sha256": "8ff2ac6250fa990ea0c675af81f544d1e44b89b26f84afd405cf5fc8a8fcd231"
+        },
+        {
+          "path": "app/Domain/Grants/Member/SealedMemberGrantFacts.php",
+          "category": "application",
+          "captured_sha256": "a0e01850b81f291fa866d3dee02e11f0b7b1510ca08d0f92287cded946dce406",
+          "final_sha256": "35a6a07d6117fa92a800b7a4fcc619c3522c56039cf286e89d8574d4ae20e7ed"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipBillingEvidence.php",
+          "category": "application",
+          "captured_sha256": "aea9c888aee8a16d9731eec5c4c4ac4a7b37992136b9e85d8c0e669e68aef824",
+          "final_sha256": "7ba5b6e56d2511cc1b4fd277b83204d33fbe01eea650b86be02af79fd763e189"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipReservationContext.php",
+          "category": "application",
+          "captured_sha256": "d2367d8166262a926e03cfd1e832c406dc1e0e621b0ff5df4c3db80203dfa9f6",
+          "final_sha256": "a02b8246e8e9247c3095a8f90b38a13a45ddd0569441278702277bf398e37624"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipReservations.php",
+          "category": "application",
+          "captured_sha256": "5bc1ef19b79102e3a5ca2ff9f420d738f2ee01f67f0c6c3bcd59abd1e9c8a8f7",
+          "final_sha256": "491df724395f74fe91a066b56e77e7811e678734138b0b1a5c8fb5912caa11b2"
+        },
+        {
+          "path": "scripts/ci/database-mysql-selection.json",
+          "category": "config/resource/tooling",
+          "captured_sha256": "a6e943d29564e5ac9c3444c8b43c1e02e5e8682477be22633de42f342740c571",
+          "final_sha256": "f792c2b2fef6430c7a1fac36f71e2ca3869473397eb30ad8396172cb91d55845"
+        },
+        {
+          "path": "scripts/ci/database-sqlite-skips.json",
+          "category": "config/resource/tooling",
+          "captured_sha256": "d94f9ecb010fc2e0102b9cc564fe3e54e3c59b77915a0a5f902e33ecaf896a95",
+          "final_sha256": "eb18afd1403b2f4270fa3304fa3da28e52eae5b987fe8eaa497f780c7bffe914"
+        },
+        {
+          "path": "tests/Feature/ProductionMemberOriginals/MemberOriginalFinishBoundaryTest.php",
+          "category": "test/fixture",
+          "captured_sha256": "a28f0de507fd93debe952739bfaef7638c17a1b8ff1b25f48473c853e3391a3a",
+          "final_sha256": "e2b0c01c7b14f3c3008c80737a92ad29d0a824a79790b5687b52e4df0391f70c"
+        }
+      ]
+    },
+    {
+      "run": "facts/schema component slice",
+      "binding": "facts-schema-source-detach",
+      "original_reference": "3561eee8351d83aec11af996687f4b2d63ea271c",
+      "captured_paths": 8,
+      "selected_input_paths": 8,
+      "all_selected_inputs_match_final": true,
+      "differences": []
+    },
+    {
+      "run": "facts/authoring component slice",
+      "binding": "facts-authoring-facts-first-source-versus-bd3661ec",
+      "original_reference": "bd3661ec02e3004fef3ae3d8a990e44ef5c6ce08",
+      "captured_paths": 11503,
+      "selected_input_paths": 2377,
+      "all_selected_inputs_match_final": false,
+      "differences": [
+        {
+          "path": ".github/workflows/final-verification.yml",
+          "category": "config/resource/tooling",
+          "captured_sha256": "1ffbddb38f50997ae6bc990b178d71df76e5308cd51f3e50683826128423f47b",
+          "final_sha256": "1658872ac03968525a7f0f13719018dc50cfc2951eb91ed2e2b0e0f5334aa62b"
+        },
+        {
+          "path": ".gitlab-ci.yml",
+          "category": "config/resource/tooling",
+          "captured_sha256": "49b06da921c0d503ed55da17ad73571ab93d9bd2e6b4665ad346b6fa5e171ffd",
+          "final_sha256": "da0df87f5320c26f9e11d70f15ff04e9036d466b3b5d8bed63ebb854a0bbf8ea"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberGrantDocumentValues.php",
+          "category": "application",
+          "captured_sha256": "1289cabe04f1ef0eae2db703824551589b3074b0d0940555ca2c529212a2b3e2",
+          "final_sha256": "5371b90f0a74bb9f2d3bc010aec651b7fe7016eee16d8557e395fb27b85463b0"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalArtifactAuthority.php",
+          "category": "application",
+          "captured_sha256": "259d236aa11cf1833256e8ae3f2b5f7d4fab64edfe4ae6e0e85e93ea62126605",
+          "final_sha256": "ee6c66d601b47819a3d94433c462667ee3af2d4398322f174644427afe4ab87e"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalFiles.php",
+          "category": "application",
+          "captured_sha256": "7eefd2c8d63bcab39507525ed5ec3fb89a4e76562df65ee1df86157f3bd26c8a",
+          "final_sha256": "da13ccc2d5353fddd22e531d6a717ecc230485a4893629d14d4b2f46c2eeccbe"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalFinishBoundary.php",
+          "category": "application",
+          "captured_sha256": "9d6959216f08701de10454b6bcbf20dfd91262aff039d10e9bf36ee514ac43c6",
+          "final_sha256": "7d31293a272fd32f9598cace3f28dacd471c49e891e4d9fb0fd5b587c4c45996"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalWorkspace.php",
+          "category": "application",
+          "captured_sha256": "7d777b3b2f3793c8e545fc011a495e16a30d45aa91fb661dbd6306dcd7df4a53",
+          "final_sha256": "8ff2ac6250fa990ea0c675af81f544d1e44b89b26f84afd405cf5fc8a8fcd231"
+        },
+        {
+          "path": "app/Domain/Grants/Member/SealedMemberGrantFacts.php",
+          "category": "application",
+          "captured_sha256": "999525d75fbba1866f7b76f8fecbf383d0bec69af9c74dfbb156aa449b4ada0c",
+          "final_sha256": "35a6a07d6117fa92a800b7a4fcc619c3522c56039cf286e89d8574d4ae20e7ed"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipBillingEvidence.php",
+          "category": "application",
+          "captured_sha256": "aea9c888aee8a16d9731eec5c4c4ac4a7b37992136b9e85d8c0e669e68aef824",
+          "final_sha256": "7ba5b6e56d2511cc1b4fd277b83204d33fbe01eea650b86be02af79fd763e189"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipReservationContext.php",
+          "category": "application",
+          "captured_sha256": "d2367d8166262a926e03cfd1e832c406dc1e0e621b0ff5df4c3db80203dfa9f6",
+          "final_sha256": "a02b8246e8e9247c3095a8f90b38a13a45ddd0569441278702277bf398e37624"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipReservations.php",
+          "category": "application",
+          "captured_sha256": "5bc1ef19b79102e3a5ca2ff9f420d738f2ee01f67f0c6c3bcd59abd1e9c8a8f7",
+          "final_sha256": "491df724395f74fe91a066b56e77e7811e678734138b0b1a5c8fb5912caa11b2"
+        },
+        {
+          "path": "scripts/ci/database-mysql-selection.json",
+          "category": "config/resource/tooling",
+          "captured_sha256": "a6e943d29564e5ac9c3444c8b43c1e02e5e8682477be22633de42f342740c571",
+          "final_sha256": "f792c2b2fef6430c7a1fac36f71e2ca3869473397eb30ad8396172cb91d55845"
+        },
+        {
+          "path": "scripts/ci/database-sqlite-skips.json",
+          "category": "config/resource/tooling",
+          "captured_sha256": "d94f9ecb010fc2e0102b9cc564fe3e54e3c59b77915a0a5f902e33ecaf896a95",
+          "final_sha256": "eb18afd1403b2f4270fa3304fa3da28e52eae5b987fe8eaa497f780c7bffe914"
+        },
+        {
+          "path": "tests/Feature/ProductionMemberOriginals/MemberGrantFactsTest.php",
+          "category": "test/fixture",
+          "captured_sha256": "8b7057aeaeb85229c9cbce0b43a9d14f28278f64775f30e1160111d8bc0990e6",
+          "final_sha256": "5f0338c8315a4958be5ff843f38d196e87c347a2297c2f584e3e764711d0e4b8"
+        },
+        {
+          "path": "tests/Feature/ProductionMemberOriginals/MemberOriginalFinishBoundaryTest.php",
+          "category": "test/fixture",
+          "captured_sha256": "a28f0de507fd93debe952739bfaef7638c17a1b8ff1b25f48473c853e3391a3a",
+          "final_sha256": "e2b0c01c7b14f3c3008c80737a92ad29d0a824a79790b5687b52e4df0391f70c"
+        },
+        {
+          "path": "tests/Unit/ProductionMemberOriginals/MemberGrantDocumentsTest.php",
+          "category": "test/fixture",
+          "captured_sha256": "7a3ec26b7c82b7f9e533fde5a7dacb72fd69c624d2f07b39fe13db5d147f477c",
+          "final_sha256": "85cfe24650ebc67bb8485a76475d3a4352f4453fdffde751ff1ccc7b7c55e842"
+        }
+      ]
+    },
+    {
+      "run": "operation/budget-io-final",
+      "binding": "operation/budget-io-review-binding",
+      "original_reference": "d3aafa1b1563353fe56a1eef54c4f477a50f0d61",
+      "captured_paths": 4,
+      "selected_input_paths": 4,
+      "all_selected_inputs_match_final": true,
+      "differences": []
+    },
+    {
+      "run": "operation/native-io-final",
+      "binding": "operation/native-io-final.commit-binding",
+      "original_reference": "98ca4f0a64e82ee49a7d4b310d60a5095214c3c9",
+      "captured_paths": 5,
+      "selected_input_paths": 5,
+      "all_selected_inputs_match_final": true,
+      "differences": []
+    },
+    {
+      "run": "operation/composition-frame-issuer-5bbebd77",
+      "binding": "operation/composition-frame-issuer-5bbebd77",
+      "original_reference": "5bbebd776ca6cce2be4fd0d427f3baa926c2676d",
+      "captured_paths": 2003,
+      "selected_input_paths": 2003,
+      "all_selected_inputs_match_final": false,
+      "differences": [
+        {
+          "path": "app/Domain/Grants/Member/MemberGrantDocumentValues.php",
+          "category": "application",
+          "captured_sha256": "8da46f30b9bc511ec92728d717e1e255fd15445e9261999d789ac76ff7037179",
+          "final_sha256": "5371b90f0a74bb9f2d3bc010aec651b7fe7016eee16d8557e395fb27b85463b0"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalInspection.php",
+          "category": "application",
+          "captured_sha256": "9e3190d4f4c93e23d2995d4ad58ea4ecfaaffb8c5a2acd991fe9dda1a64ea89f",
+          "final_sha256": "fe6ffc866a9f257b7bd98e4cece6e472af3c61c97aeaaf57d4acae27a04eb295"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalObserver.php",
+          "category": "application",
+          "captured_sha256": "1ed8dfe16580c25a5a6591b8d4caec726796305fd76f48ffe2d67a013c5f444d",
+          "final_sha256": "a1f05c4d1584a6fea8857110e831bcd79a0edf2b4628db9f485a6045f5892a64"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalSourceCapture.php",
+          "category": "application",
+          "captured_sha256": "28c2e28dffe2e4f01aa64f0f24416c62ee00390fad27d56b5cb4c56d01bcc5eb",
+          "final_sha256": "0b769153caed6b5164b2eed2bfaf2eb6c95cfeeae42d77c4b6d079996aa57f2f"
+        },
+        {
+          "path": "app/Domain/Grants/Member/SealedMemberGrantFacts.php",
+          "category": "application",
+          "captured_sha256": "a0e01850b81f291fa866d3dee02e11f0b7b1510ca08d0f92287cded946dce406",
+          "final_sha256": "35a6a07d6117fa92a800b7a4fcc619c3522c56039cf286e89d8574d4ae20e7ed"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipReservationContext.php",
+          "category": "application",
+          "captured_sha256": "df8eb87171f553f06003c7e39d50c789a8c9452ad1f91022e6c545f724fa6da2",
+          "final_sha256": "a02b8246e8e9247c3095a8f90b38a13a45ddd0569441278702277bf398e37624"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipReservations.php",
+          "category": "application",
+          "captured_sha256": "0ec97aeb69e24ce6e75a35cd8b0092eafd02ba0b33c40313218e7bfbd0a5816a",
+          "final_sha256": "491df724395f74fe91a066b56e77e7811e678734138b0b1a5c8fb5912caa11b2"
+        },
+        {
+          "path": "tests/Feature/ProductionMemberOriginals/MemberOriginalCompositionTest.php",
+          "category": "test/fixture",
+          "captured_sha256": "654130c109f49f5ea12fdebf09917d3e64ac6d4c927990fed99f1127edd11c7c",
+          "final_sha256": "0acebb7ac58f663180318b1a5538b463a20f89e655a2b44103685421f4b92e94"
+        },
+        {
+          "path": "tests/Feature/ProductionMemberOriginals/MemberOriginalIssuerOwnershipTest.php",
+          "category": "test/fixture",
+          "captured_sha256": "394958bcd5699983eec8a96c36abc6bc825315fd9bf7241e320b49d9597897dc",
+          "final_sha256": "569b4741c21363a8ab132c368f65ca11f86cddb21e3979044879c855a562adb8"
+        }
+      ]
+    },
+    {
+      "run": "operation/reservation-wrappers-initial",
+      "binding": "operation/reservation-wrappers-initial",
+      "original_reference": "9d8abd4501b75a2577dc6f72a6a2adb4b6afbf5a",
+      "captured_paths": 2006,
+      "selected_input_paths": 2006,
+      "all_selected_inputs_match_final": false,
+      "differences": [
+        {
+          "path": "app/Domain/Grants/Member/MemberGrantDocumentValues.php",
+          "category": "application",
+          "captured_sha256": "8da46f30b9bc511ec92728d717e1e255fd15445e9261999d789ac76ff7037179",
+          "final_sha256": "5371b90f0a74bb9f2d3bc010aec651b7fe7016eee16d8557e395fb27b85463b0"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalInspection.php",
+          "category": "application",
+          "captured_sha256": "976f961bb6ff90d498c42b71da055a4c1ded9fc397994aa752372835936e2627",
+          "final_sha256": "fe6ffc866a9f257b7bd98e4cece6e472af3c61c97aeaaf57d4acae27a04eb295"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipReservationContext.php",
+          "category": "application",
+          "captured_sha256": "8645feeb3e020f71a66f741e6e45f22a81e0a751898a6305d94e11822325d37a",
+          "final_sha256": "a02b8246e8e9247c3095a8f90b38a13a45ddd0569441278702277bf398e37624"
+        },
+        {
+          "path": "tests/Feature/ProductionMemberOriginals/MemberOriginalCompositionTest.php",
+          "category": "test/fixture",
+          "captured_sha256": "a95781f152e46665a10011f6d95e1088a3201f41c5c8b0381f90a8e15df2689c",
+          "final_sha256": "0acebb7ac58f663180318b1a5538b463a20f89e655a2b44103685421f4b92e94"
+        },
+        {
+          "path": "tests/Feature/ProductionMemberOriginals/MemberOriginalIssuerOwnershipTest.php",
+          "category": "test/fixture",
+          "captured_sha256": "394958bcd5699983eec8a96c36abc6bc825315fd9bf7241e320b49d9597897dc",
+          "final_sha256": "569b4741c21363a8ab132c368f65ca11f86cddb21e3979044879c855a562adb8"
+        },
+        {
+          "path": "tests/Feature/ProductionMemberOriginals/MemberOriginalRetainedDeadlineTest.php",
+          "category": "test/fixture",
+          "captured_sha256": "da2fb1b3dad03de24f6171565ea5275dc7fd01a67f30686ff1372923a1aa55ae",
+          "final_sha256": "daa2e4734d855f8135770ffa79ea2d3bd32b4e2a5331ec8699c66407b0d25d2c"
+        }
+      ]
+    },
+    {
+      "run": "operation/reservation-clock-wrapper-final",
+      "binding": "operation/reservation-clock-wrapper-final",
+      "original_reference": "2cfd9a0db46a806c0a0bd0c83839b5b584fc3627",
+      "captured_paths": 2034,
+      "selected_input_paths": 2034,
+      "all_selected_inputs_match_final": false,
+      "differences": [
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalInspection.php",
+          "category": "application",
+          "captured_sha256": "976f961bb6ff90d498c42b71da055a4c1ded9fc397994aa752372835936e2627",
+          "final_sha256": "fe6ffc866a9f257b7bd98e4cece6e472af3c61c97aeaaf57d4acae27a04eb295"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipReservationContext.php",
+          "category": "application",
+          "captured_sha256": "8645feeb3e020f71a66f741e6e45f22a81e0a751898a6305d94e11822325d37a",
+          "final_sha256": "a02b8246e8e9247c3095a8f90b38a13a45ddd0569441278702277bf398e37624"
+        },
+        {
+          "path": "tests/Feature/ProductionMemberOriginals/MemberOriginalCompositionTest.php",
+          "category": "test/fixture",
+          "captured_sha256": "30f47d2875e5150266bdfb809d9c544d4b30f5c9f7e4bc90d34ec4b029868658",
+          "final_sha256": "0acebb7ac58f663180318b1a5538b463a20f89e655a2b44103685421f4b92e94"
+        },
+        {
+          "path": "tests/Feature/ProductionMemberOriginals/MemberOriginalIssuerOwnershipTest.php",
+          "category": "test/fixture",
+          "captured_sha256": "394958bcd5699983eec8a96c36abc6bc825315fd9bf7241e320b49d9597897dc",
+          "final_sha256": "569b4741c21363a8ab132c368f65ca11f86cddb21e3979044879c855a562adb8"
+        }
+      ]
+    },
+    {
+      "run": "root/integrated-pure-4962943d",
+      "binding": "root/integrated-pure-4962943d",
+      "original_reference": "4962943d366b54c9e3b85e16ef1f747bf6eb09c0",
+      "captured_paths": 1396,
+      "selected_input_paths": 1396,
+      "all_selected_inputs_match_final": false,
+      "differences": [
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalInspection.php",
+          "category": "application",
+          "captured_sha256": "976f961bb6ff90d498c42b71da055a4c1ded9fc397994aa752372835936e2627",
+          "final_sha256": "fe6ffc866a9f257b7bd98e4cece6e472af3c61c97aeaaf57d4acae27a04eb295"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipReservationContext.php",
+          "category": "application",
+          "captured_sha256": "8645feeb3e020f71a66f741e6e45f22a81e0a751898a6305d94e11822325d37a",
+          "final_sha256": "a02b8246e8e9247c3095a8f90b38a13a45ddd0569441278702277bf398e37624"
+        },
+        {
+          "path": "scripts/ci/database-mysql-selection.json",
+          "category": "config/resource/tooling",
+          "captured_sha256": "2e897aafd1a1bdd23cbd75bc3d8cabe2206bbea9f401290c8692a837538a2e7c",
+          "final_sha256": "f792c2b2fef6430c7a1fac36f71e2ca3869473397eb30ad8396172cb91d55845"
+        },
+        {
+          "path": "scripts/ci/database-mysql-skips.json",
+          "category": "config/resource/tooling",
+          "captured_sha256": "3a43c9bb79607d503b91936f1af77c6b93cb545c555dd58f0b2f41eb609b63cf",
+          "final_sha256": "e69a1971831a49f5dc3db31af96e82963a66bedb958837672e0a357c6684d7f0"
+        }
+      ]
+    },
+    {
+      "run": "quality initial159policy78Pintdiscovery",
+      "binding": "quality/source-before",
+      "original_reference": "78ef16be7626c81de49d103d581551b707201eda",
+      "captured_paths": 2254,
+      "selected_input_paths": 2251,
+      "all_selected_inputs_match_final": false,
+      "differences": [
+        {
+          "path": ".github/workflows/final-verification.yml",
+          "category": "config/resource/tooling",
+          "captured_sha256": "1ffbddb38f50997ae6bc990b178d71df76e5308cd51f3e50683826128423f47b",
+          "final_sha256": "1658872ac03968525a7f0f13719018dc50cfc2951eb91ed2e2b0e0f5334aa62b"
+        },
+        {
+          "path": ".gitlab-ci.yml",
+          "category": "config/resource/tooling",
+          "captured_sha256": "49b06da921c0d503ed55da17ad73571ab93d9bd2e6b4665ad346b6fa5e171ffd",
+          "final_sha256": "da0df87f5320c26f9e11d70f15ff04e9036d466b3b5d8bed63ebb854a0bbf8ea"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalInspection.php",
+          "category": "application",
+          "captured_sha256": "976f961bb6ff90d498c42b71da055a4c1ded9fc397994aa752372835936e2627",
+          "final_sha256": "fe6ffc866a9f257b7bd98e4cece6e472af3c61c97aeaaf57d4acae27a04eb295"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipReservationContext.php",
+          "category": "application",
+          "captured_sha256": "8645feeb3e020f71a66f741e6e45f22a81e0a751898a6305d94e11822325d37a",
+          "final_sha256": "a02b8246e8e9247c3095a8f90b38a13a45ddd0569441278702277bf398e37624"
+        },
+        {
+          "path": "tests/Feature/ProductionMemberOriginals/MemberOriginalCompositionTest.php",
+          "category": "test/fixture",
+          "captured_sha256": "30f47d2875e5150266bdfb809d9c544d4b30f5c9f7e4bc90d34ec4b029868658",
+          "final_sha256": "0acebb7ac58f663180318b1a5538b463a20f89e655a2b44103685421f4b92e94"
+        },
+        {
+          "path": "tests/Feature/ProductionMemberOriginals/MemberOriginalIssuerOwnershipTest.php",
+          "category": "test/fixture",
+          "captured_sha256": "394958bcd5699983eec8a96c36abc6bc825315fd9bf7241e320b49d9597897dc",
+          "final_sha256": "569b4741c21363a8ab132c368f65ca11f86cddb21e3979044879c855a562adb8"
+        }
+      ]
+    },
+    {
+      "run": "quality followup4Pintdiscovery",
+      "binding": "quality/native-budget-followup",
+      "original_reference": "32f083d28db0609a52cade793849a8767a855ae3",
+      "captured_paths": 2360,
+      "selected_input_paths": 2357,
+      "all_selected_inputs_match_final": false,
+      "differences": [
+        {
+          "path": ".github/workflows/final-verification.yml",
+          "category": "config/resource/tooling",
+          "captured_sha256": "a11df36c4055d3aa579b18e4411ee270c630a0430eb65dea0a96ab2b9521a062",
+          "final_sha256": "1658872ac03968525a7f0f13719018dc50cfc2951eb91ed2e2b0e0f5334aa62b"
+        },
+        {
+          "path": ".gitlab-ci.yml",
+          "category": "config/resource/tooling",
+          "captured_sha256": "464c12b84912e12b08a9a901512db915bb302c8f13854ffa3e725ad3466e66c8",
+          "final_sha256": "da0df87f5320c26f9e11d70f15ff04e9036d466b3b5d8bed63ebb854a0bbf8ea"
+        }
+      ]
+    },
+    {
+      "run": "operation/native-preparation-correction/sqlite-owned-composition",
+      "binding": "operation/native-preparation-correction/sqlite-owned-composition",
+      "original_reference": "9399dd998cc3d972b94f6753e576e2c756438657",
+      "captured_paths": 2034,
+      "selected_input_paths": 2034,
+      "all_selected_inputs_match_final": true,
+      "differences": []
+    },
+    {
+      "run": "operation/native-preparation-correction/sqlite-public-reservation-proof",
+      "binding": "operation/native-preparation-correction/sqlite-public-reservation-proof",
+      "original_reference": "9399dd998cc3d972b94f6753e576e2c756438657",
+      "captured_paths": 2034,
+      "selected_input_paths": 2034,
+      "all_selected_inputs_match_final": true,
+      "differences": []
+    },
+    {
+      "run": "operation/native-preparation-correction/native-positive-final",
+      "binding": "operation/native-preparation-correction/native-positive-final",
+      "original_reference": "9399dd998cc3d972b94f6753e576e2c756438657",
+      "captured_paths": 1324,
+      "selected_input_paths": 1324,
+      "all_selected_inputs_match_final": true,
+      "differences": []
+    },
+    {
+      "run": "root/native-source-withdrawal-ec90cc1a",
+      "binding": "root/native-source-withdrawal-ec90cc1a",
+      "original_reference": "ec90cc1a097db8925d87689d0ac62fdff0165c5a",
+      "captured_paths": 1388,
+      "selected_input_paths": 1388,
+      "all_selected_inputs_match_final": true,
+      "differences": []
+    }
+  ],
+  "runtime_tree_equivalence": [
+    {
+      "source": "32f083d28db0609a52cade793849a8767a855ae3",
+      "target": "ec90cc1a097db8925d87689d0ac62fdff0165c5a",
+      "paths": [
+        "app",
+        "bootstrap",
+        "config",
+        "database",
+        "public",
+        "resources",
+        "routes",
+        "scripts",
+        "tests",
+        "artisan",
+        "composer.json",
+        "composer.lock",
+        "phpunit.xml",
+        "phpunit.xml.dist",
+        "package.json",
+        "package-lock.json",
+        "vite.config.ts",
+        "tsconfig.json"
+      ],
+      "scope": "Complete named runtime/test/dependency path trees between reachable integrated correction and final native target; excludes documentation and workflow census comments. Not an additional test execution.",
+      "changed_paths": []
+    }
+  ]
+}

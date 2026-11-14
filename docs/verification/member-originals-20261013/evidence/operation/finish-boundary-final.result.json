@@ -1,0 +1,16 @@
+{
+  "exit": 0,
+  "seconds": 0.512,
+  "source_count": 1977,
+  "changed_sources": [],
+  "junit": {
+    "name": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFinishBoundaryTest",
+    "file": "/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMemberOriginals/MemberOriginalFinishBoundaryTest.php",
+    "tests": "5",
+    "assertions": "21",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "time": "0.263255"
+  }
+}

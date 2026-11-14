@@ -1,0 +1,238 @@
+{
+  "kind": "Independent bounded four-repair source/behavioral-control checkpoint",
+  "decision": "APPROVE BOUNDED FOUR-REPAIR SOURCE CHECKPOINT WITH EVIDENCE CONDITIONS",
+  "reviewed_commit": "d6367b3f632e576be65af8e08b0a15ffc05a1f6f",
+  "old_control_commit": "d349c182d13df907b69afd1a65338a53265f860a",
+  "original_source_commit": "f2cefff70473349c4273ff4dd1e1aab9880d48ff",
+  "open_p0_p1": false,
+  "new_required_material_repairs": [],
+  "closed_findings": [
+    {
+      "id": "PTD-R1",
+      "source": "Bounded exact post-insert recent4 snapshot/count<=3 and append-sensitive status>=min21 close omitted predicates.",
+      "evidence": "Late valid ordinary committing append oldaccepted/newrefused and rolledback. Dedicated status empty/20 lateappend evidence still to add."
+    },
+    {
+      "id": "PTD-R2",
+      "source": "Exact RequestBudget passed into original SnapshotDeadline min scalar/live value; own copy/readback and helper pre/post checkpoints observe shrink without frozen-helper interruption claim.",
+      "evidence": "Same real app-resolver shrink0 oldcopies1 despiteeventual refusal, newcopies0/no attempt. Deeper helper/flush/readback/cleanup boundaries remain."
+    },
+    {
+      "id": "PTD-R3",
+      "source": "Pure tick+actual elapsed check now immediately before every handoff; original sibling/request ceiling remains first-only.",
+      "evidence": "Actual multichunk original asset with one-second derived allowance and1.1second delayed clock: oldlater chunk accepted; newfirst1048576bytes only then410/honest spentattempt."
+    },
+    {
+      "id": "PTD-R4",
+      "source": "Completed deliveryAdmitted separate from captured/pending literals; only private enrollment can qualify pending tables, public getter/rows/Records requirecompletion.",
+      "evidence": "Same genuine SQLite grammarcompileCreate callback sees oldpublicread succeeds; newpublicrefusal then standard authorized positive."
+    }
+  ],
+  "application_delta": [
+    "app/Domain/Grants/PaidTax/PaidTaxDownloads.php",
+    "app/Domain/Grants/PaidTax/PaidTaxPrepareStream.php",
+    "app/Domain/Grants/PaidTax/PaidTaxRows.php",
+    "app/Domain/Grants/PaidTax/PaidTaxSnapshotDeadline.php",
+    "app/Domain/Grants/PaidTax/PaidTaxTransfer.php"
+  ],
+  "tests_and_fixtures_unchanged_between_control_and_fix": true,
+  "old_control_application_bytes_equal_f2": true,
+  "source_bindings": [
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxDownloads.php",
+      "git_blob": "20e3591a5b9fe89990b9b6569a6cdfe1fafd14ef",
+      "sha256": "7a675ad64f246bd69840071b1b4fedf7faf8b3e0222039b460cb0df40473a56a"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxPrepareStream.php",
+      "git_blob": "064cb59e3b331d264195d5ee9b7cb9ff76780472",
+      "sha256": "12c50a1a2f4099e9c5f02a47f2e8e162d4aecd75ba95fb75631fdaac9902c534"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxRows.php",
+      "git_blob": "e4c22c9cf4422db60b1e514349ec609bce2ec610",
+      "sha256": "dc02eef0f0a785af2f725c6f46786626c7ed73c76204fad27aaa162fe8d62ca6"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxSnapshotDeadline.php",
+      "git_blob": "338cd7620a8abca1f7bec56d04b2a91ad0ce55b6",
+      "sha256": "8e3dbe4d11933ca8bc4e1a2d7719338bd1e5ab4ef5983f3a9cd003e677712529"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxTransfer.php",
+      "git_blob": "31e29cdabdb5cf839bbaae0b4951f5f43665335e",
+      "sha256": "8a1d058c3a909d7254c49d4909db3bd58aedf9e1b2dc0b72659b25a4eac6a215"
+    }
+  ],
+  "receipts": [
+    {
+      "name": "sqlite-four-source-oracles-corrected-fixtures",
+      "head": "d349c182d13df907b69afd1a65338a53265f860a",
+      "counts": {
+        "tests": 5,
+        "assertions": 27,
+        "failures": 4,
+        "errors": 0,
+        "skipped": 0
+      },
+      "php": 1,
+      "verifier": 1,
+      "observed_recorder_os": 1,
+      "launch_os_identity_match": true,
+      "source_inputs": 2405,
+      "routes": 16,
+      "loaders": 13,
+      "all_exact_git_source_bindings_and_bundle_hashes_match": true,
+      "stability": {
+        "autoload_unchanged": true,
+        "runner_unchanged": true,
+        "source_head_unchanged": true,
+        "source_status_unchanged": true,
+        "source_unchanged": true
+      },
+      "case_identities": [
+        "Tests\\Feature\\PaidTaxDownloadJourneyTest::test_late_authorization_key_change_and_source_decryption_owner_withdrawal_roll_back_new_rows",
+        "Tests\\Feature\\PaidTaxDownloadJourneyTest::test_recent_issuance_set_is_reproved_after_late_valid_commit_append",
+        "Tests\\Feature\\PaidTaxDownloadJourneyTest::test_live_snapshot_budget_shortening_is_observed_before_any_adapter_copy",
+        "Tests\\Feature\\PaidTaxDownloadJourneyTest::test_late_second_chunk_clock_cannot_return_old_tick_to_deliver_past_transfer_end",
+        "Tests\\Feature\\PaidTaxDownloadJourneyTest::test_new_delivery_public_reads_refuse_while_schema_admission_is_still_pending"
+      ],
+      "failing_methods": [
+        "test_recent_issuance_set_is_reproved_after_late_valid_commit_append",
+        "test_live_snapshot_budget_shortening_is_observed_before_any_adapter_copy",
+        "test_late_second_chunk_clock_cannot_return_old_tick_to_deliver_past_transfer_end",
+        "test_new_delivery_public_reads_refuse_while_schema_admission_is_still_pending"
+      ],
+      "held_mutation_timing": [
+        {
+          "pdo_transaction": true,
+          "framework_depth": 1,
+          "calls": [
+            "Tests\\Feature\\PaidTaxDownloadJourneyTest::{closure:{closure:Tests\\Feature\\PaidTaxDownloadJourneyTest::test_late_authorization_key_change_and_source_decryption_owner_withdrawal_roll_back_new_rows():221}:228}",
+            "Mockery\\Expectation->_getReturnValue",
+            "Mockery\\Expectation->verifyCall",
+            "Mockery\\ExpectationDirector->call",
+            "Mockery_2_Illuminate_Encryption_Encrypter->_mockery_handleMethodCall",
+            "Mockery_2_Illuminate_Encryption_Encrypter->decryptString",
+            "Illuminate\\Support\\Facades\\Facade::__callStatic",
+            "App\\Domain\\Commerce\\ProductionCheckout\\Evidence::open",
+            "App\\Domain\\Commerce\\ProductionTaxCheckout\\TaxCheckoutEvidence::intent",
+            "App\\Domain\\Commerce\\ProductionTaxCheckout\\ProductionTaxPaidOrderSourceV2->proveAuthenticatedCurrent",
+            "App\\Domain\\Commerce\\ProductionTaxCheckout\\ProductionTaxPaidOrderSourceV2->{closure:App\\Domain\\Commerce\\ProductionTaxCheckout\\ProductionTaxPaidOrderSourceV2::proveRetainedCurrent():86}",
+            "App\\Domain\\Commerce\\ProductionTaxCheckout\\TaxPaidReadContext->held",
+            "App\\Domain\\Commerce\\ProductionTaxCheckout\\ProductionTaxPaidOrderSourceV2->proveRetainedCurrent",
+            "App\\Domain\\Commerce\\ProductionTaxCheckout\\TaxPaidOriginalCommitDispatcher->{closure:App\\Domain\\Commerce\\ProductionTaxCheckout\\TaxPaidOriginalCommitDispatcher::dispatch():170}",
+            "App\\Domain\\Commerce\\ProductionTaxCheckout\\TaxPaidReadContext->held",
+            "App\\Domain\\Commerce\\ProductionTaxCheckout\\TaxPaidOriginalCommitDispatcher->dispatch"
+          ]
+        }
+      ],
+      "filter": "test_recent_issuance_set|test_live_snapshot_budget|test_late_second_chunk_clock|test_new_delivery_public_reads|test_late_authorization_key_change",
+      "no_stop_on_defect": true
+    },
+    {
+      "name": "sqlite-four-source-oracles-after-repair",
+      "head": "d6367b3f632e576be65af8e08b0a15ffc05a1f6f",
+      "counts": {
+        "tests": 5,
+        "assertions": 39,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "php": 0,
+      "verifier": 0,
+      "observed_recorder_os": 0,
+      "launch_os_identity_match": true,
+      "source_inputs": 2406,
+      "routes": 16,
+      "loaders": 13,
+      "all_exact_git_source_bindings_and_bundle_hashes_match": true,
+      "stability": {
+        "autoload_unchanged": true,
+        "runner_unchanged": true,
+        "source_head_unchanged": true,
+        "source_status_unchanged": true,
+        "source_unchanged": true
+      },
+      "case_identities": [
+        "Tests\\Feature\\PaidTaxDownloadJourneyTest::test_late_authorization_key_change_and_source_decryption_owner_withdrawal_roll_back_new_rows",
+        "Tests\\Feature\\PaidTaxDownloadJourneyTest::test_recent_issuance_set_is_reproved_after_late_valid_commit_append",
+        "Tests\\Feature\\PaidTaxDownloadJourneyTest::test_live_snapshot_budget_shortening_is_observed_before_any_adapter_copy",
+        "Tests\\Feature\\PaidTaxDownloadJourneyTest::test_late_second_chunk_clock_cannot_return_old_tick_to_deliver_past_transfer_end",
+        "Tests\\Feature\\PaidTaxDownloadJourneyTest::test_new_delivery_public_reads_refuse_while_schema_admission_is_still_pending"
+      ],
+      "failing_methods": [],
+      "held_mutation_timing": [
+        {
+          "pdo_transaction": true,
+          "framework_depth": 1,
+          "calls": [
+            "Tests\\Feature\\PaidTaxDownloadJourneyTest::{closure:{closure:Tests\\Feature\\PaidTaxDownloadJourneyTest::test_late_authorization_key_change_and_source_decryption_owner_withdrawal_roll_back_new_rows():221}:228}",
+            "Mockery\\Expectation->_getReturnValue",
+            "Mockery\\Expectation->verifyCall",
+            "Mockery\\ExpectationDirector->call",
+            "Mockery_2_Illuminate_Encryption_Encrypter->_mockery_handleMethodCall",
+            "Mockery_2_Illuminate_Encryption_Encrypter->decryptString",
+            "Illuminate\\Support\\Facades\\Facade::__callStatic",
+            "App\\Domain\\Commerce\\ProductionCheckout\\Evidence::open",
+            "App\\Domain\\Commerce\\ProductionTaxCheckout\\TaxCheckoutEvidence::intent",
+            "App\\Domain\\Commerce\\ProductionTaxCheckout\\ProductionTaxPaidOrderSourceV2->proveAuthenticatedCurrent",
+            "App\\Domain\\Commerce\\ProductionTaxCheckout\\ProductionTaxPaidOrderSourceV2->{closure:App\\Domain\\Commerce\\ProductionTaxCheckout\\ProductionTaxPaidOrderSourceV2::proveRetainedCurrent():86}",
+            "App\\Domain\\Commerce\\ProductionTaxCheckout\\TaxPaidReadContext->held",
+            "App\\Domain\\Commerce\\ProductionTaxCheckout\\ProductionTaxPaidOrderSourceV2->proveRetainedCurrent",
+            "App\\Domain\\Commerce\\ProductionTaxCheckout\\TaxPaidOriginalCommitDispatcher->{closure:App\\Domain\\Commerce\\ProductionTaxCheckout\\TaxPaidOriginalCommitDispatcher::dispatch():170}",
+            "App\\Domain\\Commerce\\ProductionTaxCheckout\\TaxPaidReadContext->held",
+            "App\\Domain\\Commerce\\ProductionTaxCheckout\\TaxPaidOriginalCommitDispatcher->dispatch"
+          ]
+        }
+      ],
+      "filter": "test_recent_issuance_set|test_live_snapshot_budget|test_late_second_chunk_clock|test_new_delivery_public_reads|test_late_authorization_key_change",
+      "no_stop_on_defect": true
+    }
+  ],
+  "receipt_sha256": {
+    "/workspace/runtime/paid252-tax-delivery-evidence-20261015/sqlite-four-source-oracles-corrected-fixtures/result.json": "6313c6743285f3abcdd159fa86bd018a4490401deda470be6302db87b4f66840",
+    "/workspace/runtime/paid252-tax-delivery-evidence-20261015/sqlite-four-source-oracles-corrected-fixtures/command.json": "9c1a82d7663e35bb5ddcf34965bc88d9b52efe199a37b90a321db7b32a8112a2",
+    "/workspace/runtime/paid252-tax-delivery-evidence-20261015/sqlite-four-source-oracles-corrected-fixtures/junit.xml": "914102866fd98b0610fdf8a47efb6ab9840736897961aa1bb125c2d83ba10c50",
+    "/workspace/runtime/paid252-tax-delivery-evidence-20261015/sqlite-four-source-oracles-corrected-fixtures/log.txt": "5e5e3599565dd53ba6dcc8ffa5ad270388f515cae6b01dd848b62e62d1c8a022",
+    "/workspace/runtime/paid252-tax-delivery-evidence-20261015/sqlite-four-source-oracles-corrected-fixtures/process.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "/workspace/runtime/paid252-tax-delivery-evidence-20261015/launch-sqlite-four-source-oracles-corrected-fixtures.json": "02b6efb259de53915621082ab22ca08f25e3886fe6703a052ba8264236735855",
+    "/workspace/runtime/paid252-tax-delivery-evidence-20261015/observed-os-exit-sqlite-four-source-oracles-corrected-fixtures.json": "0a802c294766de6f52d633199505cd1ba06fb080557fb3be3ed16536827d9f2f",
+    "/workspace/runtime/paid252-tax-delivery-evidence-20261015/bundle-d349c182d13d-2eb1f9e5cf930d0d/identity.json": "54c1603e20469b52a5c7b43988eaa656240c4b1933720ca8855842eae8608352",
+    "/workspace/runtime/paid252-tax-delivery-evidence-20261015/bundle-d349c182d13d-2eb1f9e5cf930d0d/manifest.json": "3b32e133e7170e5031be2fa006a75fe210ddede9043b7886e23d53e29b2b079c",
+    "/workspace/runtime/paid252-tax-delivery-evidence-20261015/bundle-d349c182d13d-2eb1f9e5cf930d0d/public-environment.json": "8763b448cbadb0037954eb770985f4ac76cc611cc7e3ca3a5d08a1e17d3bc7fc",
+    "/workspace/runtime/paid252-tax-delivery-evidence-20261015/bundle-d349c182d13d-2eb1f9e5cf930d0d/runner.py": "3086eb90702002cf1b83ea51bc7556dc712cf70c3bd90f69489d61be7c60f29f",
+    "/workspace/runtime/paid252-tax-delivery-evidence-20261015/bundle-d349c182d13d-2eb1f9e5cf930d0d/runtime.json": "345672214f4787647c7f1b3d6763607e5dccb77d80210631ab06b335dcd097c2",
+    "/workspace/runtime/paid252-tax-delivery-evidence-20261015/sqlite-four-source-oracles-after-repair/result.json": "0188e3948df51e84f144932e5cf18785927e94e2cdd15ff75929b661e578e4f8",
+    "/workspace/runtime/paid252-tax-delivery-evidence-20261015/sqlite-four-source-oracles-after-repair/command.json": "38bf404449e81dcd5e4ea230572f45d6c8f846fe2c1627455c658ac3892d7243",
+    "/workspace/runtime/paid252-tax-delivery-evidence-20261015/sqlite-four-source-oracles-after-repair/junit.xml": "791fdf912ccc2d07ff273c4827d64c9c078ca55ed5d8cdb59ce6509dbcf72b46",
+    "/workspace/runtime/paid252-tax-delivery-evidence-20261015/sqlite-four-source-oracles-after-repair/log.txt": "f575e62802fb09b59f39ae0f037cff8bb9c6a3371ad81472604fb01b4944ae98",
+    "/workspace/runtime/paid252-tax-delivery-evidence-20261015/sqlite-four-source-oracles-after-repair/process.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "/workspace/runtime/paid252-tax-delivery-evidence-20261015/launch-sqlite-four-source-oracles-after-repair.json": "085229c3005e0b53307318265e80bc60faa6415654a378912fec3028953022d4",
+    "/workspace/runtime/paid252-tax-delivery-evidence-20261015/observed-os-exit-sqlite-four-source-oracles-after-repair.json": "0da669abfc45cce06f8271083cf3fa972141e8774ad864fd4d01de08965aa0b1",
+    "/workspace/runtime/paid252-tax-delivery-evidence-20261015/bundle-d6367b3f632e-2fa83797afb5895f/identity.json": "40c07dfad09cd4dcb2c90ef94bfe85834da7f10b1689219398472fe2307fbf14",
+    "/workspace/runtime/paid252-tax-delivery-evidence-20261015/bundle-d6367b3f632e-2fa83797afb5895f/manifest.json": "8b9c0982b3c9abef87f7775d4bf4b5e2473557bbe0e9693100a48fb07d1a45ea",
+    "/workspace/runtime/paid252-tax-delivery-evidence-20261015/bundle-d6367b3f632e-2fa83797afb5895f/public-environment.json": "8763b448cbadb0037954eb770985f4ac76cc611cc7e3ca3a5d08a1e17d3bc7fc",
+    "/workspace/runtime/paid252-tax-delivery-evidence-20261015/bundle-d6367b3f632e-2fa83797afb5895f/runner.py": "3086eb90702002cf1b83ea51bc7556dc712cf70c3bd90f69489d61be7c60f29f",
+    "/workspace/runtime/paid252-tax-delivery-evidence-20261015/bundle-d6367b3f632e-2fa83797afb5895f/runtime.json": "345672214f4787647c7f1b3d6763607e5dccb77d80210631ab06b335dcd097c2"
+  },
+  "control_quality": "Same actual APIs/test bodies/filter/fixtures; allfive execute. Four assertion behavioral failuresE0/S0 onold, not API/compiler errors; fifth held-key/owner positive passes both. Original/fixed process/verifier/launch-bound OS1/0 respectively.",
+  "original_harness_classification": {
+    "50_and_92": "Original owner mutation hit outside-locator decryption (PDO false/framework0), not target held Source callback; mistarget fixture, original preserved.",
+    "ab09": "Compiler/unpublish/status expectation defects remain separate; earlier mixed5/13F4E1 before-repair is not clean four-oracle evidence.",
+    "reviewer_preparation": "Initial guessed separate test filename absent; first before-repair path was earlierab09 and corrected by actual inventory. Own parser initially expected prior OS witness fieldstart_ticks; new witness usesprocess_start_ticks andobserved_os_exit, inspected actual original and corrected. No app outcome inferred and no report existed before corrected parsing."
+  },
+  "remaining_evidence_conditions": [
+    "Direct empty/latest20 historyappend boundary; own-helper/flush/readback live-budget and cleanup cases.",
+    "All purchased roles/two-line bytes, expiry/system-monotonic timing, wrong targets/owners/tokens/producers, late key/policy/source/current actor, before/after physical commit, unused observer disposal and preservation of unrelated reopened/peer/replacement work.",
+    "Populated exact schema prefixes/recovery/drift/external refs/temp/engine and actual private MySQL duplicate authorization/redemption/final-limit/wait restoration.",
+    "Whole affected delivery/PaidTax/V1 +format/policy/skip checks and independent coherent tested-source/sealed-packet/publicationhead decision."
+  ],
+  "limits": [
+    "Source checkpoint only, not final development/merge approval or native pass.",
+    "Default-off/unmounted, HTTP/root/host/provider/activation/commercial/release and generalSQL/isolation/DDL/deadlock/invisible-reopen/cache/physical conditions remain open.",
+    "Frozen V1/identity/shared metadata and ordinarymembership afterCommit P2s remain outside scope."
+  ],
+  "actions": "Read-only exact source/test diff and original JUnit/command/process/launch/OS/log/source/runner/runtime/loader parsing/hash comparisons. Own runtime originals only, no application/test/DB/container/network/CI/tracked edit."
+}

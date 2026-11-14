@@ -14,6 +14,7 @@ use App\Domain\Grants\Paid\PaidGrantJson;
 use App\Domain\Grants\Paid\PaidGrantPolicy;
 use App\Domain\Grants\Paid\PaidGrantProjectionRead;
 use App\Domain\Grants\Paid\PaidGrantReads;
+use App\Domain\Grants\Paid\PaidGrantRequestBudget;
 use App\Domain\Grants\Paid\PaidGrants;
 use App\Http\Middleware\PaidGrantPrivacy;
 use App\Models\User;
@@ -116,12 +117,13 @@ final class PaidGrantController
             // The server's own request-start time, taken before the identity proof: admission judges the token as it was
             // when the request arrived (Codex 4224514947). Never a client-supplied header. Validated here, once, into a
             // type only capture can create; redeem() uses it without a second age check (Codex 4224939409).
-            $receivedAt = PaidGrantDownloads::receivedAt($request->server('REQUEST_TIME_FLOAT'));
+            $budget = PaidGrantRequestBudget::capture($request->server('REQUEST_TIME_FLOAT'));
             [$principal, $actor] = $this->identity($request);
+            $budget->initialDeadline()->proveCurrent();
             $input = $this->body($request);
             PaidGrantInput::keys($input, ['token']);
             PaidGrantException::require(is_string($input['token']), 403);
-            $transfer = (new PaidGrantDownloads)->redeem($authorization, $input['token'], $principal, $actor, $receivedAt);
+            $transfer = (new PaidGrantDownloads)->redeem($authorization, $input['token'], $principal, $actor, $budget->receivedAt, $budget);
 
             return response()->stream(function () use ($transfer): void {
                 try {

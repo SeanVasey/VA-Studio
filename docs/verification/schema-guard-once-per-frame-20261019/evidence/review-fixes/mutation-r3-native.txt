@@ -1,0 +1,21 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/b5dc44df-c06e-5677-8541-57d7464f9ccc/scratchpad/g1-fix/mut/phpunit.xml
+
+F                                                                   1 / 1 (100%)
+
+Time: 03:01.240, Memory: 85.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionMembershipBilling\MembershipSchemaProofFrameTest::test_a_session_change_after_a_remembered_proof_sends_the_guards_back_to_a_complete_proof
+Guard unexpectedly passed.
+
+/tmp/claude-0/-home-user-VA-Studio/b5dc44df-c06e-5677-8541-57d7464f9ccc/scratchpad/g1-fix/mut/tests/Feature/ProductionMembershipBilling/MembershipSchemaProofFrameTest.php:333
+/tmp/claude-0/-home-user-VA-Studio/b5dc44df-c06e-5677-8541-57d7464f9ccc/scratchpad/g1-fix/mut/tests/Feature/ProductionMembershipBilling/MembershipSchemaProofFrameTest.php:291
+/tmp/claude-0/-home-user-VA-Studio/b5dc44df-c06e-5677-8541-57d7464f9ccc/scratchpad/g1-fix/mut/tests/Feature/ProductionMembershipBilling/MembershipSchemaProofFrameTest.php:121
+/tmp/claude-0/-home-user-VA-Studio/b5dc44df-c06e-5677-8541-57d7464f9ccc/scratchpad/g1-fix/mut/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 1, Assertions: 4, Failures: 1.

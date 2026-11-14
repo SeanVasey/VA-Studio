@@ -1,0 +1,66 @@
+[
+  {
+    "argv": [
+      "python3",
+      "scripts/ci/test-phpunit-shards.py"
+    ],
+    "completed_at_utc": "2026-10-13T07:29:53.125687+00:00",
+    "cwd": "/workspace/VA-Studio-member-source-currentness",
+    "duration_seconds": 0.367455,
+    "exit": 0,
+    "head_at_start": "ca0fe30b6614d64a8b9050a39d6944256f170d69",
+    "log_sha256": "28e9ff86f6ee868eb7e12044c0cb985e10dc00796b09083bac46024b855b965f",
+    "runner_sha256": "0cbc9dc13566b6b276963c5611fd8fb8ce29f96c497359afad43f576300f92ca",
+    "selected_php_files": null,
+    "started_at_utc": "2026-10-13T07:29:52.758027+00:00",
+    "unittest_reported_tests": 52
+  },
+  {
+    "argv": [
+      "python3",
+      "scripts/ci/test-database-receipts.py"
+    ],
+    "completed_at_utc": "2026-10-13T07:30:42.436776+00:00",
+    "cwd": "/workspace/VA-Studio-member-source-currentness",
+    "duration_seconds": 49.308459,
+    "exit": 0,
+    "head_at_start": "ca0fe30b6614d64a8b9050a39d6944256f170d69",
+    "log_sha256": "1af98951f66faff8d4c9a63769a9099e35c8dd5e84f57a661c90469984228ea8",
+    "runner_sha256": "0cbc9dc13566b6b276963c5611fd8fb8ce29f96c497359afad43f576300f92ca",
+    "selected_php_files": null,
+    "started_at_utc": "2026-10-13T07:29:53.128078+00:00",
+    "unittest_reported_tests": 61
+  },
+  {
+    "argv": [
+      "python3",
+      "scripts/ci/test-ci-scope.py"
+    ],
+    "completed_at_utc": "2026-10-13T07:30:43.279017+00:00",
+    "cwd": "/workspace/VA-Studio-member-source-currentness",
+    "duration_seconds": 0.837515,
+    "exit": 0,
+    "head_at_start": "ca0fe30b6614d64a8b9050a39d6944256f170d69",
+    "log_sha256": "29d7556fd1e509233345b5a6b54e2915fd33fdb75f92a2a4c10ab934f1e6e5f9",
+    "runner_sha256": "0cbc9dc13566b6b276963c5611fd8fb8ce29f96c497359afad43f576300f92ca",
+    "selected_php_files": null,
+    "started_at_utc": "2026-10-13T07:30:42.441240+00:00",
+    "unittest_reported_tests": 27
+  },
+  {
+    "argv": [
+      "python3",
+      "scripts/ci/test-workflow-cadence.py"
+    ],
+    "completed_at_utc": "2026-10-13T07:30:43.366841+00:00",
+    "cwd": "/workspace/VA-Studio-member-source-currentness",
+    "duration_seconds": 0.085762,
+    "exit": 0,
+    "head_at_start": "ca0fe30b6614d64a8b9050a39d6944256f170d69",
+    "log_sha256": "dd818658e9c8008cb354da9371485cb574dabd3d7c356cdfa1c694608942fdca",
+    "runner_sha256": "0cbc9dc13566b6b276963c5611fd8fb8ce29f96c497359afad43f576300f92ca",
+    "selected_php_files": null,
+    "started_at_utc": "2026-10-13T07:30:43.280921+00:00",
+    "unittest_reported_tests": 14
+  }
+]

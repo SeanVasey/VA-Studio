@@ -1,0 +1,19 @@
+{
+  "command": "Read-only git cat-file --batch over each commit:path member of reference-defe9580.json and reference-45d12994.json; SHA-256 compared against every inventory value.",
+  "references": [
+    {
+      "inventory": "reference-defe9580.json",
+      "commit": "defe95802e7d09e7df12c61a98c1ebf1caee99c0",
+      "file_count": 2137
+    },
+    {
+      "inventory": "reference-45d12994.json",
+      "commit": "45d1299406821627f4ba02af186e324a70c6ade0",
+      "file_count": 2137
+    }
+  ],
+  "total_blobs_checked": 4274,
+  "mismatches": [],
+  "owned_markdown_relative_links_checked": 60,
+  "missing_links": []
+}

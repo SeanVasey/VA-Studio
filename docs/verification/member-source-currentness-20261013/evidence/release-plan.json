@@ -1,0 +1,1693 @@
+{
+  "scope": "Owner-released completed public receipts only. Prepared source/runner artifacts are labelled and never counted as executed tests. Runtime-only preparation; final integration source pending.",
+  "artifacts": [
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/autoload.txt",
+      "path": "r4/autoload.txt",
+      "released_sha256": "3a2a4b054cb89b43baa722d996228f1f6fa8a100d794395c879e8963f5160774",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/pint-initial.txt",
+      "path": "r4/pint-initial.txt",
+      "released_sha256": "ace5d715a1bdfafacc0beeeb2866ccd3536aeecc0b06fa7364d537c6cef1d80e",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/pint-fix.txt",
+      "path": "r4/pint-fix.txt",
+      "released_sha256": "71590bdfacd81d759b856023cd143565065a67c08b47e773d705929a8d3763cb",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/pint-final.txt",
+      "path": "r4/pint-final.txt",
+      "released_sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/pint-terminal-fix.txt",
+      "path": "r4/pint-terminal-fix.txt",
+      "released_sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/pint-frame-cleanup.txt",
+      "path": "r4/pint-frame-cleanup.txt",
+      "released_sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/configuration-source.json",
+      "path": "r4/configuration-source.json",
+      "released_sha256": "2d105e1d8650571464102ba17e14e15cac66d57ea49c739528dc4f6830664cfd",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/configuration.txt",
+      "path": "r4/configuration.txt",
+      "released_sha256": "4697f3aeae2fda14e6168420c16efdb6275f4d2c82fa694ddf56a1e434c15f75",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/configuration.xml",
+      "path": "r4/configuration.xml",
+      "released_sha256": "3780d3724b2276a863f5f3fe7637d6db8b8d673550adfd952c8b74b2831aa5e5",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/configuration.exit",
+      "path": "r4/configuration.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/staging-configuration.txt",
+      "path": "r4/staging-configuration.txt",
+      "released_sha256": "3560a0bb6fb19a429dcb1d5f88c9b6f12498f922ae9ddd0cb9b03e592a7fcee8",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/staging-configuration.xml",
+      "path": "r4/staging-configuration.xml",
+      "released_sha256": "026b2e99e7b0f5b96fcf96566d295723da5e78b77c411fa8f4c6284c50c31d95",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/staging-configuration.exit",
+      "path": "r4/staging-configuration.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/initial-results.json",
+      "path": "r4/initial-results.json",
+      "released_sha256": "566f10017a42fe9226a6c740504054e1a9353b076c8dfdc90188ff647434cabd",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/frame-initial-source.json",
+      "path": "r4/frame-initial-source.json.gz",
+      "released_sha256": "488ce88b39b8bc8274ceb74cc003ab7d973a082042a6907a0f39f7318f3593c0",
+      "gzip": true
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/frame-initial.txt",
+      "path": "r4/frame-initial.txt",
+      "released_sha256": "c107125cea38a9f715083d22f0ccb68f595caed6bcaeaaa550269ad46eb1e2fc",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/frame-initial.xml",
+      "path": "r4/frame-initial.xml",
+      "released_sha256": "5ef815a1e09e40f076d6d977d6cc5d84eac57f01864e125cf3f3d1e8fbcfb870",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/frame-initial.exit",
+      "path": "r4/frame-initial.exit",
+      "released_sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/sqlite-final-source.json",
+      "path": "r4/sqlite-final-source.json.gz",
+      "released_sha256": "978fa96bb06ab3437c12f83d5257b6cf0bd6a3dfed7adff746c5055572315dad",
+      "gzip": true
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/sqlite-final-verification.json",
+      "path": "r4/sqlite-final-verification.json",
+      "released_sha256": "f795a7823b54dd0d340f2ecb3fb7b30be6e5c508f7fd54d75e9d6b6167e54365",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/sqlite-final.txt",
+      "path": "r4/sqlite-final.txt",
+      "released_sha256": "4e5b74ff0d4662a70ae1a033bbdc65eac8fb59460e48c0b0461aba61acd27300",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/sqlite-final.xml",
+      "path": "r4/sqlite-final.xml",
+      "released_sha256": "1a1872f500ffe0501cda83b15c204da362fbd45b2a7b37ad0d8c108f8d65a8a6",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/sqlite-final.exit",
+      "path": "r4/sqlite-final.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/source-commits.json",
+      "path": "r4/source-commits.json",
+      "released_sha256": "41ebb9a9141a5bcc18c0c12895f947a04517967b771dda961accf62a44ecc389",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/component-probe-carry.diff",
+      "path": "r4/component-probe-carry.diff",
+      "released_sha256": "ffbce36fb7364b33ab23fad59366b54187ca42417ef1bca4b6fc43bca8cd0dd3",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/commands.md",
+      "path": "r4/commands-initial-release.md",
+      "released_sha256": "90f9f9184c511aec0cf121acb31dd5f357aaccbd2987fb5dd5fc6932975a6071",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/baseline/MemberGrantMixedProvenanceRegressionTest.php",
+      "path": "r4/baseline/MemberGrantMixedProvenanceRegressionTest.php",
+      "released_sha256": "50c610a082d5767b09ca6fb86b477861b86e308ae1b2646301f42cb254fd2f25",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/baseline/README.md",
+      "path": "r4/baseline/README.md",
+      "released_sha256": "a8fb4f47e759c20ada9017d89a1f53a65d5f256c5685ff5ac34632e1fe95668f",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/baseline/comparison.json",
+      "path": "r4/baseline/comparison.json",
+      "released_sha256": "e1fe142587ed69b20e43da3e9f3a7d75df46e3b0795aa6eedcc1a44336925d00",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/baseline/fail-0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371/artifacts.json",
+      "path": "r4/baseline/fail-0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371/artifacts.json",
+      "released_sha256": "5b2340b34c52d7da97406d9ef4fe810bf81a139d28669eb712b57ac6877c07c5",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/baseline/fail-0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371/command.txt",
+      "path": "r4/baseline/fail-0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371/command.txt",
+      "released_sha256": "440861bd0c6189dd6c69018af94994ac33c0301819b77caef6493e21d8a05c23",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/baseline/fail-0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371/observed.json",
+      "path": "r4/baseline/fail-0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371/observed.json",
+      "released_sha256": "b52d373c6ce34c7c61489e435aae9316bd709e8c446032c256b840cc0d7b8738",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/baseline/fail-0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371/phpunit.exit",
+      "path": "r4/baseline/fail-0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371/phpunit.exit",
+      "released_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/baseline/fail-0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371/phpunit.log",
+      "path": "r4/baseline/fail-0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371/phpunit.log",
+      "released_sha256": "75f8419da95240d07264ceb2f4b3f12b9314a8ded866564a84380471804a198b",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/baseline/fail-0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371/phpunit.xml",
+      "path": "r4/baseline/fail-0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371/phpunit.xml",
+      "released_sha256": "9b2fb9712c31b4725e736c0d3fcc2f945c1d0d12dcc4d79f1140baeba4daba1e",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/baseline/fail-0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371/runtime.txt",
+      "path": "r4/baseline/fail-0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371/runtime.txt",
+      "released_sha256": "537d36145aff7b8ae9c3e85e59dcb528f77b8b9828de2cf996c937f4cf64bfb8",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/baseline/fail-0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371/source-after.json",
+      "path": "r4/baseline/fail-0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371/source-after.json.gz",
+      "released_sha256": "60103d1f1d49ec7d48484c347b5a4e9f12f5004c6d6d1717cb62cc862db68d9b",
+      "gzip": true
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/baseline/fail-0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371/source-before.json",
+      "path": "r4/baseline/fail-0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371/source-before.json.gz",
+      "released_sha256": "60103d1f1d49ec7d48484c347b5a4e9f12f5004c6d6d1717cb62cc862db68d9b",
+      "gzip": true
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/baseline/fail-0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371/verification.json",
+      "path": "r4/baseline/fail-0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371/verification.json",
+      "released_sha256": "290a1249dcfe58f0f5af8a64197010dc7ae3b5db340a8505286459bee82d8a06",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/baseline/pass-a4e37cdc222ccea13ae65fb983c6d5fd89a25e29/artifacts.json",
+      "path": "r4/baseline/pass-a4e37cdc222ccea13ae65fb983c6d5fd89a25e29/artifacts.json",
+      "released_sha256": "7c6f9f55d95906175a376d1691c0acbca9c637d7ca0073854bacca53d0647772",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/baseline/pass-a4e37cdc222ccea13ae65fb983c6d5fd89a25e29/command.txt",
+      "path": "r4/baseline/pass-a4e37cdc222ccea13ae65fb983c6d5fd89a25e29/command.txt",
+      "released_sha256": "6f057ba8666f7f4ee5683d38468c5bacbbc5540be243f465263a7213a81604b7",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/baseline/pass-a4e37cdc222ccea13ae65fb983c6d5fd89a25e29/observed.json",
+      "path": "r4/baseline/pass-a4e37cdc222ccea13ae65fb983c6d5fd89a25e29/observed.json",
+      "released_sha256": "95d2a2da489c2b02f1a64c3b9c77be3cb4359264249d1f931ee76bcfdea4734e",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/baseline/pass-a4e37cdc222ccea13ae65fb983c6d5fd89a25e29/phpunit.exit",
+      "path": "r4/baseline/pass-a4e37cdc222ccea13ae65fb983c6d5fd89a25e29/phpunit.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/baseline/pass-a4e37cdc222ccea13ae65fb983c6d5fd89a25e29/phpunit.log",
+      "path": "r4/baseline/pass-a4e37cdc222ccea13ae65fb983c6d5fd89a25e29/phpunit.log",
+      "released_sha256": "02e5026ced452763a015cca62845c1e109f65ab05f6dfad536b67df3d53b81d5",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/baseline/pass-a4e37cdc222ccea13ae65fb983c6d5fd89a25e29/phpunit.xml",
+      "path": "r4/baseline/pass-a4e37cdc222ccea13ae65fb983c6d5fd89a25e29/phpunit.xml",
+      "released_sha256": "a9680a083aeb674a193a7e756466c729f9eedb34b0ad43e7c9372749ef97cbd2",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/baseline/pass-a4e37cdc222ccea13ae65fb983c6d5fd89a25e29/runtime.txt",
+      "path": "r4/baseline/pass-a4e37cdc222ccea13ae65fb983c6d5fd89a25e29/runtime.txt",
+      "released_sha256": "92034b7d01adf3c673059ec68992726470cd1baa55d5fed4adb2e2908e580978",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/baseline/pass-a4e37cdc222ccea13ae65fb983c6d5fd89a25e29/source-after.json",
+      "path": "r4/baseline/pass-a4e37cdc222ccea13ae65fb983c6d5fd89a25e29/source-after.json.gz",
+      "released_sha256": "0972eb1407abb51a65fa6a8f62af100d7ed67ce2753e7fbd7131d0fc29466ab7",
+      "gzip": true
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/baseline/pass-a4e37cdc222ccea13ae65fb983c6d5fd89a25e29/source-before.json",
+      "path": "r4/baseline/pass-a4e37cdc222ccea13ae65fb983c6d5fd89a25e29/source-before.json.gz",
+      "released_sha256": "0972eb1407abb51a65fa6a8f62af100d7ed67ce2753e7fbd7131d0fc29466ab7",
+      "gzip": true
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/baseline/pass-a4e37cdc222ccea13ae65fb983c6d5fd89a25e29/verification.json",
+      "path": "r4/baseline/pass-a4e37cdc222ccea13ae65fb983c6d5fd89a25e29/verification.json",
+      "released_sha256": "81e543a298c7fac376d83b725395598f8882a35827b0f9f92381d073746d624e",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/baseline/run.sh",
+      "path": "r4/baseline/run.sh",
+      "released_sha256": "443d9a9e93326990567435a04bed818da8ae4c56952398498a7f39df355662f4",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/autoload.exit",
+      "path": "catalog/autoload.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/autoload.log",
+      "path": "catalog/autoload.log",
+      "released_sha256": "3a2a4b054cb89b43baa722d996228f1f6fa8a100d794395c879e8963f5160774",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/commands.md",
+      "path": "catalog/commands-initial-release.md",
+      "released_sha256": "4815a4b7e694b837b480752e2be00ea127fe7022cdcf15bfadc239b1d7153a8f",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/commit-binding.json",
+      "path": "catalog/commit-binding.json",
+      "released_sha256": "c3f79abf525f4b3dbd7f898cc47d11b206a1a3b4ea110b8a9ce7b0d655fedae8",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/diff-check.exit",
+      "path": "catalog/diff-check.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/diff-check.log",
+      "path": "catalog/diff-check.log",
+      "released_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/native-old-source-red.exit",
+      "path": "catalog/native-old-source-red.exit",
+      "released_sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/native-old-source-red.log",
+      "path": "catalog/native-old-source-red.log",
+      "released_sha256": "7d69d619abd36997cc07d28cc060ec2b649c08f4d79bb3dc29dbd3ac4fb47143",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/native-old-source-red.result.json",
+      "path": "catalog/native-old-source-red.result.json",
+      "released_sha256": "e4fe2ea93e2d9729e3546db7162f0af0ea93252978f59a74aea16d225a61453d",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/native-old-source-red.source-check.json",
+      "path": "catalog/native-old-source-red.source-check.json",
+      "released_sha256": "b418eff7c37ab6907762045e62854cecc65e4aa0a462d625aa52dfdf9dd6fc9b",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/native-old-source-red.source.json",
+      "path": "catalog/native-old-source-red.source.json.gz",
+      "released_sha256": "adef82fc9d70e3b8d36f8cc97de89c4f0adf74b4c4957a05830c8670e615c8d1",
+      "gzip": true
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/native-old-source-red.xml",
+      "path": "catalog/native-old-source-red.xml",
+      "released_sha256": "82c79fa59df906688471107daa45c84eb29468b50679492efe6e9cffd381064f",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/native-receipt-pint.exit",
+      "path": "catalog/native-receipt-pint.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/native-receipt-pint.log",
+      "path": "catalog/native-receipt-pint.log",
+      "released_sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/native-receipt-syntax.exit",
+      "path": "catalog/native-receipt-syntax.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/native-receipt-syntax.log",
+      "path": "catalog/native-receipt-syntax.log",
+      "released_sha256": "dc33aacb8778cba28c2b3207fdc3750922f3b065e0d22bac4bd7ba0b75382a94",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/native-setup.exit",
+      "path": "catalog/native-setup.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/native-setup.json",
+      "path": "catalog/native-setup.json",
+      "released_sha256": "75d2479a087e173dd4141a043f18e3cd13ffe5ba8b00e24e6ac8639d88eeee3f",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/native-setup.log",
+      "path": "catalog/native-setup.log",
+      "released_sha256": "fa3d07402e2b3bd571755ea303a5a20d5d65fceaf616cd6dfdc77d427897a95a",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/native-syntax.exit",
+      "path": "catalog/native-syntax.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/native-syntax.log",
+      "path": "catalog/native-syntax.log",
+      "released_sha256": "dc33aacb8778cba28c2b3207fdc3750922f3b065e0d22bac4bd7ba0b75382a94",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/native-test-822a8481.php",
+      "path": "catalog/native-test-822a8481.php",
+      "released_sha256": "a2fdba09f61d8019f8f6757d2a03a272e845055bc8e1df101b32262c0d439185",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/native-test-982f4ea6.php",
+      "path": "catalog/native-test-982f4ea6.php",
+      "released_sha256": "d02bd82587987818ddd96e5c44df6a723be10e194b56b6bf613aa841d1e916bd",
+      "gzip": false,
+      "note": "Prepared corrected native test, not executed at this release."
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/native-window-pint.exit",
+      "path": "catalog/native-window-pint.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/native-window-pint.log",
+      "path": "catalog/native-window-pint.log",
+      "released_sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/native-window-source.json",
+      "path": "catalog/native-window-source.json",
+      "released_sha256": "7875463f2e993dcddc46e52909c35a7939e3122e46852ba63e28b6ec4b88bbeb",
+      "gzip": false,
+      "note": "Prepared corrected native test, not executed at this release."
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/native-window-syntax.exit",
+      "path": "catalog/native-window-syntax.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/native-window-syntax.log",
+      "path": "catalog/native-window-syntax.log",
+      "released_sha256": "dc33aacb8778cba28c2b3207fdc3750922f3b065e0d22bac4bd7ba0b75382a94",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pint-final-v2.exit",
+      "path": "catalog/pint-final-v2.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pint-final-v2.log",
+      "path": "catalog/pint-final-v2.log",
+      "released_sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pint-final.exit",
+      "path": "catalog/pint-final.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pint-final.log",
+      "path": "catalog/pint-final.log",
+      "released_sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pint-fix.exit",
+      "path": "catalog/pint-fix.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pint-fix.log",
+      "path": "catalog/pint-fix.log",
+      "released_sha256": "55c808b145a839f1a82de020be2b9be3d0ee83e8a2cc3cd1a6d1e637e5104129",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pint-initial.exit",
+      "path": "catalog/pint-initial.exit",
+      "released_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pint-initial.log",
+      "path": "catalog/pint-initial.log",
+      "released_sha256": "97869386c8d716bf346ce0a78090df9d6d69fc156d2a894846e0df33ad635863",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pure-engine-boundary-green.exit",
+      "path": "catalog/pure-engine-boundary-green.exit",
+      "released_sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pure-engine-boundary-green.log",
+      "path": "catalog/pure-engine-boundary-green.log",
+      "released_sha256": "3543f051d7371398f054d108dda4eba96dbe220155b9aeb0eaf9ad26ba792acb",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pure-engine-boundary-green.result.json",
+      "path": "catalog/pure-engine-boundary-green.result.json",
+      "released_sha256": "57e8d0b9ee182bbf1a7b094325aae06109363c20e37f1a6642b4ed9bcb91a331",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pure-engine-boundary-green.source.json",
+      "path": "catalog/pure-engine-boundary-green.source.json",
+      "released_sha256": "58ac6ad60e365a4970cbdd6721bfd96a86e45f8497df343245872a0f546f37a0",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pure-engine-boundary-green.xml",
+      "path": "catalog/pure-engine-boundary-green.xml",
+      "released_sha256": "d3f298c48e7d9f9ce3c85b4a7d3ebc53b3f0f791eba5131ed660e84a9970e493",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pure-engine-boundary-red.exit",
+      "path": "catalog/pure-engine-boundary-red.exit",
+      "released_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pure-engine-boundary-red.log",
+      "path": "catalog/pure-engine-boundary-red.log",
+      "released_sha256": "70ea1104f674011a5bc15b51a7237fe37c77faa9195c175c06c47a8f7df5d689",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pure-engine-boundary-red.result.json",
+      "path": "catalog/pure-engine-boundary-red.result.json",
+      "released_sha256": "6a6fa06fbf3047a71d1351b4bd5cfc94437443d8aa406d88e78923cf06cdc91b",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pure-engine-boundary-red.source.json",
+      "path": "catalog/pure-engine-boundary-red.source.json",
+      "released_sha256": "fdf9eeda2f4064a535bc145d357dc742b9538d499ec778d954c9c0e1acd012ad",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pure-engine-boundary-red.xml",
+      "path": "catalog/pure-engine-boundary-red.xml",
+      "released_sha256": "f83381d7b5ab7471eee6eafb46701b11750a526e1ba04231852b75c917ae23b1",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pure-final.exit",
+      "path": "catalog/pure-final.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pure-final.log",
+      "path": "catalog/pure-final.log",
+      "released_sha256": "0dacad1c0c9a30ad2d25e906fbc5b723d39aea694d113e65cebcf2ffd568cd5d",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pure-final.result.json",
+      "path": "catalog/pure-final.result.json",
+      "released_sha256": "9017cb867857750faddbe5fd3c9760045e8edc191d10544cee289715004f7112",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pure-final.source.json",
+      "path": "catalog/pure-final.source.json",
+      "released_sha256": "4de3405f5c927836e922d20fe55a2f91cf35fe78c9cfe6d5000bcd0c1f187b59",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pure-final.xml",
+      "path": "catalog/pure-final.xml",
+      "released_sha256": "6bb35588a88a84b35374e0516ad48d0faee6570709c3f328d18b8f8d13acee10",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pure-initial.exit",
+      "path": "catalog/pure-initial.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pure-initial.log",
+      "path": "catalog/pure-initial.log",
+      "released_sha256": "a4d781b51f801d855639a4431c732e2a26c1946da672181f60938df1cc020d89",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pure-initial.result.json",
+      "path": "catalog/pure-initial.result.json",
+      "released_sha256": "63da1ea39cf2e84ce5b5670a56803e3247c8830100aecffcaa00dfe7e3355f3e",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pure-initial.source.json",
+      "path": "catalog/pure-initial.source.json",
+      "released_sha256": "21432103819e30e18c7289d838d4e9d406e50fc6d989872cd89a03a885c8db2b",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pure-initial.xml",
+      "path": "catalog/pure-initial.xml",
+      "released_sha256": "b4d603f7a9496c22def234a8ecea07b153cfd6873db1c1ae18c98f79e83fb3b0",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pure-quote-boundary.exit",
+      "path": "catalog/pure-quote-boundary.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pure-quote-boundary.log",
+      "path": "catalog/pure-quote-boundary.log",
+      "released_sha256": "3d92aad24368327ec7fe9d52e2a1f9b4d3ccd6f2f8ceb817b15c086cd2a86586",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pure-quote-boundary.result.json",
+      "path": "catalog/pure-quote-boundary.result.json",
+      "released_sha256": "04abd400649627d1f0309e000d252b7559fffb9111ce1e2c798cdb4000fcedc1",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pure-quote-boundary.source.json",
+      "path": "catalog/pure-quote-boundary.source.json",
+      "released_sha256": "ab98dd136524dfa5fd5df1e46b88ee08d5a6655c0744b87b64be153f33be947c",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pure-quote-boundary.xml",
+      "path": "catalog/pure-quote-boundary.xml",
+      "released_sha256": "53699599ed632007151d9b514e37a6a6f1cd31fce8799cd0424031b03e9dca77",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/quote-ambiguity-probe.log",
+      "path": "catalog/quote-ambiguity-probe.log",
+      "released_sha256": "36df1824fd7ef8801efb1b894f5eb6e6e140ed0d6b120b782213d87ee2631fd0",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/run-native.py",
+      "path": "catalog/run-native.py",
+      "released_sha256": "7ed5291c5db36181d6b5df34c9de8b13a0be9d46d5805414cd79f5b4b0222ccd",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/run-pure.py",
+      "path": "catalog/run-pure.py",
+      "released_sha256": "f90084c6a6586b2158570d27ab24d26ed294c1199b8b570594d2b6cbb5513480",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/run-sqlite.py",
+      "path": "catalog/run-sqlite.py",
+      "released_sha256": "a743c9f1d4d3fe5d69c43bd17853e9899f1d0c5f1974748a4cf723bb509748cf",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/run-static.py",
+      "path": "catalog/run-static.py",
+      "released_sha256": "8fa2c0bbb55b47411badb6f2b24ba73a5335345608f80de185c1f097b6d779d8",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/setup-native.py",
+      "path": "catalog/setup-native.py",
+      "released_sha256": "8cb093a357a42118c0b373976ffa6c21b73294534645b084ca651bc69e0cca69",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/static-final.json",
+      "path": "catalog/static-final.json",
+      "released_sha256": "05dbe32ad5581c14cd84311b1baaf624d184362829bf764be36f87171f574ab0",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/syntax-1.exit",
+      "path": "catalog/syntax-1.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/syntax-1.log",
+      "path": "catalog/syntax-1.log",
+      "released_sha256": "4bceb720be022dd39b0759fe5a548398250ed8ca39083835be4415249e2c654f",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/syntax-2.exit",
+      "path": "catalog/syntax-2.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/syntax-2.log",
+      "path": "catalog/syntax-2.log",
+      "released_sha256": "fb45595e3e541af438072d014629945accf312fd014d77f24f7e733379a5f97d",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/syntax-3.exit",
+      "path": "catalog/syntax-3.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/syntax-3.log",
+      "path": "catalog/syntax-3.log",
+      "released_sha256": "0781f74f40c361e8bc6f7b7ee815143ca12c6a776795898075d44a085abdc5b3",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/syntax-4.exit",
+      "path": "catalog/syntax-4.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/syntax-4.log",
+      "path": "catalog/syntax-4.log",
+      "released_sha256": "dc33aacb8778cba28c2b3207fdc3750922f3b065e0d22bac4bd7ba0b75382a94",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pure-engine-boundary-red-source/app/Domain/Memberships/Production/MembershipCatalogDefinition.php",
+      "path": "catalog/pure-engine-boundary-red-source/app/Domain/Memberships/Production/MembershipCatalogDefinition.php",
+      "released_sha256": "ec0f7e685fe8e0e6a0a8adbf86c480bcd353f2cba27e4b00b97c7c8f65c6f485",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pure-engine-boundary-red-source/app/Domain/Memberships/Production/MembershipCatalogEvidence.php",
+      "path": "catalog/pure-engine-boundary-red-source/app/Domain/Memberships/Production/MembershipCatalogEvidence.php",
+      "released_sha256": "6b33144f493d1d6304382168b24dfa81adc75c8fc5f0579b5e08afb31a401afd",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pure-engine-boundary-red-source/composer.lock",
+      "path": "catalog/pure-engine-boundary-red-source/composer.lock",
+      "released_sha256": "ef380eba2d55aa74970f5267f273202ec455334d426460d282c56b30902bcb06",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pure-engine-boundary-red-source/phpunit.xml",
+      "path": "catalog/pure-engine-boundary-red-source/phpunit.xml",
+      "released_sha256": "493369cfb7feea104da4bec214c2cc6526ca2f1b9d937c50a2961fc59cb61aaf",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pure-engine-boundary-red-source/tests/Unit/MembershipCatalogDefinitionTest.php",
+      "path": "catalog/pure-engine-boundary-red-source/tests/Unit/MembershipCatalogDefinitionTest.php",
+      "released_sha256": "7c62df85de48a4cbe7a72c851a3cdc59a9ef7553a55f91d99551462a0e76a403",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pure-engine-boundary-green-source/app/Domain/Memberships/Production/MembershipCatalogDefinition.php",
+      "path": "catalog/pure-engine-boundary-green-source/app/Domain/Memberships/Production/MembershipCatalogDefinition.php",
+      "released_sha256": "e72bc203013e553d89d32dbdd92a89e02445e5b4ac35f5e2d06daab9800898f6",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pure-engine-boundary-green-source/app/Domain/Memberships/Production/MembershipCatalogEvidence.php",
+      "path": "catalog/pure-engine-boundary-green-source/app/Domain/Memberships/Production/MembershipCatalogEvidence.php",
+      "released_sha256": "6b33144f493d1d6304382168b24dfa81adc75c8fc5f0579b5e08afb31a401afd",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pure-engine-boundary-green-source/composer.lock",
+      "path": "catalog/pure-engine-boundary-green-source/composer.lock",
+      "released_sha256": "ef380eba2d55aa74970f5267f273202ec455334d426460d282c56b30902bcb06",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pure-engine-boundary-green-source/phpunit.xml",
+      "path": "catalog/pure-engine-boundary-green-source/phpunit.xml",
+      "released_sha256": "493369cfb7feea104da4bec214c2cc6526ca2f1b9d937c50a2961fc59cb61aaf",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/pure-engine-boundary-green-source/tests/Unit/MembershipCatalogDefinitionTest.php",
+      "path": "catalog/pure-engine-boundary-green-source/tests/Unit/MembershipCatalogDefinitionTest.php",
+      "released_sha256": "7c62df85de48a4cbe7a72c851a3cdc59a9ef7553a55f91d99551462a0e76a403",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/native-red-planned-source/app/Domain/Memberships/Production/MembershipCatalogEvidence.php",
+      "path": "catalog/native-red-planned-source/app/Domain/Memberships/Production/MembershipCatalogEvidence.php",
+      "released_sha256": "79cc5e7a443f4af4dd7b002b316090d9d889b14c5ecfdb73e25e3b682ae411a9",
+      "gzip": false,
+      "note": "Exact original class actually loaded by the initial native setup-error run; no successful mutation/reproof reached."
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/commands.md",
+      "path": "r4/commands-final-release.md",
+      "released_sha256": "ede9b774bb619e673e2de54040634f1ef0793f375914d125e1fe7c1104171bcc",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/native-four.exit",
+      "path": "r4/native-four.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/native-four.metadata.json",
+      "path": "r4/native-four.metadata.json",
+      "released_sha256": "8d4c03b523bf5edd3df3ddb93aedd2a6bb0980b6c4425bea71904d3ad8edcd0f",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/native-four.setup.exit",
+      "path": "r4/native-four.setup.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/native-four.setup.txt",
+      "path": "r4/native-four.setup.txt",
+      "released_sha256": "5eda841aa4edaadda8859ebce9c28e4fcfe3e3af509e74c043b48b597b14cc39",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/native-four.source-check.json",
+      "path": "r4/native-four.source-check.json",
+      "released_sha256": "41688779b19d32470bf326e9855bd722410299ba1ff9c21a9e97bfd867b3aaad",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/native-four.source.json",
+      "path": "r4/native-four.source.json.gz",
+      "released_sha256": "69b3ffdbca43740a2eda2dc7f550bb5c7452d040ff9b999260dad5a38a2d47e3",
+      "gzip": true
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/native-four.txt",
+      "path": "r4/native-four.txt",
+      "released_sha256": "da409f9d6c99b37a261905a442f7115183bce486a196d747c6d203b7c35b8bd5",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/native-four.verification.json",
+      "path": "r4/native-four.verification.json",
+      "released_sha256": "4964be994925e15cbbb826ddddbc3b238e0ea5982cdde19263cee619a4cf84ee",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/native-four.xml",
+      "path": "r4/native-four.xml",
+      "released_sha256": "6073b250003d2d0fc56de4d7649ea82aef6b10331fcd1bd35939f017a294f260",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/native-runner-start.json",
+      "path": "r4/native-runner-start.json",
+      "released_sha256": "e0f746c388f0368a3c9737376106a2cbb948c3af4264a6d37811dc2095295051",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/native-status-observer-later.json",
+      "path": "r4/native-status-observer-later.json",
+      "released_sha256": "8963033a16f90a125a31a861ab38a3739b6803cadf4d2d7c67eaa5a8bb1805b0",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/native-status-observer.json",
+      "path": "r4/native-status-observer.json",
+      "released_sha256": "3411a74f15883c5398d3724edd65d3ac82a3313e9f9743abd70843b0c2ae2341",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/run-native.py",
+      "path": "r4/run-native.py",
+      "released_sha256": "e5f2c1f8ec7830d9b1bad99b89233f1136832f3f9f389fe878fc4297c86ef52a",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-policy-admission-evidence/artifacts.json",
+      "path": "r4/component-release-artifacts.json",
+      "released_sha256": "32e4ce1f66fa64521eae0d5789112dd26e6b4252396e01faaf67e1851093f517",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/native-old-source-red-v2.source.json",
+      "path": "catalog/native-old-source-red-v2.source.json.gz",
+      "released_sha256": "7068a7d79b1e1feb4e21fb99ef47bcaf819e2c1d60f0f0c782469143c461e5e2",
+      "gzip": true
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/native-old-source-red-v2.log",
+      "path": "catalog/native-old-source-red-v2.log",
+      "released_sha256": "67aaea68db288cf34216090c3d86e67ff345bf568fd3e1ce5ff0079df46af896",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/native-old-source-red-v2.xml",
+      "path": "catalog/native-old-source-red-v2.xml",
+      "released_sha256": "2639970adb83d3349581e9a11d2ece86a9b924bc7b62d68bece5290d00b51d17",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/native-old-source-red-v2.exit",
+      "path": "catalog/native-old-source-red-v2.exit",
+      "released_sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/native-old-source-red-v2.result.json",
+      "path": "catalog/native-old-source-red-v2.result.json",
+      "released_sha256": "39f60df780135aa681cebbf5516ac52610f21dd4c57a7409149bb0e59bc424ea",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/native-old-source-red-v2.source-check.json",
+      "path": "catalog/native-old-source-red-v2.source-check.json",
+      "released_sha256": "b418eff7c37ab6907762045e62854cecc65e4aa0a462d625aa52dfdf9dd6fc9b",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/commands.md",
+      "path": "catalog/commands-corrected-red-release.md",
+      "released_sha256": "d2de3bae0508fa13d7e4952ce4c9c2fc68ed91f7f4c63ab8024ac1e2a79be0ad",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/carry.json",
+      "path": "quality/carry.json",
+      "released_sha256": "587188ab4774555dc50a45157a9f515ddf8ae8a0504bbf36b7b6630befc4d244",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/changed-php-files.txt",
+      "path": "quality/changed-php-files.txt",
+      "released_sha256": "cde40205e40020b36daad899db56922e8fc6941536f334299b0986c762f0f81b",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/metadata.json",
+      "path": "quality/metadata.json",
+      "released_sha256": "a01352e6fd3a85cc4beecf04d675ba5fcbfade028ca33ef266ff384ffae6450e",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/pint.command.json",
+      "path": "quality/pint.command.json",
+      "released_sha256": "c80e19a29bf45302798292ebb6f547f2f6f429d189d699f1daf0eeab2e2bf10b",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/pint.exit",
+      "path": "quality/pint.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/pint.log",
+      "path": "quality/pint.log",
+      "released_sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/pint.result.json",
+      "path": "quality/pint.result.json",
+      "released_sha256": "0584e98ca90a587e3106629e78cc9c3320c57669479b5e4fba5d6469a7892d4a",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/policy-final/changed-php-files.txt",
+      "path": "quality/policy-final/changed-php-files.txt",
+      "released_sha256": "cde40205e40020b36daad899db56922e8fc6941536f334299b0986c762f0f81b",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/policy-final/metadata.json",
+      "path": "quality/policy-final/metadata.json",
+      "released_sha256": "91904632340608d658755e28861181e1f3640889e98828f0ca62c4108d4ac253",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/policy-final/results.json",
+      "path": "quality/policy-final/results.json",
+      "released_sha256": "3741689353b0b40af3eca1e4f89da7e2c53b17f146ba2ac635ec7382c1b92602",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/policy-final/run-quality.py",
+      "path": "quality/policy-final/run-quality.py",
+      "released_sha256": "0cbc9dc13566b6b276963c5611fd8fb8ce29f96c497359afad43f576300f92ca",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/policy-final/source-check.json",
+      "path": "quality/policy-final/source-check.json",
+      "released_sha256": "56c3f173681fda4211b5b4783e3c04ffafdac599dc0b9681f239a0258f7649e7",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/policy-final/sources-after.json",
+      "path": "quality/policy-final/sources-after.json.gz",
+      "released_sha256": "3b1d0882511cbb1bd1df531b0692497f2c24587abed39920adbdb7e3a6b32f80",
+      "gzip": true
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/policy-final/sources-before.json",
+      "path": "quality/policy-final/sources-before.json.gz",
+      "released_sha256": "3b1d0882511cbb1bd1df531b0692497f2c24587abed39920adbdb7e3a6b32f80",
+      "gzip": true
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/policy-final/test-ci-scope.command.json",
+      "path": "quality/policy-final/test-ci-scope.command.json",
+      "released_sha256": "2dbb5c19f6699637f0985bbce5322dd0b770817f2c8394682cc2ed63d0d248c9",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/policy-final/test-ci-scope.exit",
+      "path": "quality/policy-final/test-ci-scope.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/policy-final/test-ci-scope.log",
+      "path": "quality/policy-final/test-ci-scope.log",
+      "released_sha256": "29d7556fd1e509233345b5a6b54e2915fd33fdb75f92a2a4c10ab934f1e6e5f9",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/policy-final/test-ci-scope.result.json",
+      "path": "quality/policy-final/test-ci-scope.result.json",
+      "released_sha256": "c438947cc6a5d39195bb8d2225335fcc3801aa726b6458aec12af46558a5367f",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/policy-final/test-database-receipts.command.json",
+      "path": "quality/policy-final/test-database-receipts.command.json",
+      "released_sha256": "d87a3cd65a38c020013db39cd2e45e23dfb021967844199a9a3d85c7348cd28b",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/policy-final/test-database-receipts.exit",
+      "path": "quality/policy-final/test-database-receipts.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/policy-final/test-database-receipts.log",
+      "path": "quality/policy-final/test-database-receipts.log",
+      "released_sha256": "1af98951f66faff8d4c9a63769a9099e35c8dd5e84f57a661c90469984228ea8",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/policy-final/test-database-receipts.result.json",
+      "path": "quality/policy-final/test-database-receipts.result.json",
+      "released_sha256": "78c0c5c252def65a67f810b123e16635535eb342097128b2c39767ce88d918b8",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/policy-final/test-phpunit-shards.command.json",
+      "path": "quality/policy-final/test-phpunit-shards.command.json",
+      "released_sha256": "add3ec1988cc1cc145853d7147184afe58d6c58e027c6fddf02661260d4c3f82",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/policy-final/test-phpunit-shards.exit",
+      "path": "quality/policy-final/test-phpunit-shards.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/policy-final/test-phpunit-shards.log",
+      "path": "quality/policy-final/test-phpunit-shards.log",
+      "released_sha256": "28e9ff86f6ee868eb7e12044c0cb985e10dc00796b09083bac46024b855b965f",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/policy-final/test-phpunit-shards.result.json",
+      "path": "quality/policy-final/test-phpunit-shards.result.json",
+      "released_sha256": "bf120eaba7efc8b2b3268f39ea03941495fdecb1f3e8f26afffc3b287f9e1b2e",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/policy-final/test-workflow-cadence.command.json",
+      "path": "quality/policy-final/test-workflow-cadence.command.json",
+      "released_sha256": "0328dbbc08167d5454a7acab88eba30b8059591cdc6fc24b69e0f3738832f0bf",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/policy-final/test-workflow-cadence.exit",
+      "path": "quality/policy-final/test-workflow-cadence.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/policy-final/test-workflow-cadence.log",
+      "path": "quality/policy-final/test-workflow-cadence.log",
+      "released_sha256": "dd818658e9c8008cb354da9371485cb574dabd3d7c356cdfa1c694608942fdca",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/policy-final/test-workflow-cadence.result.json",
+      "path": "quality/policy-final/test-workflow-cadence.result.json",
+      "released_sha256": "6b78b1e522ca8b26031908587c08c20a5a8d63a4504578f5fe0a867787520823",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/results.json",
+      "path": "quality/results.json",
+      "released_sha256": "bd73c21753db6a8404ba594dc410a95fa860999c8d4d844e1312656aa828149a",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/run-quality.py",
+      "path": "quality/run-quality.py",
+      "released_sha256": "d045ebd0e6249e6d219eb5296d9587ce933eb53390a5344f49dd306a339f7506",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/source-check.json",
+      "path": "quality/source-check.json",
+      "released_sha256": "2df63f7188a861b1859306e65d2d0138e5f9183df011f43df53f9eaa1c3e0162",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/sources-after.json",
+      "path": "quality/sources-after.json.gz",
+      "released_sha256": "87c2a6d6840cdd48338508846b962ed7c8399b4cecdd8fba9c3ca371b254c76a",
+      "gzip": true
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/sources-before.json",
+      "path": "quality/sources-before.json.gz",
+      "released_sha256": "87c2a6d6840cdd48338508846b962ed7c8399b4cecdd8fba9c3ca371b254c76a",
+      "gzip": true
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/test-ci-scope.command.json",
+      "path": "quality/test-ci-scope.command.json",
+      "released_sha256": "d615228040772604908ad0bdc7e57fecff7b65aa194777753b936530cd095c78",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/test-ci-scope.exit",
+      "path": "quality/test-ci-scope.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/test-ci-scope.log",
+      "path": "quality/test-ci-scope.log",
+      "released_sha256": "37acda06308aec11e88944ce508224ad7d6e721eb000eebd5c69eb31e428f225",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/test-ci-scope.result.json",
+      "path": "quality/test-ci-scope.result.json",
+      "released_sha256": "21df5ec88851903b27164c06f7debfbe7c24d3f0d9f62259f5e34719327bdcd5",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/test-database-receipts.command.json",
+      "path": "quality/test-database-receipts.command.json",
+      "released_sha256": "00270a80a47ccf14ace591f51dd8902f6ffd36f775c9e6fdac428eba463462c1",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/test-database-receipts.exit",
+      "path": "quality/test-database-receipts.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/test-database-receipts.log",
+      "path": "quality/test-database-receipts.log",
+      "released_sha256": "9d5296b3420fb5db5d97df585c451520d0f497130f6dca4ebcc6a300b6d8db51",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/test-database-receipts.result.json",
+      "path": "quality/test-database-receipts.result.json",
+      "released_sha256": "c613c4151977f20efcbc55a598e27a4511c57002460be2f8e2bab145ad2a5442",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/test-phpunit-shards.command.json",
+      "path": "quality/test-phpunit-shards.command.json",
+      "released_sha256": "01ffa0f7393c4700a03bedbdd586efb77100b93bf52755a00845fe364d300f73",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/test-phpunit-shards.exit",
+      "path": "quality/test-phpunit-shards.exit",
+      "released_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/test-phpunit-shards.log",
+      "path": "quality/test-phpunit-shards.log",
+      "released_sha256": "bbe9d4b919890748c281ecd82ebe3f9d0689c00229f598e8cb350246180a7bec",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/test-phpunit-shards.result.json",
+      "path": "quality/test-phpunit-shards.result.json",
+      "released_sha256": "7e89967c437d5dc2331b9eabdf03c0701c481a3fd7da2dce6fbbba23535194f9",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/test-workflow-cadence.command.json",
+      "path": "quality/test-workflow-cadence.command.json",
+      "released_sha256": "497c9072fdf9d8c2dc24c0f9b20222d09340a690fdebf8d08eed76608151a356",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/test-workflow-cadence.exit",
+      "path": "quality/test-workflow-cadence.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/test-workflow-cadence.log",
+      "path": "quality/test-workflow-cadence.log",
+      "released_sha256": "dd818658e9c8008cb354da9371485cb574dabd3d7c356cdfa1c694608942fdca",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-quality/test-workflow-cadence.result.json",
+      "path": "quality/test-workflow-cadence.result.json",
+      "released_sha256": "0034333aec12860a87f895106b2e3a9f086b18a91dfd9b93f9d5dd6262af177b",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-selection/discovery-source-check.json",
+      "path": "selection/discovery-source-check.json",
+      "released_sha256": "00f33a29428821264789e3ab032c13d97642fa2ea9ac2b1d7dc794c62791918b",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-selection/discovery.base",
+      "path": "selection/discovery.base",
+      "released_sha256": "6e009a0f5a668365726558b027a05824b6fd6e1b11eaa996af55621b2af24043",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-selection/discovery.exit",
+      "path": "selection/discovery.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-selection/discovery.sh",
+      "path": "selection/discovery.sh",
+      "released_sha256": "6ee2db288de6f7530bb2bd67f7d3ccc1ecc77cf658e3a18144b1c5a76bf4f043",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-selection/discovery.sources.json",
+      "path": "selection/discovery.sources.json.gz",
+      "released_sha256": "ce7282010123769765c1805bc5e8ba61494120934c74f683eba1c81e2a8e882a",
+      "gzip": true
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-selection/discovery.txt",
+      "path": "selection/discovery.txt",
+      "released_sha256": "d5cecf88cce5d9da0777a40e61c3a4fd0e50e0d134977cc11475789a1bc2df41",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-selection/listings/phpunit-ci-mysql-1-tests.xml",
+      "path": "selection/listings/phpunit-ci-mysql-1-tests.xml",
+      "released_sha256": "0b45660a308af673afd832b58b91492d6f70f4f1de126faa579d8577bd37f255",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-selection/listings/phpunit-ci-mysql-10-tests.xml",
+      "path": "selection/listings/phpunit-ci-mysql-10-tests.xml",
+      "released_sha256": "1cafe0acca7ba18b74cfa342c6a806f64bf970c7940cb3e0e94d987835965ec4",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-selection/listings/phpunit-ci-mysql-11-tests.xml",
+      "path": "selection/listings/phpunit-ci-mysql-11-tests.xml",
+      "released_sha256": "800ad1c917575afa2a602f6d12ebaa5152c166260be173875f59b35ba361169f",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-selection/listings/phpunit-ci-mysql-12-tests.xml",
+      "path": "selection/listings/phpunit-ci-mysql-12-tests.xml",
+      "released_sha256": "6525585b36d83c71cc6f6a4927e956e030052f37493bbb1761ad426b0cf0ab04",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-selection/listings/phpunit-ci-mysql-13-tests.xml",
+      "path": "selection/listings/phpunit-ci-mysql-13-tests.xml",
+      "released_sha256": "037010ba96373688745e21f5ae5f258fc6fe53b09967b799b86bb3200615647e",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-selection/listings/phpunit-ci-mysql-14-tests.xml",
+      "path": "selection/listings/phpunit-ci-mysql-14-tests.xml",
+      "released_sha256": "93e881500adb4d7d548096a623a6d4578fb9da25b375451210f2f861f1d1f3f4",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-selection/listings/phpunit-ci-mysql-15-tests.xml",
+      "path": "selection/listings/phpunit-ci-mysql-15-tests.xml",
+      "released_sha256": "d5397c52eb1f5ca873dabe986f906cd773131efb940e250a86b591af32ea92d0",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-selection/listings/phpunit-ci-mysql-16-tests.xml",
+      "path": "selection/listings/phpunit-ci-mysql-16-tests.xml",
+      "released_sha256": "60d76bfcb6f5924c0b0ea829120d82d395ba8ebdbebbbbfd17036ec651662b52",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-selection/listings/phpunit-ci-mysql-17-tests.xml",
+      "path": "selection/listings/phpunit-ci-mysql-17-tests.xml",
+      "released_sha256": "a9f983977a961da56d7a6738e51d7d7f1273ab18b89c639afeab934473bacfad",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-selection/listings/phpunit-ci-mysql-18-tests.xml",
+      "path": "selection/listings/phpunit-ci-mysql-18-tests.xml",
+      "released_sha256": "52f8e5d849cbb4c7547baea4a50092b727bb3ea1f0bb4a008dbf0fa79d1af10d",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-selection/listings/phpunit-ci-mysql-19-tests.xml",
+      "path": "selection/listings/phpunit-ci-mysql-19-tests.xml",
+      "released_sha256": "dfe51e38fece6253b6934ce4c974c97ab55c4db705ebf6dccd836ceb05b91350",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-selection/listings/phpunit-ci-mysql-2-tests.xml",
+      "path": "selection/listings/phpunit-ci-mysql-2-tests.xml",
+      "released_sha256": "206a9f6433aacbf7d094a122aff39758460a92ceb3ca277b71c1f3325df55aec",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-selection/listings/phpunit-ci-mysql-20-tests.xml",
+      "path": "selection/listings/phpunit-ci-mysql-20-tests.xml",
+      "released_sha256": "9583cf3e81d65830cfa698995cbfc64d3090b23f795bf2d6e1e2f8d932683d8d",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-selection/listings/phpunit-ci-mysql-21-tests.xml",
+      "path": "selection/listings/phpunit-ci-mysql-21-tests.xml",
+      "released_sha256": "928753e7d8719b9ff738c1a7f1e5caf831e75bd153c75e5d1dffb7ba7ecfdf46",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-selection/listings/phpunit-ci-mysql-22-tests.xml",
+      "path": "selection/listings/phpunit-ci-mysql-22-tests.xml",
+      "released_sha256": "6c396a724f91dc59c4924379e4d81658b3f0b5362833042b0c7ac2fdbb349eed",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-selection/listings/phpunit-ci-mysql-23-tests.xml",
+      "path": "selection/listings/phpunit-ci-mysql-23-tests.xml",
+      "released_sha256": "da58b5385eeeb580a135e76f71329f20e24cc25714309992165f0358197cdae6",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-selection/listings/phpunit-ci-mysql-24-tests.xml",
+      "path": "selection/listings/phpunit-ci-mysql-24-tests.xml",
+      "released_sha256": "f17752a384da8653edce21115369019892ccd311d769e7d4060e5a3381148afc",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-selection/listings/phpunit-ci-mysql-3-tests.xml",
+      "path": "selection/listings/phpunit-ci-mysql-3-tests.xml",
+      "released_sha256": "6ba0e4aac46c310d08e479140472269fc03bc83fec771bd5a8c9aa04d8b12af6",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-selection/listings/phpunit-ci-mysql-4-tests.xml",
+      "path": "selection/listings/phpunit-ci-mysql-4-tests.xml",
+      "released_sha256": "c9e0da2992f6eb8a5c787b0f73b4d1a9c023e01f1fd90f437f4640fd9e7f22c4",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-selection/listings/phpunit-ci-mysql-5-tests.xml",
+      "path": "selection/listings/phpunit-ci-mysql-5-tests.xml",
+      "released_sha256": "44b6afa615f034c8c4683cf709885dc46e477b9aeada590c78daa3466ba8db34",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-selection/listings/phpunit-ci-mysql-6-tests.xml",
+      "path": "selection/listings/phpunit-ci-mysql-6-tests.xml",
+      "released_sha256": "20ac764536048a9d6b50804b8ac8686fa5c47239d1d7fe02c37de1382388511e",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-selection/listings/phpunit-ci-mysql-7-tests.xml",
+      "path": "selection/listings/phpunit-ci-mysql-7-tests.xml",
+      "released_sha256": "dcc93ad63b8296bb6ab0f0f53ea1ef85aaf0358b7d98c700f7a46c92ef011b21",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-selection/listings/phpunit-ci-mysql-8-tests.xml",
+      "path": "selection/listings/phpunit-ci-mysql-8-tests.xml",
+      "released_sha256": "4d8618bc293d72f1d658d805950061c0a852fe130b670636d70f240ca6c1b1c1",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-selection/listings/phpunit-ci-mysql-9-tests.xml",
+      "path": "selection/listings/phpunit-ci-mysql-9-tests.xml",
+      "released_sha256": "4999b440e08fb2c2e62983436457f6b83620e89ff9865dec82639e7f85f8e30b",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-selection/listings/phpunit-ci-mysql-manifest.json",
+      "path": "selection/listings/phpunit-ci-mysql-manifest.json",
+      "released_sha256": "a2a1ca8620eec679985fee118a17a742ca0601597bbd796593dbc97566302860",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-selection/listings/phpunit-ci-mysql-source-tests.xml",
+      "path": "selection/listings/phpunit-ci-mysql-source-tests.xml",
+      "released_sha256": "5dbd1b658474c3b383666f55276e31ca959f0e6e6c33a5a081bca70593da38e0",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-local-release.json",
+      "path": "root-local-release.json",
+      "released_sha256": "70ae668015d7d6fed1f17ac15efe602708affba17ba4346035a8b5af6413fb53",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-selection/generated-file-cleanup.json",
+      "path": "selection/generated-file-cleanup.json",
+      "released_sha256": "79a3cd3850404b7d915729a4541270526e56d29843c0a20b7b76a7a893c0c7e7",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/native-fixed-five.source.json",
+      "path": "catalog/native-fixed-five.source.json.gz",
+      "released_sha256": "ecc927d447a627fa3539b54d0058f5436fe2fe42efc396b2d62b4a0b6a3351c0",
+      "gzip": true
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/native-fixed-five.log",
+      "path": "catalog/native-fixed-five.log",
+      "released_sha256": "0ea0e782d2178fb262759db8fac98661f8887aedbb2f7e5ad98669f5046b1427",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/native-fixed-five.xml",
+      "path": "catalog/native-fixed-five.xml",
+      "released_sha256": "baa8c75dcf8d47cee413889dfec0149d4297496f6ff79952093afdf18d26ac27",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/native-fixed-five.exit",
+      "path": "catalog/native-fixed-five.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/native-fixed-five.result.json",
+      "path": "catalog/native-fixed-five.result.json",
+      "released_sha256": "d506e364b8e1c92742cc75ca924bc6a1984cb67ba4ddf3a3d76ad4356bbcb614",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/native-fixed-five.source-check.json",
+      "path": "catalog/native-fixed-five.source-check.json",
+      "released_sha256": "b418eff7c37ab6907762045e62854cecc65e4aa0a462d625aa52dfdf9dd6fc9b",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/commands.md",
+      "path": "catalog/commands-native-fixed-release.md",
+      "released_sha256": "99a6b4aae4f3591d09ed539539445854df0c3d680000135fadfb0bbc7b10c11c",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/commands.md",
+      "path": "catalog/commands-final-release.md",
+      "released_sha256": "979d06a2905df67a3c77dc70b9d828aa070bca8e4915edae10da9acaa74d78c9",
+      "gzip": false,
+      "note": null
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/final-verification.json",
+      "path": "catalog/final-verification.json",
+      "released_sha256": "b58f7319b06d38b5225f772755dcae90aa027e3c76dbbabc8a59228158fc07ac",
+      "gzip": false,
+      "note": null
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/finalize-receipts.py",
+      "path": "catalog/finalize-receipts.py",
+      "released_sha256": "88d6859c7d1c718eb0118bf1a230db0f632a22d1c25334716d093ba5f179a69f",
+      "gzip": false,
+      "note": null
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/native-red-plan-a58d.json",
+      "path": "catalog/native-red-plan-a58d.json",
+      "released_sha256": "715f3424e91d659239f9d45b05fcbabad90f18c556703eed9e59e3670a1adc75",
+      "gzip": false,
+      "note": "Historical/planned source capsule; not an additional executed test."
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/native-red-plan.json",
+      "path": "catalog/native-red-plan.json",
+      "released_sha256": "401c99227bd219e1e391800c9954e3f7e46fd80282bc3a2b6842fe52404693db",
+      "gzip": false,
+      "note": "Historical/planned source capsule; not an additional executed test."
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/native-red-planned-source/tests/Feature/ProductionMembershipBilling/MembershipNativeCatalogCurrentnessTest.php",
+      "path": "catalog/native-red-planned-source/tests/Feature/ProductionMembershipBilling/MembershipNativeCatalogCurrentnessTest.php",
+      "released_sha256": "4a76bf71cdb429ddae4a216b4b0ffe09d2b5e33e4849dd776e8bd9c4dc021670",
+      "gzip": false,
+      "note": "Historical/planned source capsule; not an additional executed test."
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/sqlite-eligibility-whole.exit",
+      "path": "catalog/sqlite-eligibility-whole.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzip": false,
+      "note": null
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/sqlite-eligibility-whole.log",
+      "path": "catalog/sqlite-eligibility-whole.log",
+      "released_sha256": "b5858e38276991efbe68c6a6eb3726fc235e26238ee3cac9eacb4641054835aa",
+      "gzip": false,
+      "note": null
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/sqlite-eligibility-whole.result.json",
+      "path": "catalog/sqlite-eligibility-whole.result.json",
+      "released_sha256": "73534712afbe3e9362698294c443c857e158f2f179a8b689ee029d9a0381aa72",
+      "gzip": false,
+      "note": null
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/sqlite-eligibility-whole.source.json",
+      "path": "catalog/sqlite-eligibility-whole.source.json.gz",
+      "released_sha256": "ef2804adbf7bbc71f674343dea8976ad7211728c0d617d264cf6ffdfcbb02cac",
+      "gzip": true,
+      "note": null
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/sqlite-eligibility-whole.xml",
+      "path": "catalog/sqlite-eligibility-whole.xml",
+      "released_sha256": "93270a817ca1c2c61084137f1dbf147db9f1509547464207a428ddd38a5882ed",
+      "gzip": false,
+      "note": null
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-catalog-currentness-evidence/artifact-digests.json",
+      "path": "catalog/component-release-artifacts.json",
+      "released_sha256": "e5ca0ed9cd608fe6053071439c93aa50d6f591a67ebc5740057d79b9513b681f",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-root-evidence/README.md",
+      "path": "root/README.md",
+      "released_sha256": "130f47ac6cef9e70816991adee5dd7f908996e74a62ec42ff88764ed5a925a52",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-root-evidence/native-progress-observer.command.json",
+      "path": "root/native-progress-observer.command.json",
+      "released_sha256": "fc7b0c0fdcaabcdbe7f15ad2f4ecbd9780b383b6a3457d1ec4c3cc89b05dfdf8",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-root-evidence/native-progress-observer.txt",
+      "path": "root/native-progress-observer.txt",
+      "released_sha256": "ebc2424cc5469655b71dc3ce14ae696ff7c2a951af94d4584417ee63d119ad63",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-root-evidence/native-reservation-integration.exit",
+      "path": "root/native-reservation-integration.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-root-evidence/native-reservation-integration.log",
+      "path": "root/native-reservation-integration.log",
+      "released_sha256": "edbe29474a498b4d480a913732833e3b9b987c07dfaea928179f4237a2d59d8a",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-root-evidence/native-reservation-integration.result.json",
+      "path": "root/native-reservation-integration.result.json",
+      "released_sha256": "ab39402b24d4b16203d90f49183ec65ca99abde67e7afb78d01053709bcd4f95",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-root-evidence/native-reservation-integration.source.json",
+      "path": "root/native-reservation-integration.source.json.gz",
+      "released_sha256": "be02300e128173b1d97bcf01cb195f02840fb9faed1e1033896bff1425f5771e",
+      "gzip": true
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-root-evidence/native-reservation-integration.xml",
+      "path": "root/native-reservation-integration.xml",
+      "released_sha256": "4d467b8ff2011d46e62e9d25488c281ca66ade298a5dae370559986a8e220212",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-root-evidence/native-setup.exit",
+      "path": "root/native-setup.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-root-evidence/native-setup.json",
+      "path": "root/native-setup.json",
+      "released_sha256": "adbfaad500be7afe5bcf8d143b1131ca5c2c1415f31c7a98a7545836ec7cd54f",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-root-evidence/native-setup.log",
+      "path": "root/native-setup.log",
+      "released_sha256": "f6cef2580d913eab053fbdcbac6faccaf4c7ab021fb932fc031a517c713538e4",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-root-evidence/run-native-focused.py",
+      "path": "root/run-native-focused.py",
+      "released_sha256": "4575ced928e10fe429c360ad90de87cca4056fc65e079997869b33f0063f7fc7",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-root-evidence/run-native-integration.sh",
+      "path": "root/run-native-integration.sh",
+      "released_sha256": "f75e8312d0be3721313cf4ec4cac3bf14d77f7209d07a6264efe0f3fac9cdf93",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-root-evidence/setup-private-native.py",
+      "path": "root/setup-private-native.py",
+      "released_sha256": "6fa6c18e3c676ba968c18f6f91acf883f73f14fe1f5637e453e960b999804401",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-root-evidence/source-verification.json",
+      "path": "root/source-verification.json",
+      "released_sha256": "553994d8ed9334fb7abc7afbbf4541f90424570015da59ca5a9e2e0e2b69f874",
+      "gzip": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/member-source-currentness-root-evidence/release-manifest.json",
+      "path": "root/release-manifest.json",
+      "released_sha256": "3fb186f66e6e9c9c7c7c729461275a08413fe7afa5fe6d91a90c465ec1e75b72",
+      "gzip": false
+    }
+  ]
+}

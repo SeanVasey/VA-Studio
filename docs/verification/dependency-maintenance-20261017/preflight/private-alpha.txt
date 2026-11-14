@@ -1,0 +1,23 @@
+## PRIVATE_ALPHA_REQUIRE_PHP=1 node --test scripts/dev/private-alpha.test.mjs
+✔ sandbox ignores inherited production connections, policies and PHP injection values (7.414866ms)
+✔ canonical temporary parent works through a macOS-style symlink (6.064691ms)
+✔ cleanup never follows a substituted directory symlink (3.636949ms)
+✔ missing build, active Vite and maintenance are refused without changing checkout (2.851144ms)
+✔ occupied port is refused without stopping or reusing the listener (17.363546ms)
+✔ interruption during preparation terminates its child and removes all sandbox data (160.085818ms)
+✔ HTTP process failure never prints credentials and cleans up (191.712991ms)
+✔ a foreign readiness marker cannot disclose credentials (498.528603ms)
+✔ credentials appear only for owned readiness and stop cleans its server and data (177.407524ms)
+✔ shutdown escalates for an owned server that ignores SIGTERM (5163.633882ms)
+✔ native PHP bootstrap prerequisites are required by CI (0.462709ms)
+✔ native PHP refuses production, external paths, config caches and provider policy before migration (460.025317ms)
+✔ native preparation and HTTP preserve isolation, real draft evidence and unsafe-path refusal (8503.571627ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 15357.17299
+exit 0

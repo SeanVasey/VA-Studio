@@ -27,13 +27,15 @@ final class ContractWork
                 throw new ContractIssuanceException('evidence_changed');
             }
             if ($work->attempts >= 5) {
-                $work->forceFill(['state' => 'quarantined', 'reason' => 'retry_exhausted',
-                    'claim_token' => null, 'lease_expires_at' => null, 'next_attempt_at' => null, 'updated_at' => $at])->save();
+                ContractRenderWork::withoutTimestamps(fn () => $work->forceFill(['state' => 'quarantined', 'reason' => 'retry_exhausted',
+                    'claim_token' => null, 'lease_expires_at' => null, 'next_attempt_at' => null, 'updated_at' => $at])->save());
                 return null;
             }
             $token = (string) Str::uuid(); $lease = $at->addSeconds(300);
-            $work->forceFill(['state' => 'processing', 'attempts' => $work->attempts + 1, 'claim_token' => $token,
-                'lease_expires_at' => $lease, 'next_attempt_at' => null, 'reason' => null, 'updated_at' => $at])->save();
+            // Store exactly $at: when it equals the stored stamp, Eloquent would otherwise replace it with a later clock
+            // reading, and the database guard requires lease_expires_at = updated_at + 300.
+            ContractRenderWork::withoutTimestamps(fn () => $work->forceFill(['state' => 'processing', 'attempts' => $work->attempts + 1,
+                'claim_token' => $token, 'lease_expires_at' => $lease, 'next_attempt_at' => null, 'reason' => null, 'updated_at' => $at])->save());
 
             return ['id' => $request->id, 'token' => $token, 'leaseExpiresAt' => $lease, 'attempt' => $work->attempts];
         });
@@ -50,10 +52,11 @@ final class ContractWork
             }
             $exhausted = $work->attempts >= 5;
             $quarantine = $permanent || $exhausted || ! in_array($reason, ['render_failed', 'storage_failed'], true);
-            $work->forceFill(['state' => $quarantine ? 'quarantined' : 'retry',
+            // Exactly $at, as in claim(): the retry guard requires next_attempt_at >= updated_at + 60.
+            ContractRenderWork::withoutTimestamps(fn () => $work->forceFill(['state' => $quarantine ? 'quarantined' : 'retry',
                 'reason' => $exhausted && ! $permanent ? 'retry_exhausted' : $reason,
                 'claim_token' => null, 'lease_expires_at' => null,
-                'next_attempt_at' => $quarantine ? null : $at->addSeconds(60), 'updated_at' => $at])->save();
+                'next_attempt_at' => $quarantine ? null : $at->addSeconds(60), 'updated_at' => $at])->save());
 
             return $work->state;
         });

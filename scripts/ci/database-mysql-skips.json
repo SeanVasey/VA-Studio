@@ -35,6 +35,14 @@
       "test_sqlite_composite_dependency_primary_key_is_not_a_unique_id_target"
     ],
     [
+      "Tests\\Feature\\PaidTaxDownloadJourneyTest",
+      "test_new_delivery_public_reads_refuse_while_schema_admission_is_still_pending"
+    ],
+    [
+      "Tests\\Feature\\PaidTaxSchemaRecoveryTest",
+      "test_sqlite_composite_dependency_primary_key_is_not_a_unique_id_target"
+    ],
+    [
       "Tests\\Feature\\ProductionCheckoutMigrationTest",
       "test_sqlite_duplicate_table_and_trigger_namespace_cannot_hide_a_foreign_marker"
     ],
@@ -51,12 +59,56 @@
       "test_parent_floor_drift_is_refused_before_the_first_owned_ddl"
     ],
     [
+      "Tests\\Feature\\ProductionIdentity\\AccountAdmissionGuardUpgradeTest",
+      "test_sqlite_down_noop_still_refuses_a_missing_guard"
+    ],
+    [
+      "Tests\\Feature\\ProductionMemberGrants\\MemberActivationCommitWitnessTest",
+      "test_sqlite_real_commit_constraint_failure_keeps_the_activation_pre_commit_refusal"
+    ],
+    [
+      "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest",
+      "test_sqlite_verified_member_refuses_both_honest_and_mislabeled_configuration_before_factories"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\BillingAwardFenceTest",
+      "test_sqlite_replay_lock_holds_writer_intent_even_without_a_period_insert"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\BillingSubscriptionApprovalTest",
+      "test_encryption_callback_cannot_remove_a_billing_guard_before_the_write"
+    ],
+    [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+      "test_global_provider_identity_reuse_in_an_unrelated_request_refuses_before_commit"
+    ],
+    [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+      "test_historical_owner_key_withdrawal_in_a_committing_delegate_rolls_back_new_provider_evidence"
+    ],
+    [
       "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutMigrationTest",
       "test_installer_refuses_drift_gaps_populated_partials_shadows_and_foreign_references"
     ],
     [
       "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutMigrationTest",
       "test_migration_installs_exactly_four_tables_and_twelve_guards_and_a_rerun_is_a_no_op"
+    ],
+    [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCommittedReadReceiptTest",
+      "test_sqlite_final_raw_order_fence_detects_late_decryption_callback_drift_and_restores_guard"
+    ],
+    [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCommittedReadReceiptTest",
+      "test_sqlite_global_payment_alias_in_an_unrelated_request_refuses_original_raw_fence"
+    ],
+    [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCommittedReadReceiptTest",
+      "test_sqlite_historical_owner_key_drift_refuses_and_owned_abort_restores_original_relation"
+    ],
+    [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCommittedReadReceiptTest",
+      "test_sqlite_receipt_birth_refuses_disabled_rollback_journaling"
     ]
   ]
 }

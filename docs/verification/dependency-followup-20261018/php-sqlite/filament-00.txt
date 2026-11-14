@@ -1,0 +1,134 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: {worktree}/phpunit.xml
+
+.......................................SSSSSSSSSSSSSSSSSSSS....  63 / 837 (  7%)
+............................................................... 126 / 837 ( 15%)
+...............................SSSSSS.......................... 189 / 837 ( 22%)
+............................................................... 252 / 837 ( 30%)
+.............SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS...SSS.SSSSSSS 315 / 837 ( 37%)
+SSSS........................................................... 378 / 837 ( 45%)
+............................................................... 441 / 837 ( 52%)
+...............................SSSSSSSS........................ 504 / 837 ( 60%)
+............................................................... 567 / 837 ( 67%)
+............................SSSSSSSSSS......................... 630 / 837 ( 75%)
+..............................................SSSSSSSSSSS.EE... 693 / 837 ( 82%)
+...................EEEE........................................ 756 / 837 ( 90%)
+...................................SSSSSSSSSS.................. 819 / 837 ( 97%)
+.........SSSSSSSSS                                              837 / 837 (100%)
+
+Time: 27:51.415, Memory: 163.00 MB
+
+There were 6 errors:
+
+1) Tests\Feature\OrderInquiryStaffContextTest::test_actual_retained_context_entry_rechecks_authority_even_after_filament_cached_its_state#0 with data ('role')
+Illuminate\Auth\Access\AuthorizationException: Staff multi-factor authentication is required for this write.
+
+{worktree}/app/Domain/Staff/StaffWriteAuthority.php:122
+{worktree}/app/Domain/Rights/ReviewLicense.php:59
+{worktree}/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+{worktree}/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+{worktree}/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+{worktree}/app/Domain/Rights/ReviewLicense.php:52
+{worktree}/tests/Support/LicenseFixtures.php:42
+{worktree}/tests/Support/LicenseFixtures.php:51
+{worktree}/tests/Support/QuoteFixtures.php:24
+{worktree}/tests/Support/InventoryFixtures.php:28
+{worktree}/tests/Support/OrderFixtures.php:42
+{worktree}/tests/Support/OrderInquiryFixtures.php:26
+{worktree}/tests/Feature/OrderInquiryStaffContextTest.php:61
+{worktree}/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\OrderInquiryStaffContextTest::test_actual_retained_context_entry_rechecks_authority_even_after_filament_cached_its_state#1 with data ('mfa')
+Illuminate\Auth\Access\AuthorizationException: Staff multi-factor authentication is required for this write.
+
+{worktree}/app/Domain/Staff/StaffWriteAuthority.php:122
+{worktree}/app/Domain/Rights/ReviewLicense.php:59
+{worktree}/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+{worktree}/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+{worktree}/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+{worktree}/app/Domain/Rights/ReviewLicense.php:52
+{worktree}/tests/Support/LicenseFixtures.php:42
+{worktree}/tests/Support/LicenseFixtures.php:51
+{worktree}/tests/Support/QuoteFixtures.php:24
+{worktree}/tests/Support/InventoryFixtures.php:28
+{worktree}/tests/Support/OrderFixtures.php:42
+{worktree}/tests/Support/OrderInquiryFixtures.php:26
+{worktree}/tests/Feature/OrderInquiryStaffContextTest.php:61
+{worktree}/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\OrderInquiryTest::test_staff_context_rechecks_authority_after_reconstruction_and_audit#0 with data ('read', 'role')
+Illuminate\Auth\Access\AuthorizationException: Staff multi-factor authentication is required for this write.
+
+{worktree}/app/Domain/Staff/StaffWriteAuthority.php:122
+{worktree}/app/Domain/Rights/ReviewLicense.php:59
+{worktree}/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+{worktree}/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+{worktree}/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+{worktree}/app/Domain/Rights/ReviewLicense.php:52
+{worktree}/tests/Support/LicenseFixtures.php:42
+{worktree}/tests/Support/LicenseFixtures.php:51
+{worktree}/tests/Support/QuoteFixtures.php:24
+{worktree}/tests/Support/InventoryFixtures.php:28
+{worktree}/tests/Support/OrderFixtures.php:42
+{worktree}/tests/Support/OrderInquiryFixtures.php:26
+{worktree}/tests/Feature/OrderInquiryTest.php:349
+{worktree}/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\OrderInquiryTest::test_staff_context_rechecks_authority_after_reconstruction_and_audit#1 with data ('read', 'mfa')
+Illuminate\Auth\Access\AuthorizationException: Staff multi-factor authentication is required for this write.
+
+{worktree}/app/Domain/Staff/StaffWriteAuthority.php:122
+{worktree}/app/Domain/Rights/ReviewLicense.php:59
+{worktree}/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+{worktree}/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+{worktree}/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+{worktree}/app/Domain/Rights/ReviewLicense.php:52
+{worktree}/tests/Support/LicenseFixtures.php:42
+{worktree}/tests/Support/LicenseFixtures.php:51
+{worktree}/tests/Support/QuoteFixtures.php:24
+{worktree}/tests/Support/InventoryFixtures.php:28
+{worktree}/tests/Support/OrderFixtures.php:42
+{worktree}/tests/Support/OrderInquiryFixtures.php:26
+{worktree}/tests/Feature/OrderInquiryTest.php:349
+{worktree}/vendor/phpunit/phpunit/phpunit:104
+
+5) Tests\Feature\OrderInquiryTest::test_staff_context_rechecks_authority_after_reconstruction_and_audit#2 with data ('audit', 'role')
+Illuminate\Auth\Access\AuthorizationException: Staff multi-factor authentication is required for this write.
+
+{worktree}/app/Domain/Staff/StaffWriteAuthority.php:122
+{worktree}/app/Domain/Rights/ReviewLicense.php:59
+{worktree}/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+{worktree}/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+{worktree}/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+{worktree}/app/Domain/Rights/ReviewLicense.php:52
+{worktree}/tests/Support/LicenseFixtures.php:42
+{worktree}/tests/Support/LicenseFixtures.php:51
+{worktree}/tests/Support/QuoteFixtures.php:24
+{worktree}/tests/Support/InventoryFixtures.php:28
+{worktree}/tests/Support/OrderFixtures.php:42
+{worktree}/tests/Support/OrderInquiryFixtures.php:26
+{worktree}/tests/Feature/OrderInquiryTest.php:349
+{worktree}/vendor/phpunit/phpunit/phpunit:104
+
+6) Tests\Feature\OrderInquiryTest::test_staff_context_rechecks_authority_after_reconstruction_and_audit#3 with data ('audit', 'mfa')
+Illuminate\Auth\Access\AuthorizationException: Staff multi-factor authentication is required for this write.
+
+{worktree}/app/Domain/Staff/StaffWriteAuthority.php:122
+{worktree}/app/Domain/Rights/ReviewLicense.php:59
+{worktree}/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+{worktree}/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+{worktree}/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+{worktree}/app/Domain/Rights/ReviewLicense.php:52
+{worktree}/tests/Support/LicenseFixtures.php:42
+{worktree}/tests/Support/LicenseFixtures.php:51
+{worktree}/tests/Support/QuoteFixtures.php:24
+{worktree}/tests/Support/InventoryFixtures.php:28
+{worktree}/tests/Support/OrderFixtures.php:42
+{worktree}/tests/Support/OrderInquiryFixtures.php:26
+{worktree}/tests/Feature/OrderInquiryTest.php:349
+{worktree}/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 837, Assertions: 9138, Errors: 6, Skipped: 124.

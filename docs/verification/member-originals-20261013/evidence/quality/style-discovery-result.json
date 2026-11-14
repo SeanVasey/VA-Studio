@@ -1,0 +1,15 @@
+{
+  "pint_exit": 0,
+  "pint_files": 78,
+  "historical_php_excluded": 32,
+  "discovery_exit": 0,
+  "generated_count": 50,
+  "census": {
+    "source_cases": 8475,
+    "source_files": 625,
+    "selected_cases": 2143,
+    "selected_files": 210,
+    "shards": 24,
+    "untimed_files": 47
+  }
+}

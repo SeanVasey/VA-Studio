@@ -1,0 +1,1198 @@
+{
+  "scope": "Deduplicated latest successful relevant component results at documented mixed sources; not a single full or final-source suite execution. Native-only race file was not executed on SQLite and contributes no cases or skips here.",
+  "precedence": [
+    "policy/sqlite-policy-final",
+    "integration-and-adapters/license-binding-unit",
+    "ledger/ledger-focused",
+    "integration-and-adapters/entry-sqlite-v2",
+    "integration-and-adapters/eligibility-review-final",
+    "integration-and-adapters/award-replay-integration",
+    "integration-and-adapters/sqlite-integrated-lifecycle"
+  ],
+  "tests": 180,
+  "assertions": 965,
+  "passed": 179,
+  "skipped": 1,
+  "errors": 0,
+  "failures": 0,
+  "contributing_runs": [
+    {
+      "run": "policy/sqlite-policy-final",
+      "retained_unique_tests": 78,
+      "assertions": 252,
+      "passed": 78,
+      "skipped": 0
+    },
+    {
+      "run": "integration-and-adapters/license-binding-unit",
+      "retained_unique_tests": 7,
+      "assertions": 7,
+      "passed": 7,
+      "skipped": 0
+    },
+    {
+      "run": "ledger/ledger-focused",
+      "retained_unique_tests": 45,
+      "assertions": 79,
+      "passed": 45,
+      "skipped": 0
+    },
+    {
+      "run": "integration-and-adapters/entry-sqlite-v2",
+      "retained_unique_tests": 6,
+      "assertions": 135,
+      "passed": 6,
+      "skipped": 0
+    },
+    {
+      "run": "integration-and-adapters/eligibility-review-final",
+      "retained_unique_tests": 16,
+      "assertions": 123,
+      "passed": 16,
+      "skipped": 0
+    },
+    {
+      "run": "integration-and-adapters/award-replay-integration",
+      "retained_unique_tests": 15,
+      "assertions": 141,
+      "passed": 15,
+      "skipped": 0
+    },
+    {
+      "run": "integration-and-adapters/sqlite-integrated-lifecycle",
+      "retained_unique_tests": 13,
+      "assertions": 228,
+      "passed": 12,
+      "skipped": 1
+    }
+  ],
+  "overridden_cases": [
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipFirstAwardTest::test_owned_award_commits_one_period_and_one_event_and_replays_the_original_result",
+      "old_run": "ledger/ledger-focused",
+      "new_run": "integration-and-adapters/award-replay-integration"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipFirstAwardTest::test_fresh_identical_retrieval_replays_original_award_but_changed_paid_facts_refuse",
+      "old_run": "ledger/ledger-focused",
+      "new_run": "integration-and-adapters/award-replay-integration"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipFirstAwardTest::test_provider_paid_time_controls_late_payment_even_when_retrieval_is_after_period_end",
+      "old_run": "ledger/ledger-focused",
+      "new_run": "integration-and-adapters/award-replay-integration"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipFirstAwardTest::test_payment_at_exclusive_late_boundary_records_no_award",
+      "old_run": "ledger/ledger-focused",
+      "new_run": "integration-and-adapters/award-replay-integration"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipFirstAwardTest::test_missing_complete_runtime_capabilities_and_nested_transactions_cannot_award",
+      "old_run": "ledger/ledger-focused",
+      "new_run": "integration-and-adapters/award-replay-integration"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipFirstAwardTest::test_committing_callback_policy_withdrawal_rolls_back_both_effects",
+      "old_run": "ledger/ledger-focused",
+      "new_run": "integration-and-adapters/award-replay-integration"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipFirstAwardTest::test_after_commit_owner_change_refuses_success_but_does_not_claim_rollback",
+      "old_run": "ledger/ledger-focused",
+      "new_run": "integration-and-adapters/award-replay-integration"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipFirstAwardTest::test_committed_callback_uncovered_hint_refuses_success_with_durable_award",
+      "old_run": "ledger/ledger-focused",
+      "new_run": "integration-and-adapters/award-replay-integration"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipFirstAwardTest::test_direct_pdo_replacement_in_beginning_does_not_adopt_or_rollback_foreign_transaction",
+      "old_run": "ledger/ledger-focused",
+      "new_run": "integration-and-adapters/award-replay-integration"
+    }
+  ],
+  "cases": [
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipAwardOwnershipTest::test_capability_resolution_cannot_remove_a_remaining_capability_before_capture",
+      "assertions": 10,
+      "status": "passed",
+      "run": "integration-and-adapters/award-replay-integration"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipAwardOwnershipTest::test_complete_direct_nonshared_factories_support_one_owned_award",
+      "assertions": 13,
+      "status": "passed",
+      "run": "integration-and-adapters/award-replay-integration"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipAwardOwnershipTest::test_direct_context_cannot_write_using_policy_facts_and_only_two_real_capabilities",
+      "assertions": 6,
+      "status": "passed",
+      "run": "integration-and-adapters/award-replay-integration"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipAwardOwnershipTest::test_invoice_callback_cannot_construct_a_second_context_on_the_owned_rows",
+      "assertions": 10,
+      "status": "passed",
+      "run": "integration-and-adapters/award-replay-integration"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipAwardOwnershipTest::test_owned_award_refuses_untracked_capability_aliases_before_writing",
+      "assertions": 6,
+      "status": "passed",
+      "run": "integration-and-adapters/award-replay-integration"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipAwardOwnershipTest::test_transient_capability_rebinding_cannot_make_a_missing_capture_baseline_authoritative",
+      "assertions": 11,
+      "status": "passed",
+      "run": "integration-and-adapters/award-replay-integration"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_a_new_published_revision_does_not_admit_an_old_selection_locator",
+      "assertions": 6,
+      "status": "passed",
+      "run": "integration-and-adapters/eligibility-review-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_catalog_snapshot_is_verified_nonlocking_inside_committed_read_only_frame",
+      "assertions": 5,
+      "status": "passed",
+      "run": "integration-and-adapters/eligibility-review-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_clock_callback_after_file_proof_cannot_change_private_bytes_before_authority_returns",
+      "assertions": 7,
+      "status": "passed",
+      "run": "integration-and-adapters/eligibility-review-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_committed_snapshot_checks_native_bytes_after_later_clock_callback",
+      "assertions": 7,
+      "status": "passed",
+      "run": "integration-and-adapters/eligibility-review-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_final_clock_callback_cannot_withdraw_the_current_buyer_after_identity_proof",
+      "assertions": 7,
+      "status": "passed",
+      "run": "integration-and-adapters/eligibility-review-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_locator_and_expected_revision_have_one_unambiguous_bounded_encoding",
+      "assertions": 13,
+      "status": "passed",
+      "run": "integration-and-adapters/eligibility-review-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_original_license_effective_until_caps_wall_and_monotonic_readiness",
+      "assertions": 11,
+      "status": "passed",
+      "run": "integration-and-adapters/eligibility-review-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_original_readiness_boundary_and_configuration_change_refuse_existing_proof",
+      "assertions": 6,
+      "status": "passed",
+      "run": "integration-and-adapters/eligibility-review-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_private_bytes_are_rechecked_without_minting_a_new_readiness_deadline",
+      "assertions": 5,
+      "status": "passed",
+      "run": "integration-and-adapters/eligibility-review-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_real_current_catalog_derives_exact_identity_manifest_and_member_license_terms",
+      "assertions": 12,
+      "status": "passed",
+      "run": "integration-and-adapters/eligibility-review-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_storage_callback_cannot_authenticate_a_later_graph_instead_of_the_selected_graph",
+      "assertions": 6,
+      "status": "passed",
+      "run": "integration-and-adapters/eligibility-review-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_temporary_catalog_shadow_is_refused_even_when_its_rows_are_identical",
+      "assertions": 5,
+      "status": "passed",
+      "run": "integration-and-adapters/eligibility-review-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_terminal_file_admission_refuses_a_one_shot_non_native_stat_wrapper",
+      "assertions": 8,
+      "status": "passed",
+      "run": "integration-and-adapters/eligibility-review-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_terminal_raw_evidence_uses_no_file_callback_and_refuses_changed_complete_footprint",
+      "assertions": 6,
+      "status": "passed",
+      "run": "integration-and-adapters/eligibility-review-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_tokens_require_original_issuer_owner_rows_and_frame_and_cannot_be_copied",
+      "assertions": 13,
+      "status": "passed",
+      "run": "integration-and-adapters/eligibility-review-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_unpublished_track_and_new_unverified_rights_refuse_catalog_authority",
+      "assertions": 6,
+      "status": "passed",
+      "run": "integration-and-adapters/eligibility-review-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipFirstAwardTest::test_after_commit_owner_change_refuses_success_but_does_not_claim_rollback",
+      "assertions": 10,
+      "status": "passed",
+      "run": "integration-and-adapters/award-replay-integration"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipFirstAwardTest::test_committed_callback_uncovered_hint_refuses_success_with_durable_award",
+      "assertions": 8,
+      "status": "passed",
+      "run": "integration-and-adapters/award-replay-integration"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipFirstAwardTest::test_committing_callback_policy_withdrawal_rolls_back_both_effects",
+      "assertions": 9,
+      "status": "passed",
+      "run": "integration-and-adapters/award-replay-integration"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipFirstAwardTest::test_direct_pdo_replacement_in_beginning_does_not_adopt_or_rollback_foreign_transaction",
+      "assertions": 9,
+      "status": "passed",
+      "run": "integration-and-adapters/award-replay-integration"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipFirstAwardTest::test_fresh_identical_retrieval_replays_original_award_but_changed_paid_facts_refuse",
+      "assertions": 9,
+      "status": "passed",
+      "run": "integration-and-adapters/award-replay-integration"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipFirstAwardTest::test_missing_complete_runtime_capabilities_and_nested_transactions_cannot_award",
+      "assertions": 10,
+      "status": "passed",
+      "run": "integration-and-adapters/award-replay-integration"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipFirstAwardTest::test_owned_award_commits_one_period_and_one_event_and_replays_the_original_result",
+      "assertions": 15,
+      "status": "passed",
+      "run": "integration-and-adapters/award-replay-integration"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipFirstAwardTest::test_payment_at_exclusive_late_boundary_records_no_award",
+      "assertions": 8,
+      "status": "passed",
+      "run": "integration-and-adapters/award-replay-integration"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipFirstAwardTest::test_provider_paid_time_controls_late_payment_even_when_retrieval_is_after_period_end",
+      "assertions": 7,
+      "status": "passed",
+      "run": "integration-and-adapters/award-replay-integration"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationClockClosureTest::test_native_committed_clock_callback_owner_withdrawal_refuses_receipt_without_undoing_reservation",
+      "assertions": 0,
+      "status": "skipped",
+      "run": "integration-and-adapters/sqlite-integrated-lifecycle"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationClockClosureTest::test_terminal_clock_callback_cannot_withdraw_identity_after_the_last_precommit_owner_check",
+      "assertions": 18,
+      "status": "passed",
+      "run": "integration-and-adapters/sqlite-integrated-lifecycle"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationEntryTest::test_capability_callback_cannot_open_another_transaction_after_the_initial_admission",
+      "assertions": 31,
+      "status": "passed",
+      "run": "integration-and-adapters/entry-sqlite-v2"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationEntryTest::test_capability_callback_cannot_remove_a_remaining_capability_during_capture",
+      "assertions": 22,
+      "status": "passed",
+      "run": "integration-and-adapters/entry-sqlite-v2"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationEntryTest::test_each_operation_refuses_an_existing_primary_transaction_without_rolling_it_back",
+      "assertions": 17,
+      "status": "passed",
+      "run": "integration-and-adapters/entry-sqlite-v2"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationEntryTest::test_each_operation_refuses_an_existing_transaction_on_another_connection",
+      "assertions": 20,
+      "status": "passed",
+      "run": "integration-and-adapters/entry-sqlite-v2"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationEntryTest::test_each_operation_requires_every_member_of_the_complete_capability_gate",
+      "assertions": 20,
+      "status": "passed",
+      "run": "integration-and-adapters/entry-sqlite-v2"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationEntryTest::test_transient_registration_cannot_make_an_incomplete_baseline_authoritative",
+      "assertions": 25,
+      "status": "passed",
+      "run": "integration-and-adapters/entry-sqlite-v2"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationLifecycleTest::test_available_expiry_preserves_reserved_credit_and_a_later_release_never_restores_it",
+      "assertions": 21,
+      "status": "passed",
+      "run": "integration-and-adapters/sqlite-integrated-lifecycle"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationLifecycleTest::test_last_credit_refusal_keeps_exactly_the_first_redemption_and_reserve_event",
+      "assertions": 18,
+      "status": "passed",
+      "run": "integration-and-adapters/sqlite-integrated-lifecycle"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationLifecycleTest::test_real_sources_reserve_once_and_exact_retry_and_award_replay_preserve_the_retained_identity",
+      "assertions": 21,
+      "status": "passed",
+      "run": "integration-and-adapters/sqlite-integrated-lifecycle"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationLifecycleTest::test_release_requires_honor_expiry_then_is_idempotent_and_preserves_award_replay",
+      "assertions": 20,
+      "status": "passed",
+      "run": "integration-and-adapters/sqlite-integrated-lifecycle"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationLifecycleTest::test_reused_key_cannot_adopt_another_actually_awarded_paid_period",
+      "assertions": 18,
+      "status": "passed",
+      "run": "integration-and-adapters/sqlite-integrated-lifecycle"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationLifecycleTest::test_reused_key_cannot_adopt_another_eligible_selection",
+      "assertions": 24,
+      "status": "passed",
+      "run": "integration-and-adapters/sqlite-integrated-lifecycle"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationOwnershipTest::test_after_commit_configuration_change_refuses_response_but_preserves_durable_effects",
+      "assertions": 18,
+      "status": "passed",
+      "run": "integration-and-adapters/sqlite-integrated-lifecycle"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationOwnershipTest::test_committing_at_honor_deadline_cannot_commit_new_reservation",
+      "assertions": 16,
+      "status": "passed",
+      "run": "integration-and-adapters/sqlite-integrated-lifecycle"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationOwnershipTest::test_committing_configuration_change_rolls_back_redemption_and_event",
+      "assertions": 17,
+      "status": "passed",
+      "run": "integration-and-adapters/sqlite-integrated-lifecycle"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationOwnershipTest::test_direct_context_construction_cannot_mutate_even_with_real_source_capabilities",
+      "assertions": 17,
+      "status": "passed",
+      "run": "integration-and-adapters/sqlite-integrated-lifecycle"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationOwnershipTest::test_reservation_proof_is_issuer_owned_and_cannot_be_serialized_or_adopted_by_a_new_frame",
+      "assertions": 20,
+      "status": "passed",
+      "run": "integration-and-adapters/sqlite-integrated-lifecycle"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipPolicyClockTest::test_terminal_clock_callback_cannot_withdraw_policy_or_replace_the_transaction",
+      "assertions": 5,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipPolicyFactsTest::test_a_commit_and_reopen_cannot_reuse_a_policy_proof",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipPolicyFactsTest::test_authoring_is_separate_default_off_and_cannot_relabel_synthetic_provenance",
+      "assertions": 4,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipPolicyFactsTest::test_award_terms_use_exact_provider_paid_time_and_explicit_expiry",
+      "assertions": 6,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipPolicyFactsTest::test_different_policy_documents_create_distinct_immutable_versions",
+      "assertions": 3,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipPolicyFactsTest::test_document_rejects_missing_unknown_unsupported_or_unbounded_facts",
+      "assertions": 9,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipPolicyFactsTest::test_encryption_callback_withdrawal_refuses_before_the_policy_write",
+      "assertions": 3,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipPolicyFactsTest::test_gate_callback_revocation_rolls_back_the_policy_and_the_callback_write",
+      "assertions": 5,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipPolicyFactsTest::test_nonstaff_unverified_unenrolled_and_stale_staff_cannot_author",
+      "assertions": 5,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipPolicyFactsTest::test_original_proof_deadline_is_not_renewed_by_revalidation",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipPolicyFactsTest::test_proofs_refuse_other_issuer_other_rows_forged_values_and_serialization",
+      "assertions": 8,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipPolicyFactsTest::test_real_staff_writer_retains_an_immutable_policy_and_the_approved_producer_proves_it",
+      "assertions": 18,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipPolicyFactsTest::test_retained_seals_ciphertexts_and_document_hashes_are_validated",
+      "assertions": 5,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipPolicyFactsTest::test_unapproved_policy_and_changed_configuration_are_refused",
+      "assertions": 2,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipPolicyFactsTest::test_writer_cannot_run_without_the_captured_outer_transaction",
+      "assertions": 3,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipPreparationTest::test_default_off_and_missing_approved_facts_refuse_even_with_claimed_enablement",
+      "assertions": 3,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipPreparationTest::test_flag_and_policy_hash_cannot_replace_actual_typed_invoice_capability",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipPreparationTest::test_nullable_cached_environment_is_an_ordinary_baseline_without_award_authority",
+      "assertions": 2,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipPreparationTest::test_object_policy_leaves_cannot_become_a_held_configuration_baseline",
+      "assertions": 4,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipPreparationTest::test_original_dates_are_exact_utc_and_do_not_silently_normalize",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipPreparationTest::test_policy_value_requires_actual_bounded_allowance_and_explicit_billing_currency",
+      "assertions": 3,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipPreparationTest::test_provider_callback_cannot_withdraw_policy_then_return_a_configuration_baseline",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipPreparationTest::test_value_bindings_refuse_secret_fields_and_test_owner_keys",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipRedemptionPolicyFactsTest::test_a_different_credit_policy_is_not_approved_by_the_old_hash_and_new_approval_does_not_upgrade_v1",
+      "assertions": 4,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipRedemptionPolicyFactsTest::test_current_mfa_author_retains_v2_and_real_producer_preserves_v1_without_mutating_or_upgrading_it",
+      "assertions": 26,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipRedemptionPolicyFactsTest::test_v2_authoring_requires_current_staff_mfa_and_does_not_gain_an_exception_from_explicit_terms",
+      "assertions": 3,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_complete_ledger_sorts_sequence_and_preserves_award_after_reserve_release_and_expiry",
+      "assertions": 7,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_every_retained_redemption_column_is_authenticated with data set #0",
+      "assertions": 1,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_every_retained_redemption_column_is_authenticated with data set #1",
+      "assertions": 1,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_every_retained_redemption_column_is_authenticated with data set #10",
+      "assertions": 1,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_every_retained_redemption_column_is_authenticated with data set #11",
+      "assertions": 1,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_every_retained_redemption_column_is_authenticated with data set #12",
+      "assertions": 1,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_every_retained_redemption_column_is_authenticated with data set #13",
+      "assertions": 1,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_every_retained_redemption_column_is_authenticated with data set #2",
+      "assertions": 1,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_every_retained_redemption_column_is_authenticated with data set #3",
+      "assertions": 1,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_every_retained_redemption_column_is_authenticated with data set #4",
+      "assertions": 1,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_every_retained_redemption_column_is_authenticated with data set #5",
+      "assertions": 1,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_every_retained_redemption_column_is_authenticated with data set #6",
+      "assertions": 1,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_every_retained_redemption_column_is_authenticated with data set #7",
+      "assertions": 1,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_every_retained_redemption_column_is_authenticated with data set #8",
+      "assertions": 1,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_every_retained_redemption_column_is_authenticated with data set #9",
+      "assertions": 1,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_expiry_before_boundary_and_release_before_honor_are_refused",
+      "assertions": 2,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_expiry_never_takes_reserved_credit_and_later_honor_release_cannot_resurrect_it",
+      "assertions": 4,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_insufficient_credit_and_wrong_actor_have_no_buildable_effect",
+      "assertions": 3,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_live_reservations_each_need_a_slot_and_no_expiry_period_needs_no_expiry_slot",
+      "assertions": 3,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_orphan_rows_duplicate_redemptions_and_duplicate_terminal_are_refused",
+      "assertions": 5,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_previous_record_key_is_accepted_and_unknown_key_refuses",
+      "assertions": 3,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_release_at_exact_credit_expiry_moves_reserved_credit_to_expired",
+      "assertions": 1,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_request_scope_prevents_cross_period_retargeting_and_retry_intent_does_not_renew_honor",
+      "assertions": 7,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_resealed_broken_chain_or_balance_refuses with data set #0",
+      "assertions": 1,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_resealed_broken_chain_or_balance_refuses with data set #1",
+      "assertions": 1,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_resealed_broken_chain_or_balance_refuses with data set #10",
+      "assertions": 1,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_resealed_broken_chain_or_balance_refuses with data set #11",
+      "assertions": 1,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_resealed_broken_chain_or_balance_refuses with data set #12",
+      "assertions": 1,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_resealed_broken_chain_or_balance_refuses with data set #2",
+      "assertions": 1,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_resealed_broken_chain_or_balance_refuses with data set #3",
+      "assertions": 1,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_resealed_broken_chain_or_balance_refuses with data set #4",
+      "assertions": 1,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_resealed_broken_chain_or_balance_refuses with data set #5",
+      "assertions": 1,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_resealed_broken_chain_or_balance_refuses with data set #6",
+      "assertions": 1,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_resealed_broken_chain_or_balance_refuses with data set #7",
+      "assertions": 1,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_resealed_broken_chain_or_balance_refuses with data set #8",
+      "assertions": 1,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_resealed_broken_chain_or_balance_refuses with data set #9",
+      "assertions": 1,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_resealed_semantic_forgery_still_refuses with data set #0",
+      "assertions": 1,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_resealed_semantic_forgery_still_refuses with data set #1",
+      "assertions": 1,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_resealed_semantic_forgery_still_refuses with data set #2",
+      "assertions": 1,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_resealed_semantic_forgery_still_refuses with data set #3",
+      "assertions": 1,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_resealed_semantic_forgery_still_refuses with data set #4",
+      "assertions": 1,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_resealed_semantic_forgery_still_refuses with data set #5",
+      "assertions": 1,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_resealed_semantic_forgery_still_refuses with data set #6",
+      "assertions": 1,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_reserve_keeps_terminal_and_finite_expiry_slots_even_when_all_credit_is_reserved",
+      "assertions": 5,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLedgerAuditTest::test_v1_award_projection_and_original_seal_purpose_stay_unchanged",
+      "assertions": 5,
+      "status": "passed",
+      "run": "ledger/ledger-focused"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLicenseBindingTest::test_complete_bounded_catalog_identity_is_retained_exactly",
+      "assertions": 1,
+      "status": "passed",
+      "run": "integration-and-adapters/license-binding-unit"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLicenseBindingTest::test_incomplete_or_unbounded_catalog_identity_is_refused with data set \"gap\"",
+      "assertions": 1,
+      "status": "passed",
+      "run": "integration-and-adapters/license-binding-unit"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLicenseBindingTest::test_incomplete_or_unbounded_catalog_identity_is_refused with data set \"negative\"",
+      "assertions": 1,
+      "status": "passed",
+      "run": "integration-and-adapters/license-binding-unit"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLicenseBindingTest::test_incomplete_or_unbounded_catalog_identity_is_refused with data set \"overflow\"",
+      "assertions": 1,
+      "status": "passed",
+      "run": "integration-and-adapters/license-binding-unit"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLicenseBindingTest::test_incomplete_or_unbounded_catalog_identity_is_refused with data set \"partial\"",
+      "assertions": 1,
+      "status": "passed",
+      "run": "integration-and-adapters/license-binding-unit"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLicenseBindingTest::test_incomplete_or_unbounded_catalog_identity_is_refused with data set \"zero\"",
+      "assertions": 1,
+      "status": "passed",
+      "run": "integration-and-adapters/license-binding-unit"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipLicenseBindingTest::test_legacy_values_have_no_catalog_rule_identity",
+      "assertions": 1,
+      "status": "passed",
+      "run": "integration-and-adapters/license-binding-unit"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_changed_cost_hash_or_honor_is_a_new_document_and_authored_rule_order_is_preserved",
+      "assertions": 6,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_date_overflow_and_noncanonical_utc_values_refuse",
+      "assertions": 4,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_duplicate_rule_ids_or_duplicate_exact_revision_targets_are_refused",
+      "assertions": 2,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_each_redemption_term_and_each_rule_member_is_required_without_a_default",
+      "assertions": 19,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_every_current_identity_and_manifest_must_match_the_retained_rule with data set #0",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_every_current_identity_and_manifest_must_match_the_retained_rule with data set #1",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_every_current_identity_and_manifest_must_match_the_retained_rule with data set #2",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_every_current_identity_and_manifest_must_match_the_retained_rule with data set #3",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_every_current_identity_and_manifest_must_match_the_retained_rule with data set #4",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_every_current_identity_and_manifest_must_match_the_retained_rule with data set #5",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_every_current_identity_and_manifest_must_match_the_retained_rule with data set #6",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_explicit_honor_modes_and_release_destinations_observe_exact_expiry_boundaries",
+      "assertions": 18,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_rule_count_and_retained_document_size_are_bounded",
+      "assertions": 3,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_unknown_rule_does_not_fall_back_to_another_cost",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_v1_cannot_be_augmented_with_redemption_terms_and_an_unknown_version_is_not_inferred",
+      "assertions": 2,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_v1_canonical_bytes_hashes_and_record_seal_are_unchanged_and_no_redemption_is_implied",
+      "assertions": 14,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_v2_exposes_only_explicit_credit_operations_and_retained_exact_cost_rules",
+      "assertions": 14,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_v2_refuses_missing_typed_facts_unknown_rules_and_unsupported_operations with data set #0",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_v2_refuses_missing_typed_facts_unknown_rules_and_unsupported_operations with data set #1",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_v2_refuses_missing_typed_facts_unknown_rules_and_unsupported_operations with data set #10",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_v2_refuses_missing_typed_facts_unknown_rules_and_unsupported_operations with data set #11",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_v2_refuses_missing_typed_facts_unknown_rules_and_unsupported_operations with data set #12",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_v2_refuses_missing_typed_facts_unknown_rules_and_unsupported_operations with data set #13",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_v2_refuses_missing_typed_facts_unknown_rules_and_unsupported_operations with data set #14",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_v2_refuses_missing_typed_facts_unknown_rules_and_unsupported_operations with data set #15",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_v2_refuses_missing_typed_facts_unknown_rules_and_unsupported_operations with data set #16",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_v2_refuses_missing_typed_facts_unknown_rules_and_unsupported_operations with data set #17",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_v2_refuses_missing_typed_facts_unknown_rules_and_unsupported_operations with data set #18",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_v2_refuses_missing_typed_facts_unknown_rules_and_unsupported_operations with data set #19",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_v2_refuses_missing_typed_facts_unknown_rules_and_unsupported_operations with data set #2",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_v2_refuses_missing_typed_facts_unknown_rules_and_unsupported_operations with data set #20",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_v2_refuses_missing_typed_facts_unknown_rules_and_unsupported_operations with data set #21",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_v2_refuses_missing_typed_facts_unknown_rules_and_unsupported_operations with data set #22",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_v2_refuses_missing_typed_facts_unknown_rules_and_unsupported_operations with data set #23",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_v2_refuses_missing_typed_facts_unknown_rules_and_unsupported_operations with data set #24",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_v2_refuses_missing_typed_facts_unknown_rules_and_unsupported_operations with data set #25",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_v2_refuses_missing_typed_facts_unknown_rules_and_unsupported_operations with data set #26",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_v2_refuses_missing_typed_facts_unknown_rules_and_unsupported_operations with data set #27",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_v2_refuses_missing_typed_facts_unknown_rules_and_unsupported_operations with data set #28",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_v2_refuses_missing_typed_facts_unknown_rules_and_unsupported_operations with data set #29",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_v2_refuses_missing_typed_facts_unknown_rules_and_unsupported_operations with data set #3",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_v2_refuses_missing_typed_facts_unknown_rules_and_unsupported_operations with data set #30",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_v2_refuses_missing_typed_facts_unknown_rules_and_unsupported_operations with data set #31",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_v2_refuses_missing_typed_facts_unknown_rules_and_unsupported_operations with data set #32",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_v2_refuses_missing_typed_facts_unknown_rules_and_unsupported_operations with data set #33",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_v2_refuses_missing_typed_facts_unknown_rules_and_unsupported_operations with data set #34",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_v2_refuses_missing_typed_facts_unknown_rules_and_unsupported_operations with data set #4",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_v2_refuses_missing_typed_facts_unknown_rules_and_unsupported_operations with data set #5",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_v2_refuses_missing_typed_facts_unknown_rules_and_unsupported_operations with data set #6",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_v2_refuses_missing_typed_facts_unknown_rules_and_unsupported_operations with data set #7",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_v2_refuses_missing_typed_facts_unknown_rules_and_unsupported_operations with data set #8",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipRedemptionPolicyTest::test_v2_refuses_missing_typed_facts_unknown_rules_and_unsupported_operations with data set #9",
+      "assertions": 1,
+      "status": "passed",
+      "run": "policy/sqlite-policy-final"
+    }
+  ]
+}

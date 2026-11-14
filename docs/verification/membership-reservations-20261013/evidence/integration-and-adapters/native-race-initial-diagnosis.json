@@ -1,0 +1,70 @@
+{
+  "kind": "Read-only diagnosis derived from original worker monotonic timestamps; no edit or rerun during diagnosis",
+  "source": "defe95802e7d09e7df12c61a98c1ebf1caee99c0",
+  "cases": [
+    {
+      "case": "test_different_request_keys_cannot_spend_the_same_last_credit",
+      "worker_receipt": "integration-and-adapters/native-race-workers/test_different_request_keys_cannot_spend_the_same_last_credit-7fab95bf-646d-45a7-b7ab-ab1363c6cba7.json",
+      "nanoseconds": {
+        "first_operation_duration": 51166898795,
+        "second_operation_duration": 64665400044,
+        "first_entry_to_fence_wait_observation": 3171389060,
+        "first_entry_to_second_wait_observation": 4707857298,
+        "second_entry_to_second_wait_observation": 1535611589,
+        "second_entry_to_first_return": 47994653086,
+        "first_return_to_second_return": 16670746958
+      },
+      "seconds": {
+        "first_operation_duration": 51.166898795,
+        "second_operation_duration": 64.665400044,
+        "first_entry_to_fence_wait_observation": 3.17138906,
+        "first_entry_to_second_wait_observation": 4.707857298,
+        "second_entry_to_second_wait_observation": 1.535611589,
+        "second_entry_to_first_return": 47.994653086,
+        "first_return_to_second_return": 16.670746958
+      },
+      "first_reason": null,
+      "second_reason": "insufficient_credit",
+      "both_workers_ready_before_any_operation": true,
+      "both_processes_exit_zero": true,
+      "both_transactions_closed": true,
+      "both_processes_finished_without_teardown_termination": true
+    },
+    {
+      "case": "test_same_key_and_intent_return_the_same_retained_reservation_and_event",
+      "worker_receipt": "integration-and-adapters/native-race-workers/test_same_key_and_intent_return_the_same_retained_reservation_and_event-2a2c8fcc-1583-4557-8bae-a9de74b2617e.json",
+      "nanoseconds": {
+        "first_operation_duration": 54943302333,
+        "second_operation_duration": 66748257435,
+        "first_entry_to_fence_wait_observation": 3021361772,
+        "first_entry_to_second_wait_observation": 4425108038,
+        "second_entry_to_second_wait_observation": 1399237432,
+        "second_entry_to_first_return": 51917431727,
+        "first_return_to_second_return": 14830825708
+      },
+      "seconds": {
+        "first_operation_duration": 54.943302333,
+        "second_operation_duration": 66.748257435,
+        "first_entry_to_fence_wait_observation": 3.021361772,
+        "first_entry_to_second_wait_observation": 4.425108038,
+        "second_entry_to_second_wait_observation": 1.399237432,
+        "second_entry_to_first_return": 51.917431727,
+        "first_return_to_second_return": 14.830825708
+      },
+      "first_reason": null,
+      "second_reason": "operation_deadline",
+      "both_workers_ready_before_any_operation": true,
+      "both_processes_exit_zero": true,
+      "both_transactions_closed": true,
+      "both_processes_finished_without_teardown_termination": true
+    }
+  ],
+  "unknowns": [
+    "Exact parent commit timestamp was not retained, so observed barrier spans do not prove an upper bound on a hypothetical post-barrier receipt-write/commit stall.",
+    "Worker lock-acquisition/commit phase timestamps and exception backtrace were not retained, so the exact database-wait versus operation-work split is unknown.",
+    "Separate-schema concurrent workload is recorded, but these receipts do not establish its causal performance contribution.",
+    "The failed same-key case asserted second success before its final parent ledger audit; no post-failure audit result is inferred."
+  ],
+  "conclusion": "The second same-key operation exceeded its original 60-second admission budget and refused. Both workers were ready before operation entry and reached the intended native fence/buyer barriers. No duplicate or changed-identity successful result was observed. The failed dual-success expectation remains a failure, not accepted native concurrency proof.",
+  "next_step": "Reviewer-endorsed single same-source rerun of failed selection after competing focused native suite finishes, then remaining three race methods serially with no competing suite. No deadline, application or test changes authorized by this diagnosis."
+}

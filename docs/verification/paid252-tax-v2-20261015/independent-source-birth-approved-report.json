@@ -1,0 +1,295 @@
+{
+  "schema_version": 1,
+  "kind": "Independent bounded transaction-birth repair approval; not complete family/final packet approval",
+  "decision": "APPROVE BOUNDED SOURCE REPAIR",
+  "reviewed_commit": "035e7cd885e29754af81a549061b6ae00d4e8823",
+  "baseline_checkpoint_commit": "8ae2903be6c259e1465830f0e1ca792308b00c58",
+  "observed_head": "035e7cd885e29754af81a549061b6ae00d4e8823",
+  "observed_status": "",
+  "changed_paths": [
+    "app/Domain/Grants/PaidTax/PaidTaxBeginningDispatcher.php",
+    "docs/verification/paid252-tax-v2-20261015/independent-source-prestart-REVISE.md",
+    "docs/verification/paid252-tax-v2-20261015/independent-source-prestart-report.json",
+    "tests/Feature/PaidTaxGrantJourneyTest.php"
+  ],
+  "application_delta": [
+    "app/Domain/Grants/PaidTax/PaidTaxBeginningDispatcher.php"
+  ],
+  "source_bindings": [
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxBeginningDispatcher.php",
+      "git_blob": "5900f93f3b5f5e9cf22cd9f77d1c726725e33a38",
+      "sha256": "6d751b970d0104bc58fe65c917fe6cae73532f1648722b8763979c2146e8fc5e"
+    },
+    {
+      "path": "docs/verification/paid252-tax-v2-20261015/independent-source-prestart-REVISE.md",
+      "git_blob": "9946f4a5ed80728cedd1dda23ab26fac32a03eb9",
+      "sha256": "7d7d92b2198fd58b18188b1a5d1d2dac1b13767896207e4d2e996fbbba7fb7f8"
+    },
+    {
+      "path": "docs/verification/paid252-tax-v2-20261015/independent-source-prestart-report.json",
+      "git_blob": "370ea1772a8dd5da9f34a4ee4fa9081201b09924",
+      "sha256": "7b7e84ab6127763f8c71096f8f595661ec4d358b9c9dcdb86c852de3b10c71d9"
+    },
+    {
+      "path": "tests/Feature/PaidTaxGrantJourneyTest.php",
+      "git_blob": "8035b14bdef43f1ad82a6d3fa7927dd014ff1272",
+      "sha256": "a545ead3f7be45fa8cbefbb875e9085fbfae67b5528cddb149470c33f000ca53"
+    }
+  ],
+  "findings": [],
+  "open_p0_p1_for_bounded_delta": false,
+  "required_repairs_for_bounded_delta": [],
+  "closed_finding": "PTV2-8AE-01: final captured pre-start tail guard refuses displaced hooks/observer before physical begin; raw maps/Collections admitted; original runtime/native/empty manager proof remains callback-free; exact conditional restoration and inactive retained hook preserve replacements and permit pre-restoration retry.",
+  "prior_repairs": "All four427 repairs,512 owned cleanup/last-generated-ID capture, and8ae post-birth original capture remain unchanged.",
+  "receipts": [
+    {
+      "name": "sqlite-prestart-displacement-old-source",
+      "source_head": "5a3e1b794eec254a24649a164027114ac5d54767",
+      "counts": {
+        "tests": 1,
+        "assertions": 6,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      },
+      "cases": [
+        "test_prestart_displacement_refuses_before_physical_begin_and_preserves_replacement with data set \"dispatcher replacement\""
+      ],
+      "process_marker": 1,
+      "process_exit": 1,
+      "verifier_exit": 1,
+      "observed_os_exit": 1,
+      "launch_pid": 149694,
+      "launch_start_ticks": "6501238",
+      "launch_uid": 1000,
+      "os_launch_identity_matches": true,
+      "log_hash_matches": true,
+      "source_input_count": 2391,
+      "stability": {
+        "autoload_unchanged": true,
+        "runner_unchanged": true,
+        "source_head_unchanged": true,
+        "source_status_unchanged": true,
+        "source_unchanged": true
+      },
+      "original_failure": [
+        [
+          "A displaced pre-start witness was refused only after opening an unowned transaction.",
+          "Failed asserting that true is false."
+        ]
+      ],
+      "receipt_hashes": {
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/sqlite-prestart-displacement-old-source/result.json": "807df06fc19664f97f24522c1afe35157d8a5b4ac3e31a7a11414dc1a345302a",
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/sqlite-prestart-displacement-old-source/junit.xml": "4af257a49c5fab1184bd18916efea0cc978d5db7b06700a88180d7f205377c88",
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/sqlite-prestart-displacement-old-source/process.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/sqlite-prestart-displacement-old-source/command.json": "d066c58d6fda1e419d84764f3bb5f9492581221516150137427071d91db3166f",
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/sqlite-prestart-displacement-old-source/log.txt": "5d5c640481e598ac0517e9b9e0e7b9e3266fcdfb7d9e6f7c1f0b742f3ea2fd91",
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/launch-sqlite-prestart-displacement-old-source.json": "cf08038d972042023bbbaee7b291bfeb171196b3f58cb71fb2d3ccbbcce2e7ac",
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/observed-os-exit-sqlite-prestart-displacement-old-source.json": "8c72b3dfbc0e15d377a4622ba0f75c97a4e63426f82e6d0d0badce0baf827eee"
+      },
+      "all_recorded_exits_agree": true
+    },
+    {
+      "name": "sqlite-prestart-and-begin-fixed",
+      "source_head": "035e7cd885e29754af81a549061b6ae00d4e8823",
+      "counts": {
+        "tests": 7,
+        "assertions": 86,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "cases": [
+        "test_begin_delegate_refusal_closes_only_the_original_frame_and_discards_its_callbacks with data set \"ordinary throw\"",
+        "test_begin_delegate_refusal_closes_only_the_original_frame_and_discards_its_callbacks with data set \"purpose withdrawal\"",
+        "test_begin_delegate_direct_reopen_and_throw_preserves_unrelated_work_and_replacement_dispatcher",
+        "test_live_budget_shortened_in_begin_delegate_closes_original_without_renewal",
+        "test_prestart_displacement_refuses_before_physical_begin_and_preserves_replacement with data set \"dispatcher replacement\"",
+        "test_prestart_displacement_refuses_before_physical_begin_and_preserves_replacement with data set \"appended hook\"",
+        "test_prestart_displacement_refuses_before_physical_begin_and_preserves_replacement with data set \"replaced hooks\""
+      ],
+      "process_marker": 0,
+      "process_exit": 0,
+      "verifier_exit": 0,
+      "observed_os_exit": 0,
+      "launch_pid": 149908,
+      "launch_start_ticks": "6511927",
+      "launch_uid": 1000,
+      "os_launch_identity_matches": true,
+      "log_hash_matches": true,
+      "source_input_count": 2391,
+      "stability": {
+        "autoload_unchanged": true,
+        "runner_unchanged": true,
+        "source_head_unchanged": true,
+        "source_status_unchanged": true,
+        "source_unchanged": true
+      },
+      "original_failure": [],
+      "receipt_hashes": {
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/sqlite-prestart-and-begin-fixed/result.json": "751547b8663ccc1cf887cf85c9a418b28ef1a13189c734a3b30dc7d946a320b2",
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/sqlite-prestart-and-begin-fixed/junit.xml": "dfdf50a2217d4f4a8940f7326d11462c1ce7aec920f09aa4471d8f2bd0969c03",
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/sqlite-prestart-and-begin-fixed/process.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/sqlite-prestart-and-begin-fixed/command.json": "cc9da0b5c29f01b41e71456d86012ea270429be91a1abae8a81f3be43ac2bbf1",
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/sqlite-prestart-and-begin-fixed/log.txt": "00bcc227f41a875fefc8e6f82370a142ee99b53d8ec7ccb20033ebe040d8bc8d",
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/launch-sqlite-prestart-and-begin-fixed.json": "efc240a7831f91c05fc50eb8f89efc370a68dc17a75d0ee593e8b57b3ec854d7",
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/observed-os-exit-sqlite-prestart-and-begin-fixed.json": "93278c7e7d8e68afef0e13dceb1616a9c8b1b28dd070c648fbbdc9899e5754e5"
+      },
+      "all_recorded_exits_agree": true
+    },
+    {
+      "name": "mysql-provider-case-fixed",
+      "source_head": "8ae2903be6c259e1465830f0e1ca792308b00c58",
+      "counts": {
+        "tests": 1,
+        "assertions": 12,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "cases": [
+        "test_native_case_distinct_provider_payments_retain_two_valid_same_buyer_orders_and_exact_replays"
+      ],
+      "process_marker": 0,
+      "process_exit": 0,
+      "verifier_exit": 0,
+      "observed_os_exit": 0,
+      "launch_pid": 148297,
+      "launch_start_ticks": "6467278",
+      "launch_uid": 1000,
+      "os_launch_identity_matches": true,
+      "log_hash_matches": true,
+      "source_input_count": 2391,
+      "stability": {
+        "autoload_unchanged": true,
+        "runner_unchanged": true,
+        "source_head_unchanged": true,
+        "source_status_unchanged": true,
+        "source_unchanged": true
+      },
+      "original_failure": [],
+      "receipt_hashes": {
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/mysql-provider-case-fixed/result.json": "148eae6a24f23b6caeeb7d8c9f8e2a897179f1995e7634618a51136e9995b4dd",
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/mysql-provider-case-fixed/junit.xml": "465a73fd65557bed88715199da2b380a2702232aa3ec5e7fee807ec031998d7a",
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/mysql-provider-case-fixed/process.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/mysql-provider-case-fixed/command.json": "71d5e64b67bc364ffbb4ee2e4d7d2b4425e262998bb24338b4972dca6ae52711",
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/mysql-provider-case-fixed/log.txt": "45aa3eacfb094cc825d1aee1882ec2b29212f2a9d975cf39f0b42fcb7f2df405",
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/launch-mysql-provider-case-fixed.json": "97f1b8e6c30f4cbbef59d755a6a3ad8dc58c432d10d31261db19fab479e774b6",
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/observed-os-exit-mysql-provider-case-fixed.json": "2c116a88a62c44cc9410649b5fcb85ecd10037fdc33f90117a65619d661555d4"
+      },
+      "all_recorded_exits_agree": true
+    },
+    {
+      "name": "sqlite-begin-throw-old-source",
+      "source_head": "ba89be684e81408e1fd8286fd0bc9880b97e86a9",
+      "counts": {
+        "tests": 1,
+        "assertions": 6,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      },
+      "cases": [
+        "test_begin_delegate_refusal_closes_only_the_original_frame_and_discards_its_callbacks with data set \"ordinary throw\""
+      ],
+      "process_marker": 1,
+      "process_exit": 1,
+      "verifier_exit": 1,
+      "observed_os_exit": 1,
+      "launch_pid": 147752,
+      "launch_start_ticks": "6455826",
+      "launch_uid": 1000,
+      "os_launch_identity_matches": true,
+      "log_hash_matches": true,
+      "source_input_count": 2390,
+      "stability": {
+        "autoload_unchanged": true,
+        "runner_unchanged": true,
+        "source_head_unchanged": true,
+        "source_status_unchanged": true,
+        "source_unchanged": true
+      },
+      "original_failure": [
+        [
+          "An original transaction leaked after an ordinary begun delegate refused.",
+          "Failed asserting that true is false."
+        ]
+      ],
+      "receipt_hashes": {
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/sqlite-begin-throw-old-source/result.json": "97e01ed692286bd4ca200bdf0e3b84a8cfab71845a6803c8d74a7d65119ad385",
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/sqlite-begin-throw-old-source/junit.xml": "a26f734100118c1a2db11bf89fd5ac88c264e44348cd640f76e40bd9447f82db",
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/sqlite-begin-throw-old-source/process.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/sqlite-begin-throw-old-source/command.json": "bcf8fc1acde075e89b4a11d7c350c81a5a8b4d0ee0bbfb4d2ef9295496d6ee0f",
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/sqlite-begin-throw-old-source/log.txt": "f9f2bc43feb9714a9b70dc3cc5518056ec305817eff5736a45a99aefce0b352b",
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/launch-sqlite-begin-throw-old-source.json": "bde313a259873c8fc557db66866db03b09a2f36f8e948d6d6b20e2c3b6961c94",
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/observed-os-exit-sqlite-begin-throw-old-source.json": "0d9b55064aa07c34fb8bbcdee628216152a2d0988c70c4929e5029b39c81ffbe"
+      },
+      "all_recorded_exits_agree": true
+    }
+  ],
+  "old_prestart_source_app_diff_vs_8ae": [],
+  "old_begin_source_app_diff_vs_512": [],
+  "native_carry": "Native provider case1/12 applies directly to8ae only. Current035 retains byte-identical provider schema, Rows/Records generated-ID capture and replay/source bodies, permitting those narrow semantic observations to be retained. No fresh current native transaction-birth/whole-source/source-age pass is claimed because the birth guard changed.",
+  "prior_imports": [
+    {
+      "path": "docs/verification/paid252-tax-v2-20261015/independent-source-prestart-REVISE.md",
+      "sha256": "7d7d92b2198fd58b18188b1a5d1d2dac1b13767896207e4d2e996fbbba7fb7f8",
+      "exact_runtime_original": true
+    },
+    {
+      "path": "docs/verification/paid252-tax-v2-20261015/independent-source-prestart-report.json",
+      "sha256": "7b7e84ab6127763f8c71096f8f595661ec4d358b9c9dcdb86c852de3b10c71d9",
+      "exact_runtime_original": true
+    }
+  ],
+  "manifest": {
+    "sha256": "9cc50e19608a11be4db4648b49aa5ccf234945a63fced68d95f6b42bf2e048b4",
+    "member_count": 6,
+    "checks": [
+      {
+        "path": "app/Domain/Grants/PaidTax/PaidTaxText.php",
+        "sha256": "7a6d6ccbf3df1292604e680038abe9f64be418ae4bbe667dfe487147f89f291d",
+        "matches": true
+      },
+      {
+        "path": "app/Domain/Grants/PaidTax/PaidTaxPdfRenderer.php",
+        "sha256": "74bf8bdb62afdb4d3f8c91bb6b1836f93268dbc583c5b82703d0d85199125f9a",
+        "matches": true
+      },
+      {
+        "path": "app/Domain/Grants/PaidTax/PaidTaxRendererProcess.php",
+        "sha256": "6111d9af2a37eee594054754ab299657a85724a040f8a9f528ec38882c4c4ea3",
+        "matches": true
+      },
+      {
+        "path": "app/Domain/Grants/PaidTax/PaidTaxRenderInput.php",
+        "sha256": "3a755533c1a8e68dee51ef7db7db77c72211915ef24d00f5f0694a9d81abc6a1",
+        "matches": true
+      },
+      {
+        "path": "app/Domain/Grants/PaidTax/PaidTaxFiles.php",
+        "sha256": "afda6760090cde95ee623223fe4899d65e5bc4e09fc0c3d96d57171cdede21db",
+        "matches": true
+      },
+      {
+        "path": "scripts/render-paid-tax-grant.php",
+        "sha256": "eab7d2adcc5170f1d638b4ed2d79c330023c9163cfe1c7af55e980c5fa1d81f8",
+        "matches": true
+      }
+    ],
+    "all_match": true
+  },
+  "protected_delta": [],
+  "actions": "Read-only Git/source/vendor/closed-receipt inspection and standard-library XML/JSON/hash parsing; own runtime artifacts only. No app/test/database/CI/host/network execution or tracked write.",
+  "reviewer_tool_error": "One initial functions.exec JavaScript syntax error occurred before nested tools or shell execution. Corrected read-only calls completed; this is reviewer orchestration preparation, not application evidence.",
+  "limits": [
+    "Bounded source repair approval only; full coherent family/final immutable evidence approval still required.",
+    "No current whole/native/source-age claim. Seven current SQLite cases prove named normal begun/refusal/reopened and pre-start mutations, not arbitrary framework mutation/SQL/reconnect failure.",
+    "Native damaged-engine/temporary-shadow/concurrency/current-source/physical pipeline/V1 compatibility and full batch cases remain pending final review.",
+    "No HTTP/root/download redemption, live provider/operative/rehearsal/mount enabling, host/legal/commercial/release acceptance.",
+    "Lost-connection/reconnect/general SQL, effective isolation/deadlock/DDL/trigger/restore, invisible empty post-closure reopen and SQL/output interruption remain unproved.",
+    "Frozen shared V1/generic/identity metadata and ordinary membership afterCommit P2 remain outside this owned slice.",
+    "Cheap exact-head preflight/carry/expected-head merge are later gates."
+  ]
+}

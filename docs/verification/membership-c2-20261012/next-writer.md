@@ -1,0 +1,13 @@
+# Next bounded C2 work
+
+This is an implementation dependency record, not an operative writer or an approval to activate memberships.
+
+The integrated base contains `IdentityCommittedFrame` and `ProductionCustomerAccess::proveCommitted()`. Those are the T23 committed APIs referenced by implementation-plan step 0.4; a new owned membership operation must use a separate committed frame after commit callbacks. A captured `MembershipRows` object and its proof tokens cannot survive commit. `ProductionFeatureOperation` is a useful pattern, but is feature-specific and is not a membership operation wrapper.
+
+The current `MembershipInvoiceBinding` lacks a provider payment timestamp. Late-payment rules must use a validated provider `paidAt`, never retrieval time or award time: a delayed retrieval can concern an on-time payment. `BillingSettlement` and its future transaction-bound invoice authority must supply that fact before real late-payment behavior is implemented.
+
+`MembershipPolicyBinding` currently exposes allowance, price and currency but opaque hashes for expiry, late-payment, reservation honor and other policy. Hashes are insufficient to compute credit behavior. The next writer needs explicit validated policy facts from an immutable, staff-approved policy producer. Sean has been asked for the approved credit allowance, license-tier costs, expiry/rollover, late-payment treatment and reservation duration; no reply or commercial defaults are assumed here. The complete owner-input list remains implementation-plan section 0.3.
+
+The first coherent writer increment should atomically store one paid period and its first award, with semantic idempotence on globally unique source-invoice identity, replay/conflict checks and a canonical audit of sealed balances. Identity locks precede membership locks. The schema's first award uses a 64-zero prior seal, identical period/event creation times and an available balance equal to the allowance. Preserve the original historical buyer binding through later credential recovery. Returning provisional IDs from an open transaction is not committed success.
+
+Then implement reservation authority, release/expiry and guarded consumption with the actual license eligibility facts. Consumption and 258 activation must share one owned transaction. Required native evidence remains independent-process duplicate-invoice and last-credit races. Synthetic proof producers can support component development, but cannot establish Billing-backed commerce or replace the real policy and invoice producers. No such component or writer is implemented by this prerequisite PR.

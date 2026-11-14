@@ -1,0 +1,11 @@
+{
+  "commit": "982f4ea69ed8d2191345cd8c752377da19780a89",
+  "test": "tests/Feature/ProductionMembershipBilling/MembershipNativeCatalogCurrentnessTest.php",
+  "test_sha256": "d02bd82587987818ddd96e5c44df6a723be10e194b56b6bf613aa841d1e916bd",
+  "application_unchanged_from": "a58d53ef0a8303e59b984e5c5a4a0222f815a66b",
+  "application_diff": "",
+  "old_evidence_sha256": "79cc5e7a443f4af4dd7b002b316090d9d889b14c5ecfdb73e25e3b682ae411a9",
+  "next_run_status": "pending explicit slot release after R4 native selection",
+  "original_snapshot": "Captured under real CurrentEligibleLicenses, original transaction committed, same snapshot/files/deadline compared in IdentityCommittedFrame after independent auto-id INSERT",
+  "negative_frame": "Fresh independently admitted current frame; no cross-frame token reuse"
+}

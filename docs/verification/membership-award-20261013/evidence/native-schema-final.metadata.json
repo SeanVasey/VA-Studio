@@ -1,0 +1,5 @@
+{
+    "mysql_version": "8.4.11",
+    "database": "vaseyaudio_membership_award",
+    "php_version": "8.4.26"
+}

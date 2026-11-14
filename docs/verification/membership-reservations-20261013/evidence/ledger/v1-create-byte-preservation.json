@@ -1,0 +1,6 @@
+{
+  "base": "670f9caa158e436746ed9aed85667c10b9905f35",
+  "method": "MembershipPeriodRecords::create",
+  "byte_equal": true,
+  "sha256": "ec9626726d98bdf9b5d30c5e11180b54553d657642e83ec99b83cdfff4a9516c"
+}

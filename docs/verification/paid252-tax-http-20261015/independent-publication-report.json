@@ -1,0 +1,81 @@
+{
+  "DECISION": "APPROVE PUBLICATION-HEAD CARRY WITH CONDITIONS",
+  "actual_current_and_recorded_loaders_equal": 13,
+  "actual_current_route_inputs": 17,
+  "actual_current_source_inputs_equal": 2423,
+  "app_test_policy_schema_profiles_dependency_ops_Git_delta": [],
+  "approved_candidate_sha": "2a382a505c3145f709cede4110dbcd0b57196a3c",
+  "archive": {
+    "all_indexed_digests_valid": true,
+    "bytes": 8323164,
+    "exact_safe_regular_member_set": true,
+    "members": 2546,
+    "sha256": "e72a5383d387a23048fc350bbfdc824b426e42380f362050d374956d49327c87"
+  },
+  "archive_index_sha256": "c1eb05831f45bf13ba1a410c596e14aeaf9c41bd48460393fcfbb89ccbe029b1",
+  "created_utc": "2026-10-15T12:07:40.400026+00:00",
+  "exact_delta": [
+    "docs/verification/paid252-tax-http-20261015/README.md",
+    "docs/verification/paid252-tax-http-20261015/independent-final-DECISION.md",
+    "docs/verification/paid252-tax-http-20261015/independent-final-report.json",
+    "docs/verification/paid252-tax-http-20261015/independent-final-verifier-report.json",
+    "docs/verification/paid252-tax-http-20261015/independent-final-verifier.py"
+  ],
+  "open_P0": false,
+  "open_P1": false,
+  "operative_application_test_source_sha": "bb3d29983d6d225cfb62d9607beaa54874f3aa03",
+  "original_imports": [
+    {
+      "path": "independent-final-DECISION.md",
+      "sha256": "43fb6fca13c4e48b46556d5d00040b61d39889e3e0b17144ffe2f650ae319fee",
+      "unchanged_original": true
+    },
+    {
+      "path": "independent-final-report.json",
+      "sha256": "ba2ac3ed7ce04ce8635fc8730e3e0dd25878316a37e7cf03a41e3d593cec63fe",
+      "unchanged_original": true
+    },
+    {
+      "path": "independent-final-verifier.py",
+      "sha256": "0bb6949416b2e21491be446eecdbcb83c5251756c631a3dddd71c461224745e1",
+      "unchanged_original": true
+    },
+    {
+      "path": "independent-final-verifier-report.json",
+      "sha256": "00f8bc994d9af1b30979647dabf64a2fe9363a858b6e015201a1912f131fc8a8",
+      "unchanged_original": true
+    }
+  ],
+  "prior_decision_carried_unchanged": {
+    "DECISION": "APPROVE WITH CONDITIONS",
+    "actual_invocations": 11,
+    "nonzero_invocations": 6,
+    "passing_invocations": 5,
+    "preserved_release_conditions": [
+      "Both mount flags and all commerce policies ship default-off; provider remains Unbound, synthetic fixtures provide no merchant authority.",
+      "No Tax UI/history index, live account/payment/credentials/import/DNS/deployment/cutover or activation claim.",
+      "No current native SQL/schema/race execution or census; unchanged primitive historical native evidence retains original scope/version/runtime conditions.",
+      "Existing-request final provider-I/O, global SQL/DDL/isolation/deadlock/trigger/invisible-reopen/damaged-restore and complete parity remain open.",
+      "Actual config/route-cache host rebuild, distributed cache/session, FPM/send-timeout/performance/capacity and real commercial/legal/merchant/provider/key/host conditions remain unproved.",
+      "Adjacent shared V1/Identity metadata P2 and ordinary membership throwing-afterCommit P2 remain frozen, not fixed by this batch.",
+      "No Foundation/GitLab/live/full-suite acceptance is asserted."
+    ],
+    "scope": "Whole48/970/E1 and Tax12/191/E1 remain failed originals; narrow components/current2-case continuation only. No new runtime/native/full-suite claim."
+  },
+  "remaining_merge_gates": [
+    "Green cheap preflight bound to exact f32b755c976f3c4f0ab3dc8c038fe6fc26d3273c; initial2a preflight is not sufficient for this publication head.",
+    "Complete actual check/review/thread/protection inventory without bypass/settings changes.",
+    "Expected-SHA development merge and actual merge/check/carry receipts plus both ledgers afterward.",
+    "Carry originals stay runtime until actual merge receipt, avoiding another publication-head move."
+  ],
+  "required_corrections": [],
+  "reviewed_sha": "f32b755c976f3c4f0ab3dc8c038fe6fc26d3273c",
+  "reviewer_actions": {
+    "app_test_DB_network_hosted_operations": 0,
+    "new_test_or_runtime_receipt_claims": 0,
+    "tracked_edits": 0,
+    "writes": "Only original runtime MD/JSON carry"
+  },
+  "verification_method": "Read-only exact five-path Git delta and README inspection; byte identity/hash of four imported reviewer originals; unchanged original archive/index hashes; actual2423 archived source-input and13 loader hashes; clean frozen head before/after.",
+  "verifier_preparation_errors": []
+}

@@ -10,6 +10,7 @@ import json
 from pathlib import Path
 import re
 import subprocess
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -447,10 +448,10 @@ class NativeSelectionTests(unittest.TestCase):
             self.verify(files)
 
     def test_sqlite_path_is_unchanged_complete_and_rejects_a_selection(self):
-        for shard in (1, 2):
+        for shard in range(1, receipt.COUNTS["sqlite"] + 1):
             value = self.verify(evidence("sqlite", shard), engine="sqlite", shard=shard, selection=None)
             self.assertEqual(value["source_census"], receipt.census(receipt.inventory(listing(ROWS), ROOT)))
-        self.assertEqual(len(ROWS) - 1, sum(self.verify(evidence("sqlite", shard), engine="sqlite", shard=shard)["results"]["executed_cases"] for shard in (1, 2)))
+        self.assertEqual(len(ROWS) - 1, sum(self.verify(evidence("sqlite", shard), engine="sqlite", shard=shard)["results"]["executed_cases"] for shard in range(1, receipt.COUNTS["sqlite"] + 1)))
         files = evidence("sqlite", 1)
         manifest = json.loads(files["phpunit-ci-sqlite-manifest.json"])
         manifest["selection"] = selection_block(SELECTED_ROWS)
@@ -525,10 +526,10 @@ class CollectorTests(unittest.TestCase):
                 patch.object(receipt, "validate_discovered_files"), patch.object(receipt, "locked_dependencies", return_value=({}, runtime("mysql")["dependencies"])):
             return receipt.collect(Path(ROOT), {}, api)
 
-    def test_twenty_six_complete_current_attempt_receipts_remain_full_and_outer_pending(self):
+    def test_thirty_complete_current_attempt_receipts_remain_full_and_outer_pending(self):
         value = self.collect(FakeGithub())
-        self.assertEqual(26, len(value["database_receipts"]))
-        self.assertEqual({"mysql": 24, "sqlite": 2}, receipt.COUNTS)
+        self.assertEqual(30, len(value["database_receipts"]))
+        self.assertEqual({"mysql": 24, "sqlite": 6}, receipt.COUNTS)
         # MySQL runs every selected case except its one reviewed SQLite-only skip, which SQLite executed.
         self.assertEqual(len(SELECTED_ROWS) - 1, sum(row["results"]["executed_cases"] for row in value["database_receipts"] if row["engine"] == "mysql"))
         self.assertEqual(1, sum(row["results"]["skipped_cases"] for row in value["database_receipts"] if row["engine"] == "mysql"))
@@ -865,11 +866,43 @@ class CollectorTests(unittest.TestCase):
 
 
 class SyntheticEnvironmentTests(unittest.TestCase):
+    def test_service_address_is_the_containers_single_private_ipv4(self):
+        for inspected, expected in ((b"172.18.0.2 \n", "172.18.0.2"), (b"10.1.0.7\n", "10.1.0.7")):
+            with patch.object(receipt, "run", return_value=inspected):
+                self.assertEqual(receipt.service_address(Path(ROOT), "a" * 64), expected)
+        for inspected in (b"", b"\n", b"172.18.0.2 10.0.0.2 \n", b"8.8.8.8 \n", b"fd00::2 \n", b"0.0.0.0 \n"):
+            with self.subTest(inspected=inspected), patch.object(receipt, "run", return_value=inspected), \
+                    self.assertRaises(receipt.ReceiptError):
+                receipt.service_address(Path(ROOT), "a" * 64)
+
+    def test_mysql_host_must_be_the_jobs_service_container_before_any_database_probe(self):
+        env = {"APP_ENV": "testing", "DB_CONNECTION": "mysql", "DB_HOST": "172.18.0.2", "DB_PORT": "3306",
+               "DB_DATABASE": "vaseyaudio_test", "DB_URL": "", "DB_SOCKET": "", "MYSQL_CONTAINER_ID": "a" * 64}
+        runtime = json.dumps({"version": "8.4.27", "integer_size": 8, "memory_limit": "512M", "extensions": {}}).encode()
+        for inspected in (b"172.18.0.3 \n", b"127.0.0.1 \n"):
+            labels = []
+
+            def fake_run(root, argv, label, inspected=inspected, labels=labels):
+                labels.append(label)
+                return {"MySQL service address": inspected, "PHP runtime": runtime}.get(label, b"")
+            completed = subprocess.CompletedProcess([], 0, b"version 1\n", b"")
+            with self.subTest(inspected=inspected), patch.object(receipt, "run", side_effect=fake_run), \
+                    patch.object(receipt.shutil, "which", return_value=sys.executable), \
+                    patch.object(receipt.subprocess, "run", return_value=completed), \
+                    self.assertRaisesRegex(receipt.ReceiptError, "not the job's MySQL service container"):
+                try:
+                    receipt.runtime_identity(Path(ROOT), "mysql", env)
+                finally:
+                    self.assertIn("MySQL service address", labels)
+                    self.assertNotIn("MySQL settings", labels)
+
     def test_non_synthetic_database_target_rejects_before_any_probe(self):
-        baseline = {"APP_ENV": "testing", "DB_CONNECTION": "mysql", "DB_HOST": "127.0.0.1",
+        baseline = {"APP_ENV": "testing", "DB_CONNECTION": "mysql", "DB_HOST": "172.18.0.2",
                     "DB_PORT": "3306", "DB_DATABASE": "vaseyaudio_test", "DB_URL": "", "DB_SOCKET": ""}
         receipt.validate_test_environment("mysql", baseline)
+        receipt.validate_test_environment("mysql", baseline | {"DB_HOST": "127.0.0.1"})
         for change in ({"APP_ENV": "production"}, {"DB_CONNECTION": "sqlite"}, {"DB_HOST": "database.example.invalid"},
+                       {"DB_HOST": "8.8.8.8"}, {"DB_HOST": "0.0.0.0"}, {"DB_HOST": "fd00::2"}, {"DB_HOST": "172.18.0.02"},
                        {"DB_PORT": "3307"}, {"DB_DATABASE": "production"}, {"DB_URL": "mysql://synthetic.invalid"},
                        {"DB_SOCKET": "/tmp/foreign.sock"}):
             with self.subTest(change=change), patch.object(receipt, "run") as probe, self.assertRaises(receipt.ReceiptError):
@@ -898,7 +931,7 @@ class WorkflowTests(unittest.TestCase):
             self.assertIn(f"- name: {receipt.PARTITION_STEPS[engine]}\n", block)
             # Only MySQL narrows to the reviewed native selection; SQLite keeps the complete suite.
             self.assertEqual(engine == "mysql", "--mysql-native-selection" in block)
-        self.assertIn("Verify all twenty-six current-run database receipts without enabling reuse", workflow)
+        self.assertIn("Verify all thirty current-run database receipts without enabling reuse", workflow)
 
     def test_native_isolation_variables_are_set_only_on_the_mysql_job(self):
         workflow = (Path(__file__).parents[2] / ".github/workflows/final-verification.yml").read_text()
@@ -914,7 +947,7 @@ class WorkflowTests(unittest.TestCase):
     def test_workflow_preserves_runtime_conditions_matrices_events_and_no_reuse_output(self):
         workflow = (Path(__file__).parents[2] / ".github/workflows/final-verification.yml").read_text()
         self.assertEqual(6, workflow.count("if: needs.scope.outputs.mode != 'docs'"))
-        for retained in ("workflow_dispatch:", "expected_sha:", "shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]", "shard: [1, 2]",
+        for retained in ("workflow_dispatch:", "expected_sha:", "shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]", "shard: [1, 2, 3, 4, 5, 6]",
                          "--fail-on-phpunit-warning --display-warnings", "npm audit --audit-level=high", "npm run test:browser",
                          "needs: [scope, documentation, backend-quality, backend-mysql, backend-sqlite, frontend, operator-browser, related-browser]",
                          "  related-browser:", "run: bash tests/browser/install-related-scanner.sh", "run: node tests/browser/run-related.mjs"):

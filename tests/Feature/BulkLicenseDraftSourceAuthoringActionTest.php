@@ -19,6 +19,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Tests\Support\EconomicLicenseFixtures;
+use Tests\Support\FilamentNotifications;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\LicenseFixtures;
 use Tests\TestCase;
@@ -375,14 +376,14 @@ class BulkLicenseDraftSourceAuthoringActionTest extends TestCase
         $before = $this->evidence();
         Log::spy();
         AuditEvent::creating(fn () => throw new RuntimeException('Synthetic private license failure details'));
-        $page->callMountedAction()->assertHasActionErrors(['authored_source'])
-            ->assertNotified('The bulk save result could not be confirmed.');
+        $page->callMountedAction()->assertHasActionErrors(['authored_source']);
+        // Read the queue while it is still full, and require the expected notification so the privacy checks cannot pass on nothing.
+        FilamentNotifications::sole('The bulk save result could not be confirmed.', 'danger');
+        FilamentNotifications::assertNoneContain(['Synthetic private license failure details', 'Source saved for']);
+        $page->assertNotified('The bulk save result could not be confirmed.');
         $this->assertRetained($page, 'NONBINDING replacement source');
         $this->assertSame($before, $this->evidence());
         Log::shouldHaveReceived('warning')->once()->with('Bulk license draft UI could not confirm the result.', ['exception_class' => RuntimeException::class]);
-        $sent = session('filament.claimed_notifications') ?? session('filament.notifications');
-        $this->assertStringNotContainsString('Synthetic private license failure details', json_encode($sent, JSON_THROW_ON_ERROR));
-        $this->assertStringNotContainsString('Source saved for', json_encode($sent, JSON_THROW_ON_ERROR));
         $page->callMountedAction()->assertHasActionErrors(['authored_source']);
         $this->assertSame($before, $this->evidence());
         $page->mountAction('backToBulkSource')->assertSet('mountedActions.0.name', 'replaceDraftSource')

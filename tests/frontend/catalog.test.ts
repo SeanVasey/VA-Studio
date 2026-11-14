@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { availableOffer, restoreCartSelections, savedCartSelection, cartSubtotals, filterTracks, formatMoney, formatTime, safeMediaUrl } from '../../resources/js/lib/catalog';
+import { availableOffer, deliverableLabels, deliverableNames, restoreCartSelections, savedCartSelection, cartSubtotals, filterTracks, formatMoney, formatTime, safeMediaUrl } from '../../resources/js/lib/catalog';
+import deliverableLabelFile from '../../resources/js/lib/deliverable-labels.json';
+import { deliveryRoles } from '../../resources/js/lib/test-delivery';
 import { fixtureTracks } from '../../resources/js/test/fixtures';
 
 describe('published catalog presentation', () => {
@@ -47,5 +49,21 @@ describe('saved commercial revisions', () => {
     expect(restored.lines[0].offer).toBe(offer);
     expect(restored.lines[0].offer.priceMinor).toBe(2995);
     expect(restoreCartSelections([{ trackId: saved.trackId, offerId: saved.offerId, licenseVersionId: saved.licenseVersionId }], [track]).lines).toEqual([]);
+  });
+});
+
+describe('deliverable wording (DD-30)', () => {
+  it('keeps one label map in the generated license vocabulary and order', () => {
+    expect(Object.entries(deliverableLabels)).toEqual([['download_mp3', 'MP3'], ['master_wav', 'WAV master'], ['stems_zip', 'Stems ZIP']]);
+    expect(deliverableLabelFile).toEqual(deliverableLabels);
+  });
+  it('names files in the generated order whatever order the roles arrive in, and invents no wording', () => {
+    expect(deliverableNames(['stems_zip', 'download_mp3', 'master_wav'])).toEqual(['MP3', 'WAV master', 'Stems ZIP']);
+    expect(deliverableNames(['master_wav'])).toEqual(['WAV master']);
+    expect(deliverableNames(['stems_zip', 'untagged_mp3', 'toString'])).toEqual(['Stems ZIP', 'untagged_mp3', 'toString']);
+    expect(deliverableNames([])).toEqual([]);
+  });
+  it('labels purchased files with the same words', () => {
+    expect([deliveryRoles.download_mp3.label, deliveryRoles.master_wav.label, deliveryRoles.stems_zip.label]).toEqual(Object.values(deliverableLabels));
   });
 });

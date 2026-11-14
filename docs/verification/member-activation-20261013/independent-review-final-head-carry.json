@@ -1,0 +1,23 @@
+{
+  "application_or_ci_tests_executed": false,
+  "approved_application_and_packet_sha": "bc708923c03e83ef092286cb437042e855a898e8",
+  "archived_packet_index_source_map_digests_unchanged": true,
+  "captured13_loader_equal_current": true,
+  "captured2320_equal_current_files_and_both_git_commits": true,
+  "captured43_ci_inputs_equal_current_files_and_both_git_commits": true,
+  "changed_paths": [
+    "docs/handoff/2026-10-07/CLAUDE-PLAN.md",
+    "docs/handoff/2026-10-07/codex-deferred-20261011.md",
+    "docs/verification/member-activation-20261013/README.md",
+    "docs/verification/member-activation-20261013/independent-review-DECISION.md"
+  ],
+  "committed_index_equals_prior_independent_verification": true,
+  "decision_bytes_unchanged": true,
+  "decision_sha256": "f23216c47718ddcfce74e11f46bbb7a565a45d2f8362ecefc46ba4604a0f5fcf",
+  "exact_expected_four_docs_only": true,
+  "merge_conditions": "Cheap exact published-head preflight and repository protections remain required; existing P2 and all limits remain.",
+  "reviewed_successor_sha": "c14b7b6dac6da1658dc5a1ffb91ad64e94713214",
+  "reviewer": "/root/c4c_final_packet_review",
+  "schema": "c4c-independent-receipt-only-carry-v1",
+  "status": "clean"
+}

@@ -1,0 +1,342 @@
+<?php
+
+declare(strict_types=1);
+
+// Production runtime admission. Run with an empty application environment, as the application user, from a release.
+// No values, exceptions or provider responses are printed: only fixed check identifiers on failure.
+//
+// Usage: php validate-runtime.php ENV_FILE production HOST DATABASE [PREVIOUS_ENV_FILE] [--runtime]
+//
+// It replaces the staging validator's test-mode requirements and reuses the reviewed private-server preflight instead:
+//   1. scripts/ops/private-server-preflight.php --env-file ENV_FILE --profile=production [--runtime] must report
+//      FILE_CHECKS_PASSED. That is the one reviewed definition of the production file baseline: LOG_CHANNEL=stderr, every
+//      test-commerce switch and reserved credential off or blank, database/queue/session/cache settings, absolute media tool
+//      paths, a 32-byte key, no unreviewed precedence overrides. Its identifiers come back as `preflight.<id>`.
+//      `--runtime` adds the preflight's host checks (PHP 8.4 and extensions, nonroot, executables, a 0700 private root), so
+//      pass it only for a release whose storage/app/private is attached, never during the build before attachment.
+//   2. the same file is loaded through the real Laravel configuration in an isolated scratch directory, with no provider
+//      request, and the effective values must agree with what the kit installs: APP_ENV production, APP_DEBUG false, the
+//      https origin, key shape, database sessions/cache/queue, the local MySQL account, local private storage, file
+//      maintenance and the stderr log channel.
+//   3. production holds: no live-looking Stripe credential anywhere, every PRODUCTION_CHECKOUT_* switch and credential
+//      off or blank, and the four pre-launch capability flags in PRE_LAUNCH_HOLDS false. Production checkout is a code and
+//      review gate, not an environment switch (docs/ops/production-activation-packet.md); turning it on, or lifting one of the
+//      four flags, is a reviewed change to this file together with Sean's explicit authorization.
+//   4. APP_KEY equals the key of the previous (served) environment, when one is given.
+//
+//   5. the seller tag is not the synthetic staging placeholder: neither MEDIA_TAG_PATH nor, when the file is present in the
+//      attached private storage, its content carries the staging marker (holds.staging_seller_tag).
+//
+//   6. what DD-44 and DD-50 keep off through launch: the marketing segment flag (LAUNCH_OFF_HOLDS) and the membership literals
+//      production-memberships.enabled and http_mounted and member-grants.enabled.
+//
+// Admissions (lane PCC). MAIL_MAILER and STRIPE_MODE are the preflight's: `log` and `test` unless the candidate file sets
+// VASEY_PRODUCTION_REAL_MAIL_ADMITTED or VASEY_PRODUCTION_LIVE_STRIPE_ADMITTED to exactly `true` (then `smtp` with implicit TLS,
+// and `live`). This file adds only what the live flag changes in its holds: an `sk_live_` value is admitted as
+// PRODUCTION_CHECKOUT_STRIPE_SECRET_KEY and nowhere else, and PRODUCTION_CHECKOUT_FUNDS_MODE may be blank or `live`. Every
+// PRODUCTION_CHECKOUT_*_ENABLED switch stays held false whatever the flags say: admitting live credentials is not activation.
+// The effective admissions (config/production-runtime.php) must agree with the file.
+use App\Domain\Media\StagingSellerTag;
+use App\Support\Http\TrustedProxyList;
+use App\Support\PhpCliBinary;
+use App\Support\PhpCliBinaryUnavailable;
+use Dotenv\Dotenv;
+use Dotenv\Parser\Parser;
+use Illuminate\Contracts\Console\Kernel;
+use Vasey\Ops\CapabilityBoundary;
+
+/**
+ * Pre-launch capability hold, approved by Sean on 2026-10-18: the environment keys of the four flags, each refused unless false.
+ * Two have no environment gate in the application: an operative free grant is bound only by an adapter that other code would
+ * supply, and the public track sitemap build chain is not environment-gated while the public index serves it in production. In
+ * production this validator is their only guard. The operator notification flag now has a shipped adapter (FP-013): a default-off
+ * mail alert transport that the flag binds once an inquiry operator is configured, and that sends an operator a plain-text alert
+ * carrying an inquiry reference when the order-ready mail configuration is admitted too. That transport refuses production in code
+ * unless the literal `inquiries.operator_alert_mail_production_admitted` is true (it ships false), so this hold and that literal
+ * are lifted together, in one reviewed change. The fourth, V2 listening promotion, is reached
+ * today only through a customer session, which the test customer access path creates in local, testing and staging only, and
+ * the production listening lane does not read it; it is held as defence in depth because promotion is a one-way data change.
+ * Lifting one is a reviewed change to this file together with Sean's authorization for that activation. The config key of each
+ * flag is not restated here: it is read from scripts/ops/capability-boundary.php, the definition shared with the staging deploy
+ * gate and the profile validator, so a renamed key cannot leave this gate checking a stale one. A key the boundary no longer
+ * holds fails closed (runtime.unavailable). Never printed with a value.
+ */
+const PRE_LAUNCH_HOLDS = [
+    'VASEY_OPERATIVE_FREE_GRANTS_ENABLED',
+    'CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED',
+    'DISCOVERY_SITEMAP_ENABLED',
+    'VASEY_LISTENING_V2_PROMOTION_ENABLED',
+];
+
+/**
+ * Off through launch (decision register, 2026-11-10): DD-44 keeps marketing email off at v1, so the marketing customer segment
+ * flag is refused unless false, exactly as the pre-launch holds above are (file value and effective configuration). Its config
+ * key comes from CapabilityBoundary::PRODUCTION_LAUNCH_OFF_FLAGS; a key the boundary no longer holds fails closed
+ * (runtime.unavailable). The DD-50 membership switches are code literals and are held below, beside the other literal holds.
+ * Lifting one is a reviewed change to this file together with Sean's authorization. Never printed with a value.
+ */
+const LAUNCH_OFF_HOLDS = [
+    'REPORTING_MARKETING_SEGMENT_ENABLED',
+    // BL-70: Stripe test-mode service invoicing has no production path; the flag is refused unless false (file value and effective config).
+    'VASEY_TEST_SERVICE_INVOICING_ENABLED',
+    // Test unpaid release (Stripe test mode only): optional on the staging rehearsal since 2026-11-11, never in production; the flag is refused unless false.
+    'VASEY_TEST_UNPAID_RELEASE_ENABLED',
+    // Test refund and dispute lifecycle (Stripe test mode only): optional on the staging rehearsal since 2026-11-12, never in production;
+    // the flag is refused unless false. The production tax chain that reuses it refuses outside literal local/testing in code as well.
+    'VASEY_TEST_REFUND_DISPUTE_ENABLED',
+    // Test buyer cancellation of a never-sent order (Stripe test chain only): optional on the staging rehearsal since 2026-11-12, never in production.
+    'VASEY_TEST_BUYER_CANCEL_ENABLED',
+    // BL-71: the staging-only BeatStars catalog import (`vasey:staging-beatstars-import`) refuses production in code; this hold keeps its flag off the production host.
+    'VASEY_STAGING_BEATSTARS_IMPORT_ENABLED',
+    // Automatic test delivery enabling (Stripe test mode only, D-19 amendment 2026-11-12): optional on staging, never in production; refused unless false.
+    'VASEY_TEST_DELIVERY_AUTO_ENABLED',
+];
+
+ini_set('display_errors', '0');
+ini_set('log_errors', '0');
+$arguments = array_slice($argv, 1);
+$hostRuntime = false;
+if ($arguments !== [] && end($arguments) === '--runtime') {
+    $hostRuntime = true;
+    array_pop($arguments);
+}
+if (count($arguments) < 4 || count($arguments) > 5) {
+    fwrite(STDERR, "FAIL runtime.arguments\n");
+    exit(2);
+}
+[$file, $expected, $host, $database] = $arguments;
+$failures = [];
+$check = static function (string $id, bool $ok) use (&$failures): void {
+    if (! $ok) {
+        $failures[] = $id;
+    }
+};
+$scratch = null;
+try {
+    $root = dirname(__DIR__, 2);
+    require $root.'/vendor/autoload.php';
+    // The shared capability boundary: a missing file is a refusal (runtime.unavailable), never a silent skip, because this
+    // validator is the only guard some of the held flags have in production.
+    $boundary = $root.'/scripts/ops/capability-boundary.php';
+    if (! is_file($boundary) || is_link($boundary)) {
+        throw new RuntimeException;
+    }
+    require_once $boundary;
+    $holdKeys = array_intersect_key(CapabilityBoundary::stagedFlags(), array_flip(PRE_LAUNCH_HOLDS));
+    if (count($holdKeys) !== count(PRE_LAUNCH_HOLDS)) {
+        throw new RuntimeException;
+    }
+    $launchOffKeys = array_intersect_key(CapabilityBoundary::PRODUCTION_LAUNCH_OFF_FLAGS, array_flip(LAUNCH_OFF_HOLDS));
+    if (count($launchOffKeys) !== count(LAUNCH_OFF_HOLDS)) {
+        throw new RuntimeException;
+    }
+    // The preflight demands a canonical absolute path itself; refuse anything else before it is asked.
+    $check('runtime.arguments_shape', $expected === 'production' && str_starts_with($file, '/')
+        && preg_match('/\A[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+\z/', $host) === 1
+        && preg_match('/\A[a-z][a-z0-9_]{0,40}\z/', $database) === 1);
+    if ($failures !== []) {
+        throw new RuntimeException;
+    }
+    if (! is_file($file) || is_link($file) || ! is_readable($file) || filesize($file) > 131072) {
+        throw new RuntimeException;
+    }
+    $raw = file_get_contents($file);
+    $entries = (new Parser)->parse($raw);
+    $names = array_map(static fn ($entry) => $entry->getName(), $entries);
+    $check('runtime.unique_keys', count($names) === count(array_unique($names)));
+    $values = Dotenv::parse($raw);
+    // Admissions: exact `true` only. The preflight child below refuses any value other than `true` or `false` by identifier.
+    $realMail = ($values['VASEY_PRODUCTION_REAL_MAIL_ADMITTED'] ?? null) === 'true';
+    $liveStripe = ($values['VASEY_PRODUCTION_LIVE_STRIPE_ADMITTED'] ?? null) === 'true';
+    $liveSecret = static fn (mixed $value): bool => is_string($value) && preg_match('/\Ask_live_[A-Za-z0-9]{1,240}\z/D', $value) === 1;
+    $scanned = $values;
+    if ($liveStripe && $liveSecret($scanned['PRODUCTION_CHECKOUT_STRIPE_SECRET_KEY'] ?? null)) {
+        // The one admitted place for a live key. Restricted (rk_) and publishable (pk_) keys stay refused everywhere.
+        unset($scanned['PRODUCTION_CHECKOUT_STRIPE_SECRET_KEY']);
+    }
+    $check('holds.no_live_provider_credential', ! preg_match('/(?:sk|rk|pk)_live_/', implode("\n", array_filter($scanned, 'is_string'))));
+    // The synthetic staging seller tag is a rehearsal placeholder (docs/ops/staging-placeholders.md): its path is refused here,
+    // from the file alone, and its content below once the configuration is loaded.
+    $check('holds.staging_seller_tag', ! StagingSellerTag::pathCarriesMarker($values['MEDIA_TAG_PATH'] ?? null));
+    $check('runtime.no_cache_override', array_filter($names, static fn ($name) => preg_match('/\AAPP_[A-Z_]*CACHE\z/', $name)) === []);
+    // A production-checkout switch is accepted only as the literal false the template ships, or unset. A blank assignment is
+    // not the same as unset (the application's env() default does not apply to it), and the configuration check below refuses it.
+    foreach ($values as $name => $value) {
+        if (preg_match('/\APRODUCTION_CHECKOUT_[A-Z_]*ENABLED\z/', (string) $name) === 1) {
+            $check('holds.'.strtolower((string) $name), in_array(strtolower((string) $value), ['false', '(false)'], true));
+        }
+    }
+    // The pre-launch capability flags follow the same rule: only the literal false, or unset (the config default is false).
+    // A blank or any other value fails here, before the preflight child and the configuration check below are asked.
+    foreach ([...PRE_LAUNCH_HOLDS, ...LAUNCH_OFF_HOLDS] as $name) {
+        if (array_key_exists($name, $values)) {
+            $check('holds.'.strtolower($name), in_array(strtolower((string) $values[$name]), ['false', '(false)'], true));
+        }
+    }
+    // ---- BEGIN BL-63 merch/Printful hold (own block; lifting it is a reviewed change with Sean's authorization, U-12) ----
+    // Merchandise fulfillment ships default-off and is admitted only in local, testing and staging. In production both switches
+    // may only be the literal false, or unset. A blank or any other value fails here, before the configuration check below.
+    foreach (['MERCH_PRINTFUL_ENABLED', 'MERCH_PRINTFUL_CONFIRM_ENABLED'] as $name) {
+        if (array_key_exists($name, $values)) {
+            $check('holds.'.strtolower($name), in_array(strtolower((string) $values[$name]), ['false', '(false)'], true));
+        }
+    }
+    // ---- END BL-63 merch/Printful hold ----
+    if (isset($arguments[4])) {
+        $previous = $arguments[4];
+        if (! is_file($previous) || is_link($previous) || filesize($previous) > 262144) {
+            throw new RuntimeException;
+        }
+        $previousValues = Dotenv::parse(file_get_contents($previous));
+        $check('runtime.key_custody', isset($values['APP_KEY'], $previousValues['APP_KEY'])
+            && hash_equals($previousValues['APP_KEY'], $values['APP_KEY']));
+    }
+
+    // 1. The reviewed file baseline, as a child process with an empty environment. Only identifiers are taken from it.
+    if ($failures === []) {
+        $command = [PHP_BINARY, $root.'/scripts/ops/private-server-preflight.php', '--env-file', $file, '--profile=production'];
+        if ($hostRuntime) {
+            $command[] = '--runtime';
+        }
+        $process = proc_open($command, [1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes, $root, ['PATH' => '/usr/local/bin:/usr/bin:/bin', 'LC_ALL' => 'C']);
+        if (! is_resource($process)) {
+            throw new RuntimeException;
+        }
+        stream_set_blocking($pipes[1], false);
+        stream_set_blocking($pipes[2], false);
+        $output = '';
+        $deadline = microtime(true) + 60;
+        do {
+            $output .= (string) stream_get_contents($pipes[1]);
+            stream_get_contents($pipes[2]);
+            $status = proc_get_status($process);
+            if ($status['running']) {
+                usleep(20000);
+            }
+        } while ($status['running'] && microtime(true) < $deadline);
+        if ($status['running']) {
+            proc_terminate($process, 9);
+            proc_close($process);
+            throw new RuntimeException;
+        }
+        $output .= (string) stream_get_contents($pipes[1]);
+        fclose($pipes[1]);
+        fclose($pipes[2]);
+        proc_close($process);
+        $report = json_decode($output, true);
+        if (! is_array($report) || ($report['profile'] ?? null) !== 'production' || ! is_array($report['checks'] ?? null)) {
+            throw new RuntimeException;
+        }
+        $check('preflight.result', ($report['result'] ?? null) === 'FILE_CHECKS_PASSED');
+        foreach ($report['checks'] as $item) {
+            if (is_array($item) && ($item['status'] ?? null) === 'blocked' && is_string($item['id'] ?? null)
+                && preg_match('/\A[a-z0-9_]{1,80}\z/', $item['id']) === 1) {
+                $failures[] = 'preflight.'.$item['id'];
+            }
+        }
+    }
+
+    // 2 and 3. The effective configuration, in an isolated scratch directory, without any provider request.
+    if ($failures === []) {
+        $scratch = sys_get_temp_dir().'/vasey-runtime-'.bin2hex(random_bytes(16));
+        if (! mkdir($scratch, 0700) || file_put_contents($scratch.'/runtime.env', $raw) !== strlen($raw)) {
+            throw new RuntimeException;
+        }
+        chmod($scratch.'/runtime.env', 0600);
+        putenv('APP_CONFIG_CACHE='.$scratch.'/absent-config.php');
+        $_ENV['APP_CONFIG_CACHE'] = $_SERVER['APP_CONFIG_CACHE'] = $scratch.'/absent-config.php';
+        $app = require $root.'/bootstrap/app.php';
+        $app->useEnvironmentPath($scratch)->loadEnvironmentFrom('runtime.env');
+        $app->make(Kernel::class)->bootstrap();
+        $check('runtime.environment', app()->environment() === 'production');
+        $check('runtime.debug', config('app.debug') === false);
+        $check('runtime.origin', config('app.url') === 'https://'.$host);
+        $check('runtime.key_shape', is_string(config('app.key')) && preg_match('/\Abase64:[A-Za-z0-9+\/]{43}=\z/', config('app.key')) === 1);
+        $check('runtime.session', config('session.driver') === 'database' && config('session.secure') === true && config('session.http_only') === true);
+        $check('runtime.cache', config('cache.default') === 'database');
+        $check('runtime.queue', config('queue.default') === 'database' && config('queue.connections.database.retry_after') >= 1200);
+        $db = config('database.connections.mysql');
+        // The kit's topology is a local MySQL: every trigger DEFINER is vasey_app@127.0.0.1. A managed database needs a reviewed change.
+        $check('runtime.database', config('database.default') === 'mysql' && $db['host'] === '127.0.0.1'
+            && $db['database'] === $database && $db['username'] === 'vasey_app' && is_string($db['password']) && $db['password'] !== ''
+            && empty($db['url']) && empty($db['unix_socket']));
+        $check('runtime.filesystem', config('filesystems.default') === 'local');
+        $check('runtime.maintenance', config('app.maintenance.driver') === 'file');
+        $check('runtime.log_channel', config('logging.default') === 'stderr');
+        // Proxy trust is an explicit, bounded list or none; a wildcard or malformed list is refused here (the middleware trusts none).
+        $check('runtime.trusted_proxies', TrustedProxyList::parse(config('trusted-proxies.proxies')) !== null);
+        foreach (['http_enabled', 'fresh_checkout_enabled', 'reconciliation_enabled', 'provider_io_enabled',
+            'exemption_authoring_enabled', 'committed_read_receipts_enabled', 'operator_reconciliation_enabled'] as $flag) {
+            $check('holds.production_checkout_'.$flag, config('production_checkout.'.$flag) === false);
+        }
+        // The composition gate is a code literal (lane PCC); lifting it is a reviewed change here too, with Sean's authorization.
+        $check('holds.production_checkout_mounted', config('production_checkout.mounted') === false);
+        // DD-14: the tax-calculating chain's customer HTTP mount is the same kind of code literal (TaxHttpMount admits only a literal true),
+        // and v1's one production chain, so lifting it is a reviewed change here with Sean's authorization.
+        $check('holds.production_tax_checkout_http_mounted', config('production-tax-checkout.http_mounted') === false);
+        // D-30 contract identity capture is a code literal on each checkout; its policies also refuse outside local/testing.
+        $check('holds.production_checkout_contract_identity_v2', config('production_checkout.contract_identity_v2') === false);
+        $check('holds.production_tax_checkout_contract_identity_v2', config('production-tax-checkout.contract_identity_v2') === false);
+        // Contract increment 5: selecting the vasey-license-pdf-v2 renderer for new paid originals is a code literal too.
+        $check('holds.vasey_license_v2_issuance', config('contracts.vasey_license_v2_issuance') === false);
+        $check('holds.production_credentials', $liveStripe
+            ? (in_array(config('production_checkout.secret_key'), [null, ''], true) || $liveSecret(config('production_checkout.secret_key')))
+                && in_array(config('production_checkout.funds_mode'), [null, '', 'live'], true)
+            : in_array(config('production_checkout.secret_key'), [null, ''], true)
+                && in_array(config('production_checkout.funds_mode'), [null, ''], true));
+        // The effective tag path, and the tag itself when private storage is attached and holds it: neither may be the staging
+        // placeholder. An absent file is the preflight's and the media pipeline's to refuse, not this hold's.
+        $tagPath = config('media.tag_path');
+        $tagFile = is_string($tagPath) && preg_match('~\A[a-zA-Z0-9][a-zA-Z0-9_./-]*\z~D', $tagPath) === 1 && ! str_contains($tagPath, '..')
+            ? rtrim((string) config('filesystems.disks.local.root'), '/').'/'.$tagPath : null;
+        $check('holds.staging_seller_tag', ! StagingSellerTag::pathCarriesMarker($tagPath)
+            && ($tagFile === null || ! is_file($tagFile) || ! StagingSellerTag::fileCarriesMarker($tagFile)));
+        // Production identity SMTP composes settings only from its reviewed code literal, and only with real mail admitted.
+        $check('holds.production_identity_smtp', $realMail || config('production-identity-smtp.settings') === null);
+        // The admissions as the application reads them must be the file's. MAIL_MAILER and STRIPE_MODE stay the preflight's.
+        $check('runtime.production_admissions', config('production-runtime.real_mail_admitted') === $realMail
+            && config('production-runtime.live_stripe_admitted') === $liveStripe);
+        // Strictly false, on purpose: a config key that is renamed or removed reads null and fails closed rather than passing.
+        foreach ($holdKeys as $name => $key) {
+            $check('holds.'.strtolower($name), config($key) === false);
+        }
+        // FP-013: the operator alert mail transport refuses production in code unless this literal is true. It is lifted only
+        // together with the CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED hold above, in one reviewed change.
+        $check('holds.operator_alert_mail_production_admitted', config('inquiries.operator_alert_mail_production_admitted') === false);
+        // ---- BEGIN BL-63 merch/Printful hold (config as the application reads it; strictly false, so a renamed key fails closed) ----
+        $check('holds.merch_printful_enabled', config('merch.printful_enabled') === false);
+        $check('holds.merch_printful_confirm_enabled', config('merch.confirm_orders') === false);
+        // ---- END BL-63 merch/Printful hold ----
+        // DD-44: the marketing segment stays off through launch. Strictly false, so a renamed or removed key fails closed.
+        foreach ($launchOffKeys as $name => $key) {
+            $check('holds.'.strtolower($name), config($key) === false);
+        }
+        // DD-50: no membership is sold at v1. Code literals with no environment switch: the production membership lane, its customer
+        // HTTP mount (MembershipHttpMount admits only a literal true, in local or testing) and the member license grant lane.
+        $check('holds.production_memberships_enabled', config('production-memberships.enabled') === false);
+        $check('holds.production_memberships_http_mounted', config('production-memberships.http_mounted') === false);
+        $check('holds.member_grants_enabled', config('member-grants.enabled') === false);
+        // Renderer children started inside FPM requests need a genuine CLI PHP of this exact version and build (M-16).
+        // Validate the configured binary as the FPM pool will, with a real probe; the path itself is never printed.
+        try {
+            (new PhpCliBinary(config('app.php_cli_binary'), 'fpm-fcgi'))->path();
+            $check('runtime.php_cli_binary', true);
+        } catch (PhpCliBinaryUnavailable) {
+            $check('runtime.php_cli_binary', false);
+        }
+    }
+} catch (Throwable) {
+    $failures[] = 'runtime.unavailable';
+} finally {
+    if ($scratch !== null) {
+        @unlink($scratch.'/runtime.env');
+        @rmdir($scratch);
+    }
+}
+foreach (array_unique($failures) as $id) {
+    fwrite(STDERR, 'FAIL '.$id.PHP_EOL);
+}
+if ($failures !== []) {
+    exit(1);
+}
+echo 'PASS runtime.profile (production: reviewed preflight baseline'.($hostRuntime ? ' with host checks' : '').', isolated real configuration, production holds, no provider request)'.PHP_EOL;

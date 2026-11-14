@@ -1,0 +1,101 @@
+{
+    "case": "test_available_expiry_and_reserve_at_synthetic_equality_conserve_the_allowance",
+    "parent_pid": 155362,
+    "parent_connection_id": 107,
+    "database": "vaseyaudio_membership_reservation_races",
+    "mysql_version": "8.4.11",
+    "timing_scope": "Explicit synthetic Carbon wall time; real hrtime, process scheduling, native row waits and admission bounds.",
+    "authority_scope": "Real retained invoice, policy and eligible-license producers; unused fixture-only C4 grant gate; no provider\/host claim.",
+    "barriers": [
+        {
+            "requester": 108,
+            "blocker": 107,
+            "table": "production_membership_billing_award_fence",
+            "primary_key": 1,
+            "observed_ns": 49656624960317
+        },
+        {
+            "requester": 109,
+            "blocker": 108,
+            "table": "users",
+            "primary_key": 4,
+            "observed_ns": 49657957354710
+        }
+    ],
+    "workers": [
+        {
+            "command": "'\/workspace\/.va-studio-toolchain\/root\/usr\/bin\/php8.4' '\/workspace\/VA-Studio-membership-reservations\/tests\/Support\/membership-reservation-race-worker.php'",
+            "spawned_pid": 160205,
+            "operation": "expire",
+            "request_key": null,
+            "redemption_id": null,
+            "at": "2026-11-07 00:00:00.000000",
+            "ready": {
+                "connection_id": 108,
+                "pid": 160205,
+                "ready_ns": 49652492139792,
+                "at": "2026-11-07 00:00:00.000000"
+            },
+            "released_ns": 49653837853068,
+            "exit": 0,
+            "stdout": "{\"value\":{\"period_id\":\"89ea3a7d-2ec7-4530-b816-867a1266f6be\",\"expiry_event_id\":\"209b8b52-ffe1-4337-8f82-3fb00fca01af\",\"status\":\"available_credit_expired\",\"balances\":{\"available\":0,\"reserved\":0,\"consumed\":0,\"expired\":1}},\"error_class\":null,\"reason\":null,\"operation\":\"expire\",\"at\":\"2026-11-07 00:00:00.000000\",\"entered_ns\":49653842788547,\"finished_ns\":49687942264962,\"connection_id\":108,\"pid\":160205,\"transaction_level\":0,\"pdo_transaction\":false}",
+            "stderr": "",
+            "result": {
+                "value": {
+                    "period_id": "89ea3a7d-2ec7-4530-b816-867a1266f6be",
+                    "expiry_event_id": "209b8b52-ffe1-4337-8f82-3fb00fca01af",
+                    "status": "available_credit_expired",
+                    "balances": {
+                        "available": 0,
+                        "reserved": 0,
+                        "consumed": 0,
+                        "expired": 1
+                    }
+                },
+                "error_class": null,
+                "reason": null,
+                "operation": "expire",
+                "at": "2026-11-07 00:00:00.000000",
+                "entered_ns": 49653842788547,
+                "finished_ns": 49687942264962,
+                "connection_id": 108,
+                "pid": 160205,
+                "transaction_level": 0,
+                "pdo_transaction": false
+            },
+            "stopped_by_teardown": false
+        },
+        {
+            "command": "'\/workspace\/.va-studio-toolchain\/root\/usr\/bin\/php8.4' '\/workspace\/VA-Studio-membership-reservations\/tests\/Support\/membership-reservation-race-worker.php'",
+            "spawned_pid": 160206,
+            "operation": "reserve",
+            "request_key": "native-at-expiry",
+            "redemption_id": null,
+            "at": "2026-11-07 00:00:00.000000",
+            "ready": {
+                "connection_id": 109,
+                "pid": 160206,
+                "ready_ns": 49653815400831,
+                "at": "2026-11-07 00:00:00.000000"
+            },
+            "released_ns": 49656624963343,
+            "exit": 0,
+            "stdout": "{\"value\":null,\"error_class\":\"App\\\\Domain\\\\Memberships\\\\Production\\\\MembershipException\",\"reason\":\"credit_expired\",\"operation\":\"reserve\",\"at\":\"2026-11-07 00:00:00.000000\",\"entered_ns\":49656628041187,\"finished_ns\":49700826100685,\"connection_id\":109,\"pid\":160206,\"transaction_level\":0,\"pdo_transaction\":false}",
+            "stderr": "",
+            "result": {
+                "value": null,
+                "error_class": "App\\Domain\\Memberships\\Production\\MembershipException",
+                "reason": "credit_expired",
+                "operation": "reserve",
+                "at": "2026-11-07 00:00:00.000000",
+                "entered_ns": 49656628041187,
+                "finished_ns": 49700826100685,
+                "connection_id": 109,
+                "pid": 160206,
+                "transaction_level": 0,
+                "pdo_transaction": false
+            },
+            "stopped_by_teardown": false
+        }
+    ]
+}

@@ -1,0 +1,270 @@
+Lane O2 transcripts (2026-10-18). Red runs used the new tests against the scripts as they are at efb22df3 (origin/main);
+green runs used the fixed scripts. Temporary paths are throwaway test directories. Nothing here touched a network or a host.
+
+################ Items 1 and 4: off-host retry and shipping lock (tests/ops/test_staging_backup_offhost.py)
+== RED: new tests vs backup.sh at efb22df3
+ERROR: test_a_damaged_kept_copy_is_discarded_and_the_set_encrypted_again
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/va-offhost-9018s6c6/backups/.offhost-retry.20261015T030000Z-aaaaaaaaaaaa/20261015T030000Z-aaaaaaaaaaaa.tar.age'
+ERROR: test_a_kept_copy_that_is_not_age_ciphertext_is_never_sent
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/va-offhost-pjrk4or4/backups/.offhost-retry.20261015T030000Z-aaaaaaaaaaaa/20261015T030000Z-aaaaaaaaaaaa.tar.age'
+FAIL: test_a_concurrent_hardened_ship_refuses_before_it_cleans_up_anything
+AssertionError: 0 == 0
+FAIL: test_a_failed_checksum_upload_is_completed_by_a_retry_with_the_same_ciphertext
+AssertionError: 1 != 0 : flaky-rclone: immutable file modified
+FAIL: test_a_failing_remote_fails_the_ship_and_cleans_the_staging_copy
+AssertionError: Lists differ: [] != ['.offhost-retry.20261015T030000Z-aaaaaaaaaaaa']
+FAIL: test_a_kept_copy_for_other_recipients_is_never_sent
+AssertionError: 'remove that object first' not found in ''
+FAIL: test_a_kept_copy_whose_set_is_gone_is_removed
+AssertionError: True is not false : its set was pruned, so nothing can ever ship it
+FAIL: test_the_kept_copy_is_private_ciphertext_and_never_the_plaintext_set
+AssertionError: 'kept the encrypted copy' not found in ''
+Ran 52 tests in 12.485s
+FAILED (failures=6, errors=2)
+== GREEN
+Ran 52 tests in 13.575s
+
+OK
+
+################ Item 5: cleanup mutations (test_stale_shipping_directories_are_cleared_and_fresh_ones_are_not)
+ITEM 5 (P3-3), script at efb22df3 unchanged:
+ new test vs unmodified script: OK
+ mutation .ship.* : new test FAILED "a seven-character suffix is not the .ship.XXXXXX shape"; old test OK
+ mutation find -L (cleanup line only): new test FAILED "a link is never followed"; old test OK
+
+################ Item 2: host baseline (tests/ops/test_monitoring_scripts.py, class HostBaseline)
+== RED: host-baseline tests vs host-baseline.sh at efb22df3
+FAIL: test_apply_unattended_upgrades_fails_when_the_timers_cannot_be_enabled
+AssertionError: 0 != 2 : plan: apt-get install -y unattended-upgrades; write /tmp/va-monitoring-3xzqw6x6/52vasey:
+FAIL: test_both_apt_timers_must_be_enabled_and_active
+AssertionError: 'OK upgrades: apt-daily.timer and apt-daily-upgrade.timer are enabled and active' not found in 'OK firewall: ufw is active\nOK firewall: default deny incoming, allow outgoing\nOK firewall: allows exactly 80 443 22\nOK listeners: only SSH, 80 and 443 listen beyond loopback\nOK upgrades: daily unattended upgrades are enabled\nOK upgrades: the security pocket is allowed\nOK upgrades: no reboot is pending\nOK ssh: password authentication is off\nOK ssh: root cannot log in with a password\nSUMMARY OK\n'
+Ran 14 tests in 0.771s
+FAILED (failures=2)
+== GREEN (whole module after the fix)
+Ran 44 tests
+OK
+
+################ Item 3: clamd on re-provision (tests/ops/test_clamav_profile.py, class ReprovisioningKeepsAnOptInClamd)
+== RED: clamd reprovision tests vs provision.sh and build-kit.py at efb22df3
+FAIL: test_reprovisioning_leaves_an_installed_clamd_profile_running (kit='staging')
+----------------------------------------------------------------------
+AssertionError: Lists differ: ['disable --now clamav-daemon'] != []
+First list contains 1 additional elements.
+First extra element 0:
+- ['disable --now clamav-daemon']
++ [] : staging provision.sh would stop the opt-in clamd
+----------------------------------------------------------------------
+Ran 2 tests in 0.049s
+FAILED (failures=1)
+== GREEN
+Ran 2 tests in 0.051s
+
+OK
+Production kit before (efb22df3 build-kit.py + staging) and after: only provision.sh differs, in one comment (lines 262-263);
+every executable line is identical. semantic-delta.diff: 223 -> 213 lines, the clamd hunk gone, other hunks moved only.
+
+################ Item 7: scrub coverage of the built production forge-deploy.sh (tests/ops/test_staging_code_drift.py)
+== GREEN on the unmodified kit
+OK
+== mutation applied to ops/staging/forge-deploy.sh (second scrub arm; the end of the removed and added line):
+- ...|VASEY_*_SYNTHETIC_*) unset "$name" ;;
++ ...|VASEY_STAGING_SYNTHETIC_*) unset "$name" ;;
+== RED: drift tests with the arm narrowed to VASEY_STAGING_SYNTHETIC_*
+FAIL: test_the_built_production_deploy_scrubs_every_config_env_key_too
+AssertionError: Lists differ: ['VASEY_STAGING_SYNTHETIC_CATALOG_ENABLED'] != []
+First list contains 1 additional elements.
+First extra element 0:
+- ['VASEY_STAGING_SYNTHETIC_CATALOG_ENABLED']
++ [] : the production kit's forge-deploy.sh (after build-kit.py's renames) does not unset these config env keys: use a scrub pattern that survives the VASEY_STAGING_ -> VASEY_PRODUCTION_ rename (for example VASEY_*_SYNTHETIC_*)
+Ran 10 tests in 0.157s
+FAILED (failures=1)
+== the pre-existing staging check alone, same mutation
+OK
+(forge-deploy.sh restored with git checkout; only the test file was modified at that point)
+
+################ Mutations of the fixed scripts (each applied alone, the module run, the file restored and compared)
+backup.sh, against tests.ops.test_staging_backup_offhost.RcloneRemote:
+  M1 flock removed                                   FAILED (1) test_a_concurrent_hardened_ship_refuses_before_it_cleans_up_anything
+  M2 kept copy never reused                          FAILED (1) test_a_failed_checksum_upload_is_completed_by_a_retry_with_the_same_ciphertext
+  M3 recipients digest not compared                  FAILED (1) test_a_kept_copy_for_other_recipients_is_never_sent
+  M4 ciphertext digest not compared                  FAILED (1) test_a_damaged_kept_copy_is_discarded_and_the_set_encrypted_again
+  M5 copies of pruned sets not removed               FAILED (1) test_a_kept_copy_whose_set_is_gone_is_removed
+  M6 kept copy not removed after a verified ship     FAILED (2) the retry test and the damaged-copy test
+  M7 stale cleanup moved before the lock             FAILED (1) test_a_concurrent_hardened_ship_refuses_before_it_cleans_up_anything
+  M8 age-header check on the kept copy removed       first run: OK (survived) -> added test_a_kept_copy_that_is_not_age_ciphertext_is_never_sent;
+                                                     rerun: FAILED (1) that test
+  cleanup name broadened to .ship.*                  FAILED (1) stale-cleanup test (the old test passed)
+  find -L on the cleanup line                        FAILED (1) stale-cleanup test (the old test passed)
+host-baseline.sh, against tests.ops.test_monitoring_scripts.HostBaseline:
+  H1 is-active no longer required                    FAILED (1) test_both_apt_timers_must_be_enabled_and_active
+  H2 only apt-daily.timer checked                    FAILED (1 test, 3 subtests) test_both_apt_timers_must_be_enabled_and_active
+  H3 enable failure back to a printed warning        FAILED (1) test_apply_unattended_upgrades_fails_when_the_timers_cannot_be_enabled
+  H4 is-enabled by exit status, static accepted      FAILED (1) test_both_apt_timers_must_be_enabled_and_active
+forge-deploy.sh scrub arm VASEY_*_SYNTHETIC_* narrowed to VASEY_STAGING_SYNTHETIC_*:
+  FAILED (1) test_the_built_production_deploy_scrubs_every_config_env_key_too; the staging-only check passes
+
+################ rclone --immutable, measured (the reason the fake rclone in the retry tests refuses overwrites)
+rclone v1.60.1-DEV
+-- copyto --checksum --immutable, then different bytes under the same name
+first exit=0
+Copied (replaced existing)
+second exit=0
+destination now holds the second bytes
+-- copy --checksum --immutable, same situation
+immutable file modified
+exit=6
+destination kept
+
+################################################################ Round 2 (coordinator follow-up)
+
+################ R2-1: uploads with rclone copy --checksum --immutable --include (tests/ops/test_staging_backup_offhost.py)
+Probe of the new invocation, real rclone, local-filesystem remote:
+rclone v1.60.1-DEV
+-- copy --checksum --immutable --include /<set>.tar.age, fresh
+exit=0
+-- same command, identical object present
+There was nothing to transfer
+exit=0
+-- same command, differing object present (same size)
+immutable file modified
+exit=6
+remote object kept
+
+== GREEN: off-host tests vs the copy --immutable script
+Ran 53 tests in 12.989s
+OK
+== RED again: same tests vs backup.sh at a1c94023 (copyto)
+FAIL: test_a_damaged_kept_copy_is_discarded_and_the_set_encrypted_again
+AssertionError: 0 == 0
+FAIL: test_a_differing_object_already_on_the_remote_is_refused_and_never_overwritten (existing='.tar.age')
+AssertionError: 0 == 0 : LOG: shipped 20261015T030000Z-aaaaaaaaaaaa (age-encrypted via rclone)
+FAIL: test_a_differing_object_already_on_the_remote_is_refused_and_never_overwritten (existing='.tar.age.sha256')
+AssertionError: 0 == 0 : LOG: shipped 20261015T030000Z-aaaaaaaaaaaa (age-encrypted via rclone)
+FAIL: test_a_failed_checksum_upload_is_completed_by_a_retry_with_the_same_ciphertext
+AssertionError: 0 == 0 : LOG: shipped 20261015T030000Z-aaaaaaaaaaaa (age-encrypted via rclone)
+FAIL: test_a_kept_copy_for_other_recipients_is_never_sent
+AssertionError: 0 == 0
+FAIL: test_a_kept_copy_that_is_not_age_ciphertext_is_never_sent
+AssertionError: 0 == 0
+FAIL: test_encrypted_set_goes_to_the_remote_and_decrypts
+AssertionError: 0 == 0 : LOG: shipped 20261015T030000Z-aaaaaaaaaaaa (age-encrypted via rclone)
+FAIL: test_the_kept_copy_is_private_ciphertext_and_never_the_plaintext_set
+AssertionError: 0 == 0
+Ran 53 tests in 12.977s
+FAILED (failures=8)
+backup.sh restored to the fix
+(Red failures other than the planted-object test come from the stand-in now keying on 'copy', which the copyto script never runs,
+ and from the re-ship assertion: under copyto the second ship replaced the remote ciphertext.)
+
+Mutations of the new invocation (tests.ops.test_staging_backup_offhost.RcloneRemote; each restored and compared):
+  R1 ciphertext back to copyto                 FAILED (3) incl. test_a_differing_object_already_on_the_remote_is_refused_and_never_overwritten
+  R2 digest back to copyto                     FAILED (6) incl. the differing-object test (.sha256 case) and the retry test
+  R3 --immutable dropped from the ciphertext   FAILED (3) incl. the differing-object test
+  R4 --include dropped from the ciphertext     FAILED (9 incl. subtests) incl. the retry test (recipients.sha256 reached the remote)
+  R5 digest sent before the ciphertext         FAILED (3) and ERROR (3) incl. the differing-object test (.tar.age case)
+
+################ R2-2: semantic-delta.diff pinned to build-kit.py --delta (tests/ops/test_production_kit.py)
+== GREEN on the committed snapshot
+OK
+== one-line edit to the snapshot:
+== RED
+FAIL: test_the_committed_semantic_delta_snapshot_is_current
+----------------------------------------------------------------------
+AssertionError: docs/verification/production-ops-kit-20261017/semantic-delta.diff is stale; regenerate it with `python3 -I ops/production/build-kit.py --delta > docs/verification/production-ops-kit-20261017/semantic-delta.diff` and review the change:
+--- committed semantic-delta.diff
++++ build-kit.py --delta
+@@ -1,2 +1,2 @@
+---- staging/provision.sh (renamed) (edited)
++--- staging/provision.sh (renamed)
+----------------------------------------------------------------------
+Ran 1 test in 0.069s
+FAILED (failures=1)
+snapshot restored
+== GREEN again
+OK
+
+################################################################ Round 3 (independent review of cd35fb15, conditions)
+
+################ P2-1, P2-2, P3-1, P3-3, P3-4: tests/ops/test_staging_backup_offhost.py (68 tests)
+== RED: off-host tests vs backup.sh at cd35fb15
+ERROR: test_a_ship_from_predeploy_waits_a_bounded_time_for_the_lock
+ValueError: substring not found
+ERROR: test_already_shipped_needs_the_record_and_a_matching_remote_digest (case='record missing')
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/va-offhost-sgret60x/backups/.offhost-shipped.20261015T030000Z-aaaaaaaaaaaa'
+FAIL: test_a_differing_object_already_on_the_remote_is_refused_and_never_overwritten (existing='.tar.age')
+AssertionError: 'the remote already holds 20261015T030000Z-aaaaaaaaaaaa.tar.age' not found in 'LOG: kept the encrypted copy of 20261015T030000Z-aaaaaaaaaaaa in /tmp/va-offhost-pbb9n2s6/backups/.offhost-retry.20261015T030
+FAIL: test_a_differing_object_already_on_the_remote_is_refused_and_never_overwritten (existing='.tar.age.sha256')
+AssertionError: 'the remote already holds 20261015T030000Z-aaaaaaaaaaaa.tar.age.sha256' not found in 'LOG: re-sending the encrypted copy of 20261015T030000Z-aaaaaaaaaaaa kept from an earlier attempt\nLOG: kept the encryp
+FAIL: test_a_failing_remote_fails_the_ship_and_cleans_the_staging_copy
+AssertionError: 'could not list the remote' not found in 'LOG: kept the encrypted copy of 20261015T030000Z-aaaaaaaaaaaa in /tmp/va-offhost-5j5kmwtp/backups/.offhost-retry.20261015T030000Z-aaaaaaaaaaaa: a later `ship` of 
+FAIL: test_a_partial_upload_then_a_rotation_on_a_backend_without_hashes_is_refused
+AssertionError: 0 == 0 : LOG: shipped 20261015T030000Z-aaaaaaaaaaaa (age-encrypted via rclone)
+FAIL: test_a_remote_digest_file_that_differs_fails_the_ship
+AssertionError: 0 == 0 : LOG: shipped 20261015T030000Z-aaaaaaaaaaaa (age-encrypted via rclone)
+FAIL: test_a_retry_copy_is_kept_only_when_the_ciphertext_reached_the_remote
+AssertionError: 'so no copy is kept' not found in 'LOG: kept the encrypted copy of 20261015T030000Z-aaaaaaaaaaaa in /tmp/va-offhost-ym5bvwlj/backups/.offhost-retry.20261015T030000Z-aaaaaaaaaaaa: a later `ship` of this se
+FAIL: test_already_shipped_needs_the_record_and_a_matching_remote_digest (case='remote digest replaced')
+AssertionError: Lists differ: ['.offhost-retry.20261015T030000Z-aaaaaaaaaaaa'] != []
+FAIL: test_encrypted_set_goes_to_the_remote_and_decrypts
+AssertionError: 1 != 0 : LOG: kept the encrypted copy of 20261015T030000Z-aaaaaaaaaaaa in /tmp/va-offhost-le_bd4jy/backups/.offhost-retry.20261015T030000Z-aaaaaaaaaaaa: a later `ship` of this set re-sends the same bytes.
+FAIL: test_kept_copies_are_capped_newest_first_and_never_the_set_being_shipped
+AssertionError: Lists differ: ['.of[62 chars]261002T030000Z-aaaaaaaaaaaa', '.offhost-retry.[74 chars]aaa'] != ['.of[62 chars]261004T030000Z-aaaaaaaaaaaa']
+FAIL: test_kept_copies_are_reported_for_check_offhost
+AssertionError: 127 != 0 : bash: line 295: retry_copies_summary: command not found
+Ran 67 tests in 19.368s
+FAILED (failures=10, errors=2)
+== GREEN at d8cff5e7: Ran 68 tests, OK
+
+Mutations of the fixed backup.sh (tests.ops.test_staging_backup_offhost.RcloneRemote; each restored and compared):
+  P1 rclone check removed                          FAILED (1) test_a_failed_rclone_check_fails_the_ship
+  P2 lock released before encryption and transfer  FAILED (1) test_the_lock_is_held_through_the_transfer
+  P3 symlink checks in retry_copy_ok removed       FAILED (2 subtests) test_symlinks_in_or_as_a_kept_copy_are_never_reused
+  P4 --checksum dropped                            FAILED (1) test_an_identical_remote_object_with_another_mtime_is_accepted_as_present
+  P5 refusal of a symlinked lock removed           FAILED (1) test_a_symlinked_lock_is_refused
+  N1 presence check removed                        FAILED (8) incl. the chunker hash_type = none reproduction
+  N2 remote digest not read back and compared      FAILED (1) test_a_remote_digest_file_that_differs_fails_the_ship
+  N3 kept copy kept whatever the remote holds      FAILED (1) test_a_retry_copy_is_kept_only_when_the_ciphertext_reached_the_remote
+  N4 cap removed                                   FAILED (1) test_kept_copies_are_capped_newest_first_and_never_the_set_being_shipped
+  N5 "already shipped" without the digest match    FAILED (1) test_already_shipped_needs_the_record_and_a_matching_remote_digest
+  N6 the lock never waits                          FAILED (1) test_a_ship_from_predeploy_waits_a_bounded_time_for_the_lock
+  N7 lsf exit 3 (missing path) treated as failure  first: OK (survived) -> added test_the_first_ship_to_a_remote_path_that_does_not_exist_yet_succeeds;
+                                                   rerun: FAILED (1) that test
+
+################ P3-4: host-baseline accepting enabled-runtime (tests.ops.test_monitoring_scripts.HostBaseline)
+  mutation (is-enabled "enabled" or "enabled-runtime"): new test FAILED (1) test_both_apt_timers_must_be_enabled_and_active;
+  the previous test passed it
+
+################ P3-5: clamd marker only as the exact first line (tests/ops/test_clamav_profile.py)
+== GREEN
+OK
+== RED vs provision.sh at cd35fb15
+FAIL: test_an_unconfigured_clamd_is_still_stopped (kit='staging', conf='marker on a later line')
+FAIL: test_an_unconfigured_clamd_is_still_stopped (kit='staging', conf='look-alike first line')
+FAIL: test_an_unconfigured_clamd_is_still_stopped (kit='production', conf='marker on a later line')
+FAIL: test_an_unconfigured_clamd_is_still_stopped (kit='production', conf='look-alike first line')
+Ran 2 tests in 0.069s
+FAILED (failures=4)
+
+################ chunker hash_type = none probe (real rclone 1.60.1)
+copy --checksum --immutable of a differing same-size object: NOTICE 'no hashes in common; falling back to --size-only', exit 0, remote kept (taken as unchanged).
+lsf with anchored includes lists the name; lsf of a path that does not exist exits 3 ('directory not found').
+
+################################################################ Round 4 (narrow re-review of a28a87c5)
+== RED: new tests vs backup.sh at a28a87c5
+FAIL: test_already_shipped_checks_the_remote_ciphertext_size_and_presence (case='replaced')
+AssertionError: 0 == 0 : LOG: off-host retry copies on this host: 0 kept retry copies, 0 bytes
+FAIL: test_an_outage_during_the_digest_upload_keeps_the_copy_and_the_retry_converges
+AssertionError: Lists differ: [] != ['.offhost-retry.20261015T030000Z-aaaaaaaaaaaa']
+Ran 72 tests in 28.380s
+FAILED (failures=2)
+(test_the_cap_never_drops..., test_a_linked_shipped_record... and the 'deleted' subcase pass at a28a87c5: they guard mutations R-b, R-c, R-a)
+== GREEN at ed152682: Ran 72 tests, OK
+
+Mutations of the fixed backup.sh (RcloneRemote; each restored and compared):
+  R-a accept when only the digest name is present: OK []
+  R-b cap may drop the set being shipped: FAILED (failures=1) ['test_the_cap_never_drops_a_reusable_copy_of_the_set_being_shipped']
+  R-c linked shipped record trusted: FAILED (failures=1) ['test_a_linked_shipped_record_is_not_trusted']
+  R-d copy dropped on a listing failure: FAILED (failures=1) ['test_an_outage_during_the_digest_upload_keeps_the_copy_and_the_retry_converges']
+  R-e ciphertext size not compared: FAILED (failures=1) ['test_already_shipped_checks_the_remote_ciphertext_size_and_presence']
+  restored: True
+  R-a is an equivalent mutant now: with the size check, a missing ciphertext (empty remote size) is refused whatever the name test says.

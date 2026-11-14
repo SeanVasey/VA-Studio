@@ -1,0 +1,9 @@
+Private synthetic MySQL instance reused from preceding owned local tests.
+Version observed: MySQL 8.4.11.
+Container: va-studio-private-mysql-policy-20261013
+Owned datadir: /workspace/runtime/mysql-policy-data
+Host socket: /workspace/runtime/mysql-policy-run/mysql.sock
+Host loopback port: 33413 (container server 3306)
+New owned schema: vaseyaudio_membership_reservations (root canary/focused cases)
+New owned schema: vaseyaudio_membership_reservation_races (root-authorized race selection)
+No provider, hosted, production, or customer data.

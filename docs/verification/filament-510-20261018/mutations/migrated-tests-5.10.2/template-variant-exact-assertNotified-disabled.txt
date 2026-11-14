@@ -1,0 +1,25 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/m3/phpunit.xml
+
+FF                                                                  2 / 2 (100%)
+
+Time: 00:06.301, Memory: 95.00 MB
+
+There were 2 failures:
+
+1) Tests\Feature\LicenseTemplateAuthoringActionTest::test_uncertain_audit_failure_closes_form_without_success_and_logs_only_exception_class@create with data ('create')
+Failed asserting that '[{"id":"a303186e-c8ab-4eed-8a41-87df40e1232a","actions":[],"body":"Reload templates and inspect the current saved identity before trying again.Synthetic private exception content","color":null,"duration":"persistent","icon":"heroicon-o-x-circle","iconColor":"danger","iconSize":null,"status":"danger","title":"The save result could not be confirmed.","view":null,"viewData":[]}]' [ASCII](length: 378) does not contain "Synthetic private exception content" [ASCII](length: 35).
+
+/home/user/wt/m3/tests/Feature/LicenseTemplateAuthoringActionTest.php:299
+/home/user/wt/m3/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\LicenseTemplateAuthoringActionTest::test_uncertain_audit_failure_closes_form_without_success_and_logs_only_exception_class@edit with data ('edit')
+Failed asserting that '[{"id":"a3031873-273b-4f72-a6c8-94f8b8c66812","actions":[],"body":"Reload templates and inspect the current saved identity before trying again.Synthetic private exception content","color":null,"duration":"persistent","icon":"heroicon-o-x-circle","iconColor":"danger","iconSize":null,"status":"danger","title":"The save result could not be confirmed.","view":null,"viewData":[]}]' [ASCII](length: 378) does not contain "Synthetic private exception content" [ASCII](length: 35).
+
+/home/user/wt/m3/tests/Feature/LicenseTemplateAuthoringActionTest.php:299
+/home/user/wt/m3/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 2, Assertions: 18, Failures: 2.

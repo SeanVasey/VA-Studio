@@ -1,0 +1,43 @@
+# Independent I2 two-FULL-family design decision
+
+Reviewed frozen `/workspace/account-guard-evidence-20261101/I2-TWO-FULL-FAMILIES-DESIGN.md`, independently verified SHA256 `a7f3a78642abf862ec23adebaa2f7457ce370dcee294a3f36b4a992336e2cbcd`, against actualf972 compiler/executor/decoder/group cache and prior wire evidence. Source/design only; no PHP/runtime/DB/container/process/test/probe or code edit.
+
+**Decision: suitable for bounded I2-only implementation preparation under the stated file scope, with the P1 implementation conditions below. No confirmed arithmetic or fail-open defect in the proposed branch contract.** This is not implementation/native acceptance, authorization to run code or proof of108/110 fit. Frozen failedf972, missing-fact/OOM and133FAIL receipts remain unchanged.
+
+## Aggregate branch arithmetic is sound on its stated charge model
+
+h0=h1=28; '[null]' is6bytes, so future invalid-header reserve is28×(256+6)=7336bytes/28records. FramingF=4096 is charged ONCE.
+
+- First valid gate limits actual chargeF+t0 to B−7336=16,769,880 and r0 toR−28=131,044. It counts complete original H/R wire and rejects NULL/overpayload/per-name overflow. No LIMIT/truncation substitutes for scope.
+- First invalid emits only its28 invalid headers:4096+7336=11,432 charged bytes/28records, and stage stops before second execution.
+- After first complete successful read, residual bytes/records are derived from ACTUAL transmitted charge, not header estimates or decoded data alone. leftBytes≥7336 and leftRecords≥28 are established before second prepare.
+- Second valid gate checks its COMPLETE charge/record count against those residuals, with no second4096. Thus aggregate ≤16,777,216bytes and131,072records. Second invalid emits exactly28 invalid headers/7336bytes within reserved capacity, then whole stage refuses.
+- Empty valid family still has28 headers. Their '["0"]' payload costs28×261=7308, not zero. Header charges are part of actual t0/t1, not extra uncharged control data. P=8MiB and N=65536 remain independent caps.
+
+The future-header reservation prevents first success from consuming the second decisive-refusal wire budget. Two independent16MiB gates or a PHP-only rejection after unlimited second transmission would not satisfy this contract. SQL-side and receiver-side accounting are both necessary. This is the established logical charge model, not a proof of TLS/TCP/allocator/server-work bounds; implementation must preserve the conservative fixed framing assumptions for two result sets.
+
+## Supported scope, publication and time semantics
+
+Current I2 consumers are the adjacent reserved index/constraint lookups. Existing groupLookups assigns its cache only after CatalogLease::group returns completely; the proposed private two-stream executor can retain that exact no-partial-publication property. Keep first decoded result local until second fully validates, closes/restores and final authority checks/merge succeed. Any second/final failure discards both, invalidates the capability and never retries/reconnects/falls back. A failed first must not issue second SQL.
+
+The two statements read potentially different committed dictionary instants. The design honestly makes no atomic schema-snapshot claim. Original pre-group I2 used separate statistics/constraint scans, but no conclusion that MDL pins all foreign namespace objects follows. Keep source statistics→constraints order, same inspection stage, one private context/lease and all original primary SHOW/TEMP/FK/database/witness/pin/terminal boundaries. No callback/publication/primary-bookend may be inserted between stages or reuse first-family metadata after a failure. Final complete proof cannot excuse a stale/omitted fact at earlier use.
+
+Actual single FULL constraint control supports trying this composition; full statistics single-family equivalence remains UNPROVED. The unchanged per-name predicates, aliases/coercibility, duplicate multiplicity, ordered cells/NULL/types and warning/completeness checks must survive. No ungated diagnostic variant enters production.
+
+## P1 implementation conditions before exact-source/native review
+
+1. **Closed plan shape and transitive consumers.** I2 needs one unambiguous source-owned descriptor, not a generic executable-stage/budget/family/SQL API. Remove active/fallback failed combined SQL. Preserve every non-I2 plan SQL/bind/family byte across all versions and original CurrentCatalog::identityPlan. Audit all build/group/decoder callers and direct tests; tests must traverse the actually executed two stages, not obsolete combined SQL. No Billing/IdentityMigrationOwnership/account standalone or old migration/fixture behavior change is justified.
+2. **Exact residual parameter binding.** Validate native int/nonboolean/nonnegative bounded remaining budgets and arithmetic before prepare. Pin original string bindings and fixed residual positions/order. Use PDO::PARAM_INT for residuals without later `execute(array)` replacing explicit bound types; e.g. bind the complete fixed vector with correct original string/int types then execute without an overriding array. No SQL interpolation/caller budget/string coercion. Native differential must verify actual parameter/coercion behavior.
+3. **Same authoritative accounting.** Use the same fixed byte/record/payload/per-name contract in SQL gates and independent streaming receiver. Account all headers/tags/payloads and oneF; check exact first actual charge against reserve BEFORE second prepare. Confirm h0/h1 derive from exact frozen recipes and invalid emission cannot duplicate/miss headers. Do not accept a header-only zero as scope absence or allow reserve reuse across stages/calls.
+4. **No partial result or safe-looking failure.** Only a complete disjoint exact enum-keyed merge may return. Unknown/duplicate/missing family/name, bad descriptor/budget/type/ordinal, warnings, partial EOF, close/restore/transaction failure or changed authority before second/publication invalidates whole stage. Local requireCurrent is not a fresh server-context SQL comparison; retain existing actual outer context bookends and count any added checks honestly. Failed lease close may refuse; preserve primary failure and independently prove release rather than regain authority.
+5. **Bounded receive/error handling.** Receiving caps apply before whole-result allocation. First-family arrays/accounting must remain private and be dropped on any later error; all statement/native references need safe teardown. Normal invalid SQL branches fit reserved wire, but protocol errors/stalled drain/server work are not made bounded by this arithmetic. Exact runtime watchdog/cleanup/resource tests remain required before native acceptance.
+
+## Required focused proof and limits
+
+Pure tests should independently exercise first threshold±1, framing once, ALL28 failure headers, minimal empty-family charges, exact residual-valid/invalid second limits, byte/record/payload/per-name overflow, wrong scalar/overflow/bool/string budgets and every malformed/partial/final-merge failure. Assert zero second execution after first refusal and no publication/cache/reconnect after any second failure. Do not build a tautological model that merely calls the same implementation arithmetic twice.
+
+Native tests must compare BOTH full-family/all28-name typed bags/key order/duplicates against unchanged originals, all supported versions including migration-only overlap, canonical positives/restorations and adverse aliases/NULL/order/collision cases. Test actual second invalid-header wire/aggregate cap, first and second warning/error/resource release, primary transaction/savepoint/session/witness preservation, and exact family materialization. A getter-only warning control cannot be relabeled an organic production-stage warning. Existing native assertions must be retained; only fixed-plan traversal adaptation is necessary, not weaker expected results.
+
+An extra I2 SELECT gives conditional107→108 arithmetic only. Actual additional binding/context/decoder checks, full construction and all PDO statements remain inside unchanged cost110 window; no warmup or hidden source bypass. Memo15/ratio/terminal/earlyRR, constructor/TLS, original account PK/order/FK/generatedID/isolation, composed/fresh/populated and genuine migrator/ledger gates remain. No source correction can promise memory/headroom/repeatability from current wire evidence.
+
+Root must separately scope the coherent implementation and exact-source review before any execution. If implementation cannot meet residual/failure-wire/temporal contracts, retain the failed candidate rather than alter caps or guard density. Only this external decision was written.

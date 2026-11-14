@@ -1,0 +1,26 @@
+warning: 39 test file(s) have no entry in scripts/ci/phpunit-timings-mysql.json and use the fallback weight; refresh it with scripts/ci/phpunit-timings.py: tests/Feature/PersistentCatalogDraftImportTest.php, tests/Feature/ProductionMemberOriginals/MemberGrantSourceAdmissionTest.php, tests/Feature/ProductionMemberOriginals/MemberOriginalPreparationTest.php, tests/Feature/ProductionMembership/MembershipPolicyClockTest.php, tests/Feature/ProductionMembership/MembershipPolicyFactsTest.php, ...
+Proved 2103 selected MySQL-native tests in 202 files (of 8245 discovered tests in 602 files) across 24 nonempty shards.
+Shard 1: 85 tests; 1 complete files; estimated 122m 57s.
+Shard 2: 101 tests; 9 complete files; estimated 104m 15s.
+Shard 3: 97 tests; 7 complete files; estimated 104m 49s.
+Shard 4: 74 tests; 7 complete files; estimated 104m 32s.
+Shard 5: 97 tests; 7 complete files; estimated 104m 31s.
+Shard 6: 80 tests; 8 complete files; estimated 105m 00s.
+Shard 7: 88 tests; 8 complete files; estimated 104m 57s.
+Shard 8: 82 tests; 8 complete files; estimated 104m 57s.
+Shard 9: 90 tests; 8 complete files; estimated 104m 59s.
+Shard 10: 83 tests; 8 complete files; estimated 104m 59s.
+Shard 11: 73 tests; 8 complete files; estimated 104m 57s.
+Shard 12: 72 tests; 8 complete files; estimated 104m 30s.
+Shard 13: 83 tests; 12 complete files; estimated 104m 15s.
+Shard 14: 85 tests; 9 complete files; estimated 104m 27s.
+Shard 15: 101 tests; 9 complete files; estimated 104m 44s.
+Shard 16: 87 tests; 9 complete files; estimated 105m 01s.
+Shard 17: 101 tests; 13 complete files; estimated 104m 15s.
+Shard 18: 78 tests; 9 complete files; estimated 104m 56s.
+Shard 19: 74 tests; 9 complete files; estimated 104m 56s.
+Shard 20: 83 tests; 9 complete files; estimated 104m 58s.
+Shard 21: 108 tests; 9 complete files; estimated 105m 02s.
+Shard 22: 85 tests; 9 complete files; estimated 104m 32s.
+Shard 23: 82 tests; 9 complete files; estimated 104m 37s.
+Shard 24: 114 tests; 9 complete files; estimated 104m 36s.

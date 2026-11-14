@@ -1,0 +1,3 @@
+SYNTHETIC EXCLUSIVE TEST TEMPLATE: {LICENSE_NAME}
+
+This synthetic fixture is not a license. It names {CUSTOMER_FULLNAME}, performing as {CUSTOMER_ALIAS}, on {CONTRACT_DATE}, for {PRODUCT_TITLE} at {PRODUCT_PRICE}.

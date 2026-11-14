@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\MembershipEligibleLicenseProofTest" file="/workspace/VA-Studio-membership-reservations/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php" tests="2" assertions="12" errors="0" failures="0" skipped="0" time="226.550235">
+    <testcase name="test_temporary_catalog_shadow_is_refused_even_when_its_rows_are_identical" file="/workspace/VA-Studio-membership-reservations/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php" line="181" class="Tests\Feature\ProductionMembershipBilling\MembershipEligibleLicenseProofTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipEligibleLicenseProofTest" assertions="7" time="154.296536"/>
+    <testcase name="test_catalog_snapshot_is_verified_nonlocking_inside_committed_read_only_frame" file="/workspace/VA-Studio-membership-reservations/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php" line="228" class="Tests\Feature\ProductionMembershipBilling\MembershipEligibleLicenseProofTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipEligibleLicenseProofTest" assertions="5" time="72.253699"/>
+  </testsuite>
+</testsuites>

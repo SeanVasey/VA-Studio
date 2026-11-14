@@ -260,7 +260,9 @@ class ProductionBuyerAssentObservationsTest extends TestCase
             $before = ['rows' => DB::table(Reports::TABLE)->get()->map(fn ($row): array => (array) $row)->all(), 'migrations' => DB::table('migrations')->get()->map(fn ($row): array => (array) $row)->all(),
                 'columns' => Schema::getColumns(Reports::TABLE), 'indexes' => Schema::getIndexes(Reports::TABLE), 'foreign' => Schema::getForeignKeys(Reports::TABLE)];
             try {
-                app('migrator')->rollback([database_path('migrations')], ['step' => 1]);
+                // Later migrations run after this one, so --step counts back to it; --path alone would skip the newest as "Migration not found".
+                app('migrator')->rollback([database_path('migrations/2026_10_07_239000_production_buyer_assent_observations.php')],
+                    ['step' => array_search('2026_10_07_239000_production_buyer_assent_observations', array_column(app('migration.repository')->getMigrations(PHP_INT_MAX), 'migration'), true) + 1]);
                 $this->fail('Rollback accepted.');
             } catch (LogicException) {
                 $this->assertSame($before['rows'], DB::table(Reports::TABLE)->get()->map(fn ($row): array => (array) $row)->all());

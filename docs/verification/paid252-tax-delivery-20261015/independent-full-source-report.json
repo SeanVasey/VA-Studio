@@ -1,0 +1,527 @@
+{
+  "base_sha": "0fc2391cfd624cfa97fb5d02cc8be94492d8df36",
+  "bindings": {
+    "current_actual_differences_from_a12": [
+      "scripts/ci/database-mysql-selection.json",
+      "scripts/ci/database-mysql-skips.json",
+      "scripts/ci/database-sqlite-skips.json"
+    ],
+    "current_source_inputs": 2409,
+    "historical_git_source_bindings_verified": 12043,
+    "loaders": 13,
+    "original_before_after_stability": "verified for all five listed receipts",
+    "routes": 16,
+    "unique_git_blob_bytes_verified": 2360
+  },
+  "census": {
+    "discovered_cases": 8880,
+    "discovered_files": 662,
+    "discovery_only": true,
+    "fallback_files": 66,
+    "head": "3ea857df3d98ce38680a455163711b230f97d1bc",
+    "manifest_sha256": "bd002c6b1c636e405c7e48347d99b895c2070c7b08baf8f6c63f963904e9bc93",
+    "nonempty_shards": 8,
+    "older_be6": "Dirty policy-overlay discovery only; no exact separately retained overlay-byte or clean be6 binding claim.",
+    "policy_hashes": {
+      "mysql_skip_policy_sha256": "8d3d4cd29681f3fda8ac899c989285d3d395cf915095e56d27878f70ee0ca5c4",
+      "policy_sha256": "93344d112703d0041b59023ea2235c6cb32c7f8bf81e6d67d81f971f9f00be9f",
+      "sqlite_skip_policy_sha256": "43d24857e2b1cdfa4477164b58ec8305095b235706c930a021d85e20f6c0cc62"
+    },
+    "selected_native_cases": 2333,
+    "selected_native_files": 229
+  },
+  "corrected_metadata_sha": "3ea857df3d98ce38680a455163711b230f97d1bc",
+  "decision": "APPROVE BOUNDED SOURCE AND NARROW CARRIES",
+  "engineering_quality_verdict": "Pass for reviewed source, focused executable evidence and narrow carries.",
+  "limits": [
+    "Final immutable sealed archive/index/claims and publication-head review still required.",
+    "Exact published-head cheap preflight and expected-SHA merge still required.",
+    "Default-off and unmounted domain; typed Tax HTTP/root/auth/redemption composition is next.",
+    "No hosted Foundation/GitLab, real provider/live commerce/host/FPM/activation/release acceptance.",
+    "Native3 cases observed one winner and controlled early buyer-row-lock503; no forced uniqueness/deadlock stress, effective-isolation/RC gap or wider trigger/DDL SQL proof.",
+    "begun_dictionary_read includes identity-frame work, not evidence that blocked Tax beginning delegate executed.",
+    "927.968104315s native file elapsed includes fixture/schema lifecycle, not a latency benchmark.",
+    "Uninterruptible frozen helper I/O, distributed caches/all-family capacity, invisible reopen and wider damaged-restore conditions remain unproved.",
+    "Frozen shared V1/Identity metadata P2 and ordinary membership throwing-afterCommit P2 remain outside this batch.",
+    "Original behavioral failures, fixture failures and preparation failures remain separate originals; no retrospective reclassification without evidence."
+  ],
+  "metadata_finding": {
+    "at_a12": "Three CI policies were noncanonically ordered.",
+    "remaining_required_correction": false,
+    "resolution": "Only three policy lists sorted; app/tests/helpers/config/migration unchanged. Current pure checks and clean discovery pass.",
+    "resolved_at": "3ea857df3d98ce38680a455163711b230f97d1bc"
+  },
+  "narrow_carries": [
+    {
+      "all_git_changed_paths": [
+        ".github/workflows/final-verification.yml",
+        "scripts/ci/database-mysql-selection.json",
+        "scripts/ci/database-mysql-skips.json",
+        "scripts/ci/database-sqlite-skips.json"
+      ],
+      "application_runtime_delta": [],
+      "current_only_inputs": [],
+      "from": "be6c483e44712a6c60971bf4343d993e8a55d28a",
+      "recorded_member_differences_to_current": [
+        "scripts/ci/database-mysql-selection.json",
+        "scripts/ci/database-mysql-skips.json",
+        "scripts/ci/database-sqlite-skips.json"
+      ],
+      "selected_components_compared": [
+        "tests/Feature/PaidTaxDownloadJourneyTest.php",
+        "tests/Feature/PaidTaxDeliverySchemaRecoveryTest.php",
+        "tests/Feature/PaidTaxDownloadNativeTest.php",
+        "tests/TestCase.php",
+        "tests/Support/FinalizationDatabaseMigrations.php",
+        "tests/Support/PaidTaxDeliveryFixtures.php"
+      ],
+      "selected_tests_and_common_helpers_delta": [],
+      "selection": "sqlite-final-download-and-schema-files",
+      "to_corrected_metadata_head": "3ea857df3d98ce38680a455163711b230f97d1bc",
+      "to_source_target": "a12fe5effd31670fcdc78b6382b241554bf4c653",
+      "whole_manifest_equal_to_current": false
+    },
+    {
+      "all_git_changed_paths": [
+        ".github/workflows/final-verification.yml",
+        "docs/verification/paid252-tax-delivery-20261015/independent-four-repairs-DECISION.json",
+        "docs/verification/paid252-tax-delivery-20261015/independent-four-repairs-DECISION.md",
+        "scripts/ci/database-mysql-selection.json",
+        "scripts/ci/database-mysql-skips.json",
+        "scripts/ci/database-sqlite-skips.json",
+        "tests/Feature/PaidTaxDownloadJourneyTest.php",
+        "tests/Feature/PaidTaxDownloadNativeTest.php",
+        "tests/Support/paid-tax-delivery-race-worker.php"
+      ],
+      "application_runtime_delta": [],
+      "current_only_inputs": [
+        "tests/Feature/PaidTaxDownloadNativeTest.php",
+        "tests/Support/paid-tax-delivery-race-worker.php"
+      ],
+      "from": "f4f9d5f87e64150cae7951d7db84d73436c108d7",
+      "recorded_member_differences_to_current": [
+        "scripts/ci/database-mysql-selection.json",
+        "scripts/ci/database-mysql-skips.json",
+        "scripts/ci/database-sqlite-skips.json",
+        "tests/Feature/PaidTaxDownloadJourneyTest.php"
+      ],
+      "selected_components_compared": [
+        "tests/Feature/PaidTaxDeliverySchemaRecoveryTest.php",
+        "tests/TestCase.php",
+        "tests/Support/FinalizationDatabaseMigrations.php",
+        "tests/Support/PaidTaxDeliveryFixtures.php"
+      ],
+      "selected_tests_and_common_helpers_delta": [],
+      "selection": "mysql-whole-forward-delivery-schema",
+      "to_corrected_metadata_head": "3ea857df3d98ce38680a455163711b230f97d1bc",
+      "to_source_target": "a12fe5effd31670fcdc78b6382b241554bf4c653",
+      "whole_manifest_equal_to_current": false
+    },
+    {
+      "all_git_changed_paths": [
+        ".github/workflows/final-verification.yml",
+        "docs/verification/paid252-tax-delivery-20261015/independent-four-repairs-DECISION.json",
+        "docs/verification/paid252-tax-delivery-20261015/independent-four-repairs-DECISION.md",
+        "scripts/ci/database-mysql-selection.json",
+        "scripts/ci/database-mysql-skips.json",
+        "scripts/ci/database-sqlite-skips.json",
+        "tests/Feature/PaidTaxDownloadJourneyTest.php"
+      ],
+      "application_runtime_delta": [],
+      "current_only_inputs": [],
+      "from": "ddb85c2f0d2917bcb59efef8139f642792e28a71",
+      "recorded_member_differences_to_current": [
+        "scripts/ci/database-mysql-selection.json",
+        "scripts/ci/database-mysql-skips.json",
+        "scripts/ci/database-sqlite-skips.json",
+        "tests/Feature/PaidTaxDownloadJourneyTest.php"
+      ],
+      "selected_components_compared": [
+        "tests/Feature/PaidTaxDownloadNativeTest.php",
+        "tests/TestCase.php",
+        "tests/Support/FinalizationDatabaseMigrations.php",
+        "tests/Support/PaidTaxDeliveryFixtures.php",
+        "tests/Support/paid-tax-delivery-race-worker.php"
+      ],
+      "selected_tests_and_common_helpers_delta": [],
+      "selection": "mysql-three-real-delivery-races-first",
+      "to_corrected_metadata_head": "3ea857df3d98ce38680a455163711b230f97d1bc",
+      "to_source_target": "a12fe5effd31670fcdc78b6382b241554bf4c653",
+      "whole_manifest_equal_to_current": false
+    },
+    {
+      "all_git_changed_paths": [],
+      "application_runtime_delta": [],
+      "current_only_inputs": [],
+      "from": "294110a22c17430fae783a773dece5b0c6da09a4",
+      "recorded_member_differences_to_current": [],
+      "selected_components_compared": [
+        "tests/Feature/PaidTaxGrantJourneyTest.php",
+        "tests/Feature/PaidTaxAdversarialJourneyTest.php",
+        "tests/Feature/PaidTaxFamilyCompatibilityTest.php",
+        "tests/Unit/PaidTaxCapabilityTest.php",
+        "tests/TestCase.php",
+        "tests/Support/FinalizationDatabaseMigrations.php",
+        "tests/Support/PaidTaxDeliveryFixtures.php"
+      ],
+      "selected_tests_and_common_helpers_delta": [],
+      "selection": "sqlite-affected-existing-tax-family",
+      "to_corrected_metadata_head": "3ea857df3d98ce38680a455163711b230f97d1bc",
+      "to_source_target": "a12fe5effd31670fcdc78b6382b241554bf4c653",
+      "whole_manifest_equal_to_current": true
+    },
+    {
+      "all_git_changed_paths": [
+        "scripts/ci/database-mysql-selection.json",
+        "scripts/ci/database-mysql-skips.json",
+        "scripts/ci/database-sqlite-skips.json"
+      ],
+      "application_runtime_delta": [],
+      "current_only_inputs": [],
+      "from": "a12fe5effd31670fcdc78b6382b241554bf4c653",
+      "recorded_member_differences_to_current": [
+        "scripts/ci/database-mysql-selection.json",
+        "scripts/ci/database-mysql-skips.json",
+        "scripts/ci/database-sqlite-skips.json"
+      ],
+      "selected_components_compared": [
+        "tests/Feature/PaidGrantSourceJourneyTest.php",
+        "tests/Feature/PaidGrantDocumentJourneyTest.php",
+        "tests/Feature/PaidGrantDownloadJourneyTest.php",
+        "tests/TestCase.php",
+        "tests/Support/FinalizationDatabaseMigrations.php",
+        "tests/Support/PaidTaxDeliveryFixtures.php"
+      ],
+      "selected_tests_and_common_helpers_delta": [],
+      "selection": "sqlite-affected-v1-paid-journeys",
+      "to_corrected_metadata_head": "3ea857df3d98ce38680a455163711b230f97d1bc",
+      "to_source_target": "a12fe5effd31670fcdc78b6382b241554bf4c653",
+      "whole_manifest_equal_to_current": false
+    }
+  ],
+  "not_performed": [
+    "No app/test/DB/container/network/hosted CI operation",
+    "No source/test/config/autoload/Git/tracked edit",
+    "No final evidence sealing/publication"
+  ],
+  "observed_later_docs_only_sha": "4ca23ebbf51c9b819eec5135402601bcbfca1e85",
+  "open_P0_P1": [],
+  "operative_source_sha": "d6367b3f632e576be65af8e08b0a15ffc05a1f6f",
+  "protected_source": {
+    "all_resources_contracts_unchanged": true,
+    "paths": 40,
+    "receipt_sha256": "a08e7103a49c79ba681326f5ea7190f26390c87c741f8c736696a55ba59d8906"
+  },
+  "quality": [
+    {
+      "count": 18,
+      "exit": 0,
+      "receipt": "pint-final.json",
+      "sha256": "07ef211784ba0e43c10f560ac9e722915c2197647dda299870619b38f91ab4d3",
+      "source_head": "3ea857df3d98ce38680a455163711b230f97d1bc"
+    },
+    {
+      "count": 52,
+      "exit": 0,
+      "receipt": "ci-partition-final.json",
+      "sha256": "11400e8cf4e053f5d43772140a2d1201597dd5f5c42a2b16e11af5f309342f9a",
+      "source_head": "3ea857df3d98ce38680a455163711b230f97d1bc"
+    },
+    {
+      "count": 14,
+      "exit": 0,
+      "receipt": "ci-workflow-final.json",
+      "sha256": "9c8a28a86e40df975c79ec3358b59541b20f53a2f1b9b5ae9b52432ce7620ff3",
+      "source_head": "3ea857df3d98ce38680a455163711b230f97d1bc"
+    },
+    {
+      "count": 27,
+      "exit": 0,
+      "receipt": "ci-scope-final.json",
+      "sha256": "f368d16eb2a824c45d17d59eeaf28903a913aa887f0dfbbf78e82ed74a330fa9",
+      "source_head": "3ea857df3d98ce38680a455163711b230f97d1bc"
+    }
+  ],
+  "read_commands": [
+    "Read AGENTS.md and code-verification instructions; earlier complete source/test and design observations retained in this reviewer session.",
+    "Read-only git status/rev-parse/diff/ls-tree/show/cat-file and Python JSON/XML/SHA receipt inspection."
+  ],
+  "recorded_at": "2026-10-15T10:05:47.162950+00:00",
+  "required_product_repairs": [],
+  "requirements": [
+    {
+      "evidence": "Source fixed typed selectors and whole real-fixture PDF/master/stems/multiline journeys with late/adversarial refusals",
+      "result": "Pass within bounded fixtures",
+      "risk": "Current buyer/retained owner, target/key/config, idempotency and token"
+    },
+    {
+      "evidence": "Request arithmetic, original clock birth and four genuine old/new behavior controls plus live deep flush/later-chunk cases",
+      "result": "Pass at owned checkpoints; no immediate helper-I/O cancellation claim",
+      "risk": "Original live min-only request/snapshot and per-chunk bounds"
+    },
+    {
+      "evidence": "Throwing actual afterCommit, pre-first-byte refusal, unused/destructor cleanup and fresh authorized retry",
+      "result": "Pass for selected callback/frame boundaries",
+      "risk": "Durable attempt and original-only abandonment cleanup"
+    },
+    {
+      "evidence": "SQLite and native committed-prefix/collision/drift/temp recovery; protected old40/all contract paths unchanged",
+      "result": "Pass for tested boundaries",
+      "risk": "Separate exact forward schema and preserve old families"
+    },
+    {
+      "evidence": "Three independent-worker cases with exact users-PK waits, one winner, controlled503 competitor, restored waits/closed frames and exact bytes/replay",
+      "result": "Pass for observed early lock contention and outcome; not general final-SQL race/deadlock/isolation proof",
+      "risk": "Native duplicates and last-attempt contention"
+    },
+    {
+      "evidence": "32/371 and21/398 whole affected cases, PHP/recorder/launch-bound OS0",
+      "result": "Pass within selected files",
+      "risk": "Affected Tax/V1 compatibility"
+    }
+  ],
+  "reviewed_source_sha": "a12fe5effd31670fcdc78b6382b241554bf4c653",
+  "reviewer_preparation_error": {
+    "classification": "Reviewer preparation only, no app execution or product inference.",
+    "description": "First report command expected old d75 HEAD after root moved documentation. A second read-only command incorrectly used dotted JUnit classname for the backslash policy class. Both assertions stopped before creating artifacts; corrected reader uses the original class attribute."
+  },
+  "reviewer_role": "Independent non-author, read-only",
+  "runs": [
+    {
+      "counts": {
+        "assertions": 2364,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 3,
+        "tests": 26
+      },
+      "executed_head": "be6c483e44712a6c60971bf4343d993e8a55d28a",
+      "filter": null,
+      "launch_bound_observed_os_exit": 0,
+      "loaders": 13,
+      "log_sha256": "4b07b900a9e3362553bb1adec683d6ee82a79f152454f7d2b4c9ba3d7aad094f",
+      "manifest_canonical_sha256": "1b0df09be8abb649bbcbd90ef6ed672bfa08e67ea371b986451c52f2e6916c3c",
+      "manifest_inputs": 2409,
+      "name": "sqlite-final-download-and-schema-files",
+      "pid": 184401,
+      "process_exit": 0,
+      "process_start_ticks": "7739704",
+      "receipt_sha256": {
+        "launch-sqlite-final-download-and-schema-files.json": "2bb7d70b005218142f018cffbfdd8f44b220d96df207f160569d3a3b992a022e",
+        "observed-os-exit-sqlite-final-download-and-schema-files.json": "e1e7892102bd2bca66569ce1ae29cff27ed6e96470d70e186d193959c81cfd9e",
+        "sqlite-final-download-and-schema-files/command.json": "621f07e8449a27adabdc8f555705c39bd2a3e22c13454aa8b43e183c7fa24c24",
+        "sqlite-final-download-and-schema-files/junit.xml": "1267757236d098351c9af327810882a92daad5477ee60d3b7853a1fe0963c3b4",
+        "sqlite-final-download-and-schema-files/log.txt": "4b07b900a9e3362553bb1adec683d6ee82a79f152454f7d2b4c9ba3d7aad094f",
+        "sqlite-final-download-and-schema-files/process.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "sqlite-final-download-and-schema-files/result.json": "b053edff6a1baf77a8c6feaba2f833edf94f4cf0a7a11a299801cc30585c76e4"
+      },
+      "recorder_exit": 0,
+      "routes": 16,
+      "selected_files": [
+        "tests/Feature/PaidTaxDownloadJourneyTest.php",
+        "tests/Feature/PaidTaxDeliverySchemaRecoveryTest.php",
+        "tests/Feature/PaidTaxDownloadNativeTest.php"
+      ],
+      "skipped_cases": [
+        {
+          "class": "Tests\\Feature\\PaidTaxDownloadNativeTest",
+          "method": "test_native_duplicate_authorizations_join_one_immutable_result_after_current_buyer_serialization"
+        },
+        {
+          "class": "Tests\\Feature\\PaidTaxDownloadNativeTest",
+          "method": "test_native_redemption_duplicate_and_last_attempt_races_keep_one_spent_attempt with data set \"same authorization\""
+        },
+        {
+          "class": "Tests\\Feature\\PaidTaxDownloadNativeTest",
+          "method": "test_native_redemption_duplicate_and_last_attempt_races_keep_one_spent_attempt with data set \"last retained attempt across two authorizations\""
+        }
+      ],
+      "wall_seconds": 294.5644858930027
+    },
+    {
+      "counts": {
+        "assertions": 2893,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 5
+      },
+      "executed_head": "f4f9d5f87e64150cae7951d7db84d73436c108d7",
+      "filter": null,
+      "launch_bound_observed_os_exit": 0,
+      "loaders": 13,
+      "log_sha256": "2b907e4bdad2964d39584e8544bc970de1683bb0b47f6232513e8860dcbd2018",
+      "manifest_canonical_sha256": "84e58ef3fe789c998e81f1546560781ce2d3e17bcc8410fc6178559293637d60",
+      "manifest_inputs": 2407,
+      "name": "mysql-whole-forward-delivery-schema",
+      "pid": 180661,
+      "process_exit": 0,
+      "process_start_ticks": "7576139",
+      "receipt_sha256": {
+        "launch-mysql-whole-forward-delivery-schema.json": "b18b7a0bf78660a9938dbab901cafad0b4e0988049ff57bb9c26bc341cd06f6e",
+        "mysql-whole-forward-delivery-schema/command.json": "87538b4b564dd670fc9efd25e365c014161a55e74756247d0bcec832d42d0216",
+        "mysql-whole-forward-delivery-schema/junit.xml": "d8e8424555f8ca305bfdf4d2e5d1cdfb79b8f6788fd941a9eba49a218f25c9e0",
+        "mysql-whole-forward-delivery-schema/log.txt": "2b907e4bdad2964d39584e8544bc970de1683bb0b47f6232513e8860dcbd2018",
+        "mysql-whole-forward-delivery-schema/process.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "mysql-whole-forward-delivery-schema/result.json": "8288fa32c52c34c37a8180941f873b1fe7b72f3492389b135c7260ee20c2d009",
+        "observed-os-exit-mysql-whole-forward-delivery-schema.json": "9fd40e0852f9ef7955d7f1a7706dba2041ee44d1c47c14b9ee56d50d7a428ca2"
+      },
+      "recorder_exit": 0,
+      "routes": 16,
+      "selected_files": [
+        "tests/Feature/PaidTaxDeliverySchemaRecoveryTest.php"
+      ],
+      "skipped_cases": [],
+      "wall_seconds": 21.12263052299386
+    },
+    {
+      "counts": {
+        "assertions": 76,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 3
+      },
+      "executed_head": "ddb85c2f0d2917bcb59efef8139f642792e28a71",
+      "filter": null,
+      "launch_bound_observed_os_exit": 0,
+      "loaders": 13,
+      "log_sha256": "450455774f87f8cf286c1439e82b83ca6712a435f3169f2b967c565be967666c",
+      "manifest_canonical_sha256": "29ec087c75f0859aebc0de5d70b502a2912e211a708069d4f3cc7d48d49c45c8",
+      "manifest_inputs": 2409,
+      "name": "mysql-three-real-delivery-races-first",
+      "pid": 181323,
+      "process_exit": 0,
+      "process_start_ticks": "7601638",
+      "receipt_sha256": {
+        "launch-mysql-three-real-delivery-races-first.json": "d6ab54812f85d41ef9b10fa6304e239273ee3ed372bdbff8960008b52b002d02",
+        "mysql-three-real-delivery-races-first/command.json": "87ae9a99b193863f9f4656cb4e0ade13772e482efc53154cd7bf8f9e861dfc1f",
+        "mysql-three-real-delivery-races-first/junit.xml": "593f04a4180e35247d7a267ac6d0cced61234afa8126f1c1399637dba282242d",
+        "mysql-three-real-delivery-races-first/log.txt": "450455774f87f8cf286c1439e82b83ca6712a435f3169f2b967c565be967666c",
+        "mysql-three-real-delivery-races-first/process.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "mysql-three-real-delivery-races-first/result.json": "696cfc99d82a78a5e09b0410ecebac04a1d20f20a26a83f71257107fe2af205e",
+        "observed-os-exit-mysql-three-real-delivery-races-first.json": "72b7ea20ad3e9dd507c48010be2daa3ef5abdc61ec9d83ddab74af5243d06ee3"
+      },
+      "recorder_exit": 0,
+      "routes": 16,
+      "selected_files": [
+        "tests/Feature/PaidTaxDownloadNativeTest.php"
+      ],
+      "skipped_cases": [],
+      "wall_seconds": 927.9681043150049
+    },
+    {
+      "counts": {
+        "assertions": 371,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 32
+      },
+      "executed_head": "294110a22c17430fae783a773dece5b0c6da09a4",
+      "filter": null,
+      "launch_bound_observed_os_exit": 0,
+      "loaders": 13,
+      "log_sha256": "9206d3aa99b6a14fee0cb1ff5889bb9d37ebf5ee507bf6403582153c986d0f79",
+      "manifest_canonical_sha256": "bf919d78bbc601b7bb99e5874a645f4759b27e790d85385019ab3ebe2cbe2b61",
+      "manifest_inputs": 2409,
+      "name": "sqlite-affected-existing-tax-family",
+      "pid": 185580,
+      "process_exit": 0,
+      "process_start_ticks": "7786178",
+      "receipt_sha256": {
+        "launch-sqlite-affected-existing-tax-family.json": "64707cf9140a39dfb63014cc4c1306a1f6fe0ee51e46737ab2a7ebbfefe0779c",
+        "observed-os-exit-sqlite-affected-existing-tax-family.json": "cf14a692de310b31e946c926be0394b6b348ade9fb5f464dfdd7c27d06b14316",
+        "sqlite-affected-existing-tax-family/command.json": "d8af4df36e64d1418a4e6b2b0d85b818569083c029d54a1804f6d7005d490ee0",
+        "sqlite-affected-existing-tax-family/junit.xml": "560eb07a27290d98bd9f97e55b10f7de754c8a7c4c85bcfd8e3ec2de56bf9637",
+        "sqlite-affected-existing-tax-family/log.txt": "9206d3aa99b6a14fee0cb1ff5889bb9d37ebf5ee507bf6403582153c986d0f79",
+        "sqlite-affected-existing-tax-family/process.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "sqlite-affected-existing-tax-family/result.json": "4bac89fcb54f5d74d7e2a520a36f688a2cc829dc71033424b25c11e838fcfee9"
+      },
+      "recorder_exit": 0,
+      "routes": 16,
+      "selected_files": [
+        "tests/Feature/PaidTaxGrantJourneyTest.php",
+        "tests/Feature/PaidTaxAdversarialJourneyTest.php",
+        "tests/Feature/PaidTaxFamilyCompatibilityTest.php",
+        "tests/Unit/PaidTaxCapabilityTest.php"
+      ],
+      "skipped_cases": [],
+      "wall_seconds": 250.61064605899446
+    },
+    {
+      "counts": {
+        "assertions": 398,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 21
+      },
+      "executed_head": "a12fe5effd31670fcdc78b6382b241554bf4c653",
+      "filter": null,
+      "launch_bound_observed_os_exit": 0,
+      "loaders": 13,
+      "log_sha256": "3e42eda7b5462913a2aeda921128dc6ed39a2422375a4aa6fac6d4ad598e4d95",
+      "manifest_canonical_sha256": "0bca3fe6779528ae756c88e7b795f3f39fb5fcfd125311d1a245fce85d47482b",
+      "manifest_inputs": 2409,
+      "name": "sqlite-affected-v1-paid-journeys",
+      "pid": 187089,
+      "process_exit": 0,
+      "process_start_ticks": "7836143",
+      "receipt_sha256": {
+        "launch-sqlite-affected-v1-paid-journeys.json": "8d1ef24a73588961c38d9f097b630d9d736fe20841ac670a9d63d0bd93f7a54a",
+        "observed-os-exit-sqlite-affected-v1-paid-journeys.json": "f92356473008189f8ef815002bd88a8d17d1d80bddb1b10ab2705e3469f57080",
+        "sqlite-affected-v1-paid-journeys/command.json": "ae11148033f4e59e318c1c2f3ce65efcb73a083e90bce655a6448682ba5d2055",
+        "sqlite-affected-v1-paid-journeys/junit.xml": "2cc32e255d25220d38e04fbecc0fe2f24a36429e48a56c7227aa25ecba19a3a2",
+        "sqlite-affected-v1-paid-journeys/log.txt": "3e42eda7b5462913a2aeda921128dc6ed39a2422375a4aa6fac6d4ad598e4d95",
+        "sqlite-affected-v1-paid-journeys/process.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "sqlite-affected-v1-paid-journeys/result.json": "6bbd2ec4500c4e4afed595d682540250f2cf8628a38c8e8e7a44ee4009d961d6"
+      },
+      "recorder_exit": 0,
+      "routes": 16,
+      "selected_files": [
+        "tests/Feature/PaidGrantSourceJourneyTest.php",
+        "tests/Feature/PaidGrantDocumentJourneyTest.php",
+        "tests/Feature/PaidGrantDownloadJourneyTest.php"
+      ],
+      "skipped_cases": [],
+      "wall_seconds": 208.07340807499713
+    }
+  ],
+  "schema_version": 1,
+  "scope": "Full typed PaidTax delivery source and bounded completed test carries; not final sealed-packet or merge approval.",
+  "skip_provenance": {
+    "actual_be6_skips": [
+      {
+        "class": "Tests\\Feature\\PaidTaxDownloadNativeTest",
+        "method": "test_native_duplicate_authorizations_join_one_immutable_result_after_current_buyer_serialization"
+      },
+      {
+        "class": "Tests\\Feature\\PaidTaxDownloadNativeTest",
+        "method": "test_native_redemption_duplicate_and_last_attempt_races_keep_one_spent_attempt with data set \"same authorization\""
+      },
+      {
+        "class": "Tests\\Feature\\PaidTaxDownloadNativeTest",
+        "method": "test_native_redemption_duplicate_and_last_attempt_races_keep_one_spent_attempt with data set \"last retained attempt across two authorizations\""
+      }
+    ],
+    "declared_in_original_be6_policy": false,
+    "final_current_declarations_match": true,
+    "final_reviewed_pairs": [
+      [
+        "Tests\\Feature\\PaidTaxDownloadNativeTest",
+        "test_native_duplicate_authorizations_join_one_immutable_result_after_current_buyer_serialization"
+      ],
+      [
+        "Tests\\Feature\\PaidTaxDownloadNativeTest",
+        "test_native_redemption_duplicate_and_last_attempt_races_keep_one_spent_attempt"
+      ],
+      [
+        "Tests\\Feature\\PaidTaxDownloadNativeTest",
+        "test_native_redemption_duplicate_and_last_attempt_races_keep_one_spent_attempt"
+      ]
+    ],
+    "no_backdating": true
+  },
+  "specification_verdict": "Pass for implemented bounded domain; host/HTTP/release acceptance remains Partial."
+}

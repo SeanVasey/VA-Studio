@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="7" assertions="17" errors="1" failures="0" skipped="0" time="18.761225">
+    <testsuite name="Tests\Feature\ProductionMemberOriginals\MemberGrantCurrentSchemaTest" file="/workspace/VA-Studio-member-original-facts/tests/Feature/ProductionMemberOriginals/MemberGrantCurrentSchemaTest.php" tests="6" assertions="17" errors="0" failures="0" skipped="0" time="15.556634">
+      <testcase name="test_complete_current_plan_and_committed_frame_preserve_all_installed_definitions" file="/workspace/VA-Studio-member-original-facts/tests/Feature/ProductionMemberOriginals/MemberGrantCurrentSchemaTest.php" line="20" class="Tests\Feature\ProductionMemberOriginals\MemberGrantCurrentSchemaTest" classname="Tests.Feature.ProductionMemberOriginals.MemberGrantCurrentSchemaTest" assertions="9" time="2.811927"/>
+      <testcase name="test_missing_required_guard_is_not_repaired" file="/workspace/VA-Studio-member-original-facts/tests/Feature/ProductionMemberOriginals/MemberGrantCurrentSchemaTest.php" line="47" class="Tests\Feature\ProductionMemberOriginals\MemberGrantCurrentSchemaTest" classname="Tests.Feature.ProductionMemberOriginals.MemberGrantCurrentSchemaTest" assertions="2" time="2.482695"/>
+      <testcase name="test_same_named_guard_with_changed_literal_bytes_is_refused" file="/workspace/VA-Studio-member-original-facts/tests/Feature/ProductionMemberOriginals/MemberGrantCurrentSchemaTest.php" line="61" class="Tests\Feature\ProductionMemberOriginals\MemberGrantCurrentSchemaTest" classname="Tests.Feature.ProductionMemberOriginals.MemberGrantCurrentSchemaTest" assertions="1" time="2.517025"/>
+      <testcase name="test_temp_reserved_guard_name_and_extra_owned_index_are_refused" file="/workspace/VA-Studio-member-original-facts/tests/Feature/ProductionMemberOriginals/MemberGrantCurrentSchemaTest.php" line="75" class="Tests\Feature\ProductionMemberOriginals\MemberGrantCurrentSchemaTest" classname="Tests.Feature.ProductionMemberOriginals.MemberGrantCurrentSchemaTest" assertions="2" time="2.562461"/>
+      <testcase name="test_current_snapshot_refuses_replaced_native_transaction_without_rolling_it_back" file="/workspace/VA-Studio-member-original-facts/tests/Feature/ProductionMemberOriginals/MemberGrantCurrentSchemaTest.php" line="91" class="Tests\Feature\ProductionMemberOriginals\MemberGrantCurrentSchemaTest" classname="Tests.Feature.ProductionMemberOriginals.MemberGrantCurrentSchemaTest" assertions="2" time="2.617208"/>
+      <testcase name="test_key_configuration_drift_is_not_adopted_by_current_snapshot" file="/workspace/VA-Studio-member-original-facts/tests/Feature/ProductionMemberOriginals/MemberGrantCurrentSchemaTest.php" line="107" class="Tests\Feature\ProductionMemberOriginals\MemberGrantCurrentSchemaTest" classname="Tests.Feature.ProductionMemberOriginals.MemberGrantCurrentSchemaTest" assertions="1" time="2.565319"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionMemberOriginals\MemberGrantDefinitionsTest" file="/workspace/VA-Studio-member-original-facts/tests/Feature/ProductionMemberOriginals/MemberGrantDefinitionsTest.php" tests="1" assertions="0" errors="1" failures="0" skipped="0" time="3.204591">
+      <testcase name="test_real_enrolled_staff_authors_and_deduplicates_without_customer_gate_or_grant_writes" file="/workspace/VA-Studio-member-original-facts/tests/Feature/ProductionMemberOriginals/MemberGrantDefinitionsTest.php" line="38" class="Tests\Feature\ProductionMemberOriginals\MemberGrantDefinitionsTest" classname="Tests.Feature.ProductionMemberOriginals.MemberGrantDefinitionsTest" assertions="0" time="3.204591">
+        <error type="App\Domain\Grants\Member\MemberGrantException">Tests\Feature\ProductionMemberOriginals\MemberGrantDefinitionsTest::test_real_enrolled_staff_authors_and_deduplicates_without_customer_gate_or_grant_writes
+App\Domain\Grants\Member\MemberGrantException: Member original unavailable.
+
+/workspace/VA-Studio-member-original-facts/app/Domain/Grants/Member/MemberGrantDefinitions.php:152
+/workspace/VA-Studio-member-original-facts/tests/Feature/ProductionMemberOriginals/MemberGrantDefinitionsTest.php:41</error>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>

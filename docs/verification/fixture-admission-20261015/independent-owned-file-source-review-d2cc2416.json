@@ -1,0 +1,140 @@
+{
+  "accepted_partial_native_plan": {
+    "conditions": [
+      "Record exact method/dataset names and per-command/source-bound counts.",
+      "Label native Guards selection partial and memory bodies SQLite-specific; do not claim whole native Guards, native DDL/rollback or native concurrency.",
+      "Original baseline covers whole restore5/errors5 and only one adapter helper-site native1/error1; no claim all four old methods were run/failing.",
+      "Retain whole SQLite/providers and current end-to-end owned-file migrate/release/independent restore evidence."
+    ],
+    "scope": "One exact dataset for each of the four Guards owned-memory helper methods, plus whole Guards SQLite file/all providers and whole restore flow."
+  },
+  "baseline_sha": "27b998fe95e481c4b114b2047164b0ed2e5e9581",
+  "corrected_test_only_carry_sha": "1f7b6705f4a7d1a346779d87ec52c9080cf4ec57",
+  "corrected_test_sha256": "08720f2495184729707329dfd9212c15bb0d74f51b0a99a4e6c151d766ee5898",
+  "decision": "APPROVE BOUNDED OWNED-FILE/LOCAL SOURCE AND TEST-ONLY POSITIVE-CONTROL CORRECTION; FINAL EVIDENCE PENDING",
+  "final_conditions": [
+    "Completed corrected31-case rerun, whole affected Guards SQLite/all providers and broader relevant shared compatibility; no pending pass inferred.",
+    "Actual native partial four helper entrypoints, whole restore and meaningful current admission/local-no-CI correct/wrong marker evidence.",
+    "Final sealed evidence review, exact head carry, evidence-backed current finding replies/closure, new cheap preflight/current complete inventory and expected-SHA merge."
+  ],
+  "inventory_limit": {
+    "destructive_framework_candidates": 14,
+    "original_sha256": "251d769453c02f05a5fb9597c61a5e87fbca2c01b7846a5922be06a70d6d2a9d",
+    "override_files": 82,
+    "scope": "Static recorded inventory; no claim all paths executed or full F2/counterpart/raw SQL acceptance."
+  },
+  "limits": [
+    "Current remote P1/P2 remain open pending final completed evidence; no new source P0/P1 found.",
+    "Native lifecycle whole4/8/E4 and olddefault1/2/E1 remain failed/open.",
+    "No reviewer application/database/network/CI execution or shared edits; no full F2/raw-worker/SQL sandbox/native concurrency/host/provider/activation/release claim."
+  ],
+  "local_selector_controls": {
+    "focused-local-marker-fixed-original": {
+      "failures": 0,
+      "process_exit": 0,
+      "receipt_sha256": "32c341790fced25d768d482426a66f54192066dfca68346e57f03844d517d145",
+      "source": "d2cc24163af391e6e22b6364a1747eb47639e661",
+      "tests": 53
+    },
+    "focused-local-marker-old-original": {
+      "failures": 1,
+      "process_exit": 1,
+      "receipt_sha256": "7de7ad4536822400ac07f974f195f7faf0f71b2c7a151ae086d5b51401671a96",
+      "source": "646b53bd970effdfd2b6885bc3314fd6c91a7120",
+      "tests": 53
+    }
+  },
+  "mechanical_source_scope": {
+    "captured_outer_finalization_byte_original": true,
+    "carry_only_one_test_file": true,
+    "changed_files": [
+      "docs/verification/focused-ci.md",
+      "scripts/ci/focused-tests.py",
+      "scripts/ci/test-focused-tests.py",
+      "tests/Feature/FixtureDatabaseAdmissionTest.php",
+      "tests/Feature/ProductionTrackCapabilitiesGuardsTest.php",
+      "tests/Feature/SyntheticPrivateRestoreTest.php",
+      "tests/TestCase.php"
+    ],
+    "guards_bodies_after_fixture_helper_byte_original": true,
+    "restore_bodies_preserved_after_only_early_release_assertion_refinement_and_whitespace": true
+  },
+  "new_source_p0": 0,
+  "new_source_p1": 0,
+  "open_p0": 0,
+  "open_p1": 1,
+  "open_p2": 1,
+  "original_receipts": {
+    "owned-file-admission-and-restore-fixed-original": {
+      "counts": {
+        "assertions": 717,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 31
+      },
+      "files": [
+        "tests/Feature/FixtureDatabaseAdmissionTest.php",
+        "tests/Feature/SyntheticPrivateRestoreTest.php"
+      ],
+      "php_exit": 2,
+      "recorder_exit": 1,
+      "result_sha256": "89984279d60f400f95d4013ebd7d2103f2add07a5dca3bc3b83788f99c527d98",
+      "source": "d2cc24163af391e6e22b6364a1747eb47639e661",
+      "wall_seconds": 43.55263733801257
+    },
+    "owned-file-restore-old-original": {
+      "counts": {
+        "assertions": 0,
+        "errors": 5,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 5
+      },
+      "files": [
+        "tests/Feature/SyntheticPrivateRestoreTest.php"
+      ],
+      "php_exit": 2,
+      "recorder_exit": 1,
+      "result_sha256": "5764faabc62b3e3b46a22a3efed66edce75781e0b0933bf0eca25eae733460df",
+      "source": "27b998fe95e481c4b114b2047164b0ed2e5e9581",
+      "wall_seconds": 0.4150479039963102
+    },
+    "owned-memory-guards-old-native-original": {
+      "counts": {
+        "assertions": 0,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      "files": [
+        "tests/Feature/ProductionTrackCapabilitiesGuardsTest.php"
+      ],
+      "php_exit": 2,
+      "recorder_exit": 1,
+      "result_sha256": "4796df246dd25269767202aa525dec7ca211c19a6405d4736934a3363c7f07e5",
+      "source": "27b998fe95e481c4b114b2047164b0ed2e5e9581",
+      "wall_seconds": 219.5005128440098
+    }
+  },
+  "required_corrections": [],
+  "reviewed_sha": "d2cc24163af391e6e22b6364a1747eb47639e661",
+  "source_assessment": [
+    "Internally allocated exclusive private file/directory with literal SQLite DELETE/DEFERRED configuration, exact raw config, Connection/PDO and file/directory path/dev/inode/mode/UID/no-symlink plus actual main-path checks matches bounded contract.",
+    "Explicit owned release validates before unregister/purge, drops strong source PDO refs and removes only validated owned file/directory; legitimate early release is idempotent. Refusal controls restore intentional mutations for safe teardown.",
+    "Synthetic restore keeps separate snapshots/private copies/query-only readback/hash/inventory/no-new-effects semantics and corrects the residual outer-database contact claim.",
+    "Guard helper changes preserve four entrypoints/all provider bodies and selected-database DML cases; outer finalization cleanup remains captured.",
+    "Local marker retained only for exact MySQL vaseyaudio_focused declaration, cleared otherwise; actual CI/socket/URL/service controls preserved.",
+    "Initial positive db:wipe causes Laravel SQLiteBuilder to reset the file-backed PDO; strict pin correctly refuses release. Replacing that test-only positive with the actual restore migrate+users-presence path preserves strict ownership and tests the bounded caller behavior. No file reset/rebinding support is claimed."
+  ],
+  "source_sha256": {
+    "docs/verification/focused-ci.md": "487f40b43bd44d23ab90989975f97163bed4ce12e5c659ae5b898ec76b49ba44",
+    "scripts/ci/focused-tests.py": "99c1e677f0754ba7b2ea65859386d97869ce1aac0b7e42fcc9ede229d6c1da6f",
+    "scripts/ci/test-focused-tests.py": "ce2bc1cb210619852033662ec99e078c5232f7014425de1075590432780931ef",
+    "tests/Feature/FixtureDatabaseAdmissionTest.php": "96fb783ff2a47880308608dc3788a3399e3cdc950049bdee22df3660e5e162ff",
+    "tests/Feature/ProductionTrackCapabilitiesGuardsTest.php": "cdbbf15fb806b7c6cebc742468d38b0851ca7d637df9ccf181b824f22677de91",
+    "tests/Feature/SyntheticPrivateRestoreTest.php": "e0e0732ebb879cc9e6b9dfde84f7c7a33f6100187bd9b9693a6bc2a83985aad8",
+    "tests/TestCase.php": "250348e7f9122ffaf64453e9450dd6c43868c8d5594015e554d79b2431659da7"
+  }
+}

@@ -64,6 +64,11 @@ test('staff upload a site image privately and, without a scanner, it waits for a
   await expect(row.locator('.fi-ta-cell-attempts')).toHaveText('2');
   await expect(row.getByText('Waiting', { exact: true })).toBeVisible();
 
+  // The table polls every 5 s, and a poll in flight when navigation starts is aborted and reported as a page error
+  // ("The user aborted a request."). Leave just after one poll has finished, well before the next.
+  const poll = await page.waitForResponse(response => /\/livewire(?:-[A-Za-z0-9]+)?\/update$/.test(response.url()), { timeout: 15_000 });
+  await poll.finished();
+
   // The release editor offers only ready images, so every place keeps its built-in image here.
   await page.goto('/admin/site-releases');
   await page.getByRole('button', { name: 'New content draft', exact: true }).click();

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\MembershipReservationClockClosureTest" file="/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMembershipBilling/MembershipReservationClockClosureTest.php" tests="1" assertions="18" errors="0" failures="0" skipped="0" time="12.781017">
+    <testcase name="test_terminal_clock_callback_cannot_withdraw_identity_after_the_last_precommit_owner_check" file="/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMembershipBilling/MembershipReservationClockClosureTest.php" line="35" class="Tests\Feature\ProductionMembershipBilling\MembershipReservationClockClosureTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipReservationClockClosureTest" assertions="18" time="12.781017"/>
+  </testsuite>
+</testsuites>

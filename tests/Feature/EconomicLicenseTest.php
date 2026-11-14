@@ -222,7 +222,7 @@ class EconomicLicenseTest extends TestCase
         $this->actingAs($actor);
         $template = LicenseTemplate::create(['name' => 'SYNTHETIC ECONOMIC ADMIN', 'slug' => 'economic-admin', 'type' => 'non-exclusive']);
         Livewire::test(ManageLicenseVersions::class)->mountAction('create')
-            ->assertSet('mountedActions.0.data.structured_terms.schema_version', 4)
+            ->assertSet('mountedActions.0.data.structured_terms.schema_version', 5)
             ->assertSet('mountedActions.0.data.structured_terms.ownership.source_recording.policy_key', null)
             ->assertSet('mountedActions.0.data.structured_terms.publishing_income.mode', null)
             ->assertSet('mountedActions.0.data.structured_terms.recording_royalty.mode', null);

@@ -1,0 +1,183 @@
+{
+  "baseline_sha": "8b2cd56c2c4434a01bd1fd699f38a6649433adbb",
+  "compatibility": "Existing StaffWriteAuthority.require() evaluates admin panel required/enrolled state on that locked row; required hosted rule and optional local/testing rule remain unchanged. No attestation/API/business/schema/SQL/environment/provider/frozen changes. Existing Filament actions, bulk/preset/import callers reach the same guard without duplicated rules.",
+  "conditions": [
+    "Reconcile the fixed whole 52-case file, affected existing behavior scopes and requested private native cases from actual completed original receipts; no current fixed/native pass inferred here.",
+    "Preserve both original nonzero baseline runs and storage/loader relocation records, seal focused evidence and obtain separate final evidence review.",
+    "Obtain exact-head publication carry, cheap preflight, complete current review/check/protection inventory and expected-head development merge.",
+    "Keep real-host/session challenge, provider, activation and complete release conditions open; this batch applies the existing persisted enrollment rule, not a new per-request session challenge."
+  ],
+  "decision": "APPROVE_SOURCE_WITH_EXECUTION_AND_FINAL_EVIDENCE_CONDITIONS",
+  "execution_verdict": "Partial: fixed whole file and private native evidence were pending at review",
+  "guard_calls": 11,
+  "guard_placement": "Immediately after existing admin gate on the freshly locked User, within the unchanged write transaction and before resource reads, file verification or audit/write effects.",
+  "isolated_checkout_receipt_sha256": "fa2ac47790be95e6f7784ab4ca9556770c138484e87f3a35c15d68e5242ef8c0",
+  "observed_corrected_old_tool_receipt": {
+    "counts": {
+      "assertions": 156,
+      "errors": 0,
+      "failures": 26,
+      "skipped": 0,
+      "tests": 52
+    },
+    "name": "catalog-license-mfa-old-storage-v2-original",
+    "php_exit": 1,
+    "recorder_exit": 1,
+    "scope": "Observed completed foreground tool and original receipts, no inferred passing result",
+    "session_id": 40214,
+    "tool_exit": 1
+  },
+  "old_originals": [
+    {
+      "classification": "Initial storage failure with all 32 errors typed Flysystem UnableToCreateDirectory; retained, not a passing baseline",
+      "command_argv": [
+        "php",
+        "-d",
+        "memory_limit=512M",
+        "-r",
+        "require \"vendor/autoload.php\"; exit((new PHPUnit\\TextUI\\Application)->run(json_decode($argv[1], true, 32, JSON_THROW_ON_ERROR)));",
+        "[\"phpunit\", \"--do-not-cache-result\", \"--colors=never\", \"--log-junit\", \"/workspace/runtime/staff-mfa-leftovers-evidence-20261015/catalog-license-mfa-old-original/junit.xml\", \"tests/Feature/CatalogLicenseStaffMfaTest.php\"]"
+      ],
+      "counts": {
+        "assertions": 50,
+        "errors": 32,
+        "failures": 20,
+        "skipped": 0,
+        "tests": 52
+      },
+      "cwd": "/workspace/VA-Studio-tax-v2-committed-read",
+      "input_count": 2461,
+      "name": "catalog-license-mfa-old-original",
+      "original_hashes": {
+        "command.json": "e31cab75feb8b8e4eafc0e232651cf3575d1f935cceb79c219361bcce0fff06a",
+        "junit.xml": "e407dddb91071eaf1d389e9be28a1966ab1a8eaa7c39511bdb1c32ae6ec3ffcc",
+        "log.txt": "47045967aa578d3ed62ef3984d5e4f63f0c40bb61052b8c07e84d8ecd6d88e8f",
+        "process.exit": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+        "result.json": "4127061d9ff285e1c184d7f47135e933ca0af1e1b71c60e9ea4c0eb1655bd21c"
+      },
+      "php_process_exit": 2,
+      "recorder_exit": 1,
+      "source_sha": "8b2cd56c2c4434a01bd1fd699f38a6649433adbb"
+    },
+    {
+      "classification": "Corrected storage baseline: all 26 refusal cases fail and all 26 positive cases pass; unchanged source",
+      "command_argv": [
+        "php",
+        "-d",
+        "memory_limit=512M",
+        "-r",
+        "require \"vendor/autoload.php\"; exit((new PHPUnit\\TextUI\\Application)->run(json_decode($argv[1], true, 32, JSON_THROW_ON_ERROR)));",
+        "[\"phpunit\", \"--do-not-cache-result\", \"--colors=never\", \"--log-junit\", \"/tmp/staff-mfa-leftovers-evidence-20261015/catalog-license-mfa-old-storage-v2-original/junit.xml\", \"tests/Feature/CatalogLicenseStaffMfaTest.php\"]"
+      ],
+      "counts": {
+        "assertions": 156,
+        "errors": 0,
+        "failures": 26,
+        "skipped": 0,
+        "tests": 52
+      },
+      "cwd": "/tmp/VA-Studio-staff-mfa-leftovers-20261015",
+      "input_count": 2461,
+      "name": "catalog-license-mfa-old-storage-v2-original",
+      "original_hashes": {
+        "command.json": "1ba70825f705ef8c8202ba1e7aef028928d1532d5794c82bd310cf56fff34194",
+        "junit.xml": "3e8efa8054541e82b6ed5b74194b2191b9a6a27e568221f53020320012437829",
+        "log.txt": "d118473dcb782da65cdf00bb82a9f1775c1bac1e82a7b9e22fcb52f8f11929ae",
+        "process.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+        "result.json": "72eb2f0d71b92185ccc61e7534c7cafe89b310c9bdbfd686b8b2c1e14e0452d8"
+      },
+      "php_process_exit": 1,
+      "recorder_exit": 1,
+      "source_sha": "8b2cd56c2c4434a01bd1fd699f38a6649433adbb"
+    }
+  ],
+  "open_p0": 0,
+  "open_p1": 0,
+  "relocation_assessment": "New isolated checkout has a recorded 2,461-source equality proof and copied Composer loader regeneration/reflection for the new root. Known Laravel temporary storage resolves initial filesystem errors; PSR-4 fixture warnings are retained. This is local preparation, not host/provider evidence.",
+  "required_corrections": [],
+  "review_execution": "Read-only immutable source/diff/helper/caller and standard-library original-receipt inspection. No source/shared-test mutation, duplicate application test, DB, network or CI action; only this exclusive review MD/JSON created.",
+  "reviewed_sha": "11ab36d7ed0896b9bfe811f9530b7c27508a4117",
+  "reviewed_utc": "2026-10-15T21:54:24.407545+00:00",
+  "scope": "Authorized #92 leftovers: ten existing catalog/rights services, eleven current-actor enrollment guards; direct thirteen-operation regression coverage",
+  "scope_json_sha256": "c72699bf45374d0ca9eaefb2221923f509c91db72c0967dd27005ac267ea263b",
+  "source_bindings": {
+    "app/Domain/Catalog/ActivateExclusiveOffer.php": {
+      "baseline_sha256": "f7b1f6ddd5fd459f562a01d2195ce02df9c46093bb4f5fa6c3e76e0052e3dacd",
+      "guard_calls": 1,
+      "reviewed_sha256": "c46d7382299942541be47484d77d304c3f5dab00b1525aa8132072ebcb0d53a6"
+    },
+    "app/Domain/Catalog/DeactivateOffer.php": {
+      "baseline_sha256": "7de74aec0009fc4e99b0398b40aac4345595674f21039180f51ac93592d7c2dd",
+      "guard_calls": 1,
+      "reviewed_sha256": "80afb2fe1eb8e930ade3697305fd27537d8070f01a39f3da44d0be25dc8403f9"
+    },
+    "app/Domain/Catalog/PrepareExclusiveOffer.php": {
+      "baseline_sha256": "20bfd0825d2db0c9196e1b832fc3a6d4c7d299a73d531ad60ac9b3f720a93e89",
+      "guard_calls": 1,
+      "reviewed_sha256": "3c392893f4ede182ff101921dd1d991b9eaa9632fa5413e592af65de456ef01a"
+    },
+    "app/Domain/Catalog/PublishOffer.php": {
+      "baseline_sha256": "be703b09f95cbc083d5a160baf2f349cf5f97b27dc00a2450570b3e22fe95690",
+      "guard_calls": 1,
+      "reviewed_sha256": "76a65e2ccdae027f94aeb9b4af82ffd342249e93c32f07c5f38642577af5f5bd"
+    },
+    "app/Domain/Catalog/SaveOfferDraft.php": {
+      "baseline_sha256": "b517d22a69e296aef209068fb4cd7eff14101cdabe19b347e36da13a6bc31234",
+      "guard_calls": 1,
+      "reviewed_sha256": "7fbb80ee85589d5e16b9acc9a39288a07348f4d2acd7280f0687df04924bd7ec"
+    },
+    "app/Domain/Catalog/SaveTrackMetadata.php": {
+      "baseline_sha256": "e9c9c6ada177059d2f28ddace34cc4d7bff6275afb837499eb53d19c926c3981",
+      "guard_calls": 1,
+      "reviewed_sha256": "3036e09271e7e35af1fc70406dd1345533e17e558d7fa4d6af8d82d3c117bb92"
+    },
+    "app/Domain/Rights/CreateLicenseDraft.php": {
+      "baseline_sha256": "69c6ccdee3c8e7793fd9dc889c84c57214be50a6b246d30b113002200b9533ab",
+      "guard_calls": 1,
+      "reviewed_sha256": "999516e8adee094e7490d14bf96303fe4697da4c6739d531226245fd58ac4331"
+    },
+    "app/Domain/Rights/PublishLicense.php": {
+      "baseline_sha256": "39ab31f7690c6fe06e1f02aa39a58d89e7479b0e93b4440789998490ca720b18",
+      "guard_calls": 1,
+      "reviewed_sha256": "0883c86206eaf650d5bc3f2272366bebc804bf669e32697f8a17cbf742e6acd2"
+    },
+    "app/Domain/Rights/ReviewLicense.php": {
+      "baseline_sha256": "30f08ae356dc0e4a3bfd46b85bf4e1837d75d2572a949712c6b93a15922529cc",
+      "guard_calls": 2,
+      "reviewed_sha256": "34a04baa65ea92f90248a1c9e5551082de8b349736721c1485f0a850a4cae081"
+    },
+    "app/Domain/Rights/UpdateLicenseDraft.php": {
+      "baseline_sha256": "8732120d28114e30ea661b1c430c67f1d1fe7ea2e1e59507ece90f589ff60e2d",
+      "guard_calls": 1,
+      "reviewed_sha256": "7c4a1127122b07e752cf59d45a826a76081fe93a17788a6874d55d9ac3f235a9"
+    },
+    "app/Domain/Staff/StaffWriteAuthority.php": {
+      "baseline_sha256": "cc51104c56eb77e30d95a0eb29eafe85190fcbea3e5b7eebbc7545c8343607e2",
+      "reviewed_sha256": "cc51104c56eb77e30d95a0eb29eafe85190fcbea3e5b7eebbc7545c8343607e2",
+      "unchanged": true
+    },
+    "app/Providers/AppServiceProvider.php": {
+      "baseline_sha256": "8ffd6b079b16b468a849062e4e093408e401b1173df1c0c7eeab2ae2f332695e",
+      "reviewed_sha256": "8ffd6b079b16b468a849062e4e093408e401b1173df1c0c7eeab2ae2f332695e",
+      "unchanged": true
+    },
+    "app/Providers/Filament/AdminPanelProvider.php": {
+      "baseline_sha256": "c47ef3dc88bd04d31e8fcdeb863418b6b75eb3736028171b6e347495027373d3",
+      "reviewed_sha256": "c47ef3dc88bd04d31e8fcdeb863418b6b75eb3736028171b6e347495027373d3",
+      "unchanged": true
+    },
+    "app/Support/Environment/TestEnvironment.php": {
+      "baseline_sha256": "98566cea59214cb6d9ab1852eef7d9a6e2020048b46b02fbc1b882439ba2d948",
+      "reviewed_sha256": "98566cea59214cb6d9ab1852eef7d9a6e2020048b46b02fbc1b882439ba2d948",
+      "unchanged": true
+    },
+    "tests/Feature/CatalogLicenseStaffMfaTest.php": {
+      "baseline_sha256": "84aae810bce124ee71f6264f39e7e4ac77a49cf67a03016988f7ff5905ed6df9",
+      "reviewed_sha256": "84aae810bce124ee71f6264f39e7e4ac77a49cf67a03016988f7ff5905ed6df9",
+      "unchanged": true
+    }
+  },
+  "source_insertions": 21,
+  "source_verdict": "Pass for bounded implementation",
+  "test_assessment": "Thirteen operations times required-unenrolled/required-withdrawn/current-enrolled/optional-unenrolled yields 52 cases. Withdrawn cases retain a stale enrolled caller model, read current persisted absence and demand the exact authority refusal with unchanged ten-table domain/audit evidence and closed transaction. Required positive cases verify persisted result and current actor audit; optional positives preserve existing test behavior. Test source is unchanged between baseline and guarded source."
+}

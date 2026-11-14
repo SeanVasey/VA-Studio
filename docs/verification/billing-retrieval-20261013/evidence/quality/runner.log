@@ -1,0 +1,27 @@
+{"check": "test-phpunit-shards", "exit": 0, "tests": 52, "php_files": null, "duration_seconds": 0.364224}
+....................................................
+----------------------------------------------------------------------
+Ran 52 tests in 0.235s
+
+OK
+{"check": "test-database-receipts", "exit": 0, "tests": 61, "php_files": null, "duration_seconds": 50.358298}
+.............................................................
+----------------------------------------------------------------------
+Ran 61 tests in 50.212s
+
+OK
+{"check": "test-ci-scope", "exit": 0, "tests": 27, "php_files": null, "duration_seconds": 0.797262}
+...........................
+----------------------------------------------------------------------
+Ran 27 tests in 0.710s
+
+OK
+{"check": "test-workflow-cadence", "exit": 0, "tests": 14, "php_files": null, "duration_seconds": 0.083396}
+..............
+----------------------------------------------------------------------
+Ran 14 tests in 0.011s
+
+OK
+{"check": "pint", "exit": 1, "tests": null, "php_files": 56, "duration_seconds": 4.962219}
+{"tool":"pint","result":"fail","files":[{"path":"tests\/Feature\/ProductionMembershipBilling\/BillingRetrievalAttemptsTest.php","fixers":["no_unused_imports"]}]}
+{"source_check": {"before_count": 2283, "after_count": 2283, "changed": [], "head_before": "874d57fe1897569a520b4627acd4f34d5c3e6d80", "head_after": "874d57fe1897569a520b4627acd4f34d5c3e6d80", "status_after": "", "runner_sha256": "f677c515014bd920aa1dc71155ba80bc0a531d7e3cc5a479782462c736de656a", "requested_to_final_diff": "docs/verification/billing-retrieval-20261013/README.md"}}

@@ -1,0 +1,13 @@
+{
+  "recorded_utc": "2026-10-15T04:14:09.036985+00:00",
+  "argv": [
+    "gh",
+    "api",
+    "graphql",
+    "-f",
+    "query=query { repository(owner:\"SeanVasey\", name:\"VA-Studio\") { pullRequest(number:121) { number headRefOid baseRefOid isDraft reviewDecision reviews(first:100) { nodes { state author { login } commit { oid } } pageInfo { hasNextPage } } reviewThreads(first:100) { nodes { isResolved isOutdated comments(first:100) { nodes { body author { login } } pageInfo { hasNextPage } } } pageInfo { hasNextPage } } } } }"
+  ],
+  "exit": 0,
+  "stdout": "{\"data\":{\"repository\":{\"pullRequest\":{\"number\":121,\"headRefOid\":\"78e2c7e773f4fa0a310360b67e50fe24cb6cfa62\",\"baseRefOid\":\"78efd558b1fafe5ea10a0974ed6e4ba0f9264679\",\"isDraft\":false,\"reviewDecision\":null,\"reviews\":{\"nodes\":[],\"pageInfo\":{\"hasNextPage\":false}},\"reviewThreads\":{\"nodes\":[],\"pageInfo\":{\"hasNextPage\":false}}}}}}",
+  "stderr": ""
+}

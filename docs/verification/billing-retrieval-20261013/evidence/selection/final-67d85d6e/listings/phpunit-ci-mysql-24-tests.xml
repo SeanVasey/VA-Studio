@@ -1,0 +1,191 @@
+<?xml version="1.0"?>
+<testSuite xmlns="https://xml.phpunit.de/testSuite">
+ <tests>
+  <testClass name="Tests\Feature\ExclusiveOfferConcurrencyTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/ExclusiveOfferConcurrencyTest.php">
+   <testMethod id="Tests\Feature\ExclusiveOfferConcurrencyTest::test_independent_connections_preserve_preparation_identity_and_scope_controls#0" name="test_independent_connections_preserve_preparation_identity_and_scope_controls"/>
+   <testMethod id="Tests\Feature\ExclusiveOfferConcurrencyTest::test_independent_connections_preserve_preparation_identity_and_scope_controls#1" name="test_independent_connections_preserve_preparation_identity_and_scope_controls"/>
+   <testMethod id="Tests\Feature\ExclusiveOfferConcurrencyTest::test_independent_connections_preserve_preparation_identity_and_scope_controls#2" name="test_independent_connections_preserve_preparation_identity_and_scope_controls"/>
+  </testClass>
+  <testClass name="Tests\Feature\FreeGrantConcurrencyTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/FreeGrantConcurrencyTest.php">
+   <testMethod id="Tests\Feature\FreeGrantConcurrencyTest::test_observed_two_buyer_scope_wait_cannot_overfill_one_explicit_free_origin_capacity" name="test_observed_two_buyer_scope_wait_cannot_overfill_one_explicit_free_origin_capacity"/>
+  </testClass>
+  <testClass name="Tests\Feature\HostedCheckoutMigrationTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/HostedCheckoutMigrationTest.php">
+   <testMethod id="Tests\Feature\HostedCheckoutMigrationTest::test_empty_checkout_tables_roundtrip_without_rewriting_existing_prepared_order_evidence" name="test_empty_checkout_tables_roundtrip_without_rewriting_existing_prepared_order_evidence"/>
+   <testMethod id="Tests\Feature\HostedCheckoutMigrationTest::test_checkout_evidence_rejects_model_and_bulk_mutation#0" name="test_checkout_evidence_rejects_model_and_bulk_mutation"/>
+   <testMethod id="Tests\Feature\HostedCheckoutMigrationTest::test_checkout_evidence_rejects_model_and_bulk_mutation#1" name="test_checkout_evidence_rejects_model_and_bulk_mutation"/>
+   <testMethod id="Tests\Feature\HostedCheckoutMigrationTest::test_checkout_evidence_rejects_model_and_bulk_mutation#2" name="test_checkout_evidence_rejects_model_and_bulk_mutation"/>
+   <testMethod id="Tests\Feature\HostedCheckoutMigrationTest::test_checkout_evidence_rejects_model_and_bulk_mutation#3" name="test_checkout_evidence_rejects_model_and_bulk_mutation"/>
+   <testMethod id="Tests\Feature\HostedCheckoutMigrationTest::test_unique_bindings_and_case_sensitive_account_scopes_prevent_ambiguous_session_identity" name="test_unique_bindings_and_case_sensitive_account_scopes_prevent_ambiguous_session_identity"/>
+   <testMethod id="Tests\Feature\HostedCheckoutMigrationTest::test_foreign_keys_reject_orphan_records_and_retain_all_referenced_evidence" name="test_foreign_keys_reject_orphan_records_and_retain_all_referenced_evidence"/>
+   <testMethod id="Tests\Feature\HostedCheckoutMigrationTest::test_observations_append_and_private_ciphertext_is_hidden_by_every_model" name="test_observations_append_and_private_ciphertext_is_hidden_by_every_model"/>
+  </testClass>
+  <testClass name="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/ProductionIdentityAdapters/ProductionIdentityCommittedFrameTest.php">
+   <testMethod id="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest::test_committed_read_frame_is_read_only_one_use_and_fires_no_new_framework_commit_event" name="test_committed_read_frame_is_read_only_one_use_and_fires_no_new_framework_commit_event"/>
+   <testMethod id="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest::test_normal_commit_callback_withdrawal_retains_durable_write_but_releases_no_private_response#credential" name="test_normal_commit_callback_withdrawal_retains_durable_write_but_releases_no_private_response"/>
+   <testMethod id="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest::test_normal_commit_callback_withdrawal_retains_durable_write_but_releases_no_private_response#actor" name="test_normal_commit_callback_withdrawal_retains_durable_write_but_releases_no_private_response"/>
+   <testMethod id="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest::test_normal_commit_callback_withdrawal_retains_durable_write_but_releases_no_private_response#feature config" name="test_normal_commit_callback_withdrawal_retains_durable_write_but_releases_no_private_response"/>
+   <testMethod id="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest::test_normal_commit_callback_withdrawal_retains_durable_write_but_releases_no_private_response#identity config" name="test_normal_commit_callback_withdrawal_retains_durable_write_but_releases_no_private_response"/>
+   <testMethod id="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest::test_direct_commit_reopen_loses_physical_anchor_and_is_not_rolled_back_as_owned_work" name="test_direct_commit_reopen_loses_physical_anchor_and_is_not_rolled_back_as_owned_work"/>
+   <testMethod id="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest::test_foreign_reader_existing_or_nested_transaction_and_expired_original_deadline_are_refused" name="test_foreign_reader_existing_or_nested_transaction_and_expired_original_deadline_are_refused"/>
+   <testMethod id="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest::test_close_preserves_replacement_transaction_read_only_state" name="test_close_preserves_replacement_transaction_read_only_state"/>
+   <testMethod id="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest::test_single_close_restores_idle_default_after_caller_ends_replacement_without_another_close#rollback then statement" name="test_single_close_restores_idle_default_after_caller_ends_replacement_without_another_close"/>
+   <testMethod id="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest::test_single_close_restores_idle_default_after_caller_ends_replacement_without_another_close#rollback then transaction" name="test_single_close_restores_idle_default_after_caller_ends_replacement_without_another_close"/>
+   <testMethod id="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest::test_single_close_restores_idle_default_after_caller_ends_replacement_without_another_close#commit then statement" name="test_single_close_restores_idle_default_after_caller_ends_replacement_without_another_close"/>
+   <testMethod id="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest::test_single_close_restores_idle_default_after_caller_ends_replacement_without_another_close#commit then transaction" name="test_single_close_restores_idle_default_after_caller_ends_replacement_without_another_close"/>
+   <testMethod id="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest::test_expiring_original_deadline_cannot_be_renewed_by_starting_final_proof" name="test_expiring_original_deadline_cannot_be_renewed_by_starting_final_proof"/>
+   <testMethod id="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest::test_active_secondary_transaction_refuses_a_new_committed_frame" name="test_active_secondary_transaction_refuses_a_new_committed_frame"/>
+   <testMethod id="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest::test_native_validation_reads_current_committed_credential_instead_of_an_old_repeatable_read_snapshot" name="test_native_validation_reads_current_committed_credential_instead_of_an_old_repeatable_read_snapshot"/>
+   <testMethod id="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest::test_late_unresolved_connection_is_refused_without_running_a_callback_after_feature_policy#primary resolver" name="test_late_unresolved_connection_is_refused_without_running_a_callback_after_feature_policy"/>
+   <testMethod id="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest::test_late_unresolved_connection_is_refused_without_running_a_callback_after_feature_policy#secondary resolver" name="test_late_unresolved_connection_is_refused_without_running_a_callback_after_feature_policy"/>
+   <testMethod id="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest::test_late_unresolved_connection_is_refused_without_running_a_callback_after_feature_policy#secondary null" name="test_late_unresolved_connection_is_refused_without_running_a_callback_after_feature_policy"/>
+  </testClass>
+  <testClass name="Tests\Feature\ProductionMembershipBilling\BillingRetrievalIdentitySchemaTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/ProductionMembershipBilling/BillingRetrievalIdentitySchemaTest.php">
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingRetrievalIdentitySchemaTest::test_native_positions_require_database_time_and_unique_allocation_and_read_phase" name="test_native_positions_require_database_time_and_unique_allocation_and_read_phase"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingRetrievalIdentitySchemaTest::test_exact_endpoint_identity_and_database_time_are_required_on_both_ledgers" name="test_exact_endpoint_identity_and_database_time_are_required_on_both_ledgers"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingRetrievalIdentitySchemaTest::test_endpoints_from_two_reads_cannot_be_spliced_even_with_both_actual_tokens" name="test_endpoints_from_two_reads_cannot_be_spliced_even_with_both_actual_tokens"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingRetrievalIdentitySchemaTest::test_same_integer_after_disposable_allocation_replacement_does_not_retain_identity" name="test_same_integer_after_disposable_allocation_replacement_does_not_retain_identity"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingRetrievalIdentitySchemaTest::test_both_cross_ledger_directions_refuse_reusing_an_exact_valid_interval" name="test_both_cross_ledger_directions_refuse_reusing_an_exact_valid_interval"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingRetrievalIdentitySchemaTest::test_allocated_identity_fields_remain_immutable" name="test_allocated_identity_fields_remain_immutable"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingRetrievalIdentitySchemaTest::test_native_database_utc_is_independent_of_session_timezone" name="test_native_database_utc_is_independent_of_session_timezone"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingRetrievalIdentitySchemaTest::test_native_old_snapshot_cannot_hide_a_competing_committed_interval_claim" name="test_native_old_snapshot_cannot_hide_a_competing_committed_interval_claim"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingRetrievalIdentitySchemaTest::test_native_endpoint_lookup_uses_current_allocation_after_an_older_snapshot" name="test_native_endpoint_lookup_uses_current_allocation_after_an_older_snapshot"/>
+  </testClass>
+  <testClass name="Tests\Feature\ReviewedLicenseDraftTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/ReviewedLicenseDraftTest.php">
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftTest::test_two_open_editors_keep_the_winning_draft_and_require_explicit_reopen" name="test_two_open_editors_keep_the_winning_draft_and_require_explicit_reopen"/>
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftTest::test_review_and_no_op_preserve_each_supported_schema_and_use_minimized_atomic_edit_audits#original" name="test_review_and_no_op_preserve_each_supported_schema_and_use_minimized_atomic_edit_audits"/>
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftTest::test_review_and_no_op_preserve_each_supported_schema_and_use_minimized_atomic_edit_audits#typed" name="test_review_and_no_op_preserve_each_supported_schema_and_use_minimized_atomic_edit_audits"/>
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftTest::test_review_and_no_op_preserve_each_supported_schema_and_use_minimized_atomic_edit_audits#scoped" name="test_review_and_no_op_preserve_each_supported_schema_and_use_minimized_atomic_edit_audits"/>
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftTest::test_review_and_no_op_preserve_each_supported_schema_and_use_minimized_atomic_edit_audits#economic" name="test_review_and_no_op_preserve_each_supported_schema_and_use_minimized_atomic_edit_audits"/>
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftTest::test_participating_legacy_and_template_writes_invalidate_even_same_second_aba#legacy content" name="test_participating_legacy_and_template_writes_invalidate_even_same_second_aba"/>
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftTest::test_participating_legacy_and_template_writes_invalidate_even_same_second_aba#legacy no-op" name="test_participating_legacy_and_template_writes_invalidate_even_same_second_aba"/>
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftTest::test_participating_legacy_and_template_writes_invalidate_even_same_second_aba#legacy same-second ABA" name="test_participating_legacy_and_template_writes_invalidate_even_same_second_aba"/>
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftTest::test_participating_legacy_and_template_writes_invalidate_even_same_second_aba#template identity" name="test_participating_legacy_and_template_writes_invalidate_even_same_second_aba"/>
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftTest::test_participating_legacy_and_template_writes_invalidate_even_same_second_aba#template same-second ABA" name="test_participating_legacy_and_template_writes_invalidate_even_same_second_aba"/>
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftTest::test_lifecycle_drift_refuses_capture_and_save_without_changing_retained_evidence#submitted" name="test_lifecycle_drift_refuses_capture_and_save_without_changing_retained_evidence"/>
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftTest::test_lifecycle_drift_refuses_capture_and_save_without_changing_retained_evidence#approved" name="test_lifecycle_drift_refuses_capture_and_save_without_changing_retained_evidence"/>
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftTest::test_lifecycle_drift_refuses_capture_and_save_without_changing_retained_evidence#published" name="test_lifecycle_drift_refuses_capture_and_save_without_changing_retained_evidence"/>
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftTest::test_forged_baselines_unknown_fields_bad_content_and_reparented_hints_fail_closed" name="test_forged_baselines_unknown_fields_bad_content_and_reparented_hints_fail_closed"/>
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftTest::test_current_actor_and_required_mfa_guard_capture_and_save#review / role" name="test_current_actor_and_required_mfa_guard_capture_and_save"/>
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftTest::test_current_actor_and_required_mfa_guard_capture_and_save#review / email" name="test_current_actor_and_required_mfa_guard_capture_and_save"/>
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftTest::test_current_actor_and_required_mfa_guard_capture_and_save#review / mfa" name="test_current_actor_and_required_mfa_guard_capture_and_save"/>
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftTest::test_current_actor_and_required_mfa_guard_capture_and_save#review / unsaved" name="test_current_actor_and_required_mfa_guard_capture_and_save"/>
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftTest::test_current_actor_and_required_mfa_guard_capture_and_save#review / customer" name="test_current_actor_and_required_mfa_guard_capture_and_save"/>
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftTest::test_current_actor_and_required_mfa_guard_capture_and_save#save / role" name="test_current_actor_and_required_mfa_guard_capture_and_save"/>
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftTest::test_current_actor_and_required_mfa_guard_capture_and_save#save / email" name="test_current_actor_and_required_mfa_guard_capture_and_save"/>
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftTest::test_current_actor_and_required_mfa_guard_capture_and_save#save / mfa" name="test_current_actor_and_required_mfa_guard_capture_and_save"/>
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftTest::test_current_actor_and_required_mfa_guard_capture_and_save#save / unsaved" name="test_current_actor_and_required_mfa_guard_capture_and_save"/>
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftTest::test_current_actor_and_required_mfa_guard_capture_and_save#save / customer" name="test_current_actor_and_required_mfa_guard_capture_and_save"/>
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftTest::test_post_projection_or_post_audit_withdrawal_rolls_back_before_return#capture role" name="test_post_projection_or_post_audit_withdrawal_rolls_back_before_return"/>
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftTest::test_post_projection_or_post_audit_withdrawal_rolls_back_before_return#capture MFA" name="test_post_projection_or_post_audit_withdrawal_rolls_back_before_return"/>
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftTest::test_post_projection_or_post_audit_withdrawal_rolls_back_before_return#audit role" name="test_post_projection_or_post_audit_withdrawal_rolls_back_before_return"/>
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftTest::test_post_projection_or_post_audit_withdrawal_rolls_back_before_return#audit MFA" name="test_post_projection_or_post_audit_withdrawal_rolls_back_before_return"/>
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftTest::test_audit_failure_rolls_back_content_authorship_and_reopening_reads_committed_state" name="test_audit_failure_rolls_back_content_authorship_and_reopening_reads_committed_state"/>
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftTest::test_review_fences_precede_snapshot_reads_and_new_entry_points_refuse_caller_transactions" name="test_review_fences_precede_snapshot_reads_and_new_entry_points_refuse_caller_transactions"/>
+  </testClass>
+  <testClass name="Tests\Feature\SiteScheduleConcurrencyTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/SiteScheduleConcurrencyTest.php">
+   <testMethod id="Tests\Feature\SiteScheduleConcurrencyTest::test_scheduler_and_manual_publication_serialize_to_one_consistent_outcome#scheduler takes the lock first" name="test_scheduler_and_manual_publication_serialize_to_one_consistent_outcome"/>
+   <testMethod id="Tests\Feature\SiteScheduleConcurrencyTest::test_scheduler_and_manual_publication_serialize_to_one_consistent_outcome#staff take the lock first" name="test_scheduler_and_manual_publication_serialize_to_one_consistent_outcome"/>
+   <testMethod id="Tests\Feature\SiteScheduleConcurrencyTest::test_overlapping_scheduler_runs_publish_the_schedule_once" name="test_overlapping_scheduler_runs_publish_the_schedule_once"/>
+   <testMethod id="Tests\Feature\SiteScheduleConcurrencyTest::test_scheduler_and_cancellation_serialize_to_one_consistent_outcome#scheduler takes the lock first" name="test_scheduler_and_cancellation_serialize_to_one_consistent_outcome"/>
+   <testMethod id="Tests\Feature\SiteScheduleConcurrencyTest::test_scheduler_and_cancellation_serialize_to_one_consistent_outcome#staff take the lock first" name="test_scheduler_and_cancellation_serialize_to_one_consistent_outcome"/>
+  </testClass>
+  <testClass name="Tests\Feature\SupportAttachmentNativeConcurrencyTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/SupportAttachmentNativeConcurrencyTest.php">
+   <testMethod id="Tests\Feature\SupportAttachmentNativeConcurrencyTest::test_native_last_file_reservation_serializes_real_contenders_and_retains_exact_originals" name="test_native_last_file_reservation_serializes_real_contenders_and_retains_exact_originals"/>
+  </testClass>
+  <testClass name="Tests\Feature\TrackPublicationManifestConcurrencyTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/TrackPublicationManifestConcurrencyTest.php">
+   <testMethod id="Tests\Feature\TrackPublicationManifestConcurrencyTest::test_capture_and_authority_withdrawal_serialize_on_the_exact_actor_row#capture locks first" name="test_capture_and_authority_withdrawal_serialize_on_the_exact_actor_row"/>
+   <testMethod id="Tests\Feature\TrackPublicationManifestConcurrencyTest::test_capture_and_authority_withdrawal_serialize_on_the_exact_actor_row#authority withdrawal locks first" name="test_capture_and_authority_withdrawal_serialize_on_the_exact_actor_row"/>
+   <testMethod id="Tests\Feature\TrackPublicationManifestConcurrencyTest::test_old_repeatable_read_authority_snapshot_is_refused_then_standalone_capture_uses_current_authority#staff role" name="test_old_repeatable_read_authority_snapshot_is_refused_then_standalone_capture_uses_current_authority"/>
+   <testMethod id="Tests\Feature\TrackPublicationManifestConcurrencyTest::test_old_repeatable_read_authority_snapshot_is_refused_then_standalone_capture_uses_current_authority#verified email" name="test_old_repeatable_read_authority_snapshot_is_refused_then_standalone_capture_uses_current_authority"/>
+   <testMethod id="Tests\Feature\TrackPublicationManifestConcurrencyTest::test_old_repeatable_read_authority_snapshot_is_refused_then_standalone_capture_uses_current_authority#MFA enrollment" name="test_old_repeatable_read_authority_snapshot_is_refused_then_standalone_capture_uses_current_authority"/>
+   <testMethod id="Tests\Feature\TrackPublicationManifestConcurrencyTest::test_metadata_writer_committed_first_is_observed_after_the_exact_track_row_wait" name="test_metadata_writer_committed_first_is_observed_after_the_exact_track_row_wait"/>
+   <testMethod id="Tests\Feature\TrackPublicationManifestConcurrencyTest::test_publication_writer_committed_first_is_observed_after_the_exact_track_row_wait" name="test_publication_writer_committed_first_is_observed_after_the_exact_track_row_wait"/>
+  </testClass>
+ </tests>
+ <groups>
+  <group name="default">
+   <test id="Tests\Feature\ExclusiveOfferConcurrencyTest::test_independent_connections_preserve_preparation_identity_and_scope_controls#0"/>
+   <test id="Tests\Feature\ExclusiveOfferConcurrencyTest::test_independent_connections_preserve_preparation_identity_and_scope_controls#1"/>
+   <test id="Tests\Feature\ExclusiveOfferConcurrencyTest::test_independent_connections_preserve_preparation_identity_and_scope_controls#2"/>
+   <test id="Tests\Feature\FreeGrantConcurrencyTest::test_observed_two_buyer_scope_wait_cannot_overfill_one_explicit_free_origin_capacity"/>
+   <test id="Tests\Feature\HostedCheckoutMigrationTest::test_empty_checkout_tables_roundtrip_without_rewriting_existing_prepared_order_evidence"/>
+   <test id="Tests\Feature\HostedCheckoutMigrationTest::test_checkout_evidence_rejects_model_and_bulk_mutation#0"/>
+   <test id="Tests\Feature\HostedCheckoutMigrationTest::test_checkout_evidence_rejects_model_and_bulk_mutation#1"/>
+   <test id="Tests\Feature\HostedCheckoutMigrationTest::test_checkout_evidence_rejects_model_and_bulk_mutation#2"/>
+   <test id="Tests\Feature\HostedCheckoutMigrationTest::test_checkout_evidence_rejects_model_and_bulk_mutation#3"/>
+   <test id="Tests\Feature\HostedCheckoutMigrationTest::test_unique_bindings_and_case_sensitive_account_scopes_prevent_ambiguous_session_identity"/>
+   <test id="Tests\Feature\HostedCheckoutMigrationTest::test_foreign_keys_reject_orphan_records_and_retain_all_referenced_evidence"/>
+   <test id="Tests\Feature\HostedCheckoutMigrationTest::test_observations_append_and_private_ciphertext_is_hidden_by_every_model"/>
+   <test id="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest::test_committed_read_frame_is_read_only_one_use_and_fires_no_new_framework_commit_event"/>
+   <test id="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest::test_normal_commit_callback_withdrawal_retains_durable_write_but_releases_no_private_response#credential"/>
+   <test id="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest::test_normal_commit_callback_withdrawal_retains_durable_write_but_releases_no_private_response#actor"/>
+   <test id="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest::test_normal_commit_callback_withdrawal_retains_durable_write_but_releases_no_private_response#feature config"/>
+   <test id="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest::test_normal_commit_callback_withdrawal_retains_durable_write_but_releases_no_private_response#identity config"/>
+   <test id="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest::test_direct_commit_reopen_loses_physical_anchor_and_is_not_rolled_back_as_owned_work"/>
+   <test id="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest::test_foreign_reader_existing_or_nested_transaction_and_expired_original_deadline_are_refused"/>
+   <test id="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest::test_close_preserves_replacement_transaction_read_only_state"/>
+   <test id="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest::test_single_close_restores_idle_default_after_caller_ends_replacement_without_another_close#rollback then statement"/>
+   <test id="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest::test_single_close_restores_idle_default_after_caller_ends_replacement_without_another_close#rollback then transaction"/>
+   <test id="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest::test_single_close_restores_idle_default_after_caller_ends_replacement_without_another_close#commit then statement"/>
+   <test id="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest::test_single_close_restores_idle_default_after_caller_ends_replacement_without_another_close#commit then transaction"/>
+   <test id="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest::test_expiring_original_deadline_cannot_be_renewed_by_starting_final_proof"/>
+   <test id="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest::test_active_secondary_transaction_refuses_a_new_committed_frame"/>
+   <test id="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest::test_native_validation_reads_current_committed_credential_instead_of_an_old_repeatable_read_snapshot"/>
+   <test id="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest::test_late_unresolved_connection_is_refused_without_running_a_callback_after_feature_policy#primary resolver"/>
+   <test id="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest::test_late_unresolved_connection_is_refused_without_running_a_callback_after_feature_policy#secondary resolver"/>
+   <test id="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest::test_late_unresolved_connection_is_refused_without_running_a_callback_after_feature_policy#secondary null"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingRetrievalIdentitySchemaTest::test_native_positions_require_database_time_and_unique_allocation_and_read_phase"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingRetrievalIdentitySchemaTest::test_exact_endpoint_identity_and_database_time_are_required_on_both_ledgers"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingRetrievalIdentitySchemaTest::test_endpoints_from_two_reads_cannot_be_spliced_even_with_both_actual_tokens"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingRetrievalIdentitySchemaTest::test_same_integer_after_disposable_allocation_replacement_does_not_retain_identity"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingRetrievalIdentitySchemaTest::test_both_cross_ledger_directions_refuse_reusing_an_exact_valid_interval"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingRetrievalIdentitySchemaTest::test_allocated_identity_fields_remain_immutable"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingRetrievalIdentitySchemaTest::test_native_database_utc_is_independent_of_session_timezone"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingRetrievalIdentitySchemaTest::test_native_old_snapshot_cannot_hide_a_competing_committed_interval_claim"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingRetrievalIdentitySchemaTest::test_native_endpoint_lookup_uses_current_allocation_after_an_older_snapshot"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftTest::test_two_open_editors_keep_the_winning_draft_and_require_explicit_reopen"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftTest::test_review_and_no_op_preserve_each_supported_schema_and_use_minimized_atomic_edit_audits#original"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftTest::test_review_and_no_op_preserve_each_supported_schema_and_use_minimized_atomic_edit_audits#typed"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftTest::test_review_and_no_op_preserve_each_supported_schema_and_use_minimized_atomic_edit_audits#scoped"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftTest::test_review_and_no_op_preserve_each_supported_schema_and_use_minimized_atomic_edit_audits#economic"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftTest::test_participating_legacy_and_template_writes_invalidate_even_same_second_aba#legacy content"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftTest::test_participating_legacy_and_template_writes_invalidate_even_same_second_aba#legacy no-op"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftTest::test_participating_legacy_and_template_writes_invalidate_even_same_second_aba#legacy same-second ABA"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftTest::test_participating_legacy_and_template_writes_invalidate_even_same_second_aba#template identity"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftTest::test_participating_legacy_and_template_writes_invalidate_even_same_second_aba#template same-second ABA"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftTest::test_lifecycle_drift_refuses_capture_and_save_without_changing_retained_evidence#submitted"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftTest::test_lifecycle_drift_refuses_capture_and_save_without_changing_retained_evidence#approved"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftTest::test_lifecycle_drift_refuses_capture_and_save_without_changing_retained_evidence#published"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftTest::test_forged_baselines_unknown_fields_bad_content_and_reparented_hints_fail_closed"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftTest::test_current_actor_and_required_mfa_guard_capture_and_save#review / role"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftTest::test_current_actor_and_required_mfa_guard_capture_and_save#review / email"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftTest::test_current_actor_and_required_mfa_guard_capture_and_save#review / mfa"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftTest::test_current_actor_and_required_mfa_guard_capture_and_save#review / unsaved"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftTest::test_current_actor_and_required_mfa_guard_capture_and_save#review / customer"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftTest::test_current_actor_and_required_mfa_guard_capture_and_save#save / role"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftTest::test_current_actor_and_required_mfa_guard_capture_and_save#save / email"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftTest::test_current_actor_and_required_mfa_guard_capture_and_save#save / mfa"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftTest::test_current_actor_and_required_mfa_guard_capture_and_save#save / unsaved"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftTest::test_current_actor_and_required_mfa_guard_capture_and_save#save / customer"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftTest::test_post_projection_or_post_audit_withdrawal_rolls_back_before_return#capture role"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftTest::test_post_projection_or_post_audit_withdrawal_rolls_back_before_return#capture MFA"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftTest::test_post_projection_or_post_audit_withdrawal_rolls_back_before_return#audit role"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftTest::test_post_projection_or_post_audit_withdrawal_rolls_back_before_return#audit MFA"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftTest::test_audit_failure_rolls_back_content_authorship_and_reopening_reads_committed_state"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftTest::test_review_fences_precede_snapshot_reads_and_new_entry_points_refuse_caller_transactions"/>
+   <test id="Tests\Feature\SiteScheduleConcurrencyTest::test_scheduler_and_manual_publication_serialize_to_one_consistent_outcome#scheduler takes the lock first"/>
+   <test id="Tests\Feature\SiteScheduleConcurrencyTest::test_scheduler_and_manual_publication_serialize_to_one_consistent_outcome#staff take the lock first"/>
+   <test id="Tests\Feature\SiteScheduleConcurrencyTest::test_overlapping_scheduler_runs_publish_the_schedule_once"/>
+   <test id="Tests\Feature\SiteScheduleConcurrencyTest::test_scheduler_and_cancellation_serialize_to_one_consistent_outcome#scheduler takes the lock first"/>
+   <test id="Tests\Feature\SiteScheduleConcurrencyTest::test_scheduler_and_cancellation_serialize_to_one_consistent_outcome#staff take the lock first"/>
+   <test id="Tests\Feature\SupportAttachmentNativeConcurrencyTest::test_native_last_file_reservation_serializes_real_contenders_and_retains_exact_originals"/>
+   <test id="Tests\Feature\TrackPublicationManifestConcurrencyTest::test_capture_and_authority_withdrawal_serialize_on_the_exact_actor_row#capture locks first"/>
+   <test id="Tests\Feature\TrackPublicationManifestConcurrencyTest::test_capture_and_authority_withdrawal_serialize_on_the_exact_actor_row#authority withdrawal locks first"/>
+   <test id="Tests\Feature\TrackPublicationManifestConcurrencyTest::test_old_repeatable_read_authority_snapshot_is_refused_then_standalone_capture_uses_current_authority#staff role"/>
+   <test id="Tests\Feature\TrackPublicationManifestConcurrencyTest::test_old_repeatable_read_authority_snapshot_is_refused_then_standalone_capture_uses_current_authority#verified email"/>
+   <test id="Tests\Feature\TrackPublicationManifestConcurrencyTest::test_old_repeatable_read_authority_snapshot_is_refused_then_standalone_capture_uses_current_authority#MFA enrollment"/>
+   <test id="Tests\Feature\TrackPublicationManifestConcurrencyTest::test_metadata_writer_committed_first_is_observed_after_the_exact_track_row_wait"/>
+   <test id="Tests\Feature\TrackPublicationManifestConcurrencyTest::test_publication_writer_committed_first_is_observed_after_the_exact_track_row_wait"/>
+  </group>
+ </groups>
+</testSuite>

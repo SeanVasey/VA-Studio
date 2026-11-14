@@ -1,0 +1,444 @@
+{
+  "DECISION": "APPROVE WITH CONDITIONS",
+  "archive": {
+    "all_digests_and_safe_exact_member_set": true,
+    "bytes": 7073062,
+    "index_sha256": "e96458f04224ac7bdee00f462767d107d9651f79b644d2f350e630f6fb782e9d",
+    "members": 2460,
+    "sha256": "bd681b5f192e87b7f1f1ec9708682e5a87a91b5797009bbdbd8514aba6bba2fb"
+  },
+  "base_actual_merge_sha": "d8817316558b3d5965203b548d75cd635e7cde92",
+  "cheap_counts": {
+    "combined_narrow10": 263,
+    "current3": 67,
+    "failed_original_preserved": {
+      "exit": 1,
+      "failures": 1,
+      "tests": 52
+    },
+    "prior7_carried": 196
+  },
+  "cheap_originals": [
+    {
+      "Python_test_count": 27,
+      "argv": [
+        "python3",
+        "scripts/ci/test-ci-scope.py"
+      ],
+      "exit": 0,
+      "member": "cheap/paid-financial-cheap-20261015/00-test-ci-scope.json",
+      "source": "3e6f89222c0832c08bf0205ee79077935b0c4e28"
+    },
+    {
+      "Python_test_count": 14,
+      "argv": [
+        "python3",
+        "scripts/ci/test-workflow-cadence.py"
+      ],
+      "exit": 0,
+      "member": "cheap/paid-financial-cheap-20261015/01-test-workflow-cadence.json",
+      "source": "3e6f89222c0832c08bf0205ee79077935b0c4e28"
+    },
+    {
+      "Python_test_count": 50,
+      "argv": [
+        "python3",
+        "scripts/ci/test-focused-tests.py"
+      ],
+      "exit": 0,
+      "member": "cheap/paid-financial-cheap-20261015/02-test-focused-tests.json",
+      "source": "3e6f89222c0832c08bf0205ee79077935b0c4e28"
+    },
+    {
+      "Python_test_count": 61,
+      "argv": [
+        "python3",
+        "scripts/ci/test-database-receipts.py"
+      ],
+      "exit": 0,
+      "member": "cheap/paid-financial-cheap-20261015/03-test-database-receipts.json",
+      "source": "3e6f89222c0832c08bf0205ee79077935b0c4e28"
+    },
+    {
+      "Python_test_count": 32,
+      "argv": [
+        "python3",
+        "scripts/ci/test-gitlab-database-receipts.py"
+      ],
+      "exit": 0,
+      "member": "cheap/paid-financial-cheap-20261015/04-test-gitlab-database-receipts.json",
+      "source": "3e6f89222c0832c08bf0205ee79077935b0c4e28"
+    },
+    {
+      "Python_test_count": 7,
+      "argv": [
+        "python3",
+        "scripts/ci/test-gitlab-writer-feedback.py"
+      ],
+      "exit": 0,
+      "member": "cheap/paid-financial-cheap-20261015/05-test-gitlab-writer-feedback.json",
+      "source": "3e6f89222c0832c08bf0205ee79077935b0c4e28"
+    },
+    {
+      "Python_test_count": 5,
+      "argv": [
+        "python3",
+        "scripts/ci/test-php-test-runtime.py"
+      ],
+      "exit": 0,
+      "member": "cheap/paid-financial-cheap-20261015/06-test-php-test-runtime.json",
+      "source": "3e6f89222c0832c08bf0205ee79077935b0c4e28"
+    },
+    {
+      "Python_test_count": 52,
+      "argv": [
+        "python3",
+        "scripts/ci/test-phpunit-shards.py"
+      ],
+      "exit": 1,
+      "member": "cheap/paid-financial-cheap-20261015/07-test-phpunit-shards.json",
+      "source": "3e6f89222c0832c08bf0205ee79077935b0c4e28"
+    },
+    {
+      "Python_test_count": 52,
+      "argv": [
+        "python3",
+        "scripts/ci/test-phpunit-shards.py"
+      ],
+      "exit": 0,
+      "member": "cheap/paid-financial-cheap-continuation-20261015/00-test-phpunit-shards.json",
+      "source": "ae6d109581bac6b685360a5941d6c7819cd5616f"
+    },
+    {
+      "Python_test_count": 13,
+      "argv": [
+        "python3",
+        "scripts/dev/test-bootstrap-macos.py"
+      ],
+      "exit": 0,
+      "member": "cheap/paid-financial-cheap-continuation-20261015/01-test-bootstrap-macos.json",
+      "source": "ae6d109581bac6b685360a5941d6c7819cd5616f"
+    },
+    {
+      "Python_test_count": 2,
+      "argv": [
+        "python3",
+        "scripts/test-publish-github.py"
+      ],
+      "exit": 0,
+      "member": "cheap/paid-financial-cheap-continuation-20261015/02-test-publish-github.json",
+      "source": "ae6d109581bac6b685360a5941d6c7819cd5616f"
+    },
+    {
+      "Python_test_count": null,
+      "argv": [
+        "composer",
+        "validate",
+        "--strict"
+      ],
+      "exit": 0,
+      "member": "cheap/paid-financial-cheap-continuation-20261015/03-validate.json",
+      "source": "ae6d109581bac6b685360a5941d6c7819cd5616f"
+    },
+    {
+      "Python_test_count": null,
+      "argv": [
+        "composer",
+        "audit",
+        "--format=json"
+      ],
+      "exit": 0,
+      "member": "cheap/paid-financial-cheap-continuation-20261015/04-audit.json",
+      "source": "ae6d109581bac6b685360a5941d6c7819cd5616f"
+    },
+    {
+      "Python_test_count": null,
+      "argv": [
+        "composer",
+        "check-platform-reqs"
+      ],
+      "exit": 0,
+      "member": "cheap/paid-financial-cheap-continuation-20261015/05-check-platform-reqs.json",
+      "source": "ae6d109581bac6b685360a5941d6c7819cd5616f"
+    },
+    {
+      "Python_test_count": null,
+      "argv": [
+        "vendor/bin/pint",
+        "--test",
+        "app/Domain/Commerce/ProductionFinancialInspection",
+        "config/production-financial-inspection.php",
+        "tests/Feature/ProductionFinancialInspection/FinancialCandidateTest.php"
+      ],
+      "exit": 0,
+      "member": "cheap/paid-financial-cheap-continuation-20261015/06---test.json",
+      "source": "ae6d109581bac6b685360a5941d6c7819cd5616f"
+    }
+  ],
+  "created_utc": "2026-10-15T13:23:02.637911+00:00",
+  "current_quality": {
+    "Pint": {
+      "PHP_files": 7,
+      "exit": 0
+    },
+    "audit": 0,
+    "platform": 0,
+    "strict_validate": 0
+  },
+  "documentation_failures": [
+    {
+      "exit": 1,
+      "path": "docs/verification/paid-financial-observation-20261015/documentation-preparation/charge.json",
+      "scope": "Failed public documentation only; not provider interoperability",
+      "sha256": "9c6c4cd69c55efcb4f7fe879546fcd6ba8228ae0352eb6191f2ff3f492d568c5"
+    },
+    {
+      "exit": 1,
+      "path": "docs/verification/paid-financial-observation-20261015/documentation-preparation/dispute.json",
+      "scope": "Failed public documentation only; not provider interoperability",
+      "sha256": "9d5f1ced7db60fb36d9024da5d8711aa802604fc01b958a81f583e6ea6546467"
+    },
+    {
+      "exit": 1,
+      "path": "docs/verification/paid-financial-observation-20261015/documentation-preparation/refund.json",
+      "scope": "Failed public documentation only; not provider interoperability",
+      "sha256": "a5437092581346f571b597d11d97c77625ea4aa58f4338b9baaf6b6299f7cfb9"
+    },
+    {
+      "exit": 1,
+      "path": "docs/verification/paid-financial-observation-20261015/documentation-preparation/refund-direct-path.json",
+      "scope": "Failed public documentation only; not provider interoperability",
+      "sha256": "5bcab16814397a4fb289ea518899046f5151d1038405860a3202fb2fa5a31c1e"
+    }
+  ],
+  "engineering_verdict": "Approved for focused development integration; no remaining material source/evidence correction identified. Current13/351 plus meaningful original red controls and unchanged legacy/cheap dependencies are proportionate under AGENTS cost policy.",
+  "independent_originals_preserved": [
+    {
+      "path": "design-review-ef74c3cb-original.md",
+      "sha256": "738915dbe92ca5e12b7e631796a5b1d301dc8773278978323a80f3bd79ed8a63"
+    },
+    {
+      "path": "design-review-ef74c3cb-original.json",
+      "sha256": "bc8ae9e56cb9b381519c8d943a263a83d6ee6d90821b264e727d3c413d7676a9"
+    },
+    {
+      "path": "design-review-b6a8b72c-original.md",
+      "sha256": "44c14c83fa2bc00144071b6a5618a983ef0dcc5c0712f766e25ea83cbf0a8dd4"
+    },
+    {
+      "path": "design-review-b6a8b72c-original.json",
+      "sha256": "d1dbdabfdfc2ea9b7eca68eebe24f73065ade997028ced02f298e24bbb7641d5"
+    },
+    {
+      "path": "source-review-3e6f8922-original.md",
+      "sha256": "e63229e342878110d8e2d4246b7c590b6da70bec6d5aaa9539f839d247f38e45"
+    },
+    {
+      "path": "source-review-3e6f8922-original.json",
+      "sha256": "bf757a8e76307df67fe8e7ba62d1f3b85a994b06b3dbf0cb8c4c24c14e7d23a4"
+    },
+    {
+      "path": "source-review-ae6d1095-original.md",
+      "sha256": "71cae4880ff461cb84ae1407cb6847831fac692ff84319f0bfd9f2edecb7bf06"
+    },
+    {
+      "path": "source-review-ae6d1095-original.json",
+      "sha256": "8ffe307a286e3693b573b62a9cf7dcd283ef4a5e00066201d983cebcfff027d2"
+    }
+  ],
+  "narrow_carry_limits": [
+    "Legacy69/291 and cheap7/196 remain original3e source evidence; no fresh69/current full10-command or native/full-suite claim.",
+    "Legacy69/291 remains original3e execution; new pure helper corrections are outside those callers. No fresh legacy/new whole aggregate claim.",
+    "Seven earlier safeguards196 pass remain source-specific with261 exact unchanged dependencies; three current safeguards67 complete the10-command coverage. No fresh full10-command run is claimed.",
+    "No new native/schema/race/census/current provider/live/FPM/distributed/full-suite proof is inferred."
+  ],
+  "open_P0": false,
+  "open_P1": false,
+  "operative_application_config_test_sha": "ae6d109581bac6b685360a5941d6c7819cd5616f",
+  "original_PHP_invocations": [
+    {
+      "PHP_exit": 0,
+      "counts": {
+        "assertions": 291,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 69
+      },
+      "errors": [],
+      "filter": null,
+      "launch": {
+        "pid": 216843,
+        "start_ticks": "8985591",
+        "uid": 1000
+      },
+      "name": "affected-financial-3e6f8922",
+      "observed_recorder_OS_exit": 0,
+      "pass": true,
+      "recorder_exit": 0,
+      "selected_files": [
+        "tests/Unit/StripeFinancialInspectionGatewayTest.php",
+        "tests/Feature/TestPaymentFinancialObservationTest.php"
+      ],
+      "source": "3e6f89222c0832c08bf0205ee79077935b0c4e28",
+      "source_runner_loader_HEAD_status_stable": true
+    },
+    {
+      "PHP_exit": 0,
+      "counts": {
+        "assertions": 331,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 10
+      },
+      "errors": [],
+      "filter": null,
+      "launch": {
+        "pid": 216183,
+        "start_ticks": "8977108",
+        "uid": 1000
+      },
+      "name": "candidate-whole-3e6f8922",
+      "observed_recorder_OS_exit": 0,
+      "pass": true,
+      "recorder_exit": 0,
+      "selected_files": [
+        "tests/Feature/ProductionFinancialInspection/FinancialCandidateTest.php"
+      ],
+      "source": "3e6f89222c0832c08bf0205ee79077935b0c4e28",
+      "source_runner_loader_HEAD_status_stable": true
+    },
+    {
+      "PHP_exit": 0,
+      "counts": {
+        "assertions": 351,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 13
+      },
+      "errors": [],
+      "filter": null,
+      "launch": {
+        "pid": 218994,
+        "start_ticks": "9026304",
+        "uid": 1000
+      },
+      "name": "candidate-whole-repaired",
+      "observed_recorder_OS_exit": 0,
+      "pass": true,
+      "recorder_exit": 0,
+      "selected_files": [
+        "tests/Feature/ProductionFinancialInspection/FinancialCandidateTest.php"
+      ],
+      "source": "ae6d109581bac6b685360a5941d6c7819cd5616f",
+      "source_runner_loader_HEAD_status_stable": true
+    },
+    {
+      "PHP_exit": 2,
+      "counts": {
+        "assertions": 7,
+        "errors": 2,
+        "failures": 1,
+        "skipped": 0,
+        "tests": 3
+      },
+      "errors": [
+        {
+          "case": "test_original_v1_automatic_async_capture_is_admitted_and_other_capture_methods_are_refused",
+          "message": "App\\Domain\\Commerce\\ProductionFinancialInspection\\FinancialInspectionException: PAID_FINANCIAL_CANDIDATE_UNAVAILABLE",
+          "reached_normalizer": true
+        },
+        {
+          "case": "test_original_tax_automatic_async_capture_is_admitted_and_other_capture_methods_are_refused",
+          "message": "App\\Domain\\Commerce\\ProductionFinancialInspection\\FinancialInspectionException: PAID_FINANCIAL_CANDIDATE_UNAVAILABLE",
+          "reached_normalizer": true
+        }
+      ],
+      "filter": "automatic_async|transfer_pointer",
+      "launch": {
+        "pid": 218629,
+        "start_ticks": "9013626",
+        "uid": 1000
+      },
+      "name": "reviewer-regressions-red",
+      "observed_recorder_OS_exit": 1,
+      "pass": false,
+      "recorder_exit": 1,
+      "selected_files": [
+        "tests/Feature/ProductionFinancialInspection/FinancialCandidateTest.php"
+      ],
+      "source": "f9fda036ad483cafbe524437fcf0c56435a96376",
+      "source_runner_loader_HEAD_status_stable": true
+    }
+  ],
+  "passing_invocations": 3,
+  "preserved_release_conditions": [
+    "New purpose ships literalfalse; no provider/transport/route/job/command/UI/schema/durable financial observation or business write added.",
+    "No normalized candidate/expectation authenticates provider retrieval, freshness/current finances, positive original commit, dispatch/refund/settlement/payout/access/rights/inventory authority.",
+    "Future authenticated retrieval/original source+commit closure/durable append-only ledger/staff MFA/idempotency need separate design/implementation/review.",
+    "Sean eligibility/window/partial-tax allocation/dispute-download/rights/exclusive rules remain unknown and must not be invented.",
+    "Original source/receipt/schema/profile/SDK21.3.2/API2026-08-26.dahlia bodies and adjacent shared V1/Identity metadata/membership afterCommit P2 remain frozen.",
+    "Official public docs/real account/provider interoperability, merchant/key/host/live activation, existing-request final I/O, global SQL/DDL/isolation/reopen/restore, FPM/distributed/performance/parity/full verification remain open.",
+    "No Foundation/GitLab/live/deployment/DNS/customer import or actual financial/provider operation by reviewer."
+  ],
+  "ready_for_development_merge_after_required_gates": true,
+  "ready_for_exact_head_cheap_preflight": true,
+  "red_nonzero_invocations": 1,
+  "remaining_required_merge_gates": [
+    "If importing final receipt originals moves10e0, independently verify doc-only publication successor carry.",
+    "Publish exact reviewed/carried head and obtain green cheap preflight bound to that40-character SHA.",
+    "Inspect complete checks/reviews/threads/protection inventory without bypass or settings changes, then merge expected exact head.",
+    "Record actual merge/check/carry receipts and update both ledgers afterward."
+  ],
+  "required_source_or_packet_corrections": [],
+  "review_assessment": [
+    "Both original source factories prove caller-held sources before/after complete extraction and recheck captured literal policy after callback-capable work; preserve V1 versus Tax buyer-reviewed gross and actual automatic/automatic_async method. No new SQL/frame/clock/cleanup/receipt/provider authority.",
+    "Candidate is fixed consistent_candidate/providerAuthenticated=false/unattested_input, never authenticated current provider state or settled balance. Charges bind within the supplied PI.latest_charge envelope; source exposes no original Charge ID.",
+    "All monetary items/status maps are bounded primitive/int inputs; succeeded sum remains bounded while non-succeeded attempt histories and provider aggregate/flags remain separate, with only a comparison boolean. No refund/rights/access/inventory disposition inferred.",
+    "Original transfer/capture method defects have meaningful actual source red controls and current whole13 repaired green. Source/fixture policy-regex correction preserves original reader mismatch without weakening selection/gates.",
+    "Protected16 refs include original sources/reader/legacy normalizer/profile manifests/local pinned SDK bodies. Whole routes/schema/resources/contracts/provider/bootstrap/selection/workflow/dependency scopes match actual124 base.",
+    "All8 design/source original imports retain exact bytes; earlier failures/provenance limits and documentation retrieval errors stay explicit."
+  ],
+  "review_kind": "Independent non-author final bounded source/evidence development decision",
+  "reviewed_sha": "10e0d86177603f5a0c41f2c1a9011c4eee634592",
+  "reviewer_actions": {
+    "application_test_DB_network_CI_hosted_operations": 0,
+    "tracked_edits": 0
+  },
+  "source_and_carry_verification": {
+    "Git_path_bindings": 7290,
+    "actual_current_inputs_equal": 2430,
+    "all_scoped_original_schema_routes_profile_SDK_pins_provider_workflow_body_paths_unchanged": true,
+    "current_and_recorded_loaders": 13,
+    "distinct_source_blobs": 2377,
+    "heads": [
+      "3e6f89222c0832c08bf0205ee79077935b0c4e28",
+      "ae6d109581bac6b685360a5941d6c7819cd5616f",
+      "f9fda036ad483cafbe524437fcf0c56435a96376"
+    ],
+    "inputs_each": 2430,
+    "inventories": 3,
+    "narrow_carry_exact_bindings": 261,
+    "protected_original_refs_including_local_SDK": 16,
+    "reachable_Git_objects_checked": 2377,
+    "route_inputs": 17
+  },
+  "specification_verdict": "Pass for the bounded defaultfalse/unattested financial-input first slice, with original source/capture method/transfer/policy/shape/summary semantics and explicit narrow evidence carry. No complete A5 lifecycle acceptance.",
+  "verification_artifacts": {
+    "reviewer_preparation_errors": [
+      "Read-only cat guessed docs/ops/paid-financial-observation-runtime.md and returned no-such-file exit1. Corrected to README-linked paid-financial-candidate-runtime.md; no app/DB/test failure."
+    ],
+    "verifier": {
+      "exit": 0,
+      "path": "/workspace/runtime/paid-financial-observation-final-verifier-10e0d861-20261015.py",
+      "sha256": "152dc4f9a2b1fbae6bdc87fef2f5539ed858b2fde8ccd6974234c962d3deb137"
+    },
+    "working_report": {
+      "path": "/workspace/runtime/paid-financial-observation-final-working-report-10e0d861-20261015.json",
+      "sha256": "270495cdb8dd518758f97797fe67fa76ffe3839ed6fd416d2d295c63b08a4b40"
+    }
+  },
+  "verification_method": "Independent read-only exact archive/index/member hashes,7290 reachable Git path/object bytes, actual2430 input/13 loader hashes,3 canonical runtime/source inventories,4 command/JUnit/log/process/launch-OS originals,261 narrow carries/protected16 refs,15 cheap command outputs/current quality,8 imported original hashes and doc/runbook/failure-scope inspection."
+}

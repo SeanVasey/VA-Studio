@@ -167,12 +167,20 @@ final class ProductionFreeGrantApprovalTest extends TestCase
         $this->assertNull($shipped['provenance']);
         $this->assertSame([], $shipped['approved_terms_hashes']);
         $this->assertNull($shipped['storage_root']);
-        // Nothing registers, binds or mounts family 256; root composes it after review.
-        $shared = file_get_contents(base_path('bootstrap/providers.php')).file_get_contents(base_path('routes/web.php')).file_get_contents(base_path('config/app.php'));
+        $this->assertFalse($shipped['http_mounted']);
+        // The HTTP mount is the one conditional route include, admitted only by the literal flag; nothing registers a
+        // provider or binds the sources capability. The only container binding is the renderer's, like the other families.
+        $web = file_get_contents(base_path('routes/web.php'));
+        $this->assertSame(1, substr_count($web, 'production-free-grants.php'));
+        $this->assertMatchesRegularExpression("~if \\(ProductionFreeHttpMount::admitted\\(\\)\\) \\{\\s*require __DIR__\\.'/production-free-grants\\.php';\\s*\\}~", $web);
+        $this->assertStringNotContainsString('ProductionFree', file_get_contents(base_path('bootstrap/providers.php')).file_get_contents(base_path('config/app.php')));
+        $providers = '';
         foreach (glob(base_path('app/Providers/*.php')) as $provider) {
-            $shared .= file_get_contents($provider);
+            $providers .= file_get_contents($provider);
         }
-        $this->assertStringNotContainsString('ProductionFree', $shared);
+        $this->assertStringContainsString('ProductionFreeGrantRendererProcess::class', $providers);
+        $this->assertStringNotContainsString('ProductionFree', str_replace(['App\\Domain\\Grants\\ProductionFree\\ProductionFreeGrantRendererProcess',
+            'ProductionFreeGrantRendererProcess'], '', $providers));
     }
 
     /**

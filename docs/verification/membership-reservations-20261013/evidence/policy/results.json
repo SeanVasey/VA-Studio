@@ -1,0 +1,83 @@
+{
+  "base": "670f9caa158e436746ed9aed85667c10b9905f35",
+  "final_suite": {
+    "name": "CLI Arguments",
+    "tests": "78",
+    "assertions": "252",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "time": "32.584822"
+  },
+  "files": [
+    {
+      "name": "Tests\\Unit\\MembershipRedemptionPolicyTest",
+      "file": "/workspace/VA-Studio-membership-redemption-policy/tests/Unit/MembershipRedemptionPolicyTest.php",
+      "tests": "52",
+      "assertions": "125",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "0.012853"
+    },
+    {
+      "name": "Tests\\Feature\\ProductionMembership\\MembershipRedemptionPolicyFactsTest",
+      "file": "/workspace/VA-Studio-membership-redemption-policy/tests/Feature/ProductionMembership/MembershipRedemptionPolicyFactsTest.php",
+      "tests": "3",
+      "assertions": "33",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "6.340438"
+    },
+    {
+      "name": "Tests\\Feature\\ProductionMembership\\MembershipPolicyFactsTest",
+      "file": "/workspace/VA-Studio-membership-redemption-policy/tests/Feature/ProductionMembership/MembershipPolicyFactsTest.php",
+      "tests": "14",
+      "assertions": "73",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "24.209711"
+    },
+    {
+      "name": "Tests\\Feature\\ProductionMembership\\MembershipPolicyClockTest",
+      "file": "/workspace/VA-Studio-membership-redemption-policy/tests/Feature/ProductionMembership/MembershipPolicyClockTest.php",
+      "tests": "1",
+      "assertions": "5",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "1.893630"
+    },
+    {
+      "name": "Tests\\Feature\\ProductionMembership\\MembershipPreparationTest",
+      "file": "/workspace/VA-Studio-membership-redemption-policy/tests/Feature/ProductionMembership/MembershipPreparationTest.php",
+      "tests": "8",
+      "assertions": "16",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "0.128191"
+    }
+  ],
+  "tests_run": [
+    "unit-initial:52/132,7 failures,exit1",
+    "sqlite-policy:78/245,1 failure,exit1",
+    "sqlite-policy-final:78/252,zero skips/errors/failures,exit0"
+  ],
+  "final_source_sha256": {
+    "app/Domain/Memberships/Production/MembershipPolicyDocument.php": "1545367e9c167458e401ba90950c286e8fadb7aa9918360de9170328e613092e",
+    "app/Domain/Memberships/Production/MembershipPolicyBinding.php": "96b62f5f6b3fc4603fd9df5f1a4c0c5f6060e20e54c3e8249ce04e0d999c8e86",
+    "app/Domain/Memberships/Production/MembershipRedemptionTerms.php": "280383a894a3006731554087302ab986eac8512953f38efe38520db3bf0071ea",
+    "tests/Unit/MembershipRedemptionPolicyTest.php": "14cf960cef4ce27a6e46addf9dede0e5cccd701a358fa0d0582e735ba10c28bd",
+    "tests/Feature/ProductionMembership/MembershipRedemptionPolicyFactsTest.php": "6b0809c21b2fa0617ed4033631f3e3284e1f39fc67c53662c53956eae83283a4"
+  },
+  "limits": [
+    "SQLite and pure value checks only; no native MySQL case run by this lane",
+    "No current catalog/paid-period/reservation/consume integration is claimed",
+    "Synthetic terms only; no owner commercial defaults or runtime activation",
+    "Final independent review remains required for integrated batch"
+  ],
+  "commit": "87e0dc42b1a046b4dc122d2bbaff1dd1cabdde5a"
+}

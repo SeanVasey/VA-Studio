@@ -1,0 +1,147 @@
+{
+  "schema_version": "member-original-renderer-public-release-v1",
+  "tested_head": "483793065c3f7a66057907a777f938f608bf7036",
+  "released_by": "/root/member_original_design",
+  "synthetic_only": true,
+  "scope": "Only these exact files are released for copying into the public verification packet; exclude PDF/private DB/env/runtime updater and any unlisted files.",
+  "files": [
+    {
+      "path": "README.md",
+      "source_path": "/workspace/runtime/member-original-renderer-evidence/README.md",
+      "sha256": "ac15ab72d1ba04436ced3322cc2551ac49cf81023ec034e95810a62daef17b61",
+      "bytes": 13607
+    },
+    {
+      "path": "frozen-profiles-inventory.json",
+      "source_path": "/workspace/runtime/member-original-renderer-evidence/frozen-profiles-inventory.json",
+      "sha256": "f20e12e9370964df9b9f9a6c8655e8561c7aa36956fc7c28055dd5afc0cdff85",
+      "bytes": 19659
+    },
+    {
+      "path": "input-text-complete.xml",
+      "source_path": "/workspace/runtime/member-original-renderer-evidence/input-text-complete.xml",
+      "sha256": "7cf35d91dcbf7a57b7ee1c3fa8c86fcef9e43ce6aa88168753a55940fcf421e8",
+      "bytes": 8689
+    },
+    {
+      "path": "input-text-initial.xml",
+      "source_path": "/workspace/runtime/member-original-renderer-evidence/input-text-initial.xml",
+      "sha256": "61848a80d481210bccbfd8ca6948fcdf9783eee4e739650071f8e73fc888dc7a",
+      "bytes": 8689
+    },
+    {
+      "path": "lane-combined-final.xml",
+      "source_path": "/workspace/runtime/member-original-renderer-evidence/lane-combined-final.xml",
+      "sha256": "6c3e90e2a8970e3c407ec48794fd7f5702c45cf04055ea87a7d3ad138c6d3c99",
+      "bytes": 33155
+    },
+    {
+      "path": "member-original-files-e7-green-20261013.log",
+      "source_path": "/workspace/runtime/member-original-renderer-evidence/member-original-files-e7-green-20261013.log",
+      "sha256": "390957264cd4028332a14bb487544ab3b533540cc2644d1b6f4b18eb37c070b3",
+      "bytes": 92,
+      "original_path": "/workspace/runtime/member-original-files-e7-green-20261013.log"
+    },
+    {
+      "path": "member-original-files-e7-red-20261013.log",
+      "source_path": "/workspace/runtime/member-original-renderer-evidence/member-original-files-e7-red-20261013.log",
+      "sha256": "f2945a754f32306458bf3ff9da503146cbfbf0de8de5f2e4035853126815d4b0",
+      "bytes": 1283,
+      "original_path": "/workspace/runtime/member-original-files-e7-red-20261013.log"
+    },
+    {
+      "path": "member-original-files-full-final-20261013.log",
+      "source_path": "/workspace/runtime/member-original-renderer-evidence/member-original-files-full-final-20261013.log",
+      "sha256": "493b271ad2474e51ba11f96df924f45e7ff5dbd5963a9556ad570ff434d16a20",
+      "bytes": 96,
+      "original_path": "/workspace/runtime/member-original-files-full-final-20261013.log"
+    },
+    {
+      "path": "member-original-files-full-interim-38-147-20261013.log",
+      "source_path": "/workspace/runtime/member-original-renderer-evidence/member-original-files-full-interim-38-147-20261013.log",
+      "sha256": "d4927a62a61f13cdcccc0339e98b5ed52634e1a015c0941c765702d7924f6e2b",
+      "bytes": 96,
+      "original_path": "/workspace/runtime/member-original-files-full-interim-38-147-20261013.log"
+    },
+    {
+      "path": "member-original-files-workspace-green-20261013.log",
+      "source_path": "/workspace/runtime/member-original-renderer-evidence/member-original-files-workspace-green-20261013.log",
+      "sha256": "841f97cb9233e0dc2866e93fc750dc2102811073cd541904b9a4aefa02be1bb1",
+      "bytes": 92,
+      "original_path": "/workspace/runtime/member-original-files-workspace-green-20261013.log"
+    },
+    {
+      "path": "member-original-files-workspace-red-20261013.log",
+      "source_path": "/workspace/runtime/member-original-renderer-evidence/member-original-files-workspace-red-20261013.log",
+      "sha256": "a1e4bd8f56c03e61bb2b02d01ea66b40880f65d3110c00de00bf78d576962e60",
+      "bytes": 901,
+      "original_path": "/workspace/runtime/member-original-files-workspace-red-20261013.log"
+    },
+    {
+      "path": "pint-final.log",
+      "source_path": "/workspace/runtime/member-original-renderer-evidence/pint-final.log",
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "bytes": 33
+    },
+    {
+      "path": "reference-alias-fixed-source.xml",
+      "source_path": "/workspace/runtime/member-original-renderer-evidence/reference-alias-fixed-source.xml",
+      "sha256": "ba9e111f997bb8195ed02d140d6902130b23b5a565f87c2c605a0e5e2f43a379",
+      "bytes": 672
+    },
+    {
+      "path": "reference-alias-old-source.xml",
+      "source_path": "/workspace/runtime/member-original-renderer-evidence/reference-alias-old-source.xml",
+      "sha256": "5224c999d6b85681ff792a695234b49e6d4fb5d7cf16541499eef33f7d289d8e",
+      "bytes": 1206
+    },
+    {
+      "path": "renderer-corrected-barrier.xml",
+      "source_path": "/workspace/runtime/member-original-renderer-evidence/renderer-corrected-barrier.xml",
+      "sha256": "7b000a575c5362b61480a616558c1cfec1d91d8692dc4fbe513b1b41b0f238e3",
+      "bytes": 13496
+    },
+    {
+      "path": "renderer-corrected.xml",
+      "source_path": "/workspace/runtime/member-original-renderer-evidence/renderer-corrected.xml",
+      "sha256": "2065c4703a1f6888120a58f9f070f3f8e04447f97d04b723291728834940986a",
+      "bytes": 4541
+    },
+    {
+      "path": "renderer-e6-e8-complete.xml",
+      "source_path": "/workspace/runtime/member-original-renderer-evidence/renderer-e6-e8-complete.xml",
+      "sha256": "948999fc1e83f42cc4592330dd31759ab4ed65370dc3414dd3b1995a1ecc03f3",
+      "bytes": 14336
+    },
+    {
+      "path": "renderer-initial.xml",
+      "source_path": "/workspace/runtime/member-original-renderer-evidence/renderer-initial.xml",
+      "sha256": "38eab3bda0033b9a42b82859d2f56a69fbf6173c2bcccd0e6071eba234dc1306",
+      "bytes": 5950
+    },
+    {
+      "path": "renderer-input-interim.xml",
+      "source_path": "/workspace/runtime/member-original-renderer-evidence/renderer-input-interim.xml",
+      "sha256": "b06d2e81869a7ff10b559bcfa6824d837a40274f27f6d602b25e6e0e3e1cb344",
+      "bytes": 13078
+    },
+    {
+      "path": "transport-cr-fixed-source.xml",
+      "source_path": "/workspace/runtime/member-original-renderer-evidence/transport-cr-fixed-source.xml",
+      "sha256": "14d2eae857bcaa24227a1d88532165847decf452abcce8a09dd6993ce7789d8e",
+      "bytes": 5329
+    },
+    {
+      "path": "transport-cr-old-source.xml",
+      "source_path": "/workspace/runtime/member-original-renderer-evidence/transport-cr-old-source.xml",
+      "sha256": "7c144e7dff67bce5a0b02adcc6849a3736cb3e7681a5aa224c44a5e3b5afd38c",
+      "bytes": 2155
+    },
+    {
+      "path": "inventory.json",
+      "source_path": "/workspace/runtime/member-original-renderer-evidence/inventory.json",
+      "sha256": "0e9f76b4187fb431a8bebd796da178d1a24f673f737319b7b29cede72a68a8a7",
+      "bytes": 29978
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "source_commit": "904f08d55fe832aacb37b76cbd04bd0d8a02d314",
+  "recorded_source_files": 2061,
+  "all_receipt_hashes_match_commit": true,
+  "post_run_changed_files": 0,
+  "later_integrated_commit": "3a36ae0a7db5588fc45954a83e4ef024ed29bf07",
+  "later_changed_source_paths": [
+    "tests/Feature/ProductionMembershipBilling/MembershipAwardDeadlineTest.php",
+    "tests/Support/MembershipAwardMonotonicClock.php"
+  ],
+  "application_and_migrations_unchanged_from": "bf498055a5917172f930c877ffcff5f220dc4d4d",
+  "selected_schema_test_sources_unchanged": true,
+  "independent_comparison": "Git archive byte hashes for every recorded path; integrated scope delta limited to the separate deadline test/helper. Neither is selected by this native schema runner.",
+  "metadata": "evidence/native-schema-final.metadata.json"
+}

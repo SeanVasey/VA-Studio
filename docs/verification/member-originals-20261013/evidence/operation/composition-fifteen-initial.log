@@ -1,0 +1,20 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-member-original-operation/phpunit.xml
+
+........F
+
+Time: 03:28.406, Memory: 104.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionMemberOriginals\MemberOriginalCompositionTest::test_facts_callback_cannot_withdraw_catalog_after_reservation_admission
+Expected the owned composed proof to refuse.
+
+/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMemberOriginals/MemberOriginalCompositionTest.php:334
+/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMemberOriginals/MemberOriginalCompositionTest.php:172
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 9, Assertions: 269, Failures: 1.

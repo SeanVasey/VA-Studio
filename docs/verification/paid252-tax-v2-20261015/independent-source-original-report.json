@@ -1,0 +1,372 @@
+{
+  "schema_version": 1,
+  "kind": "independent staged source checkpoint; not final evidence or merge approval",
+  "decision": "REVISE SOURCE",
+  "reviewed_commit": "42774b742b9536413c753bc40297646db0886207",
+  "approved_design_commit": "1e6e103101865eff0dfe6cfd7ac8a3fa1d9ace7e",
+  "worktree": "/workspace/VA-Studio-tax-v2-committed-read",
+  "observed_worktree_head_at_completion": "16a1a8f15ded4256a90a87d819bae5902cfe1c17",
+  "observed_status_at_completion": "",
+  "read_strategy": "Immutable git show at reviewed commit; current successor was not reviewed or approved.",
+  "changed_file_count": 36,
+  "new_paid_tax_php_file_count": 26,
+  "changed_paths": [
+    "app/Domain/Grants/PaidTax/Models/PaidTaxOrderOrigin.php",
+    "app/Domain/Grants/PaidTax/PaidTaxActor.php",
+    "app/Domain/Grants/PaidTax/PaidTaxAssets.php",
+    "app/Domain/Grants/PaidTax/PaidTaxCommands.php",
+    "app/Domain/Grants/PaidTax/PaidTaxConfiguration.php",
+    "app/Domain/Grants/PaidTax/PaidTaxConsumerCommitAdmission.php",
+    "app/Domain/Grants/PaidTax/PaidTaxDeadline.php",
+    "app/Domain/Grants/PaidTax/PaidTaxDocuments.php",
+    "app/Domain/Grants/PaidTax/PaidTaxException.php",
+    "app/Domain/Grants/PaidTax/PaidTaxFiles.php",
+    "app/Domain/Grants/PaidTax/PaidTaxGrants.php",
+    "app/Domain/Grants/PaidTax/PaidTaxInput.php",
+    "app/Domain/Grants/PaidTax/PaidTaxOwnedFrame.php",
+    "app/Domain/Grants/PaidTax/PaidTaxPdfRenderer.php",
+    "app/Domain/Grants/PaidTax/PaidTaxPolicy.php",
+    "app/Domain/Grants/PaidTax/PaidTaxProjection.php",
+    "app/Domain/Grants/PaidTax/PaidTaxProjectionRead.php",
+    "app/Domain/Grants/PaidTax/PaidTaxReadReceipt.php",
+    "app/Domain/Grants/PaidTax/PaidTaxRecords.php",
+    "app/Domain/Grants/PaidTax/PaidTaxRenderInput.php",
+    "app/Domain/Grants/PaidTax/PaidTaxRenderProfile.php",
+    "app/Domain/Grants/PaidTax/PaidTaxRendererProcess.php",
+    "app/Domain/Grants/PaidTax/PaidTaxRows.php",
+    "app/Domain/Grants/PaidTax/PaidTaxRuntime.php",
+    "app/Domain/Grants/PaidTax/PaidTaxSchema.php",
+    "app/Domain/Grants/PaidTax/PaidTaxText.php",
+    "app/Providers/AppServiceProvider.php",
+    "config/paid-tax-grants.php",
+    "database/migrations/2026_10_15_252100_paid_tax_grant_origins.php",
+    "docs/verification/paid252-tax-v2-20261015/independent-design-DECISION.md",
+    "docs/verification/paid252-tax-v2-20261015/independent-design-original-REVISE.md",
+    "docs/verification/paid252-tax-v2-20261015/independent-design-original-report.json",
+    "docs/verification/paid252-tax-v2-20261015/independent-design-report.json",
+    "resources/contracts/paid-tax-v2/profile-assets.json",
+    "scripts/render-paid-tax-grant.php",
+    "tests/Feature/PaidTaxGrantJourneyTest.php"
+  ],
+  "source_objects": [
+    {
+      "path": "app/Domain/Grants/PaidTax/Models/PaidTaxOrderOrigin.php",
+      "git_blob": "0c2259a373c8f0901bdc5e7aa08b7fe409ba3aea",
+      "sha256": "d20895a17cb2f23e88fe16ff164b659c7b50727815c10458deba1e1429965069"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxActor.php",
+      "git_blob": "3431f102972a40911b57eafbd5dfd5bc00d25f74",
+      "sha256": "a90fd1d18b5bfb04a86d7fbff693c6c879af7954553a2d44f67b61bce93c7d6b"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxAssets.php",
+      "git_blob": "16420bb78fdd5081c8c92fb2e0e6ccc3a3c91d2c",
+      "sha256": "c728ca35f6d0aeffc549cc192e1faa539613c8deaddf3c1a3ade2ac75d045c45"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxCommands.php",
+      "git_blob": "95854a06719226ece59522e3e586c7349f10128b",
+      "sha256": "7726e543a2a00777974a6b31cfdefe0d9d8ffd1371a8311f56b7874543972234"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxConfiguration.php",
+      "git_blob": "94f53f6dab5911174d25359d52c28091c54f2bf4",
+      "sha256": "f4ad1496b6dca70700f006f1bd51a760eb011c8a8d5efbceb2dcf0608c0232aa"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxConsumerCommitAdmission.php",
+      "git_blob": "24d79700ccd8c21fff73d8ee76ecefc594109366",
+      "sha256": "fc38d335f95b3b805b38a20acceace22f2e358328cec1e4c0bfa917f7e0865ba"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxDeadline.php",
+      "git_blob": "c6f136b94839e51a0c2249093b636cb09e875f28",
+      "sha256": "d1accc1c591041fcdc538154953775fefdd2c9013a6745ae1b2916e92546fe35"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxDocuments.php",
+      "git_blob": "4a39356b804867bf53a6a3b0e35ae7fedd879a3f",
+      "sha256": "c965c998d56a3cce8b08ea015439148d899c2a3072967c731446443c2a91f105"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxException.php",
+      "git_blob": "04e17e454a755d2c7d98437f5fbca0284fdbfb6a",
+      "sha256": "e30341948c58fc591691a156a482db5041ab109ab9759d03a26b664c436938b2"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxFiles.php",
+      "git_blob": "4d1dd2a9013ed71ab2fefb7b75fbb705cbd3724a",
+      "sha256": "afda6760090cde95ee623223fe4899d65e5bc4e09fc0c3d96d57171cdede21db"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxGrants.php",
+      "git_blob": "cc6b3b166fc7f093ca4fd09783d7b89ca962ba18",
+      "sha256": "b8723b3191c850f5d2923de09b886504925c6f5eb1339c1557f2ac9def925812"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxInput.php",
+      "git_blob": "1be224895d338243e5a6e49a0ef1708a9a1684c3",
+      "sha256": "b79d6fa5e362374c26a2f2f969ff43b2798af218afecb6d7c0b99774ec8ca490"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxOwnedFrame.php",
+      "git_blob": "1e9d402300cdabf564ab01a740a3ee0ab31fb83f",
+      "sha256": "eb2a85f37c4648715d59169d565b0123d842261fd46106b89734a2cd7d3450f3"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxPdfRenderer.php",
+      "git_blob": "838e4574e3d1715600e790ee0de3ba6f11de3f35",
+      "sha256": "74bf8bdb62afdb4d3f8c91bb6b1836f93268dbc583c5b82703d0d85199125f9a"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxPolicy.php",
+      "git_blob": "37fd35ed43d993eb620229a3372ba7ee7c1c103c",
+      "sha256": "6bad0dac1f0c3ff2353ada0c18619def4b956f9b3b54361524823863d2a3128f"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxProjection.php",
+      "git_blob": "356d7e90f3581c511510969f264b9598fa716aa9",
+      "sha256": "ad75d1fb58b9baa8a6422a6a72e656812dc6e43e56833081c315c2743cefc16b"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxProjectionRead.php",
+      "git_blob": "94d00ffb6fe8ec7705bc3e243aa42ff71ffa640d",
+      "sha256": "b2a5471048346493b4d501937d82f2ee48a5587525a77ba986f70a51f97204e0"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxReadReceipt.php",
+      "git_blob": "52af6aa78b01386609b1bca74c153d4ba9f8bf37",
+      "sha256": "561e860f2e0fc1ff715e1550219b7753a93997dcd3f5d4a591a167069b476d65"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxRecords.php",
+      "git_blob": "5002e470578ebbbefd24adf984d5f48f193b18e8",
+      "sha256": "5d68a5cfb097a527a1f4c4aa423c8346c8a9bf7098135879eab47fd3d44cc47b"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxRenderInput.php",
+      "git_blob": "63ac28b77ca82faf9cdc837009a75cd07a43ffb6",
+      "sha256": "3a755533c1a8e68dee51ef7db7db77c72211915ef24d00f5f0694a9d81abc6a1"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxRenderProfile.php",
+      "git_blob": "9d6853ee3d1023a602c27da11f4157c10c440557",
+      "sha256": "8ed164755e50e9792408bf75f8d0b12767e011d14ea1e07f59198b8436a33609"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxRendererProcess.php",
+      "git_blob": "31698b9b2d3edf1702ae3f97c8fb114701d090cb",
+      "sha256": "6111d9af2a37eee594054754ab299657a85724a040f8a9f528ec38882c4c4ea3"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxRows.php",
+      "git_blob": "cdb6ee9a1c083d0aa6c3115056bdc1f328e0ba9f",
+      "sha256": "4a0b26133d16af86042e233bb36d2a2bc4432cb6ed761b944af58bfb9a243576"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxRuntime.php",
+      "git_blob": "f9c9968b10a70a2ea03bb46f973c5fb700f44df1",
+      "sha256": "451b2f79c006cde12477bf5f6b947f541a1804825410b104ffcd640fff4080e4"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxSchema.php",
+      "git_blob": "a1bf41acb198d65875d3abe9c286698326ede2ab",
+      "sha256": "87d59162c385d899883bfa80df22092e5f3c90ca74db8b0a27c2bdd261866547"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxText.php",
+      "git_blob": "bd378f5c08bec588054ffcbdca7107a4f6340c6b",
+      "sha256": "7a6d6ccbf3df1292604e680038abe9f64be418ae4bbe667dfe487147f89f291d"
+    },
+    {
+      "path": "app/Providers/AppServiceProvider.php",
+      "git_blob": "d1a162813da92f9048a14d37841d016292139589",
+      "sha256": "41cb587400151bbf445d6c914a48ff3f8929f464e9642a0740d6cccbad1f574a"
+    },
+    {
+      "path": "config/paid-tax-grants.php",
+      "git_blob": "1b67823b54e70b553afcf772de3606f0e6a51951",
+      "sha256": "368e7333dd0dee75be06aff5a982978be645e9330b48b489cbb673280c9e2dcf"
+    },
+    {
+      "path": "database/migrations/2026_10_15_252100_paid_tax_grant_origins.php",
+      "git_blob": "962061f54759c094ff847f60e9c35f9d096ec9f2",
+      "sha256": "507d4b0e0c60f26c14d6a58a96cdd5e999868de466410a7364d157187a4a3872"
+    },
+    {
+      "path": "docs/verification/paid252-tax-v2-20261015/independent-design-DECISION.md",
+      "git_blob": "590251862de94199a7024bbd3820c436630aec1d",
+      "sha256": "f44c5cac4fb6474b2f4bfd6a0cd630413c71364d42397ef3f11293fc7f11d407"
+    },
+    {
+      "path": "docs/verification/paid252-tax-v2-20261015/independent-design-original-REVISE.md",
+      "git_blob": "2b3045224a1e09a9751bcdcbecfa56fe9942d437",
+      "sha256": "bf44fbc4d80b92118dd303ab74990a1fb9317e88384ed64e857adc12bb58c846"
+    },
+    {
+      "path": "docs/verification/paid252-tax-v2-20261015/independent-design-original-report.json",
+      "git_blob": "490bbc154f8bea83a1623911989da1e9323e5bed",
+      "sha256": "c3d9cce60ddbc6486f1823257df329a8db1efd1e643b4be4993961157560eda1"
+    },
+    {
+      "path": "docs/verification/paid252-tax-v2-20261015/independent-design-report.json",
+      "git_blob": "b06ce32e01a47ecd50b60c33593e10cd6895d307",
+      "sha256": "175cd3ad29dcfccc3349a676565608f0dd9528f31b9e479774e397a89d502c07"
+    },
+    {
+      "path": "resources/contracts/paid-tax-v2/profile-assets.json",
+      "git_blob": "99780541548dca4d10d3ca8de339132ded23584a",
+      "sha256": "9cc50e19608a11be4db4648b49aa5ccf234945a63fced68d95f6b42bf2e048b4"
+    },
+    {
+      "path": "scripts/render-paid-tax-grant.php",
+      "git_blob": "5ba78c36568a21745b770b058df63593bb7e6af0",
+      "sha256": "eab7d2adcc5170f1d638b4ed2d79c330023c9163cfe1c7af55e980c5fa1d81f8"
+    },
+    {
+      "path": "tests/Feature/PaidTaxGrantJourneyTest.php",
+      "git_blob": "82edaf6587de867f85e807058f29178e77c234cb",
+      "sha256": "9af38f706d1f3578894428595bfe4cffa6847fca9217d5d4a099a60d3348e8d8"
+    }
+  ],
+  "manifest": {
+    "path": "resources/contracts/paid-tax-v2/profile-assets.json",
+    "sha256": "9cc50e19608a11be4db4648b49aa5ccf234945a63fced68d95f6b42bf2e048b4",
+    "member_count": 6,
+    "member_checks": [
+      {
+        "path": "app/Domain/Grants/PaidTax/PaidTaxText.php",
+        "declared_sha256": "7a6d6ccbf3df1292604e680038abe9f64be418ae4bbe667dfe487147f89f291d",
+        "actual_sha256": "7a6d6ccbf3df1292604e680038abe9f64be418ae4bbe667dfe487147f89f291d",
+        "matches": true
+      },
+      {
+        "path": "app/Domain/Grants/PaidTax/PaidTaxPdfRenderer.php",
+        "declared_sha256": "74bf8bdb62afdb4d3f8c91bb6b1836f93268dbc583c5b82703d0d85199125f9a",
+        "actual_sha256": "74bf8bdb62afdb4d3f8c91bb6b1836f93268dbc583c5b82703d0d85199125f9a",
+        "matches": true
+      },
+      {
+        "path": "app/Domain/Grants/PaidTax/PaidTaxRendererProcess.php",
+        "declared_sha256": "6111d9af2a37eee594054754ab299657a85724a040f8a9f528ec38882c4c4ea3",
+        "actual_sha256": "6111d9af2a37eee594054754ab299657a85724a040f8a9f528ec38882c4c4ea3",
+        "matches": true
+      },
+      {
+        "path": "app/Domain/Grants/PaidTax/PaidTaxRenderInput.php",
+        "declared_sha256": "3a755533c1a8e68dee51ef7db7db77c72211915ef24d00f5f0694a9d81abc6a1",
+        "actual_sha256": "3a755533c1a8e68dee51ef7db7db77c72211915ef24d00f5f0694a9d81abc6a1",
+        "matches": true
+      },
+      {
+        "path": "app/Domain/Grants/PaidTax/PaidTaxFiles.php",
+        "declared_sha256": "afda6760090cde95ee623223fe4899d65e5bc4e09fc0c3d96d57171cdede21db",
+        "actual_sha256": "afda6760090cde95ee623223fe4899d65e5bc4e09fc0c3d96d57171cdede21db",
+        "matches": true
+      },
+      {
+        "path": "scripts/render-paid-tax-grant.php",
+        "declared_sha256": "eab7d2adcc5170f1d638b4ed2d79c330023c9163cfe1c7af55e980c5fa1d81f8",
+        "actual_sha256": "eab7d2adcc5170f1d638b4ed2d79c330023c9163cfe1c7af55e980c5fa1d81f8",
+        "matches": true
+      }
+    ],
+    "all_members_match": true
+  },
+  "protected_surface_changes": [],
+  "findings": [
+    {
+      "id": "PTV2-427-01",
+      "severity": "P1",
+      "confidence": "high for source mechanism; runtime oracle pending",
+      "title": "Retain and prove the original physical consumer frame before source birth; avoid automatic rollback of replacement frames",
+      "locations": [
+        "PaidTaxRows.php:104",
+        "PaidTaxOwnedFrame.php:53",
+        "PaidTaxCommands.php:52",
+        "PaidTaxGrants.php:50"
+      ],
+      "required": "Capture the original owned frame immediately after standard begin and before domain callbacks; one-use pre-source RELEASE/rearm of original anchor; no marker cycles after source birth; ordinary commit once; owned cleanup only, never automatic transaction rollback/retry of a replacement frame."
+    },
+    {
+      "id": "PTV2-427-02",
+      "severity": "P2",
+      "confidence": "high source/configuration evidence; native behavioral reproduction pending",
+      "title": "Provider opaque identifiers inherit case-insensitive MySQL collation",
+      "locations": [
+        "PaidTaxSchema.php:50",
+        "PaidTaxSchema.php:244",
+        "config/database.php:57"
+      ],
+      "required": "Use exact byte-sensitive provider account/session/payment identity columns and matching index/trigger/inspection semantics; prove case-distinct valid payments and exact replay natively."
+    },
+    {
+      "id": "PTV2-427-03",
+      "severity": "P2",
+      "confidence": "high source-language evidence; focused original oracle pending",
+      "title": "Deadline deserialization bypasses capped private construction",
+      "locations": [
+        "PaidTaxDeadline.php:50"
+      ],
+      "required": "Reject __unserialize without modifying frozen V1; prove crafted construction refusal and ordinary min-only deadlines."
+    },
+    {
+      "id": "PTV2-427-04",
+      "severity": "P2",
+      "confidence": "high source ordering; delayed-clock behavioral reproduction pending",
+      "title": "Claim monotonic tick occurs after callback-capable wall clock",
+      "locations": [
+        "PaidTaxDocuments.php:96"
+      ],
+      "required": "Capture original monotonic tick before wall-clock service and keep identical truncation and 300-second cap; no recapture or renewal. Prove delayed clock cannot extend original physical claim allowance."
+    }
+  ],
+  "traceability": [
+    {
+      "requirement": "Versioned authenticated Tax source and unchanged nested integer tax facts",
+      "evidence": "Commands/Grants adapter accepts exact held source, position, reader and expected original order; sealed source is retained unchanged; Text requires V2 tax/pre_tax and refuses V1 amount/payment fields",
+      "result": "Partial: source coherent, final behavioral/native evidence pending"
+    },
+    {
+      "requirement": "Raw actor/runtime metadata before callback-free terminal proof",
+      "evidence": "Runtime raw Container/Facade/connection maps and actor raw original/attributes/exists admission; consumer raw capsules use captured PDO and original budget",
+      "result": "Partial: source coherent within admitted surface, focused adversarial evidence pending"
+    },
+    {
+      "requirement": "Original ownership and no false renewed-frame authority",
+      "evidence": "Original abort marker exists and cleanup uses exact frame; proveHeld omits marker continuity; Connection::transaction automatically handles operation exception before own cleanup",
+      "result": "Fail: PTV2-427-01"
+    },
+    {
+      "requirement": "Forward separate exact-owned schema and provider identity",
+      "evidence": "Five paid_tax tables, restricted ordinary account/user parents, immutable evidence retained; inherited varchar collation merges case-distinct provider identities",
+      "result": "Fail: PTV2-427-02; native installation/recovery/engine/shadow and populated-V1 compatibility pending"
+    },
+    {
+      "requirement": "Original capped min-only command/request/claim budgets",
+      "evidence": "60 ordinary command; start1..300; prepare300; attempts5; lease300; shared availability660; deserialize admission absent and claim tick late",
+      "result": "Fail: PTV2-427-03 and PTV2-427-04"
+    },
+    {
+      "requirement": "Separate render profile, retained approved assets and exact output",
+      "evidence": "New paid-tax-v2 manifest six Git byte hashes independently matched; new script/profile and versioned private paths; existing frozen profile members unchanged in diff",
+      "result": "Partial: actual whole-order physical/native evidence pending"
+    }
+  ],
+  "commands_and_actions": {
+    "executed": "Read-only git diff/show/rev-parse/status; source/vendor inspection; Python standard-library Git byte hashing and runtime report serialization only",
+    "app_test_db_ci_host_or_network_execution": false,
+    "tracked_writes": false
+  },
+  "evidence_limits": [
+    "Staged checkpoint only; not complete source or final packet approval.",
+    "Initial 427 test source reviewed; subsequent root-reported green/original oracle counts are not independently reconciled here.",
+    "No reviewer-executed application/test/database/CI/host command; no fresh native acceptance.",
+    "Physical/render Files/Text/Profile sampled for separation and manifest purposes, not exhaustive adversarial filesystem certification.",
+    "No Paid252 Tax V2 HTTP/root/download redemption integration, provider/live/activation or release claim.",
+    "Invisible empty direct PDO reopen after closed observation; SQL interrupt/host budget proof, native concurrency/isolation/deadlock/general DDL/trigger/restore conditions remain open.",
+    "Adjacent shared V1/generic/identity metadata and ordinary membership afterCommit P2 remain frozen outside this owned family."
+  ],
+  "root_proposed_repair_disposition": "Manual owned transaction wrapper plus original pre-source one-use continuity fence is the correct direction; exact repaired source, cleanup behavior, ordinary callbacks and regressions need independent review later."
+}

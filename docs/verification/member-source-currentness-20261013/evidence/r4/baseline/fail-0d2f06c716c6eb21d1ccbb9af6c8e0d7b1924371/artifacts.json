@@ -1,0 +1,38 @@
+{
+  "observed.json": {
+    "bytes": 678,
+    "sha256": "b52d373c6ce34c7c61489e435aae9316bd709e8c446032c256b840cc0d7b8738"
+  },
+  "phpunit.exit": {
+    "bytes": 2,
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+  },
+  "phpunit.log": {
+    "bytes": 1015,
+    "sha256": "75f8419da95240d07264ceb2f4b3f12b9314a8ded866564a84380471804a198b"
+  },
+  "phpunit.xml": {
+    "bytes": 1755,
+    "sha256": "9b2fb9712c31b4725e736c0d3fcc2f945c1d0d12dcc4d79f1140baeba4daba1e"
+  },
+  "runtime.txt": {
+    "bytes": 115,
+    "sha256": "537d36145aff7b8ae9c3e85e59dcb528f77b8b9828de2cf996c937f4cf64bfb8"
+  },
+  "source-after.json": {
+    "bytes": 1711937,
+    "sha256": "60103d1f1d49ec7d48484c347b5a4e9f12f5004c6d6d1717cb62cc862db68d9b"
+  },
+  "source-before.json": {
+    "bytes": 1711937,
+    "sha256": "60103d1f1d49ec7d48484c347b5a4e9f12f5004c6d6d1717cb62cc862db68d9b"
+  },
+  "verification.json": {
+    "bytes": 483,
+    "sha256": "290a1249dcfe58f0f5af8a64197010dc7ae3b5db340a8505286459bee82d8a06"
+  },
+  "command.txt": {
+    "bytes": 286,
+    "sha256": "440861bd0c6189dd6c69018af94994ac33c0301819b77caef6493e21d8a05c23"
+  }
+}

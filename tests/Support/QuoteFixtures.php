@@ -13,15 +13,19 @@ use Illuminate\Support\Str;
 /** Nonbinding test-only catalog with the real synthetic media/review/publication services. */
 final class QuoteFixtures
 {
-    public static function selection(int $priceMinor = 4999, ?MalwareScanner $scanner = null): array
+    /** @param  string|null  $masterWav  the master's bytes (default MediaFixtures::wav()) */
+    public static function selection(int $priceMinor = 4999, ?MalwareScanner $scanner = null, ?string $masterWav = null): array
     {
         $actor = LicenseFixtures::admin();
         // This explicit synthetic publisher must satisfy the real panel's required MFA enrollment.
         $actor->saveAppAuthenticationSecret('JBSWY3DPEHPK3PXP');
         $track = Track::create(['title' => 'Synthetic quote recording', 'slug' => 'quote-fixture-'.Str::uuid(), 'artist' => 'Test only', 'bpm' => 90, 'musical_key' => 'C minor', 'genre' => 'Test']);
         RightsDeclaration::create(['track_id' => $track->id, 'provenance_reference' => 'TEST-ONLY-QUOTE-RIGHTS', 'sample_disclosure' => 'Synthetic source', 'status' => 'verified', 'verified_by' => $actor->id, 'verified_at' => now()]);
-        $media = MediaFixtures::readyTrackMedia($track, $actor, $scanner);
-        $license = LicenseFixtures::published($actor);
+        $media = MediaFixtures::readyTrackMedia($track, $actor, $scanner, $masterWav);
+        // Since 11ab36d7 the independent license reviewer is a staff writer too; it needs the same enrollment as the publisher.
+        $reviewer = LicenseFixtures::admin();
+        $reviewer->saveAppAuthenticationSecret('JBSWY3DPEHPK3PXP');
+        $license = LicenseFixtures::published($actor, $reviewer);
         $offer = app(SaveOfferDraft::class)->handle(null, ['track_id' => $track->id, 'license_version_id' => $license->id, 'price_minor' => $priceMinor, 'currency' => 'USD', 'deliverable_asset_ids' => [$media['master_wav']->id]], $actor);
         $revision = app(PublishOffer::class)->handle($offer, $actor);
         $track = app(PublishTrack::class)->handle($track, $actor);

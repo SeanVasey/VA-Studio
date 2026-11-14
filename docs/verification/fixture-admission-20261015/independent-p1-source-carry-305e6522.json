@@ -1,0 +1,65 @@
+{
+  "completed_prior_sqlite_receipt": {
+    "counts": {
+      "assertions": 1318,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 103
+    },
+    "files": [
+      "tests/Feature/FixtureDatabaseAdmissionTest.php",
+      "tests/Unit/DisposableTestDatabaseTest.php",
+      "tests/Unit/DisposableNativeDatabaseTest.php",
+      "tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php",
+      "tests/Feature/ProductionTrackPreparationPacketMigrationTest.php",
+      "tests/Feature/OperatorMfaTest.php",
+      "tests/Feature/StagingOperatorMfaTest.php",
+      "tests/Feature/FinalizationDatabaseLifecycleTest.php"
+    ],
+    "junit_sha256": "6ac4d153b6b0b52574101e369cf51b27d48acc6a290185108be5bc49e18c090f",
+    "log_sha256": "9a50e18f4f01d5ba5ba8500e8761b76f3dcb863d814ace9814605fb1602055b4",
+    "php_exit": 0,
+    "recorder_exit": 0,
+    "result_sha256": "a59a31fb03664324cc1f15cd6019d5247741d439618d2e87e470de44922dc57d",
+    "source_runner_loader_unchanged": true,
+    "source_sha": "9470f1d90870c7f6b7b101b6361fc52aadf5a45d",
+    "wall_seconds": 174.51512525900034
+  },
+  "decision": "APPROVE BOUNDED CORRECTIVE SOURCE CARRY; FINAL EVIDENCE AND P1 CLOSURE PENDING",
+  "delta": {
+    "cache_collision_check_added": true,
+    "entire_prior_order_preserved": true,
+    "files": [
+      "scripts/ci/database-sqlite-skips.json",
+      "tests/Feature/FixtureDatabaseAdmissionNativeTest.php",
+      "tests/TestCase.php"
+    ],
+    "first150_sha256": "d93da4e7a13a8c6aff8f97f363eb6d93dde884bad53c9ae50eeb0ed32514c71c",
+    "native_unregistered_memory_refusal_and_retained_row_control_added": true,
+    "sqlite_methods_current_count": 266,
+    "sqlite_methods_old_count": 265
+  },
+  "limits": [
+    "The source carry closes the earlier cache-check implementation correction and adds the requested unregistered-alias evidence control; runtime result for that control is not inferred.",
+    "Existing native lifecycle whole4/8/E4 and olddefault1/2/E1 remain failed/open.",
+    "No reviewer application/database/network/CI execution or shared edits; no full F2/native lifecycle/concurrency/host/provider/release acceptance."
+  ],
+  "new_source_p0": 0,
+  "new_source_p1": 0,
+  "open_p0": 0,
+  "open_p1": 2,
+  "pending": [
+    "Actual current head whole native-outer canary/admission result; canaries remain SQLite coverage.",
+    "Actual focused runner CI-marker absent/present transport-remapped controls and final current whole SQLite result.",
+    "Final independent sealed-evidence review, exact documentation-head carry, fresh cheap preflight/current inventory and closure of both remote P1 threads before expected-SHA merge."
+  ],
+  "prior_reviewed_sha": "9470f1d90870c7f6b7b101b6361fc52aadf5a45d",
+  "required_corrections": [],
+  "reviewed_sha": "305e6522532b7e54b62b10ca7314011fdffc3916",
+  "source_sha256": {
+    "scripts/ci/database-sqlite-skips.json": "7ad5fd46debc14d75eb2e70dae48eaf5d29ce900697ecf4ad81184ad5b87b4ce",
+    "tests/Feature/FixtureDatabaseAdmissionNativeTest.php": "546e470d08963e90c0be98ebbf29f47a18796ba4e46ba35294f089b9b8b6700d",
+    "tests/TestCase.php": "f5d22f5214be700108734c4dbc2b8f6bfa6f8502c6c2ad0eeca0e7aebf2810d0"
+  }
+}

@@ -224,3 +224,7 @@ above. Everything the original decision excluded still stands. Conditions:
    `TaxReviewMoneyProbeTest` into the Journey test.
 3. After this PR merges, any further change to migration 255000's guards needs a new migration; pin the installer's
    user and `sql_mode` in the runbook once a host is chosen.
+
+## 2026-10-14 prerequisite follow-up
+
+[Current Tax255 V2 prerequisite packet](../tax-v2-integration-20261014/README.md) records current held-source/order admission and the five added Journey cases at `128f423d`, with SQLite55/267 and private MySQL8.4.11 targeted9/47. Original conditions/results above stay historical; final independent evidence approval and merge are pending. V2 committed/write admission, consumer wiring and root registration remain subsequent.

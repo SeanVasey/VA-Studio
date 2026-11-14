@@ -1,0 +1,10 @@
+{
+  "head": "0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371",
+  "files": {
+    "app/Domain/Grants/Member/MemberGrantPolicy.php": "2bd12e40b89802d7a64deac15cbe640f80846fe87eb0839127fd26fd51663875",
+    "tests/Feature/ProductionMemberOriginals/MemberOriginalPreparationTest.php": "b5c8245bae538d5cbf4f8c0e521b10b56e78fb206379d0cd327a14fe9886139b",
+    "tests/Feature/ProductionMemberOriginals/MemberGrantSourceAdmissionTest.php": "55c2f102c332f8ca166688bfb07381921fd2100615d7aac17eb2e293fa478504",
+    "tests/Feature/ProductionMembership/MembershipPolicyEnvironmentTest.php": "f9eb756b834bd30684354e733087fef3cd62eae34415aac55afe6c1c47460898",
+    "tests/Feature/StagingEnvironmentAdmissionTest.php": "a6e2462269adc67db98b4716ebd4060b704e706e72af072b8355e9fd163f4f7a"
+  }
+}

@@ -1,0 +1,6 @@
+PHP 8.4.26
+SQLite 3.46.1
+App\Domain\Memberships\Billing\BillingLedger /workspace/VA-Studio-billing-c3-baseline/app/Domain/Memberships/Billing/BillingLedger.php
+App\Domain\Memberships\Production\MembershipAwards /workspace/VA-Studio-billing-c3-baseline/app/Domain/Memberships/Production/MembershipAwards.php
+Tests\Support\MembershipAwardFixtures /workspace/VA-Studio-billing-c3-baseline/tests/Support/MembershipAwardFixtures.php
+App\Domain\Customers\ProductionIdentity\ProductionCustomerSessions /workspace/VA-Studio-billing-c3-baseline/app/Domain/Customers/ProductionIdentity/ProductionCustomerSessions.php

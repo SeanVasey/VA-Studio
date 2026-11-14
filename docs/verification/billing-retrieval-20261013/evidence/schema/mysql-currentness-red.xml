@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\BillingRetrievalGuardDefinitionTest" file="/workspace/VA-Studio-billing-retrieval-schema/tests/Feature/ProductionMembershipBilling/BillingRetrievalGuardDefinitionTest.php" tests="2" assertions="28" errors="0" failures="2" skipped="0" time="104.342510">
+    <testcase name="test_old_dictionary_snapshot_cannot_admit_a_missing_or_replaced_required_interval_guard" file="/workspace/VA-Studio-billing-retrieval-schema/tests/Feature/ProductionMembershipBilling/BillingRetrievalGuardDefinitionTest.php" line="18" class="Tests\Feature\ProductionMembershipBilling\BillingRetrievalGuardDefinitionTest" classname="Tests.Feature.ProductionMembershipBilling.BillingRetrievalGuardDefinitionTest" assertions="11" time="54.303219">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembershipBilling\BillingRetrievalGuardDefinitionTest::test_old_dictionary_snapshot_cannot_admit_a_missing_or_replaced_required_interval_guard
+Required guard admission must compare the current named definition.
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+-Array &amp;0 []
++Array &amp;0 [
++    0 =&gt; 'missing',
++    1 =&gt; 'replaced',
++]
+
+/workspace/VA-Studio-billing-retrieval-schema/tests/Feature/ProductionMembershipBilling/BillingRetrievalGuardDefinitionTest.php:75</failure>
+    </testcase>
+    <testcase name="test_old_dictionary_snapshot_cannot_admit_changed_current_endpoint_table_shape" file="/workspace/VA-Studio-billing-retrieval-schema/tests/Feature/ProductionMembershipBilling/BillingRetrievalGuardDefinitionTest.php" line="79" class="Tests\Feature\ProductionMembershipBilling\BillingRetrievalGuardDefinitionTest" classname="Tests.Feature.ProductionMembershipBilling.BillingRetrievalGuardDefinitionTest" assertions="17" time="50.039291">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembershipBilling\BillingRetrievalGuardDefinitionTest::test_old_dictionary_snapshot_cannot_admit_changed_current_endpoint_table_shape
+Required endpoint table ownership must bind its current definition.
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+-Array &amp;0 []
++Array &amp;0 [
++    0 =&gt; 'engine',
++    1 =&gt; 'collation',
++    2 =&gt; 'column_width',
++    3 =&gt; 'extra_column',
++]
+
+/workspace/VA-Studio-billing-retrieval-schema/tests/Feature/ProductionMembershipBilling/BillingRetrievalGuardDefinitionTest.php:123</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

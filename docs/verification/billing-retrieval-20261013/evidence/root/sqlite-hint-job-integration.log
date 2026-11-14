@@ -1,0 +1,25 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-billing-retrieval/phpunit.xml
+
+.....................................................[41;37mF[0m
+
+Time: 03:10.422, Memory: 91.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingSweepHintsCursorTest::test_all_stops_at_the_overall_bound_and_reports_the_cursor_that_continues_it
+Failed asserting that 'uncovered event=2a8b1d541441 type=invoice.paid received=2026-10-13 06:04:58 invoice=adc11393fb50 binding=804e121b-2ee3-42aa-a417-477a86a3e951\n
+uncovered event=b849e17b2e1a type=invoice.paid received=2026-10-13 06:04:58 invoice=e57ace520e93 binding=804e121b-2ee3-42aa-a417-477a86a3e951\n
+uncovered event=d04ec3a231ce type=invoice.paid received=2026-10-13 06:04:58 invoice=79afb381d04e binding=804e121b-2ee3-42aa-a417-477a86a3e951\n
+Stopped at the overall bound of 3 hint(s) after 2 page(s); more retained hints follow. Run again with --all --after=<cursor> to continue.\n
+Next cursor: v1.20261013060458.55095dc0-b087-4ef9-b463-a138697ec7ba.9ca54e30eecc012870d4fc8ab17978fbacc789c128683d54fa7634ff767a43e0\n
+Dispatched 3 retrieval(s) for 3 uncovered hint(s).\n
+' [ASCII](length: 748) contains "event=30cec808f881" [ASCII](length: 18).
+
+/workspace/VA-Studio-billing-retrieval/tests/Feature/ProductionMembershipBilling/BillingSweepHintsCursorTest.php:132
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 54[0m[37;41m, Assertions: 353[0m[37;41m, Failures: 1[0m[37;41m.[0m

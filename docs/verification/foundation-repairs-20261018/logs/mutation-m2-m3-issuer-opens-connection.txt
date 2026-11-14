@@ -1,0 +1,81 @@
+# meta (runner start/end, HEAD, dirty count, args)
+start 2026-10-18T03:45:24Z head=efb22df3850ba8500b6d424ceedef64649896fe8 dirty=8 args=tests/Feature/ProductionMemberOriginals/MemberOriginalIssuerOwnershipTest.php
+end 2026-10-18T03:45:25Z rc=1 secs=1
+# PHPUnit output
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/f3/phpunit.xml
+
+F.F..                                                               5 / 5 (100%)
+
+Time: 00:00.912, Memory: 75.00 MB
+
+There were 2 failures:
+
+1) Tests\Feature\ProductionMemberOriginals\MemberOriginalIssuerOwnershipTest::test_public_budget_and_real_service_assembly_cannot_mint_an_owned_source_workflow
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+-Array &0 []
++Array &0 [
++    'sqlite' => Illuminate\Database\SQLiteConnection Object #3003 (
++        'pdo' => Pdo\Sqlite Object #2993 (),
++        'readPdo' => null,
++        'readPdoConfig' => Array &1 [],
++        'directPdo' => null,
++        'directPdoConfig' => Array &2 [],
++        'database' => ':memory:',
++        'readWriteType' => null,
++        'tablePrefix' => '',
++        'config' => Array &3 [
++            'driver' => 'sqlite',
++            'database' => ':memory:',
++            'prefix' => '',
++            'foreign_key_constraints' => true,
++            'busy_timeout' => null,
++            'journal_mode' => null,
++            'synchronous' => null,
++            'transaction_mode' => 'DEFERRED',
+    [... 13459 lines of PHPUnit object diff elided by trim.py; untrimmed log kept in the lane scratchpad ...]
++    ),
++]
+
+/home/user/wt/f3/tests/Feature/ProductionMemberOriginals/MemberOriginalIssuerOwnershipTest.php:42
+/home/user/wt/f3/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMemberOriginals\MemberOriginalIssuerOwnershipTest::test_unregistered_capture_permit_and_context_shape_never_start_an_inspection
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+-Array &0 []
++Array &0 [
++    'sqlite' => Illuminate\Database\SQLiteConnection Object #3638 (
++        'pdo' => Pdo\Sqlite Object #3637 (),
++        'readPdo' => null,
++        'readPdoConfig' => Array &1 [],
++        'directPdo' => null,
++        'directPdoConfig' => Array &2 [],
++        'database' => ':memory:',
++        'readWriteType' => null,
++        'tablePrefix' => '',
++        'config' => Array &3 [
++            'driver' => 'sqlite',
++            'database' => ':memory:',
++            'prefix' => '',
++            'foreign_key_constraints' => true,
++            'busy_timeout' => null,
++            'journal_mode' => null,
++            'synchronous' => null,
++            'transaction_mode' => 'DEFERRED',
+    [... 13459 lines of PHPUnit object diff elided by trim.py; untrimmed log kept in the lane scratchpad ...]
++    ),
++]
+
+/home/user/wt/f3/tests/Feature/ProductionMemberOriginals/MemberOriginalIssuerOwnershipTest.php:71
+/home/user/wt/f3/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 5, Assertions: 23, Failures: 2.

@@ -1,0 +1,12 @@
+{
+  "mysql_version": "8.4.11",
+  "server_port": 3306,
+  "server_socket": "/run/mysql-policy/mysql.sock",
+  "datadir": "/var/lib/mysql/",
+  "php_version": "8.4.26",
+  "owned_schema": "vaseyaudio_member_policy_admission",
+  "published_port": 33413,
+  "client_socket": "/workspace/runtime/mysql-policy-run/mysql.sock",
+  "private_datadir_mount": "/workspace/runtime/mysql-policy-data",
+  "policy_path": "/workspace/VA-Studio-member-policy-admission/app/Domain/Grants/Member/MemberGrantPolicy.php"
+}

@@ -29,6 +29,7 @@ chmod 700 "$mysql_test_directory"
 mkdir "$mysql_test_directory/data"
 export APP_ENV=testing APP_DEBUG=false DB_CONNECTION=mysql DB_HOST=127.0.0.1
 export DB_PORT="${MYSQL_TEST_PORT:-33067}" DB_SOCKET='' DB_URL='' DB_DATABASE=vaseyaudio_test DB_USERNAME=root
+export VA_LOCAL_DISPOSABLE_MYSQL="$DB_DATABASE"
 export DB_PASSWORD
 DB_PASSWORD=$(php -r 'echo bin2hex(random_bytes(24));')
 export APP_KEY

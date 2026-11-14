@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware\ProductionIdentity;
 
+use App\Http\AccountFeatures\AccountFeaturePrivacy;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,7 +16,7 @@ final class IdentityPrivacy
 
     public function handle(Request $request, Closure $next): Response
     {
-        if (! self::matches($request)) {
+        if (! self::matches($request) || AccountFeaturePrivacy::matches($request)) {
             return $next($request);
         }
         if ($request->query->count() || $request->server->get('QUERY_STRING', '') !== ''

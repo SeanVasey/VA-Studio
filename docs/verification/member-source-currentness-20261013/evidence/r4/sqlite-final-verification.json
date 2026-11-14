@@ -1,0 +1,55 @@
+{
+  "head": "15a65e0761382a9ad50c4b279605a644a4eeb285",
+  "source_file_count": 10633,
+  "changed": [],
+  "tests": 50,
+  "assertions": 322,
+  "errors": 0,
+  "failures": 0,
+  "skips": [
+    {
+      "class": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest",
+      "name": "test_native_verified_member_provenance_requires_and_binds_actual_mysql_despite_rehearsal_membership",
+      "reason": null
+    }
+  ],
+  "by_class": [
+    {
+      "name": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest",
+      "tests": "12",
+      "assertions": "51",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "1",
+      "time": "32.490513"
+    },
+    {
+      "name": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest",
+      "tests": "20",
+      "assertions": "49",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.338851"
+    },
+    {
+      "name": "Tests\\Feature\\ProductionMembership\\MembershipPolicyEnvironmentTest",
+      "tests": "3",
+      "assertions": "9",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.052564"
+    },
+    {
+      "name": "Tests\\Feature\\StagingEnvironmentAdmissionTest",
+      "tests": "15",
+      "assertions": "213",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "39.261392"
+    }
+  ],
+  "exit": 0
+}

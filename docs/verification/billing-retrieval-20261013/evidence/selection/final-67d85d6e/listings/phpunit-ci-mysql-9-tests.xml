@@ -1,0 +1,209 @@
+<?xml version="1.0"?>
+<testSuite xmlns="https://xml.phpunit.de/testSuite">
+ <tests>
+  <testClass name="Tests\Feature\CustomerAccountConcurrencyTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/CustomerAccountConcurrencyTest.php">
+   <testMethod id="Tests\Feature\CustomerAccountConcurrencyTest::test_current_withdrawal_wins_exact_user_fence_before_every_customer_entrypoint#create" name="test_current_withdrawal_wins_exact_user_fence_before_every_customer_entrypoint"/>
+   <testMethod id="Tests\Feature\CustomerAccountConcurrencyTest::test_current_withdrawal_wins_exact_user_fence_before_every_customer_entrypoint#price" name="test_current_withdrawal_wins_exact_user_fence_before_every_customer_entrypoint"/>
+   <testMethod id="Tests\Feature\CustomerAccountConcurrencyTest::test_current_withdrawal_wins_exact_user_fence_before_every_customer_entrypoint#review" name="test_current_withdrawal_wins_exact_user_fence_before_every_customer_entrypoint"/>
+   <testMethod id="Tests\Feature\CustomerAccountConcurrencyTest::test_current_withdrawal_wins_exact_user_fence_before_every_customer_entrypoint#prepare" name="test_current_withdrawal_wins_exact_user_fence_before_every_customer_entrypoint"/>
+   <testMethod id="Tests\Feature\CustomerAccountConcurrencyTest::test_current_withdrawal_wins_exact_user_fence_before_every_customer_entrypoint#checkout" name="test_current_withdrawal_wins_exact_user_fence_before_every_customer_entrypoint"/>
+   <testMethod id="Tests\Feature\CustomerAccountConcurrencyTest::test_current_withdrawal_wins_exact_user_fence_before_every_customer_entrypoint#issue" name="test_current_withdrawal_wins_exact_user_fence_before_every_customer_entrypoint"/>
+   <testMethod id="Tests\Feature\CustomerAccountConcurrencyTest::test_current_withdrawal_wins_exact_user_fence_before_every_customer_entrypoint#redeem" name="test_current_withdrawal_wins_exact_user_fence_before_every_customer_entrypoint"/>
+   <testMethod id="Tests\Feature\CustomerAccountConcurrencyTest::test_current_withdrawal_wins_exact_user_fence_before_every_customer_entrypoint#sign-in / password reset" name="test_current_withdrawal_wins_exact_user_fence_before_every_customer_entrypoint"/>
+   <testMethod id="Tests\Feature\CustomerAccountConcurrencyTest::test_current_withdrawal_wins_exact_user_fence_before_every_customer_entrypoint#sign-in / account withdrawn" name="test_current_withdrawal_wins_exact_user_fence_before_every_customer_entrypoint"/>
+  </testClass>
+  <testClass name="Tests\Feature\CustomerAccountMigrationTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/CustomerAccountMigrationTest.php">
+   <testMethod id="Tests\Feature\CustomerAccountMigrationTest::test_every_unique_identity_collision_refuses_replace_even_without_recursive_delete_triggers" name="test_every_unique_identity_collision_refuses_replace_even_without_recursive_delete_triggers"/>
+   <testMethod id="Tests\Feature\CustomerAccountMigrationTest::test_raw_identity_rewrites_deletion_and_access_version_replay_are_refused" name="test_raw_identity_rewrites_deletion_and_access_version_replay_are_refused"/>
+   <testMethod id="Tests\Feature\CustomerAccountMigrationTest::test_populated_rollback_refuses_without_touching_retained_identity_or_guards" name="test_populated_rollback_refuses_without_touching_retained_identity_or_guards"/>
+   <testMethod id="Tests\Feature\CustomerAccountMigrationTest::test_empty_owned_rollback_and_reinstallation_preserve_the_expected_guard_set" name="test_empty_owned_rollback_and_reinstallation_preserve_the_expected_guard_set"/>
+   <testMethod id="Tests\Feature\CustomerAccountMigrationTest::test_temporary_table_shadow_never_bypasses_retained_identity_or_removes_permanent_guards" name="test_temporary_table_shadow_never_bypasses_retained_identity_or_removes_permanent_guards"/>
+   <testMethod id="Tests\Feature\CustomerAccountMigrationTest::test_foreign_guard_name_is_preserved_before_creation_and_when_owned_table_is_absent" name="test_foreign_guard_name_is_preserved_before_creation_and_when_owned_table_is_absent"/>
+   <testMethod id="Tests\Feature\CustomerAccountMigrationTest::test_temporary_guard_name_is_preserved_without_removing_owned_guards" name="test_temporary_guard_name_is_preserved_without_removing_owned_guards"/>
+  </testClass>
+  <testClass name="Tests\Feature\MediaWorkerIdentityTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/MediaWorkerIdentityTest.php">
+   <testMethod id="Tests\Feature\MediaWorkerIdentityTest::test_locked_completion_refuses_changed_retained_identity_without_redirecting_attribution#requester" name="test_locked_completion_refuses_changed_retained_identity_without_redirecting_attribution"/>
+   <testMethod id="Tests\Feature\MediaWorkerIdentityTest::test_locked_completion_refuses_changed_retained_identity_without_redirecting_attribution#source" name="test_locked_completion_refuses_changed_retained_identity_without_redirecting_attribution"/>
+   <testMethod id="Tests\Feature\MediaWorkerIdentityTest::test_locked_completion_refuses_changed_retained_identity_without_redirecting_attribution#source track" name="test_locked_completion_refuses_changed_retained_identity_without_redirecting_attribution"/>
+  </testClass>
+  <testClass name="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSchemaTest.php">
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_migration_installs_nine_tables_with_three_guards_each_and_retry_is_a_no_op" name="test_migration_installs_nine_tables_with_three_guards_each_and_retry_is_a_no_op"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#0" name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#1" name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#2" name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#3" name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#4" name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#5" name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#6" name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#7" name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#8" name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#9" name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#10" name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#11" name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#12" name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#13" name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#14" name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#15" name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#16" name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#17" name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#18" name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#19" name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#20" name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#21" name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#22" name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#23" name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#24" name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#25" name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#26" name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#27" name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#28" name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#29" name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#30" name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#31" name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#32" name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#33" name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#34" name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#35" name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#36" name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_an_earlier_guard_hole_with_later_objects_is_not_owned_and_is_not_repaired" name="test_an_earlier_guard_hole_with_later_objects_is_not_owned_and_is_not_repaired"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_a_data_bearing_table_missing_a_guard_is_never_adopted_or_deleted" name="test_a_data_bearing_table_missing_a_guard_is_never_adopted_or_deleted"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_a_foreign_object_holding_a_reserved_guard_name_is_refused_before_any_ddl" name="test_a_foreign_object_holding_a_reserved_guard_name_is_refused_before_any_ddl"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_an_external_dependent_on_owned_evidence_is_refused" name="test_an_external_dependent_on_owned_evidence_is_refused"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_a_temporary_shadow_of_a_parent_or_owned_table_is_refused" name="test_a_temporary_shadow_of_a_parent_or_owned_table_is_refused"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_parent_floor_drift_is_refused_before_the_first_owned_ddl" name="test_parent_floor_drift_is_refused_before_the_first_owned_ddl"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_down_refuses_before_touching_retained_originals" name="test_down_refuses_before_touching_retained_originals"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_table_refuses_update_and_delete_red_green" name="test_every_table_refuses_update_and_delete_red_green"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_table_refuses_a_relabelled_copy_and_byte_shape_drift_on_insert" name="test_every_table_refuses_a_relabelled_copy_and_byte_shape_drift_on_insert"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_review_guard_refuses_self_review_and_availability_guard_refuses_a_gap" name="test_review_guard_refuses_self_review_and_availability_guard_refuses_a_gap"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_native_schema_global_check_symbol_collision_is_refused_before_the_first_owned_ddl" name="test_native_schema_global_check_symbol_collision_is_refused_before_the_first_owned_ddl"/>
+   <testMethod id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_native_temporary_shadow_of_an_owned_table_is_refused" name="test_native_temporary_shadow_of_an_owned_table_is_refused"/>
+  </testClass>
+  <testClass name="Tests\Feature\ProductionMembership\MembershipPolicyFactsTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/ProductionMembership/MembershipPolicyFactsTest.php">
+   <testMethod id="Tests\Feature\ProductionMembership\MembershipPolicyFactsTest::test_real_staff_writer_retains_an_immutable_policy_and_the_approved_producer_proves_it" name="test_real_staff_writer_retains_an_immutable_policy_and_the_approved_producer_proves_it"/>
+   <testMethod id="Tests\Feature\ProductionMembership\MembershipPolicyFactsTest::test_different_policy_documents_create_distinct_immutable_versions" name="test_different_policy_documents_create_distinct_immutable_versions"/>
+   <testMethod id="Tests\Feature\ProductionMembership\MembershipPolicyFactsTest::test_authoring_is_separate_default_off_and_cannot_relabel_synthetic_provenance" name="test_authoring_is_separate_default_off_and_cannot_relabel_synthetic_provenance"/>
+   <testMethod id="Tests\Feature\ProductionMembership\MembershipPolicyFactsTest::test_nonstaff_unverified_unenrolled_and_stale_staff_cannot_author" name="test_nonstaff_unverified_unenrolled_and_stale_staff_cannot_author"/>
+   <testMethod id="Tests\Feature\ProductionMembership\MembershipPolicyFactsTest::test_gate_callback_revocation_rolls_back_the_policy_and_the_callback_write" name="test_gate_callback_revocation_rolls_back_the_policy_and_the_callback_write"/>
+   <testMethod id="Tests\Feature\ProductionMembership\MembershipPolicyFactsTest::test_encryption_callback_withdrawal_refuses_before_the_policy_write" name="test_encryption_callback_withdrawal_refuses_before_the_policy_write"/>
+   <testMethod id="Tests\Feature\ProductionMembership\MembershipPolicyFactsTest::test_writer_cannot_run_without_the_captured_outer_transaction" name="test_writer_cannot_run_without_the_captured_outer_transaction"/>
+   <testMethod id="Tests\Feature\ProductionMembership\MembershipPolicyFactsTest::test_unapproved_policy_and_changed_configuration_are_refused" name="test_unapproved_policy_and_changed_configuration_are_refused"/>
+   <testMethod id="Tests\Feature\ProductionMembership\MembershipPolicyFactsTest::test_proofs_refuse_other_issuer_other_rows_forged_values_and_serialization" name="test_proofs_refuse_other_issuer_other_rows_forged_values_and_serialization"/>
+   <testMethod id="Tests\Feature\ProductionMembership\MembershipPolicyFactsTest::test_original_proof_deadline_is_not_renewed_by_revalidation" name="test_original_proof_deadline_is_not_renewed_by_revalidation"/>
+   <testMethod id="Tests\Feature\ProductionMembership\MembershipPolicyFactsTest::test_a_commit_and_reopen_cannot_reuse_a_policy_proof" name="test_a_commit_and_reopen_cannot_reuse_a_policy_proof"/>
+   <testMethod id="Tests\Feature\ProductionMembership\MembershipPolicyFactsTest::test_retained_seals_ciphertexts_and_document_hashes_are_validated" name="test_retained_seals_ciphertexts_and_document_hashes_are_validated"/>
+   <testMethod id="Tests\Feature\ProductionMembership\MembershipPolicyFactsTest::test_document_rejects_missing_unknown_unsupported_or_unbounded_facts" name="test_document_rejects_missing_unknown_unsupported_or_unbounded_facts"/>
+   <testMethod id="Tests\Feature\ProductionMembership\MembershipPolicyFactsTest::test_award_terms_use_exact_provider_paid_time_and_explicit_expiry" name="test_award_terms_use_exact_provider_paid_time_and_explicit_expiry"/>
+  </testClass>
+  <testClass name="Tests\Feature\ProductionMembershipBilling\MembershipPaidInvoiceProofTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/ProductionMembershipBilling/MembershipPaidInvoiceProofTest.php">
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\MembershipPaidInvoiceProofTest::test_real_retained_billing_proves_original_buyer_and_provider_paid_time" name="test_real_retained_billing_proves_original_buyer_and_provider_paid_time"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\MembershipPaidInvoiceProofTest::test_tokens_cannot_be_forged_copied_serialized_or_reused_on_another_frame" name="test_tokens_cannot_be_forged_copied_serialized_or_reused_on_another_frame"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\MembershipPaidInvoiceProofTest::test_newer_nonsettled_observation_and_original_freshness_deadline_refuse_authority" name="test_newer_nonsettled_observation_and_original_freshness_deadline_refuse_authority"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\MembershipPaidInvoiceProofTest::test_a_hint_after_retrieval_requires_a_new_retrieval_before_authority" name="test_a_hint_after_retrieval_requires_a_new_retrieval_before_authority"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\MembershipPaidInvoiceProofTest::test_identical_retrieval_changes_evidence_but_preserves_semantic_invoice_graph" name="test_identical_retrieval_changes_evidence_but_preserves_semantic_invoice_graph"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\MembershipPaidInvoiceProofTest::test_existing_proof_refuses_a_new_observation_even_with_identical_payment_facts" name="test_existing_proof_refuses_a_new_observation_even_with_identical_payment_facts"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\MembershipPaidInvoiceProofTest::test_observation_envelope_binds_deadline_sequence_and_positions_beyond_the_outer_checksum" name="test_observation_envelope_binds_deadline_sequence_and_positions_beyond_the_outer_checksum"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\MembershipPaidInvoiceProofTest::test_another_current_customer_cannot_use_the_approved_buyers_invoice" name="test_another_current_customer_cannot_use_the_approved_buyers_invoice"/>
+  </testClass>
+  <testClass name="Tests\Feature\ProductionMembershipBilling\MembershipReservationClockClosureTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/ProductionMembershipBilling/MembershipReservationClockClosureTest.php">
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\MembershipReservationClockClosureTest::test_terminal_clock_callback_cannot_withdraw_identity_after_the_last_precommit_owner_check" name="test_terminal_clock_callback_cannot_withdraw_identity_after_the_last_precommit_owner_check"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\MembershipReservationClockClosureTest::test_native_committed_clock_callback_owner_withdrawal_refuses_receipt_without_undoing_reservation" name="test_native_committed_clock_callback_owner_withdrawal_refuses_receipt_without_undoing_reservation"/>
+  </testClass>
+ </tests>
+ <groups>
+  <group name="default">
+   <test id="Tests\Feature\CustomerAccountConcurrencyTest::test_current_withdrawal_wins_exact_user_fence_before_every_customer_entrypoint#create"/>
+   <test id="Tests\Feature\CustomerAccountConcurrencyTest::test_current_withdrawal_wins_exact_user_fence_before_every_customer_entrypoint#price"/>
+   <test id="Tests\Feature\CustomerAccountConcurrencyTest::test_current_withdrawal_wins_exact_user_fence_before_every_customer_entrypoint#review"/>
+   <test id="Tests\Feature\CustomerAccountConcurrencyTest::test_current_withdrawal_wins_exact_user_fence_before_every_customer_entrypoint#prepare"/>
+   <test id="Tests\Feature\CustomerAccountConcurrencyTest::test_current_withdrawal_wins_exact_user_fence_before_every_customer_entrypoint#checkout"/>
+   <test id="Tests\Feature\CustomerAccountConcurrencyTest::test_current_withdrawal_wins_exact_user_fence_before_every_customer_entrypoint#issue"/>
+   <test id="Tests\Feature\CustomerAccountConcurrencyTest::test_current_withdrawal_wins_exact_user_fence_before_every_customer_entrypoint#redeem"/>
+   <test id="Tests\Feature\CustomerAccountConcurrencyTest::test_current_withdrawal_wins_exact_user_fence_before_every_customer_entrypoint#sign-in / password reset"/>
+   <test id="Tests\Feature\CustomerAccountConcurrencyTest::test_current_withdrawal_wins_exact_user_fence_before_every_customer_entrypoint#sign-in / account withdrawn"/>
+   <test id="Tests\Feature\CustomerAccountMigrationTest::test_every_unique_identity_collision_refuses_replace_even_without_recursive_delete_triggers"/>
+   <test id="Tests\Feature\CustomerAccountMigrationTest::test_raw_identity_rewrites_deletion_and_access_version_replay_are_refused"/>
+   <test id="Tests\Feature\CustomerAccountMigrationTest::test_populated_rollback_refuses_without_touching_retained_identity_or_guards"/>
+   <test id="Tests\Feature\CustomerAccountMigrationTest::test_empty_owned_rollback_and_reinstallation_preserve_the_expected_guard_set"/>
+   <test id="Tests\Feature\CustomerAccountMigrationTest::test_temporary_table_shadow_never_bypasses_retained_identity_or_removes_permanent_guards"/>
+   <test id="Tests\Feature\CustomerAccountMigrationTest::test_foreign_guard_name_is_preserved_before_creation_and_when_owned_table_is_absent"/>
+   <test id="Tests\Feature\CustomerAccountMigrationTest::test_temporary_guard_name_is_preserved_without_removing_owned_guards"/>
+   <test id="Tests\Feature\MediaWorkerIdentityTest::test_locked_completion_refuses_changed_retained_identity_without_redirecting_attribution#requester"/>
+   <test id="Tests\Feature\MediaWorkerIdentityTest::test_locked_completion_refuses_changed_retained_identity_without_redirecting_attribution#source"/>
+   <test id="Tests\Feature\MediaWorkerIdentityTest::test_locked_completion_refuses_changed_retained_identity_without_redirecting_attribution#source track"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_migration_installs_nine_tables_with_three_guards_each_and_retry_is_a_no_op"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#0"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#1"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#2"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#3"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#4"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#5"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#6"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#7"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#8"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#9"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#10"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#11"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#12"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#13"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#14"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#15"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#16"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#17"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#18"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#19"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#20"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#21"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#22"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#23"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#24"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#25"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#26"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#27"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#28"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#29"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#30"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#31"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#32"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#33"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#34"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#35"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema#36"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_an_earlier_guard_hole_with_later_objects_is_not_owned_and_is_not_repaired"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_a_data_bearing_table_missing_a_guard_is_never_adopted_or_deleted"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_a_foreign_object_holding_a_reserved_guard_name_is_refused_before_any_ddl"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_an_external_dependent_on_owned_evidence_is_refused"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_a_temporary_shadow_of_a_parent_or_owned_table_is_refused"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_parent_floor_drift_is_refused_before_the_first_owned_ddl"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_down_refuses_before_touching_retained_originals"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_table_refuses_update_and_delete_red_green"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_table_refuses_a_relabelled_copy_and_byte_shape_drift_on_insert"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_review_guard_refuses_self_review_and_availability_guard_refuses_a_gap"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_native_schema_global_check_symbol_collision_is_refused_before_the_first_owned_ddl"/>
+   <test id="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_native_temporary_shadow_of_an_owned_table_is_refused"/>
+   <test id="Tests\Feature\ProductionMembership\MembershipPolicyFactsTest::test_real_staff_writer_retains_an_immutable_policy_and_the_approved_producer_proves_it"/>
+   <test id="Tests\Feature\ProductionMembership\MembershipPolicyFactsTest::test_different_policy_documents_create_distinct_immutable_versions"/>
+   <test id="Tests\Feature\ProductionMembership\MembershipPolicyFactsTest::test_authoring_is_separate_default_off_and_cannot_relabel_synthetic_provenance"/>
+   <test id="Tests\Feature\ProductionMembership\MembershipPolicyFactsTest::test_nonstaff_unverified_unenrolled_and_stale_staff_cannot_author"/>
+   <test id="Tests\Feature\ProductionMembership\MembershipPolicyFactsTest::test_gate_callback_revocation_rolls_back_the_policy_and_the_callback_write"/>
+   <test id="Tests\Feature\ProductionMembership\MembershipPolicyFactsTest::test_encryption_callback_withdrawal_refuses_before_the_policy_write"/>
+   <test id="Tests\Feature\ProductionMembership\MembershipPolicyFactsTest::test_writer_cannot_run_without_the_captured_outer_transaction"/>
+   <test id="Tests\Feature\ProductionMembership\MembershipPolicyFactsTest::test_unapproved_policy_and_changed_configuration_are_refused"/>
+   <test id="Tests\Feature\ProductionMembership\MembershipPolicyFactsTest::test_proofs_refuse_other_issuer_other_rows_forged_values_and_serialization"/>
+   <test id="Tests\Feature\ProductionMembership\MembershipPolicyFactsTest::test_original_proof_deadline_is_not_renewed_by_revalidation"/>
+   <test id="Tests\Feature\ProductionMembership\MembershipPolicyFactsTest::test_a_commit_and_reopen_cannot_reuse_a_policy_proof"/>
+   <test id="Tests\Feature\ProductionMembership\MembershipPolicyFactsTest::test_retained_seals_ciphertexts_and_document_hashes_are_validated"/>
+   <test id="Tests\Feature\ProductionMembership\MembershipPolicyFactsTest::test_document_rejects_missing_unknown_unsupported_or_unbounded_facts"/>
+   <test id="Tests\Feature\ProductionMembership\MembershipPolicyFactsTest::test_award_terms_use_exact_provider_paid_time_and_explicit_expiry"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\MembershipPaidInvoiceProofTest::test_real_retained_billing_proves_original_buyer_and_provider_paid_time"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\MembershipPaidInvoiceProofTest::test_tokens_cannot_be_forged_copied_serialized_or_reused_on_another_frame"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\MembershipPaidInvoiceProofTest::test_newer_nonsettled_observation_and_original_freshness_deadline_refuse_authority"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\MembershipPaidInvoiceProofTest::test_a_hint_after_retrieval_requires_a_new_retrieval_before_authority"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\MembershipPaidInvoiceProofTest::test_identical_retrieval_changes_evidence_but_preserves_semantic_invoice_graph"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\MembershipPaidInvoiceProofTest::test_existing_proof_refuses_a_new_observation_even_with_identical_payment_facts"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\MembershipPaidInvoiceProofTest::test_observation_envelope_binds_deadline_sequence_and_positions_beyond_the_outer_checksum"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\MembershipPaidInvoiceProofTest::test_another_current_customer_cannot_use_the_approved_buyers_invoice"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\MembershipReservationClockClosureTest::test_terminal_clock_callback_cannot_withdraw_identity_after_the_last_precommit_owner_check"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\MembershipReservationClockClosureTest::test_native_committed_clock_callback_owner_withdrawal_refuses_receipt_without_undoing_reservation"/>
+  </group>
+ </groups>
+</testSuite>

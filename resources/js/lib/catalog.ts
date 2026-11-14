@@ -1,3 +1,4 @@
+import deliverableLabelMap from './deliverable-labels.json' with { type: 'json' };
 import type { SiteContent, SiteImages } from './site-content';
 
 export interface Offer {
@@ -39,6 +40,8 @@ export interface Track {
   durationSeconds: number;
   artworkUrl: string | null;
   previewUrl: string | null;
+  /** Whether the served preview carries the tag. Absent when the source does not say, which renders neutral wording. */
+  previewTagged?: boolean;
   waveform: number[];
   tags: string[];
   offers: Offer[];
@@ -66,6 +69,8 @@ export interface PageMetadata {
   imageType?: string | null;
   type: 'website' | 'music.song';
   robots: 'index, follow' | 'noindex, nofollow';
+  /** Server-built schema.org JSON-LD with <, > and & escaped; absent outside production and on previews. */
+  structuredData?: string | null;
 }
 export interface CatalogFilters { q: string; genre: string; sort: 'featured' | 'tempo' | 'title' }
 export interface CatalogPage {
@@ -90,13 +95,26 @@ export interface StorefrontProps {
   testOrderPreparationEnabled?: boolean;
   testCheckoutEnabled?: boolean;
   customerAccountEnabled?: boolean;
+  /** Links of default-off product families whose own server policy is on (BL-50). */
+  familyLinks?: { label: string; href: string }[];
   metadata?: PageMetadata;
 }
 
-export const fileRoleLabels: Record<string, string> = {
-  tagged_preview: 'Tagged preview', preview_tagged: 'Tagged preview', download_mp3: 'Untagged MP3', mp3: 'MP3', untagged_mp3: 'Untagged MP3', wav: 'WAV',
-  master_wav: 'WAV master', stems: 'Track stems', stems_zip: 'Track stems', artwork: 'Cover artwork',
-};
+/**
+ * The one deliverable label map (DD-30): role → the words the server generates from typed license terms
+ * (`TypedLicenseTerms::DELIVERABLES`). The JSON file is pinned to that constant by
+ * tests/Feature/PublicLicenseSummaryReconciliationTest.php; do not add a second wording anywhere in the client.
+ */
+export const deliverableLabels: Readonly<Record<string, string>> = deliverableLabelMap;
+
+/**
+ * Names the files of a license in the fixed order of the generated "Deliverables:" line, whatever order the roles
+ * arrive in. A role outside the map is shown as its raw key after the known ones rather than given invented wording.
+ */
+export function deliverableNames(roles: readonly string[]): string[] {
+  const known = Object.keys(deliverableLabels).filter(role => roles.includes(role)).map(role => deliverableLabels[role]);
+  return [...known, ...roles.filter(role => !Object.hasOwn(deliverableLabels, role))];
+}
 
 export function formatMoney(minor: number, currency = 'USD'): string {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency, maximumFractionDigits: minor % 100 ? 2 : 0 }).format(minor / 100);

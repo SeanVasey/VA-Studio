@@ -1,0 +1,337 @@
+commit 0823230d742a44ecbf22c21a2e5246a29ed7dea3
+Author:     Sean Vasey <sean@vasey.audio>
+AuthorDate: Tue Oct 13 04:38:08 2026 +0000
+Commit:     Sean Vasey <sean@vasey.audio>
+CommitDate: Tue Oct 13 04:38:08 2026 +0000
+
+    Test membership reservation lifecycle with real retained sources
+
+diff --git a/tests/Feature/ProductionMembershipBilling/MembershipReservationLifecycleTest.php b/tests/Feature/ProductionMembershipBilling/MembershipReservationLifecycleTest.php
+new file mode 100644
+index 00000000..252eb419
+--- /dev/null
++++ b/tests/Feature/ProductionMembershipBilling/MembershipReservationLifecycleTest.php
+@@ -0,0 +1,143 @@
++<?php
++
++namespace Tests\Feature\ProductionMembershipBilling;
++
++use App\Domain\Memberships\Production\MembershipAwards;
++use App\Domain\Memberships\Production\MembershipException;
++use App\Domain\Memberships\Production\MembershipPeriodRecords;
++use App\Domain\Memberships\Production\MembershipReservationOperations;
++use App\Domain\Memberships\Production\MembershipReservationRecords;
++use Carbon\CarbonImmutable;
++use Illuminate\Support\Facades\DB;
++use Tests\Support\BillingStripeFixtures;
++use Tests\Support\FinalizationDatabaseMigrations;
++use Tests\Support\MembershipReservationFixtures;
++use Tests\TestCase;
++
++class MembershipReservationLifecycleTest extends TestCase
++{
++    use FinalizationDatabaseMigrations;
++    use MembershipReservationFixtures;
++
++    protected function setUp(): void
++    {
++        parent::setUp();
++        $this->reservationSetup();
++    }
++
++    protected function tearDown(): void
++    {
++        CarbonImmutable::setTestNow();
++        parent::tearDown();
++    }
++
++    public function test_real_sources_reserve_once_and_exact_retry_and_award_replay_preserve_the_retained_identity(): void
++    {
++        $fixture = $this->reservationFixture(creditAmount: 2);
++        $saved = $this->reserveFixture($fixture);
++        $this->assertSame($saved, $this->reserveFixture($fixture));
++        $this->assertSame(2, $saved['credit_amount']);
++        $this->assertSame($fixture['award'], $this->replayAward($fixture));
++        $this->assertSame(1, DB::table(MembershipReservationRecords::TABLE)->count());
++        $this->assertSame(2, DB::table(MembershipPeriodRecords::EVENTS)->count());
++        $this->assertSame(['available' => 1, 'reserved' => 2, 'consumed' => 0, 'expired' => 0], $this->ledgerSnapshot($fixture)['balances']);
++        $this->assertSame(0, DB::transactionLevel());
++        $this->assertFalse(DB::connection()->getPdo()->inTransaction());
++    }
++
++    public function test_last_credit_refusal_keeps_exactly_the_first_redemption_and_reserve_event(): void
++    {
++        $fixture = $this->reservationFixture(policyOverrides: ['credit_allowance' => 1]);
++        $saved = $this->reserveFixture($fixture, 'first-synthetic-key');
++        $this->refused(fn () => $this->reserveFixture($fixture, 'second-synthetic-key'), 'insufficient_credit');
++        $audit = $this->ledgerSnapshot($fixture);
++        $this->assertSame(['available' => 0, 'reserved' => 1, 'consumed' => 0, 'expired' => 0], $audit['balances']);
++        $this->assertSame([$saved['redemption_id']], array_keys($audit['reservations']));
++        $this->assertSame(1, DB::table(MembershipReservationRecords::TABLE)->count());
++        $this->assertSame(2, DB::table(MembershipPeriodRecords::EVENTS)->count());
++    }
++
++    public function test_reused_key_cannot_adopt_another_eligible_selection(): void
++    {
++        $fixture = $this->reservationFixture(selectionCount: 2);
++        $saved = $this->reserveFixture($fixture);
++        $other = [...$fixture, 'selection' => (string) $fixture['catalogs'][1]['offer']->id,
++            'expected_revision' => (int) $fixture['catalogs'][1]['revision']->id];
++        $this->refused(fn () => $this->reserveFixture($other), 'conflicting_request');
++        $this->assertSame($saved, $this->reserveFixture($fixture));
++        $this->assertCount(1, $this->ledgerSnapshot($fixture)['reservations']);
++    }
++
++    public function test_reused_key_cannot_adopt_another_actually_awarded_paid_period(): void
++    {
++        $first = $this->reservationFixture();
++        $saved = $this->reserveFixture($first);
++        $second = $this->reservationNextPeriod($first);
++        $this->assertNotSame($first['award']['period_id'], $second['award']['period_id']);
++        $this->refused(fn () => $this->reserveFixture($second), 'conflicting_request');
++        $this->assertSame($saved['redemption_id'], DB::table(MembershipReservationRecords::TABLE)->sole()->id);
++        $next = $this->reserveFixture($second, 'next-synthetic-period-key');
++        $this->assertSame($second['award']['period_id'], $next['period_id']);
++        $this->assertCount(1, $this->ledgerSnapshot($second)['reservations']);
++    }
++
++    public function test_release_requires_honor_expiry_then_is_idempotent_and_preserves_award_replay(): void
++    {
++        $fixture = $this->reservationFixture();
++        $saved = $this->reserveFixture($fixture);
++        $operations = new MembershipReservationOperations;
++        $release = fn () => $operations->release($fixture['invoice']['id'], $saved['redemption_id'], $fixture['buyer']['principal'], $fixture['buyer']['user']);
++        CarbonImmutable::setTestNow(CarbonImmutable::parse($saved['honor_deadline'], 'UTC')->subSecond());
++        $this->refreshReservationObservation($fixture);
++        $this->refused($release, 'honor_not_expired');
++        $this->assertSame(2, DB::table(MembershipPeriodRecords::EVENTS)->count());
++        CarbonImmutable::setTestNow(CarbonImmutable::parse($saved['honor_deadline'], 'UTC'));
++        $this->refreshReservationObservation($fixture);
++        $released = $release();
++        $this->assertSame($released, $release());
++        $this->assertSame(['available' => 3, 'reserved' => 0, 'consumed' => 0, 'expired' => 0], $this->ledgerSnapshot($fixture)['balances']);
++        $this->assertSame(3, DB::table(MembershipPeriodRecords::EVENTS)->count());
++        $this->assertSame($fixture['award'], $this->replayAward($fixture));
++        $this->refused(fn () => $this->reserveFixture($fixture), 'reservation_terminal');
++    }
++
++    public function test_available_expiry_preserves_reserved_credit_and_a_later_release_never_restores_it(): void
++    {
++        $fixture = $this->reservationFixture(policyOverrides: ['award_terms' => [
++            'expiry' => ['mode' => 'period_end', 'seconds' => 0], 'late_payment' => ['mode' => 'allow', 'seconds' => 0]]],
++            honorOverrides: ['duration_seconds' => 120, 'expiry_mode' => 'allow_beyond_credit_expiry']);
++        CarbonImmutable::setTestNow(CarbonImmutable::createFromTimestampUTC(BillingStripeFixtures::PERIOD_END - 60));
++        $this->refreshReservationObservation($fixture);
++        $saved = $this->reserveFixture($fixture);
++        $operations = new MembershipReservationOperations;
++        $this->refused(fn () => $operations->expire($fixture['invoice']['id'], $fixture['buyer']['principal'], $fixture['buyer']['user']), 'credit_not_expired');
++        CarbonImmutable::setTestNow(CarbonImmutable::createFromTimestampUTC(BillingStripeFixtures::PERIOD_END));
++        $this->refreshReservationObservation($fixture);
++        $expired = $operations->expire($fixture['invoice']['id'], $fixture['buyer']['principal'], $fixture['buyer']['user']);
++        $this->assertSame($expired, $operations->expire($fixture['invoice']['id'], $fixture['buyer']['principal'], $fixture['buyer']['user']));
++        $this->assertSame(['available' => 0, 'reserved' => 1, 'consumed' => 0, 'expired' => 2], $this->ledgerSnapshot($fixture)['balances']);
++        $this->refused(fn () => $this->reserveFixture($fixture, 'new-after-expiry'), 'credit_expired');
++        CarbonImmutable::setTestNow(CarbonImmutable::parse($saved['honor_deadline'], 'UTC'));
++        $this->refreshReservationObservation($fixture);
++        $released = $operations->release($fixture['invoice']['id'], $saved['redemption_id'], $fixture['buyer']['principal'], $fixture['buyer']['user']);
++        $this->assertSame(['available' => 0, 'reserved' => 0, 'consumed' => 0, 'expired' => 3], $released['balances']);
++        $this->assertSame($released, $operations->release($fixture['invoice']['id'], $saved['redemption_id'], $fixture['buyer']['principal'], $fixture['buyer']['user']));
++        $this->assertSame($fixture['award'], $this->replayAward($fixture));
++        $this->assertSame(4, DB::table(MembershipPeriodRecords::EVENTS)->count());
++    }
++
++    private function replayAward(array $fixture): array
++    {
++        return (new MembershipAwards)->award($fixture['invoice']['id'], $fixture['buyer']['principal'], $fixture['buyer']['user']);
++    }
++
++    private function refused(callable $work, string $reason): void
++    {
++        try {
++            $work();
++            $this->fail('Expected explicit lifecycle refusal.');
++        } catch (MembershipException $error) {
++            $this->assertSame($reason, $error->reason);
++        }
++    }
++}
+diff --git a/tests/Support/MembershipReservationFixtures.php b/tests/Support/MembershipReservationFixtures.php
+new file mode 100644
+index 00000000..fba58c71
+--- /dev/null
++++ b/tests/Support/MembershipReservationFixtures.php
+@@ -0,0 +1,174 @@
++<?php
++
++namespace Tests\Support;
++
++use App\Domain\Customers\ProductionCustomerAccess;
++use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
++use App\Domain\Memberships\Billing\BillingLedger;
++use App\Domain\Memberships\Billing\BillingSettlement;
++use App\Domain\Memberships\Billing\BillingSnapshots;
++use App\Domain\Memberships\Production\CurrentEligibleLicenses;
++use App\Domain\Memberships\Production\MembershipAwards;
++use App\Domain\Memberships\Production\MembershipCatalogEvidence;
++use App\Domain\Memberships\Production\MembershipEligibleLicenseAuthority;
++use App\Domain\Memberships\Production\MembershipLedgerAudit;
++use App\Domain\Memberships\Production\MembershipLicenseBinding;
++use App\Domain\Memberships\Production\MembershipPaidInvoiceAuthority;
++use App\Domain\Memberships\Production\MembershipPeriodRecords;
++use App\Domain\Memberships\Production\MembershipPolicy;
++use App\Domain\Memberships\Production\MembershipPolicyDocument;
++use App\Domain\Memberships\Production\MembershipPolicyFactsAuthority;
++use App\Domain\Memberships\Production\MembershipReservationOperations;
++use App\Domain\Memberships\Production\MembershipReservationRecords;
++use App\Domain\Memberships\Production\MembershipRows;
++use Carbon\CarbonImmutable;
++use Illuminate\Support\Facades\DB;
++
++/** Explicit synthetic terms over real catalog, identity, policy, billing and award writers. Never runtime registration. */
++trait MembershipReservationFixtures
++{
++    use MembershipAwardFixtures;
++
++    protected function reservationSetup(): void
++    {
++        $this->awardSetup();
++        $this->fakePrivateMediaStorage();
++    }
++
++    protected function reservationFixture(array $policyOverrides = [], array $honorOverrides = [], bool $award = true,
++        int $selectionCount = 1, int $creditAmount = 1): array
++    {
++        $catalogs = [];
++        $rules = [];
++        for ($index = 0; $index < $selectionCount; $index++) {
++            $catalog = QuoteFixtures::selection();
++            $catalog['binding'] = DB::transaction(function () use ($catalog): MembershipLicenseBinding {
++                $rows = new MembershipRows;
++                $started = hrtime(true);
++                $at = CarbonImmutable::now('UTC');
++
++                // Current real catalog values for authoring, without minting membership authority.
++                return MembershipCatalogEvidence::lock($rows, (string) $catalog['offer']->id,
++                    (int) $catalog['revision']->id, $at, $started + 60_000_000_000, $started)->binding;
++            });
++            $binding = $catalog['binding'];
++            $rules[] = ['rule_id' => 'synthetic-selection-'.$index, 'track_id' => $binding->trackId,
++                'offer_id' => $binding->offerId, 'offer_revision_id' => $binding->offerRevisionId,
++                'license_version_id' => $binding->licenseVersionId, 'license_manifest_hash' => $binding->licenseManifestHash,
++                'asset_manifest_hash' => $binding->assetManifestHash, 'original_terms_hash' => $binding->originalTermsHash,
++                'credit_amount' => $creditAmount];
++            $catalogs[] = $catalog;
++        }
++        $terms = ['schema_version' => MembershipPolicyDocument::CREDIT_VERSION, 'scope' => 'paid_period_credit_lifecycle',
++            'redemption_terms' => ['eligibility_rules' => $rules,
++                'honor' => ['duration_seconds' => 60, 'expiry_mode' => 'cap_at_credit_expiry', ...$honorOverrides],
++                'release' => ['before_credit_expiry' => 'available', 'at_or_after_credit_expiry' => 'expired'],
++                'available_expiry' => ['mode' => 'expire_available_at_credit_expiry']], ...$policyOverrides];
++        $fixture = $this->awardFixture($terms);
++        $this->reservationTestCapabilities();
++        // The actual registered producer must independently admit every catalog after real policy/owner authoring.
++        foreach ($catalogs as $catalog) {
++            DB::transaction(function () use ($fixture, $catalog): void {
++                $rows = new MembershipRows;
++                $authority = app(MembershipEligibleLicenseAuthority::class);
++                $proof = $authority->lock((string) $catalog['offer']->id, (int) $catalog['revision']->id,
++                    $fixture['buyer']['principal'], $fixture['buyer']['user'], $rows);
++                $authority->proveCurrent($proof, $fixture['buyer']['principal'], $fixture['buyer']['user'], $rows);
++                $actual = $proof->binding();
++                $expected = $catalog['binding'];
++                foreach (['trackId', 'offerId', 'offerRevisionId', 'licenseVersionId', 'selectionHash',
++                    'licenseManifestHash', 'assetManifestHash', 'originalTermsHash'] as $field) {
++                    $this->assertSame($expected->$field, $actual->$field);
++                }
++            });
++        }
++        $catalog = $catalogs[0];
++
++        return [...$fixture, 'catalog' => $catalog, 'catalogs' => $catalogs,
++            'selection' => (string) $catalog['offer']->id, 'expected_revision' => (int) $catalog['revision']->id,
++            'license_binding' => $catalog['binding'], 'provider_invoice_ref' => BillingStripeFixtures::INVOICE,
++            'provider_graph' => BillingStripeFixtures::graph(),
++            'award' => $award ? (new MembershipAwards)->award($fixture['invoice']['id'], $fixture['buyer']['principal'], $fixture['buyer']['user']) : null];
++    }
++
++    protected function reservationTestCapabilities(): void
++    {
++        $this->awardTestCapabilities();
++        // The grant capability remains the deliberately unusable test-only double supplied above.
++        $this->app->instance(MembershipEligibleLicenseAuthority::class, new CurrentEligibleLicenses);
++    }
++
++    protected function reserveFixture(array $fixture, string $requestKey = 'synthetic-reservation-request'): array
++    {
++        return (new MembershipReservationOperations)->reserve($fixture['invoice']['id'], $fixture['selection'],
++            $fixture['expected_revision'], $requestKey, $fixture['buyer']['principal'], $fixture['buyer']['user']);
++    }
++
++    protected function refreshReservationObservation(array $fixture): array
++    {
++        $ledger = new BillingLedger;
++        $start = $ledger->startRetrieval();
++        $at = CarbonImmutable::now('UTC');
++        $projected = BillingStripeFixtures::snapshots($fixture['provider_graph'], $at->timestamp);
++        $snapshots = new BillingSnapshots($fixture['provider_invoice_ref'], $projected->account, $projected->invoice,
++            $projected->lines, $projected->payments, $projected->paymentIntents, $projected->charges,
++            $projected->balanceTransactions, $projected->subscription, $at->timestamp, IdentityPolicy::REHEARSAL);
++        $verdict = BillingSettlement::evaluate($snapshots, $fixture['approval']['expectation']);
++
++        return $ledger->append($fixture['invoice'], $verdict, $at->timestamp, IdentityPolicy::REHEARSAL,
++            $start, $ledger->endRetrieval($start), $at);
++    }
++
++    /** A second actual invoice claims the adjacent, nonoverlapping synthetic service period. */
++    protected function reservationNextPeriod(array $fixture): array
++    {
++        $references = [BillingStripeFixtures::INVOICE => 'in_SYNTHETICRESERVATION2',
++            BillingStripeFixtures::INVOICE_PAYMENT => 'inpay_SYNTHETICRESERVATION2',
++            BillingStripeFixtures::PAYMENT_INTENT => 'pi_SYNTHETICRESERVATION2',
++            BillingStripeFixtures::CHARGE => 'ch_SYNTHETICRESERVATION2',
++            BillingStripeFixtures::BALANCE_TRANSACTION => 'txn_SYNTHETICRESERVATION2'];
++        $replace = function (mixed $value) use (&$replace, $references): mixed {
++            if (! is_array($value)) {
++                return is_string($value) ? ($references[$value] ?? $value) : $value;
++            }
++            $result = [];
++            foreach ($value as $key => $item) {
++                $result[is_string($key) ? ($references[$key] ?? $key) : $key] = $replace($item);
++            }
++
++            return $result;
++        };
++        $start = BillingStripeFixtures::PERIOD_END;
++        $graph = $replace(BillingStripeFixtures::graph(['line' => ['id' => 'il_SYNTHETICRESERVATION2',
++            'period' => ['start' => $start, 'end' => $start + 2678400]],
++            'invoice' => ['period_start' => BillingStripeFixtures::PERIOD_START, 'period_end' => $start],
++            'payment' => ['created' => $start, 'status_transitions' => ['canceled_at' => null, 'paid_at' => $start]],
++            'transaction' => ['available_on' => $start]]));
++        CarbonImmutable::setTestNow(CarbonImmutable::createFromTimestampUTC($start + 1));
++        $fixture['provider_invoice_ref'] = $references[BillingStripeFixtures::INVOICE];
++        $fixture['provider_graph'] = $graph;
++        $fixture['invoice'] = (new BillingLedger)->invoice($fixture['approval'], $fixture['provider_invoice_ref']);
++        $fixture['observation'] = $this->refreshReservationObservation($fixture);
++        $fixture['award'] = (new MembershipAwards)->award($fixture['invoice']['id'], $fixture['buyer']['principal'], $fixture['buyer']['user']);
++
++        return $fixture;
++    }
++
++    protected function ledgerSnapshot(array $fixture): array
++    {
++        return DB::transaction(function () use ($fixture): array {
++            $rows = new MembershipRows;
++            $access = new ProductionCustomerAccess;
++            $access->lock($fixture['buyer']['principal'], $fixture['buyer']['user'], $rows->current());
++            $invoice = app(MembershipPaidInvoiceAuthority::class)->lock($fixture['invoice']['id'],
++                $fixture['buyer']['principal'], $fixture['buyer']['user'], $rows)->binding();
++            $facts = app(MembershipPolicyFactsAuthority::class)->lock($invoice->planVersionId, $rows)->binding();
++            $historical = $access->verifyHistoricalBinding($invoice->originalBuyerBinding, $rows->current());
++            $period = $rows->one(MembershipPeriodRecords::PERIODS, 'source_invoice_hash = ?', [$invoice->sourceInvoiceHash]);
++            $events = $rows->rows(MembershipPeriodRecords::EVENTS, 'period_id = ?', [$period['id']], MembershipPolicy::MAX_EVENTS + 1);
++            $redemptions = $rows->rows(MembershipReservationRecords::TABLE, 'period_id = ?', [$period['id']], MembershipPolicy::MAX_EVENTS + 1);
++
++            return MembershipLedgerAudit::verify($period, $events, $redemptions, $invoice, $facts, (int) $historical['origin']['id']);
++        });
++    }
++}

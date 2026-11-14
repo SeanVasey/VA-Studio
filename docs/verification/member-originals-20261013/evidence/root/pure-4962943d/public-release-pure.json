@@ -1,0 +1,38 @@
+{
+  "scope": "Exact integrated PHP unit selection; SQLite configuration, no migration/native/host claim.",
+  "head": "4962943d",
+  "result": {
+    "tests": 107,
+    "assertions": 220,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "exit": 0
+  },
+  "artifacts": [
+    {
+      "path": "/workspace/runtime/member-originals-root-evidence/integrated-pure-4962943d.log",
+      "sha256": "f1162626352ab3ea43c718a19d786c275121a71b6e26ffd5c3e6a59ec950a470"
+    },
+    {
+      "path": "/workspace/runtime/member-originals-root-evidence/integrated-pure-4962943d.xml",
+      "sha256": "2a07db97a398554a8c6ef1524531f28b690c0aba3c0e1be65bd14ca0dfa30c14"
+    },
+    {
+      "path": "/workspace/runtime/member-originals-root-evidence/integrated-pure-4962943d.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "/workspace/runtime/member-originals-root-evidence/integrated-pure-4962943d.source.json",
+      "sha256": "4248d2f2eb16bb79662f58871af0fca73e6fe9b320d0cb797d856d61de4bb2cd"
+    },
+    {
+      "path": "/workspace/runtime/member-originals-root-evidence/integrated-pure-4962943d.result.json",
+      "sha256": "1066e6e4c9948d974fb57f599c9d93f60faddf78b2623a18a0f816f217954773"
+    },
+    {
+      "path": "/workspace/runtime/member-originals-root-evidence/run-native-focused.py",
+      "sha256": "d83d217d3f81a2a169c3a20f148f06baa934c7f2b4fd72bdb361186cd7c69a60"
+    }
+  ]
+}

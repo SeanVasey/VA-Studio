@@ -1,0 +1,14 @@
+{
+  "changed_named_templates": 18,
+  "direct_templates_byte_unchanged": 12,
+  "all30_bindings_families_exact": true,
+  "model_limit": "Uninterpreted T/F/NULL predicates only; no native SQL/collation/type claim",
+  "new_I2_template_sha256": "3875396f26180c26982e3d28fe757273bdcf11f33d7c89d9ce61faa448e5bee1",
+  "new_I2_bytes": 9602,
+  "I2_bindings": 112,
+  "I2_lookup_hints": 2,
+  "I2_lookup_references": 2,
+  "uninterpreted_truth_bag_cases": 360,
+  "preserved_original_oracle_file_sha256": "c238543c41ba4118a228a7955b1645ed0962263c874d3fc73347d2e3a050f03a",
+  "all_tests_byte_unchanged_caa": true
+}

@@ -1,0 +1,70 @@
+<?php
+
+namespace Tests\Feature\PccScratch;
+
+use App\Domain\Commerce\Payments\StripeCheckoutGateway;
+use App\Domain\Commerce\Payments\StripePaymentGateway;
+use App\Domain\Contracts\ContractRenderer;
+use App\Domain\Contracts\Models\ContractRenderWork;
+use Carbon\Carbon;
+use Carbon\CarbonImmutable;
+use Filament\Facades\Filament;
+use Illuminate\Support\Facades\DB;
+use Tests\Support\ActivationFixtures;
+use Tests\Support\ContractFixtures;
+use Tests\Support\DeliveryFixtures;
+use Tests\Support\FinalizationDatabaseMigrations;
+use Tests\Support\FinalizationFixtures;
+use Tests\Support\PaymentFixtures;
+use Tests\TestCase;
+
+/** UNTRACKED SCRATCH PROBE (lane PCC investigation): the clock crossing a second between the completion stamp and the save. */
+final class ContractSecondBoundaryProbeTest extends TestCase
+{
+    use FinalizationDatabaseMigrations;
+
+    private function issue(bool $crossSecondAtSave): array
+    {
+        $this->withoutVite();
+        $this->fakePrivateMediaStorage();
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+        DeliveryFixtures::configure();
+        $this->app->instance(ContractRenderer::class, ContractFixtures::renderer());
+        $gateway = PaymentFixtures::gateway();
+        $this->app->instance(StripeCheckoutGateway::class, $gateway);
+        $this->app->instance(StripePaymentGateway::class, $gateway);
+        $fixture = ContractFixtures::finalize(FinalizationFixtures::confirm(PaymentFixtures::started($gateway)));
+        $frozen = CarbonImmutable::parse('2026-11-01T01:00:00.200000Z');
+        Carbon::setTestNow($frozen); CarbonImmutable::setTestNow($frozen);
+        if ($crossSecondAtSave) {
+            ContractRenderWork::saving(function (ContractRenderWork $work) use ($frozen): void {
+                if ($work->state === 'completed') {
+                    Carbon::setTestNow($frozen->addMilliseconds(900)); CarbonImmutable::setTestNow($frozen->addMilliseconds(900));
+                }
+            });
+        }
+        try {
+            ActivationFixtures::issue($fixture);
+            $outcome = 'issued';
+        } catch (\LogicException) {
+            $outcome = 'not issued';
+        } finally {
+            Carbon::setTestNow(); CarbonImmutable::setTestNow();
+        }
+
+        return [$outcome, DB::table('contract_render_work')->get(['state', 'reason'])->all()];
+    }
+
+    public function test_same_second_completion_without_crossing_issues(): void
+    {
+        [$outcome] = $this->issue(false);
+        $this->assertSame('issued', $outcome);
+    }
+
+    public function test_same_second_completion_crossing_a_second_before_save_is_quarantined(): void
+    {
+        [$outcome, $work] = $this->issue(true);
+        fwrite(STDERR, 'CROSSING: '.$outcome.' '.json_encode($work)."\n");
+        $this->assertSame('not issued', $outcome);
+    }
+}

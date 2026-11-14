@@ -1,0 +1,20 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/m3/phpunit.xml
+
+F                                                                   1 / 1 (100%)
+
+Time: 00:03.502, Memory: 97.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\BulkLicenseDraftSourceAuthoringActionTest::test_uncertain_failure_retains_copyable_source_and_logs_only_exception_class_without_false_success
+Failed asserting that '[{"id":"a3031858-a1a4-4ccc-8dd5-cf05dc3bd43a","actions":[],"body":"Keep a copy of your entered source, then close and reopen to inspect the saved drafts before trying again.Synthetic private license failure details","color":null,"duration":"persistent","icon":"heroicon-o-x-circle","iconColor":"danger","iconSize":null,"status":"danger","title":"The bulk save result could not be confirmed.","view":null,"viewData":[]}]' [ASCII](length: 419) does not contain "Synthetic private license failure details" [ASCII](length: 41).
+
+/home/user/wt/m3/tests/Support/FilamentNotifications.php:88
+/home/user/wt/m3/tests/Feature/BulkLicenseDraftSourceAuthoringActionTest.php:382
+/home/user/wt/m3/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 1, Assertions: 13, Failures: 1.

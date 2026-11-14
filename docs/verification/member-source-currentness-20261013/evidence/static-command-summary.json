@@ -1,0 +1,191 @@
+{
+  "scope": "Only observed static/setup receipts; no implicit execution of prepared runners or corrected native tests.",
+  "runs": [
+    {
+      "argv": [
+        "php",
+        "-l",
+        "app/Domain/Memberships/Production/MembershipCatalogDefinition.php"
+      ],
+      "cwd": "/workspace/VA-Studio-member-catalog-currentness",
+      "exit": 0,
+      "name": "syntax-1",
+      "seconds": 0.03788544200506294,
+      "owner": "catalog",
+      "observed_exit": 0
+    },
+    {
+      "argv": [
+        "php",
+        "-l",
+        "app/Domain/Memberships/Production/MembershipCatalogEvidence.php"
+      ],
+      "cwd": "/workspace/VA-Studio-member-catalog-currentness",
+      "exit": 0,
+      "name": "syntax-2",
+      "seconds": 0.035297244001412764,
+      "owner": "catalog",
+      "observed_exit": 0
+    },
+    {
+      "argv": [
+        "php",
+        "-l",
+        "tests/Unit/MembershipCatalogDefinitionTest.php"
+      ],
+      "cwd": "/workspace/VA-Studio-member-catalog-currentness",
+      "exit": 0,
+      "name": "syntax-3",
+      "seconds": 0.037293558998499066,
+      "owner": "catalog",
+      "observed_exit": 0
+    },
+    {
+      "argv": [
+        "php",
+        "-l",
+        "tests/Feature/ProductionMembershipBilling/MembershipNativeCatalogCurrentnessTest.php"
+      ],
+      "cwd": "/workspace/VA-Studio-member-catalog-currentness",
+      "exit": 0,
+      "name": "syntax-4",
+      "seconds": 0.04568051700334763,
+      "owner": "catalog",
+      "observed_exit": 0
+    },
+    {
+      "argv": [
+        "vendor/bin/pint",
+        "--test",
+        "app/Domain/Memberships/Production/MembershipCatalogDefinition.php",
+        "app/Domain/Memberships/Production/MembershipCatalogEvidence.php",
+        "tests/Unit/MembershipCatalogDefinitionTest.php",
+        "tests/Feature/ProductionMembershipBilling/MembershipNativeCatalogCurrentnessTest.php"
+      ],
+      "cwd": "/workspace/VA-Studio-member-catalog-currentness",
+      "exit": 0,
+      "name": "pint-final-v2",
+      "seconds": 0.45145630199840525,
+      "owner": "catalog",
+      "observed_exit": 0
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "cwd": "/workspace/VA-Studio-member-catalog-currentness",
+      "exit": 0,
+      "name": "diff-check",
+      "seconds": 0.010261390001687687,
+      "owner": "catalog",
+      "observed_exit": 0
+    },
+    {
+      "owner": "catalog",
+      "name": "autoload",
+      "observed_exit": 0,
+      "receipt": "catalog/autoload.exit",
+      "scope": "Setup/static receipt, not an application test pass."
+    },
+    {
+      "owner": "catalog",
+      "name": "pint-initial",
+      "observed_exit": 1,
+      "receipt": "catalog/pint-initial.exit",
+      "scope": "Setup/static receipt, not an application test pass."
+    },
+    {
+      "owner": "catalog",
+      "name": "pint-fix",
+      "observed_exit": 0,
+      "receipt": "catalog/pint-fix.exit",
+      "scope": "Setup/static receipt, not an application test pass."
+    },
+    {
+      "owner": "catalog",
+      "name": "pint-final",
+      "observed_exit": 0,
+      "receipt": "catalog/pint-final.exit",
+      "scope": "Setup/static receipt, not an application test pass."
+    },
+    {
+      "owner": "catalog",
+      "name": "native-syntax",
+      "observed_exit": 0,
+      "receipt": "catalog/native-syntax.exit",
+      "scope": "Setup/static receipt, not an application test pass."
+    },
+    {
+      "owner": "catalog",
+      "name": "native-receipt-syntax",
+      "observed_exit": 0,
+      "receipt": "catalog/native-receipt-syntax.exit",
+      "scope": "Setup/static receipt, not an application test pass."
+    },
+    {
+      "owner": "catalog",
+      "name": "native-receipt-pint",
+      "observed_exit": 0,
+      "receipt": "catalog/native-receipt-pint.exit",
+      "scope": "Setup/static receipt, not an application test pass."
+    },
+    {
+      "owner": "catalog",
+      "name": "native-window-syntax",
+      "observed_exit": 0,
+      "receipt": "catalog/native-window-syntax.exit",
+      "scope": "Setup/static receipt, not an application test pass."
+    },
+    {
+      "owner": "catalog",
+      "name": "native-window-pint",
+      "observed_exit": 0,
+      "receipt": "catalog/native-window-pint.exit",
+      "scope": "Setup/static receipt, not an application test pass."
+    },
+    {
+      "owner": "catalog",
+      "name": "native-setup",
+      "observed_exit": 0,
+      "receipt": "catalog/native-setup.exit",
+      "scope": "Setup/static receipt, not an application test pass."
+    },
+    {
+      "owner": "r4",
+      "name": "pint-initial",
+      "receipt": "r4/pint-initial.txt",
+      "tool_result": "fail",
+      "scope": "Pint JSON result retained; this lane did not retain a standalone exit file for this command."
+    },
+    {
+      "owner": "r4",
+      "name": "pint-fix",
+      "receipt": "r4/pint-fix.txt",
+      "tool_result": "fixed",
+      "scope": "Pint JSON result retained; this lane did not retain a standalone exit file for this command."
+    },
+    {
+      "owner": "r4",
+      "name": "pint-final",
+      "receipt": "r4/pint-final.txt",
+      "tool_result": "passed",
+      "scope": "Pint JSON result retained; this lane did not retain a standalone exit file for this command."
+    },
+    {
+      "owner": "r4",
+      "name": "pint-terminal-fix",
+      "receipt": "r4/pint-terminal-fix.txt",
+      "tool_result": "passed",
+      "scope": "Pint JSON result retained; this lane did not retain a standalone exit file for this command."
+    },
+    {
+      "owner": "r4",
+      "name": "pint-frame-cleanup",
+      "receipt": "r4/pint-frame-cleanup.txt",
+      "tool_result": "passed",
+      "scope": "Pint JSON result retained; this lane did not retain a standalone exit file for this command."
+    }
+  ]
+}

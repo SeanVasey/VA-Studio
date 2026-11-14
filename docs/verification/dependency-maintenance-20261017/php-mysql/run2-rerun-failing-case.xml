@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMemberGrants\MemberGrantActivationIntegrationTest" file="{worktree}/tests/Feature/ProductionMemberGrants/MemberGrantActivationIntegrationTest.php" tests="1" assertions="9" errors="1" failures="0" skipped="0" time="417.610376">
+    <testcase name="test_independent_confirmations_of_the_same_intent_return_the_first_retained_effect" file="{worktree}/tests/Feature/ProductionMemberGrants/MemberGrantActivationIntegrationTest.php" line="112" class="Tests\Feature\ProductionMemberGrants\MemberGrantActivationIntegrationTest" classname="Tests.Feature.ProductionMemberGrants.MemberGrantActivationIntegrationTest" assertions="9" time="417.610376">
+      <error type="App\Domain\Memberships\Production\MembershipException">Tests\Feature\ProductionMemberGrants\MemberGrantActivationIntegrationTest::test_independent_confirmations_of_the_same_intent_return_the_first_retained_effect
+App\Domain\Memberships\Production\MembershipException: Production membership preparation unavailable.
+
+{worktree}/app/Domain/Memberships/Production/MembershipReservationOperations.php:172
+{worktree}/app/Domain/Memberships/Production/MembershipReservationOperations.php:63
+{worktree}/app/Domain/Memberships/Production/MembershipReservationOperations.php:38
+{worktree}/tests/Support/MembershipReservationFixtures.php:105
+{worktree}/tests/Support/MemberActivationFixtures.php:65
+{worktree}/tests/Feature/ProductionMemberGrants/MemberGrantActivationIntegrationTest.php:114
+{worktree}/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+  </testsuite>
+</testsuites>

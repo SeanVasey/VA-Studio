@@ -45,7 +45,12 @@ class AudioDerivatives
         return $this->probe($path, 'wav', $maxDurationSeconds, $timeoutSeconds);
     }
 
-    public function build(string $master, string $tag, array $profile, string $workspace): array
+    /**
+     * @param  bool  $untaggedPreview  also make the untagged public preview from the same master in the same run (tracks do; sound-kit
+     *                                 demos keep only the tagged one). It uses the preview bitrate, the tagged preview's gain stage and
+     *                                 length, and carries the tagged preview's waveform, so switching between the two changes only the tag.
+     */
+    public function build(string $master, string $tag, array $profile, string $workspace, bool $untaggedPreview = true): array
     {
         $metadata = $this->validateWav($master);
         $tagMetadata = $this->validateWav($tag);
@@ -70,9 +75,15 @@ class AudioDerivatives
         // Pad the approved tag to the interval, then repeat. The song remains full length.
         $filter = "[1:a]aresample=48000,apad=whole_dur={$interval},atrim=duration={$interval},aloop=loop=-1:size={$loopSamples},volume=0.8[tag];[0:a]volume=0.8[music];[music][tag]amix=inputs=2:duration=first:dropout_transition=0:normalize=0,alimiter=limit=0.95:latency=1[out]";
         $runner->run([...$base, ...$input, '-protocol_whitelist', 'file,pipe', '-err_detect', 'explode', '-f', 'wav', '-i', $tag, '-filter_complex', $filter, '-map', '[out]', '-t', $duration, ...$mp3, '-b:a', $profile['preview_bitrate'], '-f', 'mp3', $preview], $workspace);
+        $untagged = $workspace.'/preview-untagged.mp3';
+        if ($untaggedPreview) {
+            // The same 0.8 gain and limiter as the tagged mix, without the tag input, so the level does not jump when staff switch.
+            $runner->run([...$base, ...$input, '-filter_complex', '[0:a]volume=0.8,alimiter=limit=0.95:latency=1[out]', '-map', '[out]', '-t', $duration, ...$mp3, '-b:a', $profile['preview_bitrate'], '-f', 'mp3', $untagged], $workspace);
+        }
         $deliveryMetadata = $this->probe($delivery, 'mp3');
         $previewMetadata = $this->probe($preview, 'mp3');
-        foreach ([$deliveryMetadata, $previewMetadata] as $output) {
+        $untaggedMetadata = $untaggedPreview ? $this->probe($untagged, 'mp3') : null;
+        foreach (array_filter([$deliveryMetadata, $previewMetadata, $untaggedMetadata]) as $output) {
             if (abs($output['duration_seconds'] - $metadata['duration_seconds']) > 0.15) {
                 throw new MediaFailure('duration_mismatch', 'The generated audio does not match the full source duration.');
             }
@@ -82,11 +93,18 @@ class AudioDerivatives
         $peaks = $this->peaks($pcm, $profile['waveform_points']);
         $previewMetadata += ['waveform' => $peaks, 'waveform_sha256' => hash('sha256', json_encode($peaks, JSON_THROW_ON_ERROR)), 'waveform_algorithm' => $profile['waveform_algorithm'], 'tag_sha256' => hash_file('sha256', $tag), 'tag_interval_seconds' => $interval, 'full_length' => true];
 
-        return [
+        $outputs = [
             ['role' => 'master_wav', 'file' => $master, 'name' => 'master.wav', 'mime_type' => 'audio/wav', 'technical_metadata' => $metadata],
             ['role' => 'download_mp3', 'file' => $delivery, 'name' => 'delivery.mp3', 'mime_type' => 'audio/mpeg', 'technical_metadata' => $deliveryMetadata],
             ['role' => 'preview_tagged', 'file' => $preview, 'name' => 'preview.mp3', 'mime_type' => 'audio/mpeg', 'technical_metadata' => $previewMetadata],
         ];
+        if ($untaggedPreview) {
+            // The waveform is the tagged preview's, measured once: both variants show the same peaks, and the tag never enters them.
+            $outputs[] = ['role' => 'preview_untagged', 'file' => $untagged, 'name' => 'preview-untagged.mp3', 'mime_type' => 'audio/mpeg',
+                'technical_metadata' => $untaggedMetadata + ['waveform' => $peaks, 'waveform_sha256' => $previewMetadata['waveform_sha256'], 'waveform_algorithm' => $profile['waveform_algorithm'], 'tagged' => false, 'full_length' => true]];
+        }
+
+        return $outputs;
     }
 
     private function peaks(string $path, int $count): array

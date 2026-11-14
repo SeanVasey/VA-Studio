@@ -2,9 +2,15 @@
 
 namespace App\Domain\Grants\ProductionFree;
 
+use Illuminate\Database\Connection;
+use Illuminate\Database\DatabaseTransactionsManager;
 use Illuminate\Database\DeadlockException;
-use Illuminate\Support\Facades\DB;
+use PDO;
 use PDOException;
+use Pdo\Mysql;
+use Pdo\Sqlite;
+use PDOStatement;
+use ReflectionProperty;
 use Throwable;
 
 /**
@@ -13,13 +19,22 @@ use Throwable;
  * instead of a raw driver exception. There is deliberately no retry here: commands carry external effects (leased
  * claims, staged files, the one-use redemption row) and the customer-facing ones are idempotent by request key, so
  * the caller retrying the same command is the safe and observable path.
+ *
+ * The frame is owned (owner doc step 3): it must start at framework depth zero on an idle primary, and for its
+ * duration the connection's dispatcher is a `ProductionFreeGrantCommitObserver` over a fresh transaction manager.
+ * The work receives that observer and registers its terminal proof; ordinary committing listeners run first and the
+ * proof re-runs immediately before the physical commit. A failure that rolls back the owned frame is a refusal. A failure
+ * after the physical commit, or one that finds the frame already gone (a callback's raw or implicit commit, which the
+ * observer detects but cannot prevent), is the fixed `outcome_unknown`, never retried. Deadlocks stay `contention`.
+ * The original dispatcher and transaction manager are restored in every outcome.
  */
 final class ProductionFreeGrantTransactions
 {
+    /** @param  callable(ProductionFreeGrantCommitObserver):mixed  $work */
     public static function run(callable $work): mixed
     {
         try {
-            return DB::transaction($work);
+            return self::owned($work);
         } catch (ProductionFreeGrantException $error) {
             throw $error;
         } catch (Throwable $error) {
@@ -46,5 +61,69 @@ final class ProductionFreeGrantTransactions
         }
 
         return false;
+    }
+
+    private static function owned(callable $work): mixed
+    {
+        $connection = ProductionFreeGrantRows::admittedConnection();
+        $primary = $connection->getPdo();
+        ProductionFreeGrantException::require(in_array($primary::class, [PDO::class, Sqlite::class, Mysql::class], true)
+            && $primary->getAttribute(PDO::ATTR_STATEMENT_CLASS) === [PDOStatement::class], 'changed_connection');
+        // No outer frame: its commit would not be this command's commit.
+        ProductionFreeGrantException::require($connection->transactionLevel() === 0 && ! $primary->inTransaction(), 'transaction_forbidden');
+        $events = $connection->getEventDispatcher();
+        $property = new ReflectionProperty(Connection::class, 'transactionsManager');
+        $original = $property->getValue($connection);
+        ProductionFreeGrantException::require($original === null || $original::class === DatabaseTransactionsManager::class, 'changed_transaction');
+        $manager = new DatabaseTransactionsManager;
+        $observer = new ProductionFreeGrantCommitObserver($connection, $primary, $events, $manager);
+        $connection->setTransactionManager($manager);
+        $connection->setEventDispatcher($observer);
+        try {
+            try {
+                $connection->beginTransaction();
+                $result = $work($observer);
+                // Ordinary committing listeners, the terminal proof, the physical commit, scoped after-commit callbacks
+                // and ordinary committed listeners all run inside this call.
+                $connection->commit();
+                $observer->requireProof();
+                ProductionFreeGrantException::require($connection->transactionLevel() === 0 && ! $primary->inTransaction(), 'outcome_unknown');
+
+                return $result;
+            } catch (Throwable $error) {
+                if ($observer->proved() && ! $primary->inTransaction()) {
+                    // The physical commit already happened; a later callback or check cannot un-write it.
+                    if ($connection->transactionLevel() !== 0) {
+                        $connection->setPdo($connection->getRawPdo());
+                    }
+                    throw $error instanceof ProductionFreeGrantException && $error->reason === 'outcome_unknown'
+                        ? $error : new ProductionFreeGrantException('outcome_unknown');
+                }
+                // A deadlock or lock wait timeout means the server rolled the frame back: nothing of it is durable.
+                $contended = self::contended($error) || ($error instanceof ProductionFreeGrantException && $error->reason === 'contention');
+                try {
+                    $rolledBack = $observer->abort();
+                } catch (Throwable) {
+                    throw new ProductionFreeGrantException('outcome_unknown');
+                }
+                if (! $rolledBack && $observer->began() && ! $contended) {
+                    // The owned frame was no longer ours to roll back: a callback's raw or implicit commit may already have
+                    // made this command's writes durable before the terminal proof. That is an unknown outcome, not a refusal.
+                    throw new ProductionFreeGrantException('outcome_unknown');
+                }
+                throw $error;
+            }
+        } finally {
+            if ($events === null) {
+                $connection->unsetEventDispatcher();
+            } else {
+                $connection->setEventDispatcher($events);
+            }
+            if ($original === null) {
+                $connection->unsetTransactionManager();
+            } else {
+                $connection->setTransactionManager($original);
+            }
+        }
     }
 }

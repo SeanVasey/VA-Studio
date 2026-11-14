@@ -1,0 +1,71 @@
+{
+  "reviewed_sha": "fd06135d0fb7510aad27d3450ff2bbd458a7071e",
+  "decision": "APPROVE DESIGN WITH CONDITIONS",
+  "scope": "narrow docs-only recheck of three prior required amendments and original factory/held-abandonment ownership edges",
+  "independent_non_author": true,
+  "clean_before_and_after": true,
+  "changed_paths": [
+    "docs/verification/paid-financial-retrieval-20261015/design-review-aa3d01ac-original.json",
+    "docs/verification/paid-financial-retrieval-20261015/design-review-aa3d01ac-original.md",
+    "docs/verification/paid-financial-retrieval-20261015/design.md"
+  ],
+  "design_sha256": "8770a276f0b3a729891f3406c2e1778b3ea72e32d99d780c0c843030f00de342",
+  "prior_review_preserved": {
+    "reviewed_sha": "aa3d01acdc8ae9fc5c3a05b98aba09b02a52de1f",
+    "decision": "REVISE BEFORE IMPLEMENTATION",
+    "sha256": {
+      ".md": "4914921d6956f7955c1babc942e418a304e854f0a578f61e7ef637950e66a7e8",
+      ".json": "51bd29c02ef714bc6e551ff43f20c9bb3df9985ecfaa5fa3d3d7202058cbd3fb"
+    }
+  },
+  "required_amendments_closed": [
+    {
+      "id": "D1",
+      "disposition": "satisfied as design",
+      "basis": "Own factories capture authentic matching original receipts; exact-class raw private observer metadata yields the existing equal effective deadline, no caller receipt or private mutation; every checkpoint uses that cap and any tighter original plan cap."
+    },
+    {
+      "id": "D2",
+      "disposition": "satisfied as design",
+      "basis": "Claim/attempt marked before work; finally drains remaining owned observations; refusal poisons/invalidates own observer before further metadata evaluation; explicit close and nonthrowing destructor; clone copy detached and reconstruction unowned; caller retains physical cleanup."
+    },
+    {
+      "id": "D3",
+      "disposition": "satisfied as design",
+      "basis": "Reject all admitted notice-header spellings before SDK return; exact raw slot entry/exit proof; actual SDK/error-handler/displacement sentinels; preserve existing unconditional saved-slot restoration and other callback-owned mutations."
+    }
+  ],
+  "implementation_acceptance_conditions": [
+    "Reject a pre-existing original receipt observer/cohort BEFORE either mint and before callback-capable extraction. Do not acquire its remaining slot, invalidate its receipts, replace its dispatcher or perform its physical cleanup. Test both source kinds with a genuine existing peer still usable afterward.",
+    "Maintain a plain original partial owner through factory mint failures. Only exact factory-created receipt/observer identities are settled; mixed or foreign cohorts refuse without disposal of peers. Existing V1 third-receipt failure can invalidate its shared observer, so prevention before mint is required, not catching the third-mint exception.",
+    "Held close/destructor and failed-factory settlement may poison/refuse own observations but cannot commit/rollback/abort/retry any physical frame. The caller retains exact original Source/frame/connection handles, cleans original frame after refusal and preserves reopened/peer frames. Tax keeps a poisoned physically-held fence; V1 follows its existing invalidation/restoration semantics. No equalized cleanup behavior or frozen helper repair claim.",
+    "A refused metadata context is never re-entered to perform normal proofs before own poison/invalidate; settlement failures stay suppressed behind the initiating redacted result. Conditional dispatcher restoration never overwrites a foreign replacement.",
+    "Raw reflection capture verifies exact receipt/observer classes, common Source/Reader/Observer/deadline and original cap; it neither mutates private fields nor creates source/time/commit authority. A callback-delay test must prevent the next GET after the effective source deadline.",
+    "Actual pinned-SDK notice and transport displacement tests must demonstrate no notice callback/unguarded following request, exact existing slot restoration, and terminal original receipt settlement.",
+    "Raw metadata/native peer and default-off/environment/credential/request/response limits from original design remain mandatory. Candidate remains unattested/providerAuthenticated=false with no effects."
+  ],
+  "planning_feasibility": "Two matching registered receipts can bracket the SDK gap under existing original observer/witness APIs without renewed source or frame. The authenticated raw deadline capture and new owned guards are feasible within separate module scope.",
+  "execution_limits": {
+    "new_product_code_reviewed": false,
+    "tests_executed": false,
+    "database_or_native_checks_executed": false,
+    "provider_or_network_operations": false,
+    "hosted_ci": false,
+    "shared_edits": false,
+    "new_passing_claim": false
+  },
+  "remaining_gates": [
+    "Actual frozen implementation source review against all above conditions.",
+    "Meaningful whole new SQLite selection, focused owned MySQL original commit/receipt/callback/lifetime/cleanup cases and original failure retention.",
+    "Exact scoped runtime/source/loader/carry evidence, sealed-candidate independent approval, cheap exact-head preflight, complete final inventory and expected-SHA merge.",
+    "Real authenticated provider/host/account/financial-write/durable ledger/refund-rights policy and full release acceptance remain separate gates."
+  ],
+  "read_commands": [
+    "git rev-parse HEAD",
+    "git status --short",
+    "git diff aa3d01acdc8ae9fc5c3a05b98aba09b02a52de1f..fd06135d0fb7510aad27d3450ff2bbd458a7071e -- docs/verification/paid-financial-retrieval-20261015/design.md",
+    "tail -n 58 docs/verification/paid-financial-retrieval-20261015/design.md"
+  ],
+  "preparation_failures_this_recheck": [],
+  "prior_preparation_limit": "Original aa3d nonexistent app/Infrastructure rg lookup exit2 remains recorded in unchanged prior decision; no application failure or new execution outcome is inferred."
+}

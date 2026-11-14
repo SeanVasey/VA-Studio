@@ -1,0 +1,107 @@
+{
+  "decision": "REVISE DESIGN BEFORE IMPLEMENTATION",
+  "review_kind": "independent preparatory B4 design feasibility, not PR126 source re-audit",
+  "draft_path": "/workspace/runtime/account-features-http-design-draft-20261015.md",
+  "draft_sha256": "e1ed807f5ade1e6572b03c818fb9a606847e1f06284acc3b938c3a6a746c57e9",
+  "inspected_dependency_head": "127c79a7dade4b4570927cdc752a4b5fc34c722a",
+  "earlier_inspected_dependency_head": "5490d000c0069cfc2451d619f5f2fe352736c153",
+  "current_head_when_artifact_written": "9cfe3a618e19557b95828d35c52a0e4d3622b44a",
+  "feasibility": "Sealed ProductionAccountFeatureAccess::forRequest with fixed listening_library/consent_preferences and existing production253 services supports a coherent seven-operation plus page HTTP composition, with no new schema/provider/authority/adoption or rule duplication.",
+  "concrete_api_facts": [
+    "Listening read/initialize/change return initialized flag with library projection; export returns exact-version own-data export directly. Consent read/initialize/change return initialized flag with preferences projection.",
+    "GET read of absent storage returns initialized=false and creates no binding. Explicit empty-object initialize is required.",
+    "ProductionCustomerSessions requires production marker binding_digest and current sealed principal; ordinary customer test principal cannot substitute.",
+    "IdentityPrivacy matches all customer paths and independently reads every POST with4096-byte cap. Prepending a16KiB middleware alone does not bypass this downstream cap.",
+    "Domain ProductionFeatureOperation has one original10-second budget beginning at operation entry, after forRequest identity work; includes domain callbacks/normal commit/postcommit read-only closure, not complete HTTP/host latency.",
+    "Current domain final IdentityCommittedFrame consumes its owned read-only frame before returning prebuilt plain projection; generic response()->json afterward may resolve application factories after that proof.",
+    "Shipped account parent disabled, listening promotion disabled, consent grants disabled/no notice; pending suppression is not provider-confirmed delivery."
+  ],
+  "required_design_amendments": [
+    {
+      "id": "B4-D1",
+      "topic": "Exact routes/body handoff/mount/cache",
+      "required": "Freeze disjoint route/verb/operation and success/error envelope map under selected production customer prefix, separate ordinary account listening/preferences routes. Add strict literal defaultfalse HTTP flag, route-cache rebuild plus stale-cache runtime refusal before identity/data work. Precisely define single raw-body capture and trusted one-use handoff so only exact mounted listening-change route gets16KiB and IdentityPrivacy does not reread/truncate it; all original identity and other POSTs retain4KiB. GET has empty body; initializer duplicate-free empty object; export exact integer version; fixed methods/no query/overrides/range/encoding/origin restrictions apply before service."
+    },
+    {
+      "id": "B4-D2",
+      "topic": "Root privacy and final HTTP release",
+      "required": "Use feature-specific root exception/report/forced-JSON/dontFlash ordering ahead of broad IdentityPrivacy, including preprivacy failures, real419/422/405/429/500/503, bounded allowlisted headers and no redirect/location/flash/rawbody/IDs. Specify response allocation/encoding/header work relative to domain final proof: preallocate callback-capable construction before domain or use retained original closure; afterward only validated plain native output/exact response operations may release bytes. Do not claim late-proof coverage from a domain array followed by response-factory callbacks. Original-owner-only cleanup, no blanket rollback/retry/compensation/restoration of foreign callback state."
+    },
+    {
+      "id": "B4-D3",
+      "topic": "Direct shared Identity metadata dependency",
+      "required": "Handle reached raw metadata family within this related batch: IdentityCommittedFrame connectionCurrent/birth and ProductionAccountFeatureAccess resolvedConnections/current/completed proofs, plus current ProductionCustomerAccess actor source/read. Admit raw Container/Facade/Repository/manager maps before offsets/resolvers; exact standard connection and native/internal/default-statement PDO before peer methods, raw config driver/name and database/prefix before getter/coercion; original manager/connection/PDO identity and peer state after callbacks. Admit exactUser raw attributes/original arrays, exists boolean and fixed ID metadata before Eloquent getters/casts. Choose bounded shared Identity admission/helper/call sites and genuine old/fixed sentinels; no new authority/clock/frame. IdentityOriginalCommitWitness and V1/generic source adapters are not reached by B4 feature operation and remain independently frozen unless deliberately added with direct evidence; membership P2 stays frozen. Do not mark whole shared ledger family repaired by a new HTTP guard."
+    },
+    {
+      "id": "B4-D4",
+      "topic": "Actual UI envelopes/policy/version/uncertainty",
+      "required": "Specify separate production initialized/envelope parsing, fixed paths and fresh opaque session/render scope; ordinary components hardcode legacy endpoints and assume direct library/preferences, so cannot be blindly reused. Account/logout/scope change discards pending/loaded private data and revokes export URLs; no raw account/principal IDs, storage or automatic grant/init/retry. Timeout/error/abort after mutation marks result unknown and blocks new mutation until fresh authoritative read; stale409 does not silently resend. Show unavailable-track placeholders; notes only when existing schema/rollout permits, without promoting v2. Affirmative grant only existing canGrant+exact notice version/hash and new explicit confirmation; current defaults unavailable, unknown stays unknown, suppression pending never confirmed. Bound listening/export3MiB and small consent responses on wire, parse strictly and preserve own minimized exact-version export. Preserve domain original10-second cap and explicitly exclude prior identity/middleware/I/O overhead from its timing claim."
+    }
+  ],
+  "appropriate_batch_scope": "New production HTTP controller/body/privacy/mount/page/components/tests plus coordinated root/IdentityPrivacy/account HTTPflag/CI selection. Related Identity metadata correction and regressions belong in same reviewed batch. No root activation/provider/schema/frozen brand/SDK/customer import/legacy adoption or commercial effects.",
+  "required_acceptance_controls": [
+    "Genuine production identity enrollment/sign-in marker through actual root/bootstrap/session path; defaultfalse/truthy-nonboolean/stale routecache refusal with no domain/identity query claim beyond captured fixture scope.",
+    "16KiB exact and+1 listening,4KiB exact/+1 other paths, original sign-in/request remain4KiB, JSON duplicate/escaped keys/array/scalar/depth/numeric version/GET body/method override/query/encoding/origin refusal; no second body parse.",
+    "ActualCSRF enforcement defeating unit bypass: valid session/cookie token, absent/invalid token and rotated old/new token; reusing a currently valid CSRF token is not inherently forbidden one-use replay.",
+    "Preprivacy/root exceptions debugtrue: fixed class-only logging, private JSON boundedheaders/noLocation/flash/body/origin/account/recipient/principal sentinels.",
+    "Read absent storage no DML, explicit closed-empty initialize, staleversion and exactversion export; no adoption of legacy/listening/consent rows or foreign/test principal.",
+    "Real Saved/decrypt/TransactionCommitting/afterCommit/response-construction policy/owner/key/metadata changes; no stale successful response, original physical cleanup, foreign reopened frame/peer/dispatcher preservation, readback of possibly durable mutation without resend.",
+    "Genuine old-source raw map/Facade/connection/PDO subclass/statement/model attribute sentinels before reached offset/method/coercion plus supported standard normal positives; preserve original domain budgets/deadlines.",
+    "Frontend initialized/uninitialized/unknown/withdrawn/grantdisabled/unavailabletrack/notesdisabled/versionconflict/unknownmutation/exportminimization; abort pageexit/scopechange/late response/UTF8/malformed/oversize, keyboard/error-state accessibility and URL cleanup.",
+    "Meaningful focused privateMySQL owner/current/ordinarycommit/postcommit/nativeframe controls for changed shared guard composition; SQLite/browser proof remains bounded, no concurrency/host/performance claim.",
+    "Actual frozen source independent review, scoped local evidence and cheap exacthead preflight/inventory/expectedSHA development merge after amended design and actualPR126 dependency integration."
+  ],
+  "planning_limits": {
+    "new_product_code": false,
+    "app_tests_or_php_diagnostics_by_reviewer": false,
+    "database_native_network_provider_CI_by_reviewer": false,
+    "shared_edits": false,
+    "implementation_acceptance": false,
+    "currentPR126_review_reopened": false
+  },
+  "dependency_file_sha256": {
+    "routes/production-customer-identity.php": "2f9b3f7f03d50a3c8930f52a6d8187e533ead4d1c0acb1c156b2c8c161abca43",
+    "routes/web.php": "70021f63b4b755380a332d597a5fe186ef421a682ec41bf9bcf5c06f4cd60324",
+    "bootstrap/app.php": "9682fbe3ded094d4867e108848eeb18e4058dab9957f9e5bdb3eaa4ed1dd7f70",
+    "config/production-account-features.php": "f047846aa1741219effcc5db44896e836fed17599dcb3c23a0bb78f92330483a",
+    "config/production-customer-listening.php": "2ceb79c5f6ed3411a7eb5411680b55a6fcde98f968182138afa309089b945826",
+    "config/production-customer-preferences.php": "ecc9017cb2265f5e7d7ddab5c8e45ca664964270f5a2c97c917628e7b143a582",
+    "app/Http/Middleware/ProductionIdentity/IdentityPrivacy.php": "4c4d7a232282d9edd621ffff6b129b53468a8263e84d853b0077e4766bc307f6",
+    "app/Http/Requests/ProductionIdentity/IdentityBody.php": "09c14e6ccd9edf02d413cdad03238b5d82dbf704a22fb8bbb0638f81846575e1",
+    "app/Domain/Customers/ProductionIdentity/ProductionCustomerSessions.php": "73efe65ab06626178fc1aa6ecd6ff426b30a04d58acd68b164acaa31c9a5d1d6",
+    "app/Domain/Customers/ProductionIdentity/Features/ProductionAccountFeatureAccess.php": "7b47e7ae6617581d18d25687e35ea28d6804394ead13550555b81b7a91f02fd6",
+    "app/Domain/Customers/ProductionIdentity/Features/ProductionAccountFeatureIdentity.php": "940a64d2f0bc9f0f60719a38fa4436fcfcca5ecbc81e059f4b5130e37c5a2ad7",
+    "app/Domain/Customers/ProductionIdentity/Features/ProductionAccountFeaturePolicy.php": "6438997b0e13e2b8e7b39b43ab983ace8151bf2bd3d08164e78ed0a32213001e",
+    "app/Domain/Customers/ProductionCustomerAccess.php": "f0fc0b70a058954ecc0c2853b0836af547b5f4cd4654d1ba71116a03d18b20f7",
+    "app/Domain/Customers/ProductionCustomerPrincipal.php": "d49b587d1a4c22bda4797b90c65d15ee0e41f3fb3a01dda5a599bb817425457b",
+    "app/Domain/Customers/ProductionIdentity/IdentityCommittedFrame.php": "65098069d146e0c4a437acefd672f29ac43e7181541a545c97c3c007cdea8126",
+    "app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php": "14aea5dc3d5220cf493fe63348e2c7f440c4accdba73838111d9f79f75daf1ce",
+    "app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php": "841c2c7b7f5b44f6808dec09e53007168468773995f96ee2c5e92e8b2c91b1bd",
+    "app/Domain/Customers/ProductionFeatures/ProductionFeatureContext.php": "aacbf0c04bb6b55704a0772927e3c88f2fe36389e2a3d8ff790c12da9f186db9",
+    "app/Domain/Customers/ProductionFeatures/ProductionFeatureTransaction.php": "c20a3cc8c7c2e0ad681d2a4eb01efcfe30f4ec3711fc502a9751fe6fd3cc9797",
+    "app/Domain/Customers/ProductionFeatures/ProductionFeatureTransactionObserver.php": "d48288131d585653614c23b6d635d169fc882e933e86d87965660fd90d196f2e",
+    "app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php": "cc097ab23f579485661260fed613b1f57edd83c000e538b6a36cec7acdffb716",
+    "app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php": "56233c910f3db0e6304bd7f14fcd58e5e3faa7027d741587ec608a30880c9796",
+    "app/Http/Controllers/CustomerListeningLibraryController.php": "5be8b7f9e5ee70ccb11f8c8dc1f0b03667cfa868cbe1f1594941c20d48a06d40",
+    "app/Http/Controllers/CustomerCommunicationPreferencesController.php": "65c6abfab2a221169442bf4a7d3079b3abf250eb00589e5906b7fdf7288206d6",
+    "app/Http/Requests/CustomerListeningRequest.php": "570a20e18e45ddc630bc19612d1f8f68ea06dbe0ae039dc797d3ed9986713048",
+    "app/Http/Requests/CustomerCommunicationPreferencesRequest.php": "483918eb02c2ea8c293389fa4f533886bfa49ff9ba2185ea2af0b9adfa3a266e",
+    "resources/js/components/CustomerListeningLibrary.tsx": "9dd0f16c4d50be3c785a2dfcd6e81590b7bdda9a69398c29243484a29893a06a",
+    "resources/js/components/CustomerCommunicationPreferences.tsx": "426fc857ff87c1b8d85b3a1ab54ef2eb2cc0223cad9a14fdf514a9693f53324f"
+  },
+  "reviewer_read_record": [
+    "Read/hash runtime B4 draft; current Git HEAD/status",
+    "Read selected ProductionAccountFeatureAccess/Identity/Policy and ProductionFeature context/operation/transaction/observer/configuration",
+    "Read selected root/IdentityPrivacy/body/session/principal/current-access/IdentityCommittedFrame and exact identity routes",
+    "Read production listening/consent public APIs/projections and ordinary controller/request/UI patterns",
+    "Read frozen shared metadata P2 ledger entry and classify directly reached versus unwrapped V1/generic scope"
+  ],
+  "reviewer_preparation_failures": [
+    {
+      "exit": 1,
+      "command": "cat config/production-features.php within independent source-read batch",
+      "reason": "Guessed config filename absent; later read actual production-account-features/production-customer-listening/production-customer-preferences paths. No application execution or failure inferred."
+    }
+  ],
+  "status": "Planning REVISE, original draft remains unchanged. Root may amend/freeze next branch after actual PR126 merge; later source/native/final review required."
+}

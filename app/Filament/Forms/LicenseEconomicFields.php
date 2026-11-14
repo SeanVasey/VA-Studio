@@ -46,7 +46,7 @@ final class LicenseEconomicFields
             ])->columns(2)->columnSpanFull()->helperText('Each key must be referenced above. Policy identity belongs to this license version; the server hashes its exact text. Include {{policy_texts}} exactly once in the source. Review all policy text and generated declarations together.');
 
         return Section::make('Ownership and economic policies')->description('Choose every declaration explicitly. No production rates, ownership allocations or policy approvals are supplied by the editor.')
-            ->schema($fields)->columns(2)->columnSpanFull()->visible(fn (Get $get) => (int) $get('structured_terms.schema_version') === 4);
+            ->schema($fields)->columns(2)->columnSpanFull()->visible(fn (Get $get) => in_array((int) $get('structured_terms.schema_version'), [4, 5], true));
     }
 
     private static function basisPoints(string $path, string $label): TextInput

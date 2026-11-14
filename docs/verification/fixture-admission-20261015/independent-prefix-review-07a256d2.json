@@ -1,0 +1,123 @@
+{
+  "conditions": [
+    "Import the actual failed preflight/reproduction/corrected receipts and this original decision; obtain an independent exact committed documentation-head carry.",
+    "Require a fresh cheap preflight on the final corrected head, complete current review/check/protection inventory and expected-head merge.",
+    "All native lifecycle/F2/counterpart/host/session/provider/activation/release and prior residual conditions remain open."
+  ],
+  "corrected_originals": [
+    {
+      "argv": [
+        "python3",
+        "scripts/ci/test-focused-tests.py"
+      ],
+      "exit": 0,
+      "json_sha256": "57d044d8651b64fc7a9bb3ef30fad4dae5611307d05130d1bcfcc23d20f26ea5",
+      "log_sha256": "997f45f538da74c2561695b6228c06ef06484bc2f0d022f3b813673ceeddd3e3",
+      "name": "focused-selection-prefix-corrected-original",
+      "stable_reviewed_head": true,
+      "tests": 50
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/ci/test-phpunit-shards.py"
+      ],
+      "exit": 0,
+      "json_sha256": "99a7145eaf017bab708dd8e4e2537ec7a96c53b5eb0a9aa4a5ec102c6af08920",
+      "log_sha256": "91be496a651224f62ce893bcbca2469129251d6616fdcf11472b17291db4e8c1",
+      "name": "shard-policy-prefix-corrected-original",
+      "stable_reviewed_head": true,
+      "tests": 52
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/ci/test-php-test-runtime.py"
+      ],
+      "exit": 0,
+      "json_sha256": "b2356b628d7c9d9a2c5f3300fc306fcab7d08221aa316dfd25d90a6322e1de72",
+      "log_sha256": "347d0183c05be0639e5f61e6026f79ced583c94234c0f091d86d566bc9bcb915",
+      "name": "php-runtime-activated-original",
+      "stable_reviewed_head": true,
+      "tests": 5
+    }
+  ],
+  "decision": "APPROVE_NARROW_SKIP_PREFIX_CORRECTION_AND_SOURCE_EVIDENCE_CARRY_NATIVE_LIFECYCLE_OPEN",
+  "derived_appendix": {
+    "all_members_match_runtime_originals": true,
+    "bytes": 8548,
+    "index_sha256": "d7065c57102a9728781535684015ec86ab4cd9e882fa49a9d28fb219476f4b9a",
+    "member_count": 8,
+    "private_signed_log_fetch_metadata_hashes_verified": 2,
+    "sha256": "09621ff23038d6071824399157ba14111a07b89cbd26b6cd5fd936544b20e5ba",
+    "status": "Uncommitted derived appendix inspected by bytes; final committed docs-head carry still required"
+  },
+  "local_old_reproduction": {
+    "receipt_sha256": "ca98d24bb0ba90027ae4923e37ac54e4243f13372ee7ea3c07c1b2ce5c1321de",
+    "runtime_classification": "PHP absent from local PATH; does not identify the CI cause",
+    "selection_exit": 1,
+    "selection_failures": 1,
+    "selection_tests": 50,
+    "separate_php_runtime_exit": 1,
+    "separate_php_runtime_failures": 4,
+    "separate_php_runtime_tests": 5
+  },
+  "native_lifecycle_status": "Current whole4/8/E4 and matching prior default1/2/E1 remain failed/open; only one prior dataset timeout supported, no native lifecycle/full F2/host claim.",
+  "open_p0": 0,
+  "open_p1": 0,
+  "original_main_reference_sha": "f3b00476218e54f45ad1ee435e0fc5de115d717b",
+  "policy": {
+    "appended_existing_f2_methods": [
+      [
+        "Tests\\Feature\\FixtureDatabaseAdmissionNativeTest",
+        "test_actual_use_of_another_owned_schema_refuses_despite_unchanged_configuration"
+      ],
+      [
+        "Tests\\Feature\\FixtureDatabaseAdmissionNativeTest",
+        "test_an_actual_sqlite_pdo_cannot_supply_native_mysql_identity"
+      ],
+      [
+        "Tests\\Feature\\FixtureDatabaseAdmissionNativeTest",
+        "test_an_alias_of_the_selected_native_database_is_admitted"
+      ],
+      [
+        "Tests\\Feature\\FixtureDatabaseAdmissionNativeTest",
+        "test_captured_testing_selection_survives_deliberate_product_route_boot_modes"
+      ],
+      [
+        "Tests\\Feature\\FixtureDatabaseAdmissionNativeTest",
+        "test_ci_declaration_uses_external_testing_even_in_a_production_boot_fixture"
+      ]
+    ],
+    "assertion_script_unchanged": true,
+    "method_set_unchanged_from_failed_head": true,
+    "original_method_order_preserved": 260,
+    "path": "scripts/ci/database-sqlite-skips.json",
+    "pinned_first_150_sha256": "d93da4e7a13a8c6aff8f97f363eb6d93dde884bad53c9ae50eeb0ed32514c71c",
+    "source_policy_sha256": "1bf3b0e6c962c6ffbde6a625790ba6b39af55d4a7aba78ca555f4589839bc596",
+    "total_methods": 265
+  },
+  "preparation_errors": [
+    "Two initially guessed safeguard-script paths were absent; actual test-focused-tests.py and test-php-test-runtime.py were read from the original argv.",
+    "The new appendix uses correction_archive_members, rather than the original packet members mapping; a reviewer KeyError was corrected using its actual schema. No application test or original changed."
+  ],
+  "previous_approved_publication_sha": "5ef21c28d82a56197469d1222bf119b93aac9c41",
+  "real_preflight_failure": {
+    "backend_failed_step": "Verify CI routing and focused-selection safeguards",
+    "conclusion": "failure",
+    "head": "5ef21c28d82a56197469d1222bf119b93aac9c41",
+    "not_readiness_cancellation_artifact": true,
+    "receipt_sha256": "ec84598ba8ecebf0c3a3db0f04aecfab0d421f455ada983cf7182f96645c2703",
+    "run": 38821013983
+  },
+  "required_corrections": [],
+  "review_execution": "Read-only immutable diff/policy/order/hash and existing original receipt inspection. No duplicate application/native tests, DB/network/CI action or shared edits; only this exclusive reviewer report pair created.",
+  "reviewed_sha": "07a256d2bc6acd576b4e4eae6c3462da6f110859",
+  "reviewed_utc": "2026-10-15T23:12:45.155540+00:00",
+  "scope": "Single policy JSON order correction, preserved original method set/order/pinned prefix and existing tested source/evidence carry",
+  "source_carry": "Only database-sqlite-skips.json changes. Application/PHP/tests/workflows and original archive/index are unchanged; whole input-manifest equality is not claimed.",
+  "unchanged_archive_index_git_blobs": {
+    "focused-evidence-index.json": "2e9f5de27b67dc091f0b926c69e1b1a03b785efd",
+    "focused-evidence.zip": "be957451a60ee10a21b5b77d30f077a0669c481e"
+  }
+}

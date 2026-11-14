@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Unit\MemberOriginalRenderInputTest" file="/workspace/VA-Studio-member-original-renderer/tests/Unit/MemberOriginalRenderInputTest.php" tests="1" assertions="1" errors="0" failures="1" skipped="0" time="0.002030">
+    <testcase name="test_caller_held_nested_references_cannot_change_validated_values_or_returned_projections" file="/workspace/VA-Studio-member-original-renderer/tests/Unit/MemberOriginalRenderInputTest.php" line="26" class="Tests\Unit\MemberOriginalRenderInputTest" classname="Tests.Unit.MemberOriginalRenderInputTest" assertions="1" time="0.002030">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Unit\MemberOriginalRenderInputTest::test_caller_held_nested_references_cannot_change_validated_values_or_returned_projections
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'6830068a63cf89445c333664e997f134b7c6039d685fdc6c9fe8a5c008c44dbb'
++'9ca2cb09a9eb7e2c1c155e212c712d4c94a4bd0bcd9916ac02bbc9a195fed424'
+
+/workspace/VA-Studio-member-original-renderer/tests/Unit/MemberOriginalRenderInputTest.php:40</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

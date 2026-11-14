@@ -1,0 +1,21 @@
+packages CHANGED laravel/framework v13.36.0 (e5626e38) -> v13.37.0 (685f8d6c)
+records 158 -> 158
+content-hash same: True
+unchanged-check filament/actions v5.8.4 v5.8.4 OK
+unchanged-check filament/filament v5.8.4 v5.8.4 OK
+unchanged-check filament/forms v5.8.4 v5.8.4 OK
+unchanged-check filament/infolists v5.8.4 v5.8.4 OK
+unchanged-check filament/notifications v5.8.4 v5.8.4 OK
+unchanged-check filament/query-builder v5.8.4 v5.8.4 OK
+unchanged-check filament/schemas v5.8.4 v5.8.4 OK
+unchanged-check filament/support v5.8.4 v5.8.4 OK
+unchanged-check filament/tables v5.8.4 v5.8.4 OK
+unchanged-check filament/widgets v5.8.4 v5.8.4 OK
+unchanged-check livewire/livewire v4.4.6 v4.4.6 OK
+unchanged-check tecnickcom/tc-lib-pdf 8.76.3 8.76.3 OK
+unchanged-check tecnickcom/tc-lib-pdf-font 4.4.1 4.4.1 OK
+unchanged-check stripe/stripe-php v21.3.2 v21.3.2 OK
+unchanged-check phpunit/phpunit 12.5.34 12.5.34 OK
+unchanged-check symfony/console v7.4.20 v7.4.20 OK
+absent-check composer/class-map-generator False False
+absent-check composer/pcre False False

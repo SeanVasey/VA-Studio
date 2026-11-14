@@ -1,0 +1,28 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: <scratch>/baseline/phpunit.xml
+
+E                                                                   1 / 1 (100%)
+
+Time: 05:13.610, Memory: 95.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\ProductionMemberGrants\MemberGrantActivationIntegrationTest::test_independent_confirmations_of_the_same_intent_return_the_first_retained_effect
+App\Domain\Memberships\Production\MembershipException: Production membership preparation unavailable.
+
+<scratch>/baseline/app/Domain/Memberships/Production/MembershipReservationOperations.php:172
+<scratch>/baseline/app/Domain/Memberships/Production/MembershipReservationOperations.php:63
+<scratch>/baseline/app/Domain/Memberships/Production/MembershipReservationOperations.php:38
+<scratch>/baseline/tests/Support/MembershipReservationFixtures.php:105
+<scratch>/baseline/tests/Support/MemberActivationFixtures.php:65
+<scratch>/baseline/tests/Feature/ProductionMemberGrants/MemberGrantActivationIntegrationTest.php:114
+<scratch>/baseline/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 1, Assertions: 9, Errors: 1.
+
+real	5m13.809s
+user	0m12.342s
+sys	0m3.609s

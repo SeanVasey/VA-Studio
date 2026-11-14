@@ -23,7 +23,7 @@
 #      qpdf, poppler-utils, util-linux (prlimit), supervisor, rsync, Node 24 for the build
 #   2. ClamAV: freshclam enabled and current; the unused clamd stopped (clamscan is the configured engine)
 #   3. tool checks: required ffmpeg encoders, prlimit limits, signature age
-#   4. private directories with modes; nginx FastCGI temp path (private, 0700)
+#   4. private directories with modes; nginx FastCGI temp path (private, 0700); the dedicated build account
 #   5. MySQL: schema, least-privilege app account, backup-only account, binlog trigger setting
 #   6. PHP-FPM pools (default + paid-delivery), supervisor workers + scheduler, sudoers, backup cron, logrotate
 #   7. basic-auth file, probe credentials, rendered nginx site for Forge
@@ -164,7 +164,12 @@ APP_HOME=$(getent passwd "$APP_USER" | cut -d: -f6)
 MIRROR=${MIRROR:-$APP_HOME/$HOST}
 KIT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)
 for f in nginx/vasey-staging.conf php-fpm/vasey-staging.conf php-fpm/vasey-paid-delivery.conf \
-         workers/vasey-staging-workers.conf bin/vasey-staging-ctl backup.sh normalize-mysql-dump.py seal-release.py validate-runtime.php release-step.sh; do
+         workers/vasey-staging-workers.conf bin/vasey-staging-ctl backup.sh scheduler-watch.sh normalize-mysql-dump.py seal-release.py validate-runtime.php release-step.sh; do
+  [ -f "$KIT/$f" ] || die "kit file missing: ops/staging/$f"
+done
+[ -f "$KIT/tls/origin-ca.pem" ] || die "kit file missing: ops/staging/tls/origin-ca.pem"  # the probe's pinned Origin CA roots
+[ -f "$KIT/private-snapshot.py" ] || die "kit file missing: ops/staging/private-snapshot.py"  # the backup's private-store tree
+for f in nginx/vasey-staging-http.conf nginx/vasey-staging-classic.conf; do  # the http-level helpers and the whole-file wrapper
   [ -f "$KIT/$f" ] || die "kit file missing: ops/staging/$f"
 done
 
@@ -189,7 +194,8 @@ swap_kib=$(awk '/^SwapTotal:/{print $2}' /proc/meminfo)
 
 # ---------------------------------------------------------------- 1. packages
 if [ "$SKIP_PACKAGES" = 0 ]; then
-  apt-cache policy "php$PHPV-fpm" | grep -q 'Candidate: [0-9]' \
+  # Not `grep -q`: it exits at the first match, apt-cache then dies of SIGPIPE and pipefail fails the check.
+  apt-cache policy "php$PHPV-fpm" | grep 'Candidate: [0-9]' >/dev/null \
     || die "php$PHPV packages unavailable: create the Forge server with PHP 8.4 (it adds the ondrej/php repository)"
   apt-get update -q
   apt-get install -y -q --no-install-recommends \
@@ -221,13 +227,16 @@ command -v npm >/dev/null || die "npm missing"
 command -v composer >/dev/null || die "composer missing (Forge installs Composer 2)"
 command -v python3 >/dev/null || die "python3 missing (restore schema comparison requires it)"
 [ -x "$PHP_BIN" ] && [ -x "$FPM_BIN" ] || die "PHP $PHPV CLI or FPM missing"
+# composer.json requires php ^8.4.1 (composer.lock platform 8.4.1): an older 8.4.0 fails `composer install` in the middle of a deploy.
+"$PHP_BIN" -r 'exit(version_compare(PHP_VERSION, "8.4.1", ">=") ? 0 : 1);' \
+  || die "PHP $("$PHP_BIN" -r 'echo PHP_VERSION;') is older than 8.4.1, which composer.json requires; update PHP 8.4 in Forge (Server, PHP, Update)"
 
 # Extensions vasey:doctor requires (php_runtime) plus what CI installs (final-verification.yml) and the workers need.
 for ext in pdo pdo_mysql pdo_sqlite mbstring intl bcmath gd fileinfo zip curl dom xml xmlwriter posix pcntl ctype iconv tokenizer openssl; do
-  "$PHP_BIN" -m | grep -qix "$ext" || die "PHP CLI extension missing: $ext"
+  "$PHP_BIN" -m | grep -ix "$ext" >/dev/null || die "PHP CLI extension missing: $ext"
 done
 for ext in pdo_mysql pdo_sqlite mbstring intl bcmath gd fileinfo zip curl dom xml posix ctype iconv; do
-  "$FPM_BIN" -m 2>/dev/null | grep -qix "$ext" || die "PHP-FPM extension missing: $ext"
+  "$FPM_BIN" -m 2>/dev/null | grep -ix "$ext" >/dev/null || die "PHP-FPM extension missing: $ext"
 done
 info "PHP $("$PHP_BIN" -r 'echo PHP_VERSION;') with required extensions; node $nv"
 
@@ -240,7 +249,7 @@ for e in libmp3lame pcm_s16le png mjpeg libwebp; do
   grep -Eq "^ [AVS][F.][S.][X.][B.][D.] +$e( |$)" <<<"$encoders" || die "ffmpeg lacks the $e encoder (vasey:doctor media_encoders)"
 done
 # The app runs clamscan under a 3 GiB address-space cap and media tools under 2 GiB (config/media.php).
-/usr/bin/prlimit --as=3221225472 --cpu=180 --fsize=1342177280 -- /bin/true || die "prlimit cannot apply the scanner limits"
+/usr/bin/prlimit --as=3221225472 --cpu=180 --fsize=2146435072 -- /bin/true || die "prlimit cannot apply the scanner limits"
 /usr/bin/prlimit --as=2147483648 --cpu=90 -- /usr/bin/ffprobe -version >/dev/null || die "ffprobe does not run under the media limits"
 info "ffmpeg/ffprobe encoders, prlimit limits, qpdf and poppler present"
 
@@ -255,7 +264,11 @@ if [ ! -s /var/lib/clamav/daily.cvd ] && [ ! -s /var/lib/clamav/daily.cld ]; the
 fi
 systemctl enable --now clamav-freshclam >/dev/null
 # clamd is not used (the configured engine is clamscan) and would hold ~1 GiB resident.
-if systemctl list-unit-files clamav-daemon.service >/dev/null 2>&1; then systemctl disable --now clamav-daemon >/dev/null 2>&1 || true; fi
+# Stop an unused clamd, but never one the opt-in profile in ops/clamav/ configured (the marker is its exact first line), so
+# re-provisioning does not undo that opt-in.
+if [ "$(head -n 1 /etc/clamav/clamd.conf 2>/dev/null)" != '# VASEY.AUDIO clamd profile' ] && systemctl list-unit-files clamav-daemon.service >/dev/null 2>&1; then
+  systemctl disable --now clamav-daemon >/dev/null 2>&1 || true
+fi
 newest=$(find /var/lib/clamav -maxdepth 1 \( -name 'daily.c[lv]d' -o -name 'main.c[lv]d' \) -printf '%T@\n' | sort -rn | head -1)
 age=$(( $(date +%s) - ${newest%.*} ))
 [ "$age" -lt 172800 ] || warn "newest ClamAV daily signature file is $((age / 3600)) h old; the app refuses > 48 h"
@@ -266,6 +279,12 @@ runuser -u "$APP_USER" -- test -r /var/lib/clamav/daily.cvd -o -r /var/lib/clama
 install -d -m 0755 -o root -g root "$ROOT"
 install -d -m 0755 -o root -g root "$ROOT/releases"
 install -d -m 0700 -o root -g root "$ROOT/backups"
+# The nginx.org packages Forge installs keep their own temp paths under /var/cache/nginx and ship no
+# /var/lib/nginx (Ubuntu's package does). The site's fastcgi_temp_path lives below it, so create the
+# root-owned parent when absent; an existing one must already be a root-owned real directory.
+[ -e /var/lib/nginx ] || install -d -m 0755 -o root -g root /var/lib/nginx
+[ -d /var/lib/nginx ] && [ ! -L /var/lib/nginx ] && [ "$(stat -c %u /var/lib/nginx)" = 0 ] \
+  || die "/var/lib/nginx must be a root-owned directory, not a symlink"
 # App/nginx-owned paths can be replaced by those identities on a rerun. Never grant permissions
 # through a pathname below them: every child opens no-follow relative to a retained directory FD.
 initialize_runtime_directories
@@ -292,6 +311,50 @@ for file in /etc/vasey-staging/writer.lock /etc/vasey-staging/writer-admission; 
     || die "untrusted staging writer admission"
 done
 info "directories under $ROOT ready (private 0700 $APP_USER)"
+
+# The dedicated build account: the deploy builds each release as this account, before the quiesce, in a slot the
+# application can neither traverse nor write, and seals it before the application can touch it (docs/ops/staging-runbook.md
+# section 8). No login shell, no password, no sudo, no cron or at jobs, a group of its own that the application is not in,
+# and no read access to the application's environment, evidence, private store or credentials.
+BUILD_USER=vasey-staging-build
+if ! getent passwd "$BUILD_USER" >/dev/null; then
+  ! getent group "$BUILD_USER" >/dev/null || die "group $BUILD_USER exists without its account; inspect it, remove it, then re-run"
+  useradd --system --user-group --no-create-home --home-dir /nonexistent --shell /usr/sbin/nologin \
+    --comment "VASEY.AUDIO release builder" "$BUILD_USER"
+  info "created the build account $BUILD_USER"
+fi
+usermod --lock "$BUILD_USER" >/dev/null 2>&1 || true
+BUILD_UID=$(id -u "$BUILD_USER") BUILD_GID=$(id -g "$BUILD_USER")
+[ "$BUILD_UID" -gt 0 ] && [ "$BUILD_UID" != "$(id -u "$APP_USER")" ] || die "$BUILD_USER must be nonroot and not $APP_USER"
+[ "$BUILD_GID" -gt 0 ] && [ "$BUILD_GID" != "$(id -g "$APP_USER")" ] && [ "$(id -G "$BUILD_USER")" = "$BUILD_GID" ] \
+  || die "$BUILD_USER must belong to its own group only"
+for gid in $(id -G "$APP_USER"); do
+  [ "$gid" != "$BUILD_GID" ] || die "$APP_USER must not be a member of $BUILD_USER's group"
+done
+case "$(getent passwd "$BUILD_USER" | cut -d: -f7)" in
+  /usr/sbin/nologin|/sbin/nologin|/bin/false|/usr/bin/false) ;;
+  *) die "$BUILD_USER must have no login shell" ;;
+esac
+! sudo -n -l -U "$BUILD_USER" 2>/dev/null | grep 'may run the following' >/dev/null || die "$BUILD_USER must not have sudo rights"
+for deny in /etc/cron.deny /etc/at.deny; do
+  [ ! -L "$deny" ] || die "$deny must not be a symlink"
+  [ -e "$deny" ] || install -m 0644 -o root -g root /dev/null "$deny"
+  grep -qxF -- "$BUILD_USER" "$deny" || printf '%s\n' "$BUILD_USER" >> "$deny"
+done
+install -d -m 0770 -o root -g "$BUILD_GID" "$ROOT/build"
+runuser -u "$BUILD_USER" -- env -i PATH=/usr/local/bin:/usr/bin:/bin sh -c \
+  'command -v composer && command -v npm && command -v node && command -v git' >/dev/null \
+  && runuser -u "$BUILD_USER" -- test -x "$PHP_BIN" || die "$BUILD_USER cannot run composer, npm, node, git or $PHP_BIN"
+# The build runs as a transient systemd unit that hides /home, /root and /run/user (vasey-staging-ctl build_in_unit): the
+# kit root and every build tool must live outside them (a per-user nvm or Composer install would vanish inside the unit).
+[ -d /run/systemd/system ] && [ -f /sys/fs/cgroup/cgroup.controllers ] && command -v systemd-run >/dev/null \
+  || die "the build account needs systemd as init with cgroup v2 (systemd-run)"
+for tool in composer npm node git "$PHP_BIN"; do
+  resolved=$(readlink -f -- "$(PATH=/usr/local/bin:/usr/bin:/bin command -v "$tool")")
+  case "$resolved/" in /home/*|/root/*|/run/user/*) die "$tool resolves to $resolved, which the build unit cannot see" ;; esac
+done
+case "$ROOT/" in /home/*|/root/*|/run/user/*) die "the kit root $ROOT must not be under /home, /root or /run/user" ;; esac
+info "build account $BUILD_USER ready (build area $ROOT/build root:$BUILD_USER 0770)"
 
 # ---------------------------------------------------------------- 5. MySQL
 MYSQL=(mysql --protocol=socket -uroot)
@@ -404,7 +467,7 @@ mysql_q "GRANT SELECT, SHOW VIEW, TRIGGER, LOCK TABLES, EVENT ON \`$DB_NAME\`.* 
 mysql_q "GRANT SHOW_ROUTINE ON *.* TO 'vasey_backup'@'127.0.0.1'"
 
 # Binary logging stays on (point-in-time recovery). With it on, MySQL refuses CREATE TRIGGER from an account
-# without SUPER (error 1419). The migrations create ~567 triggers, so allow trusted trigger creators instead
+# without SUPER (error 1419). The migrations create 618 triggers (at 34562862), so allow trusted trigger creators instead
 # of granting SUPER: binlog_format is ROW, so the statement-replay risk this guard exists for does not apply,
 # and only vasey_app holds TRIGGER. Deprecated in 8.4 (warning 1287) but still effective; persisted.
 if [ "$(mysql_q 'SELECT @@log_bin')" = 1 ]; then
@@ -412,7 +475,21 @@ if [ "$(mysql_q 'SELECT @@log_bin')" = 1 ]; then
   mysql_q "SET PERSIST log_bin_trust_function_creators = ON" 2>/dev/null
   [ "$(mysql_q 'SELECT @@global.log_bin_trust_function_creators')" = 1 ] || die "could not set log_bin_trust_function_creators"
 fi
-mysql_q "SELECT @@bind_address" | grep -Eq '^(127\.0\.0\.1|localhost|::1)$' \
+# The identity layer admits its metadata companion connection only when PROCESSLIST names the client by a literal IP
+# (CatalogSocketBinding). With host-name resolution on (MySQL's default), a 127.0.0.1 client appears as localhost:<port>
+# and every identity migration and request refuses ("Current private catalog admission required"). Accounts here are
+# addressed by IP, % or localhost only, so resolving names is not needed. skip_name_resolve is read-only at runtime:
+# persist it and restart mysqld once; reruns find it already on and do nothing.
+if [ "$(mysql_q 'SELECT @@skip_name_resolve')" != 1 ]; then
+  named=$(mysql_q "SELECT COUNT(*) FROM mysql.user WHERE host NOT IN ('%','localhost') AND host NOT REGEXP '^[0-9.%]+$' AND host NOT LIKE '%:%'")
+  [ "$named" = 0 ] || die "MySQL accounts addressed by host name exist; resolve them before enabling skip_name_resolve"
+  mysql_q "SET PERSIST_ONLY skip_name_resolve = ON"
+  systemctl restart mysql
+  for _ in $(seq 1 60); do mysql_q 'SELECT 1' >/dev/null 2>&1 && break; sleep 1; done
+  [ "$(mysql_q 'SELECT @@skip_name_resolve')" = 1 ] || die "skip_name_resolve did not take effect after restarting MySQL"
+  info "MySQL skip_name_resolve enabled (persisted; mysqld restarted once)"
+fi
+mysql_q "SELECT @@bind_address" | grep -E '^(127\.0\.0\.1|localhost|::1)$' >/dev/null \
   || warn "MySQL bind_address is $(mysql_q 'SELECT @@bind_address'); keep port 3306 closed in the Forge firewall"
 info "MySQL $myver: schema $DB_NAME, accounts vasey_app and vasey_backup (127.0.0.1 only)"
 
@@ -447,6 +524,7 @@ VASEY_PHP_FPM_SERVICE=$FPM_SERVICE
 VASEY_EXPECTED_APP_ENV=$APP_ENV_EXPECTED
 VASEY_DB_NAME=$DB_NAME
 VASEY_PROBE_NETRC=/etc/vasey-staging/probe.netrc
+VASEY_BUILD_USER=$BUILD_USER
 VASEY_KEEP_RELEASES=3
 VASEY_BACKUP_KEEP=7
 # Off-host backup target for rsync over SSH (user@host:/path), with the key below. Empty = local copies only.
@@ -458,16 +536,25 @@ chmod 0644 /etc/vasey-staging/staging.conf.tmp; mv -f /etc/vasey-staging/staging
 
 install -m 0755 -o root -g root "$KIT/bin/vasey-staging-ctl" /usr/local/sbin/vasey-staging-ctl
 install -m 0755 -o root -g root "$KIT/backup.sh" /usr/local/sbin/vasey-staging-backup
+install -m 0755 -o root -g root "$KIT/scheduler-watch.sh" /usr/local/sbin/vasey-staging-scheduler-watch
 install -d -m 0755 -o root -g root /usr/local/libexec/vasey-staging
 install -m 0644 -o root -g root "$KIT/normalize-mysql-dump.py" /usr/local/libexec/vasey-staging/normalize-mysql-dump.py
+install -m 0644 -o root -g root "$KIT/private-snapshot.py" /usr/local/libexec/vasey-staging/private-snapshot.py
 install -m 0644 -o root -g root "$KIT/seal-release.py" /usr/local/libexec/vasey-staging/seal-release.py
 install -m 0644 -o root -g root "$KIT/release-step.sh" /usr/local/libexec/vasey-staging/release-step.sh
+install -m 0644 -o root -g root "$KIT/tls/origin-ca.pem" /usr/local/libexec/vasey-staging/origin-ca.pem
 
 render "$KIT/php-fpm/vasey-staging.conf" "/etc/php/$PHPV/fpm/pool.d/vasey-staging.conf" 0644
 render "$KIT/php-fpm/vasey-paid-delivery.conf" "/etc/php/$PHPV/fpm/pool.d/vasey-paid-delivery.conf" 0644
 "$FPM_BIN" -t >/dev/null 2>&1 || { "$FPM_BIN" -t; die "PHP-FPM configuration test failed"; }
 systemctl reload "$FPM_SERVICE" || systemctl restart "$FPM_SERVICE"
-[ -S /run/php/vasey-staging.sock ] && [ -S /run/php/vasey-paid-delivery.sock ] || die "FPM pool sockets missing after reload"
+# The reload is a USR2 re-exec that systemctl does not wait for: the new pools' sockets appear about
+# two seconds later (seen on the staging host). Wait for them rather than test once.
+for _ in $(seq 1 30); do
+  [ -S /run/php/vasey-staging.sock ] && [ -S /run/php/vasey-paid-delivery.sock ] && break
+  sleep 1
+done
+[ -S /run/php/vasey-staging.sock ] && [ -S /run/php/vasey-paid-delivery.sock ] || die "FPM pool sockets missing 30 s after reload"
 
 render "$KIT/workers/vasey-staging-workers.conf" /etc/supervisor/conf.d/vasey-staging.conf 0644
 systemctl enable --now supervisor >/dev/null
@@ -487,11 +574,23 @@ cat > /etc/cron.d/vasey-staging-backup <<'EOF'
 SHELL=/bin/bash
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 17 3 * * * root /usr/local/sbin/vasey-staging-backup nightly >> /var/log/vasey-staging/backup.log 2>&1
+# Hourly: renew the backup re-verification token when it is older than three hours, so a deploy skips its own re-hash.
+47 * * * * root /usr/local/sbin/vasey-staging-backup rearm >> /var/log/vasey-staging/rearm.log 2>&1
 EOF
 chmod 0644 /etc/cron.d/vasey-staging-backup
 
+# Scheduler dead-man's switch (FP-028). Runs from cron, not from the scheduler it watches. Sends nothing unless
+# REPORTING_SCHEDULER_ALERT_TO is set in the application .env and the transactional mail configuration is admitted.
+cat > /etc/cron.d/vasey-staging-scheduler-watch <<'EOF'
+# Scheduler dead-man's switch (ops/staging/scheduler-watch.sh): one alert per stale episode, one note on recovery.
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+*/5 * * * * root /usr/local/sbin/vasey-staging-scheduler-watch >> /var/log/vasey-staging/scheduler-watch.log 2>&1
+EOF
+chmod 0644 /etc/cron.d/vasey-staging-scheduler-watch
+
 cat > /etc/logrotate.d/vasey-staging <<'EOF'
-/var/log/php8.4-fpm-vasey-*.log /var/log/vasey-staging/backup.log /var/log/nginx/vasey-staging-*.log {
+/var/log/php8.4-fpm-vasey-*.log /var/log/vasey-staging/backup.log /var/log/vasey-staging/ship-pending.log /var/log/vasey-staging/rearm.log /var/log/vasey-staging/scheduler-watch.log /var/log/nginx/vasey-staging-*.log {
     weekly
     rotate 8
     missingok
@@ -523,6 +622,41 @@ fi
 chown root:root /etc/vasey-staging/probe.netrc; chmod 0600 /etc/vasey-staging/probe.netrc
 
 render "$KIT/nginx/vasey-staging.conf" /etc/vasey-staging/nginx-site.conf 0644
+render "$KIT/nginx/vasey-staging-classic.conf" /etc/vasey-staging/nginx-classic.conf 0644
+
+# http-level helpers (limit_req_zone, map) the site body uses. Forge edits only the inside of the site's server block,
+# where they are not allowed, so they live in conf.d, which nginx.conf includes at http level and Forge never writes.
+# Each name may be defined once per nginx: refuse clearly if an older whole-file site still defines them.
+NGINX_HTTP_CONF=/etc/nginx/conf.d/vasey-staging.conf
+command -v nginx >/dev/null 2>&1 || die "nginx not found (Forge installs it)"
+[ -d /etc/nginx/conf.d ] && [ ! -L /etc/nginx/conf.d ] || die "/etc/nginx/conf.d must be a directory"
+grep -Eq '^[[:space:]]*include[[:space:]]+(/etc/nginx/)?conf\.d/\*\.conf;' /etc/nginx/nginx.conf \
+  || die "/etc/nginx/nginx.conf does not include conf.d/*.conf at http level; the site's rate-limit zones and header maps live there"
+nginx_dupes=$(grep -rlE --exclude-dir=conf.d -e 'zone=vasey_staging_(general|webhook):' \
+  -e '^[[:space:]]*map[[:space:]]+[^[:space:]]+[[:space:]]+\$vasey_staging_(referrer_policy|robots|frame_options)\b' /etc/nginx 2>/dev/null || true)
+[ -z "$nginx_dupes" ] || die "these nginx files already define the staging zones or maps: $(echo $nginx_dupes); that is the older
+  whole-file site template. Put the interim or Forge default site config back (README step 7), then re-run"
+nginx_previous=""
+if [ -e "$NGINX_HTTP_CONF" ]; then
+  [ -f "$NGINX_HTTP_CONF" ] && [ ! -L "$NGINX_HTTP_CONF" ] || die "$NGINX_HTTP_CONF must be a regular file"
+  nginx_previous=/etc/vasey-staging/nginx-http.conf.previous
+  cp -p "$NGINX_HTTP_CONF" "$nginx_previous"
+fi
+install -m 0644 -o root -g root "$KIT/nginx/vasey-staging-http.conf" "$NGINX_HTTP_CONF.tmp"
+mv -f "$NGINX_HTTP_CONF.tmp" "$NGINX_HTTP_CONF"
+if ! nginx_test=$(nginx -t 2>&1); then
+  if [ -n "$nginx_previous" ]; then mv -f "$nginx_previous" "$NGINX_HTTP_CONF"; else rm -f "$NGINX_HTTP_CONF"; fi
+  printf '%s\n' "$nginx_test" >&2
+  die "nginx -t failed with $NGINX_HTTP_CONF installed; it was put back as before"
+fi
+[ -z "$nginx_previous" ] || rm -f "$nginx_previous"
+systemctl reload nginx || die "nginx reload failed after a passing nginx -t"
+
+# The build account must not read anything the application keeps secret (the build needs none of it).
+for secret in "$MIRROR/.env" "$ROOT/private" "$ROOT/evidence" "$ROOT/tmp" "$ROOT/backups" "$SECRETS" "$BACKUP_CNF" \
+              "$APP_HOME/.ssh"; do
+  [ ! -e "$secret" ] || ! runuser -u "$BUILD_USER" -- test -r "$secret" || die "$BUILD_USER can read $secret; fix its mode"
+done
 
 # ---------------------------------------------------------------- summary
 cat <<EOF
@@ -530,12 +664,14 @@ cat <<EOF
 provision: done for $HOST
   kit root            $ROOT (releases/, private/ 0700 $APP_USER, backups/ root 0700)
   app/worker user     $APP_USER:$APP_GROUP   nginx user $NGINX_USER
+  build account       $BUILD_USER (no login, no sudo): builds each release before the pause, in $ROOT/build and releases/
   PHP-FPM pools       vasey-staging (/run/php/vasey-staging.sock), vasey-paid-delivery (/run/php/vasey-paid-delivery.sock)
   supervisor          vasey-staging:{media,payments,contracts,default,scheduler} (start on first deploy)
-  helpers             /usr/local/sbin/vasey-staging-ctl (sudo for $APP_USER), /usr/local/sbin/vasey-staging-backup (cron 03:17 UTC)
+  helpers             /usr/local/sbin/vasey-staging-ctl (sudo for $APP_USER), /usr/local/sbin/vasey-staging-backup (cron 03:17 UTC nightly, :47 hourly token renewal)
   MySQL               schema $DB_NAME; DB_HOST=127.0.0.1 DB_USERNAME=vasey_app
   secrets (root only) $SECRETS/db-app.env (paste DB_PASSWORD into Forge > Environment), $BACKUP_CNF, $HTPASSWD, /etc/vasey-staging/probe.netrc
-  nginx site          /etc/vasey-staging/nginx-site.conf: fill __SSL_CERT__, __SSL_KEY__, __FORGE_CONF__ from Forge's
-                      generated config, then paste it into Forge > Site > Edit Nginx Configuration
+  nginx http helpers  $NGINX_HTTP_CONF (installed, nginx -t passed, reloaded)
+  nginx site body     /etc/vasey-staging/nginx-site.conf: install it as the site's nginx configuration (Forge > Site >
+                      Edit Nginx Configuration, or the site API); README step 7. Whole-file hosts: nginx-classic.conf there
 Next: ops/staging/README.md step 8 onwards.
 EOF

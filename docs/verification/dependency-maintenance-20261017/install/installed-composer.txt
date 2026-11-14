@@ -1,0 +1,8 @@
+name     : laravel/framework
+descrip. : The Laravel Framework.
+keywords : framework, laravel
+versions : * v13.36.0
+source   : [git] https://github.com/laravel/framework.git e5626e38137cf0d82b1e52f15b16283e8442c13c
+source : https://github.com/laravel/framework
+158
+installed packages 158 version mismatches vs lock: []

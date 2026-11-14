@@ -1,0 +1,19 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/m3/phpunit.xml
+
+...F...                                                             7 / 7 (100%)
+
+Time: 00:12.205, Memory: 101.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\SiteContentUnavailableHttpTest::test_new_content_draft_reports_unavailable_published_content_instead_of_opening
+Failed asserting that null is not null.
+
+/home/user/wt/m3/tests/Feature/SiteContentUnavailableHttpTest.php:162
+/home/user/wt/m3/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 7, Assertions: 357, Failures: 1.

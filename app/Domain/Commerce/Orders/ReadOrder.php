@@ -2,16 +2,20 @@
 
 namespace App\Domain\Commerce\Orders;
 
+use App\Domain\Commerce\BuyerCancel\ReadBuyerCancellation;
+use App\Domain\Commerce\Finalization\ReadFinalization;
+use App\Domain\Commerce\Finalization\ReadPaymentState;
 use App\Domain\Commerce\Models\InventoryReservation;
 use App\Domain\Commerce\Models\Order;
+use App\Domain\Commerce\Models\OrderFinalization;
 use App\Domain\Commerce\Models\PromotionUse;
 use App\Domain\Commerce\Models\Quote;
 use App\Domain\Commerce\Models\QuotePricing;
-use App\Domain\Commerce\Models\OrderFinalization;
-use App\Domain\Commerce\Finalization\ReadFinalization;
-use App\Domain\Commerce\Finalization\ReadPaymentState;
+use App\Domain\Commerce\Models\TestUnpaidRelease;
 use App\Domain\Commerce\QuoteException;
 use App\Domain\Commerce\QuoteRequest;
+use App\Domain\Commerce\UnpaidRelease\ReadUnpaidRelease;
+use App\Domain\Commerce\UnpaidRelease\ReadUnsentRelease;
 use App\Support\CanonicalJson;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Crypt;
@@ -24,9 +28,13 @@ final class ReadOrder
     public function handle(string $id, string $ownerKey): array
     {
         QuoteRequest::owner($ownerKey);
-        if (! OrderRequest::uuid($id)) { throw new QuoteException('ORDER_NOT_FOUND', 404); }
+        if (! OrderRequest::uuid($id)) {
+            throw new QuoteException('ORDER_NOT_FOUND', 404);
+        }
         $order = Order::where('public_id', $id)->where('owner_key', $ownerKey)->first();
-        if (! $order) { throw new QuoteException('ORDER_NOT_FOUND', 404); }
+        if (! $order) {
+            throw new QuoteException('ORDER_NOT_FOUND', 404);
+        }
 
         return $this->present($order);
     }
@@ -34,10 +42,14 @@ final class ReadOrder
     public function forQuote(string $quoteId, string $ownerKey): array
     {
         QuoteRequest::owner($ownerKey);
-        if (! OrderRequest::uuid($quoteId)) { throw new QuoteException('ORDER_NOT_FOUND', 404); }
+        if (! OrderRequest::uuid($quoteId)) {
+            throw new QuoteException('ORDER_NOT_FOUND', 404);
+        }
         $id = Quote::where('public_id', $quoteId)->where('owner_key', $ownerKey)->value('id');
         $order = $id === null ? null : Order::where('quote_id', $id)->where('owner_key', $ownerKey)->first();
-        if (! $order) { throw new QuoteException('ORDER_NOT_FOUND', 404); }
+        if (! $order) {
+            throw new QuoteException('ORDER_NOT_FOUND', 404);
+        }
 
         return $this->present($order);
     }
@@ -46,9 +58,13 @@ final class ReadOrder
     public function items(string $id, #[SensitiveParameter] string $ownerKey): array
     {
         QuoteRequest::owner($ownerKey);
-        if (! OrderRequest::uuid($id)) { throw new QuoteException('ORDER_NOT_FOUND', 404); }
+        if (! OrderRequest::uuid($id)) {
+            throw new QuoteException('ORDER_NOT_FOUND', 404);
+        }
         $order = Order::where('public_id', $id)->where('owner_key', $ownerKey)->first();
-        if (! $order || ! hash_equals($order->owner_key, $ownerKey)) { throw new QuoteException('ORDER_NOT_FOUND', 404); }
+        if (! $order || ! hash_equals($order->owner_key, $ownerKey)) {
+            throw new QuoteException('ORDER_NOT_FOUND', 404);
+        }
         $payload = $this->verify($order);
         $pricing = $payload['pricing']['snapshot'];
         if (! in_array($pricing['schema_version'], [1, 2, 3], true) || $pricing['currency'] !== 'USD'
@@ -85,7 +101,9 @@ final class ReadOrder
     public function verify(Order $order): array
     {
         try {
-            if ($order->canonicalization_version !== CanonicalJson::VERSION) { throw new \UnexpectedValueException; }
+            if ($order->canonicalization_version !== CanonicalJson::VERSION) {
+                throw new \UnexpectedValueException;
+            }
             if (! hash_equals($order->payload_hash, hash('sha256', $order->payload_ciphertext))) {
                 throw new \UnexpectedValueException;
             }
@@ -99,7 +117,8 @@ final class ReadOrder
                 ($payload['order_id'] ?? null) !== $order->public_id || ($payload['owner_key'] ?? null) !== $order->owner_key) {
                 throw new \UnexpectedValueException;
             }
-            $quote = Quote::findOrFail($order->quote_id); $pricing = QuotePricing::findOrFail($order->quote_pricing_id);
+            $quote = Quote::findOrFail($order->quote_id);
+            $pricing = QuotePricing::findOrFail($order->quote_pricing_id);
             $attempt = $order->attempt()->sole();
             $reservation = InventoryReservation::findOrFail($attempt->inventory_reservation_id);
             $use = $attempt->promotion_use_id === null ? null : PromotionUse::findOrFail($attempt->promotion_use_id);
@@ -116,7 +135,9 @@ final class ReadOrder
                 throw new \UnexpectedValueException;
             }
             $references = $order->lines()->orderBy('position')->get();
-            if ($references->count() !== count($expected['lines'])) { throw new \UnexpectedValueException; }
+            if ($references->count() !== count($expected['lines'])) {
+                throw new \UnexpectedValueException;
+            }
             foreach ($expected['lines'] as $position => $line) {
                 $reference = $references[$position];
                 if ($reference->position !== $position || $reference->quote_line_id !== $line['quote_line_id'] ||
@@ -125,10 +146,22 @@ final class ReadOrder
                 }
             }
 
-            $release = \App\Domain\Commerce\Models\TestUnpaidRelease::where('order_id', $order->id)->first();
-            if ($release) { app(\App\Domain\Commerce\UnpaidRelease\ReadUnpaidRelease::class)->verify($release, $order, $payload); }
+            $release = TestUnpaidRelease::where('order_id', $order->id)->first();
+            if ($release) {
+                app(ReadUnpaidRelease::class)->verify($release, $order, $payload);
+            }
+            $unsent = ReadUnsentRelease::for($order);
+            if ($unsent) {
+                app(ReadUnsentRelease::class)->verify($unsent, $order);
+            }
+            $cancellation = ReadBuyerCancellation::for($order);
+            if ($cancellation) {
+                app(ReadBuyerCancellation::class)->verify($cancellation, $order);
+            }
             $finalization = OrderFinalization::where('order_id', $order->id)->first();
-            if ($finalization) { app(ReadFinalization::class)->verify($finalization, $payload); }
+            if ($finalization) {
+                app(ReadFinalization::class)->verify($finalization, $payload);
+            }
 
             return $payload;
         } catch (QueryException $error) {
@@ -161,7 +194,9 @@ final class ReadOrder
                 throw new QuoteException('ORDER_CHANGED', 409);
             }
         }
-        if (! is_int($version) || $version < 1) { throw new QuoteException('ORDER_CHANGED', 409); }
+        if (! is_int($version) || $version < 1) {
+            throw new QuoteException('ORDER_CHANGED', 409);
+        }
 
         return ['order' => $this->projection($order, $payload), 'preview' => [
             'orderId' => $order->public_id, 'itemCount' => count($lines),

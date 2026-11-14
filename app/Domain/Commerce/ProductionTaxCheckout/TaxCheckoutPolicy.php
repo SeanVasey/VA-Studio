@@ -22,6 +22,12 @@ final class TaxCheckoutPolicy
         return app()->environment('local', 'testing') && config('production-tax-checkout.enabled') === true;
     }
 
+    /** D-30 contract identity capture: literal-false in config, and admitted only in local or testing. */
+    public static function contractIdentityV2(): bool
+    {
+        return app()->environment('local', 'testing') && config('production-tax-checkout.contract_identity_v2') === true;
+    }
+
     public static function requireEnabled(): void
     {
         CheckoutException::require(self::enabled(), 'disabled', 503);

@@ -1,0 +1,25 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-membership-award/phpunit.xml
+
+[31;1mE[0m                                                                   1 / 1 (100%)
+
+Time: 02:13.638, Memory: 87.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\ProductionMembershipBilling\MembershipFirstAwardTest::test_owned_award_commits_one_period_and_one_event_and_replays_the_original_result
+App\Domain\Memberships\Production\MembershipException: Production membership preparation unavailable.
+
+/workspace/VA-Studio-membership-award/app/Domain/Memberships/Production/MembershipException.php:16
+/workspace/VA-Studio-membership-award/app/Domain/Memberships/Production/MembershipAwardContext.php:174
+/workspace/VA-Studio-membership-award/app/Domain/Memberships/Production/MembershipAwardContext.php:147
+/workspace/VA-Studio-membership-award/app/Domain/Memberships/Production/MembershipAwardContext.php:80
+/workspace/VA-Studio-membership-award/app/Domain/Memberships/Production/MembershipAwards.php:76
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/MembershipFirstAwardTest.php:179
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/MembershipFirstAwardTest.php:39
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mERRORS![0m
+[37;41mTests: 1[0m[37;41m, Assertions: 5[0m[37;41m, Errors: 1[0m[37;41m.[0m

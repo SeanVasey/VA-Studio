@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\MembershipEligibleLicenseProofTest" file="/workspace/VA-Studio-membership-eligibility/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php" tests="2" assertions="4" errors="0" failures="2" skipped="0" time="7.601173">
+    <testcase name="test_final_clock_callback_cannot_withdraw_the_current_buyer_after_identity_proof" file="/workspace/VA-Studio-membership-eligibility/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php" line="324" class="Tests\Feature\ProductionMembershipBilling\MembershipEligibleLicenseProofTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipEligibleLicenseProofTest" assertions="2" time="4.131035">
+      <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionMembershipBilling\MembershipEligibleLicenseProofTest::test_final_clock_callback_cannot_withdraw_the_current_buyer_after_identity_proof
+Expected current catalog proof refusal.
+
+/workspace/VA-Studio-membership-eligibility/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php:436
+/workspace/VA-Studio-membership-eligibility/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php:345
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio-membership-eligibility/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php:327
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testcase name="test_terminal_file_admission_refuses_a_one_shot_non_native_stat_wrapper" file="/workspace/VA-Studio-membership-eligibility/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php" line="355" class="Tests\Feature\ProductionMembershipBilling\MembershipEligibleLicenseProofTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipEligibleLicenseProofTest" assertions="2" time="3.470138">
+      <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionMembershipBilling\MembershipEligibleLicenseProofTest::test_terminal_file_admission_refuses_a_one_shot_non_native_stat_wrapper
+Expected current catalog proof refusal.
+
+/workspace/VA-Studio-membership-eligibility/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php:436
+/workspace/VA-Studio-membership-eligibility/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php:372
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio-membership-eligibility/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php:358
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

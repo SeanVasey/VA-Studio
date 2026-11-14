@@ -15,10 +15,12 @@ final class CurrentSelection
     {
         $items = PreparationSelection::items($items);
         $graph = PreparationSelection::load($reader, $items);
-        $selection = PreparationSelection::interpret($graph, $items, $at);
         // Complete link sets prevent an unlinked successor evading historical scope governance.
         $revisionIds = array_column($graph['revisions'], 'id');
         $links = $revisionIds === [] ? [] : $reader->rows('rights_scope_offers', 'offer_revision_id IN ('.implode(',', array_fill(0, count($revisionIds), '?')).')', $revisionIds, 257);
+        // Exclusive or scoped inventory: the exclusivity authority is consulted first, then refused either way (lane PCC).
+        ExclusiveInventoryGate::refuse($graph, $links);
+        $selection = PreparationSelection::interpret($graph, $items, $at);
         CheckoutException::require($links === [], 'unsupported_inventory');
         $bytes = self::bytes($graph, $selection);
 

@@ -1,0 +1,19 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-billing-retrieval/phpunit.xml
+
+..................................................[41;37mF[0m
+
+Time: 03:02.638, Memory: 89.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingOverlappingRetrievalTest::test_a_retrieval_that_began_before_the_hint_does_not_cover_it_and_one_that_began_after_does
+Failed asserting that '2026-10-13 06:00:48' is greater than '2026-10-13 06:00:48'.
+
+/workspace/VA-Studio-billing-retrieval/tests/Feature/ProductionMembershipBilling/BillingOverlappingRetrievalTest.php:129
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 51[0m[37;41m, Assertions: 316[0m[37;41m, Failures: 1[0m[37;41m.[0m

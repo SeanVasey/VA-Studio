@@ -23,7 +23,8 @@ Preview is available only to currently authorized staff, with private no-store/n
 | Contact | Title 120; description 300; one to twelve paragraphs, 1,500 each; validated public email, at most 254 ASCII characters with no whitespace/control characters. |
 | Blog | Listing title 120 and description 300; one to thirty entries with slug, title 120, description 300 and one to twelve paragraphs, 1,500 each. |
 | Videos | Listing title 120 and description 300; one to thirty entries with slug, title 120, description 300, YouTube/Vimeo provider and video ID. |
-| Navigation | One to eight unique targets from `/`, `/#catalog`, `/#licenses`, `/#studio`, `/about`, `/contact`, `/blog`, `/videos`; optional page targets require an enabled section. |
+| Navigation | One to eight unique targets from `/`, `/#catalog`, `/#licenses`, `/#studio`, `/about`, `/contact`, `/blog`, `/videos` and, in schema version 5, `/legal/privacy`, `/legal/terms`, `/legal/licenses`; optional page targets require an enabled section. |
+| Legal pages (schema 5) | Privacy policy, Terms, License comparison: title 120, description 300, version, effective date, staff-only approval reference, one to sixty sections of a heading and one to forty paragraphs; see [site content releases](site-content-releases.md#legal-pages). |
 
 Text is plain text; HTML, scripts, styling and arbitrary URLs are not accepted. Entry slugs use lowercase ASCII letters/digits and internal single hyphens, at most 80 characters, unique within their section. Optional sections are represented by `null` when disabled. Enabled listings require entries. Blog dates, scheduling, per-entry publication, rich text and editable artwork are not included.
 

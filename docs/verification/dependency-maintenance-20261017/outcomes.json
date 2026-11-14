@@ -1,0 +1,83 @@
+{
+  "frontend": {
+    "files": 66,
+    "tests": 1141,
+    "assertions": null,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "sqlite-probe": {
+    "files": 2,
+    "tests": 62,
+    "assertions": 390,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "sqlite-chunk-a": {
+    "files": 15,
+    "tests": 345,
+    "assertions": 2267,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 11
+  },
+  "sqlite-chunk-b": {
+    "files": 21,
+    "tests": 629,
+    "assertions": 6244,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 12
+  },
+  "sqlite-chunk-c": {
+    "files": 17,
+    "tests": 294,
+    "assertions": 5801,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "sqlite-total": {
+    "files": 55,
+    "tests": 1330,
+    "assertions": 14702,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 23
+  },
+  "mysql-run1-ten-cases": {
+    "files": 7,
+    "tests": 10,
+    "assertions": 662,
+    "failures": 0,
+    "errors": 1,
+    "skipped": 0
+  },
+  "mysql-run2-rerun-failing-case": {
+    "files": 1,
+    "tests": 1,
+    "assertions": 9,
+    "failures": 0,
+    "errors": 1,
+    "skipped": 0
+  },
+  "mysql-baseline-13.35.0-failing-case": {
+    "files": 1,
+    "tests": 1,
+    "assertions": 9,
+    "failures": 0,
+    "errors": 1,
+    "skipped": 0
+  },
+  "mysql-attempt1-admission-refused": {
+    "files": 18,
+    "tests": 80,
+    "assertions": 0,
+    "failures": 0,
+    "errors": 80,
+    "skipped": 0
+  },
+  "_note": "Counts are parsed from the retained JUnit files, not from console summaries. Vitest JUnit has no assertion counts (null)."
+}

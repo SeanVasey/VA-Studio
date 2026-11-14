@@ -88,7 +88,8 @@ final class ProductionFreeGrantStalledSourceTest extends TestCase
             }
         });
         $policy = (new ProductionFreeGrantPolicy)->current();
-        $before = ['policy' => $policy, 'target' => ['role' => 'master_wav', 'sha256' => str_repeat('a', 64), 'bytes' => 10, 'source_id' => 'synthetic-master_wav']];
+        $before = ['policy' => $policy, 'auth' => ['account_id' => $this->owner['principal']->accountId],
+            'target' => ['role' => 'master_wav', 'sha256' => str_repeat('a', 64), 'bytes' => 10, 'source_id' => 'synthetic-master_wav']];
         $started = hrtime(true);
 
         // Nothing is ever written to the other end: an unbounded blocking read would hang here.
@@ -129,7 +130,8 @@ final class ProductionFreeGrantStalledSourceTest extends TestCase
             }
         });
         $policy = (new ProductionFreeGrantPolicy)->current();
-        $before = ['policy' => $policy, 'target' => ['role' => 'master_wav', 'sha256' => str_repeat('a', 64), 'bytes' => 10, 'source_id' => 'synthetic-master_wav']];
+        $before = ['policy' => $policy, 'auth' => ['account_id' => $this->owner['principal']->accountId],
+            'target' => ['role' => 'master_wav', 'sha256' => str_repeat('a', 64), 'bytes' => 10, 'source_id' => 'synthetic-master_wav']];
 
         $this->refuses(fn () => (new ReflectionMethod(ProductionFreeGrantDownloads::class, 'snapshot'))->invoke(new ProductionFreeGrantDownloads, $before, hrtime(true) + 30_000_000_000), 'artifact_unavailable');
 
@@ -141,7 +143,8 @@ final class ProductionFreeGrantStalledSourceTest extends TestCase
     {
         $this->app->instance(ProductionFreeGrantSources::class, $this->stalledSources());
         $policy = (new ProductionFreeGrantPolicy)->current();
-        $before = ['policy' => $policy, 'target' => ['role' => 'master_wav', 'sha256' => str_repeat('a', 64), 'bytes' => 10, 'source_id' => 'synthetic-master_wav']];
+        $before = ['policy' => $policy, 'auth' => ['account_id' => $this->owner['principal']->accountId],
+            'target' => ['role' => 'master_wav', 'sha256' => str_repeat('a', 64), 'bytes' => 10, 'source_id' => 'synthetic-master_wav']];
 
         try {
             (new ReflectionMethod(ProductionFreeGrantDownloads::class, 'snapshot'))->invoke(new ProductionFreeGrantDownloads, $before, hrtime(true) - 1);

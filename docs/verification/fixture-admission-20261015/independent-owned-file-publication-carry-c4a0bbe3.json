@@ -1,0 +1,47 @@
+{
+  "agenda_unchanged": true,
+  "application_test_script_config_routes_workflow_policy_frozen_inputs_unchanged": true,
+  "approved_source_evidence_sha": "4de9e2b921dee71342179dd63d2d94844b1ecb64",
+  "archives_indexes_byte_unchanged": [
+    "focused-evidence.zip",
+    "prefix-correction-evidence.zip",
+    "p1-compatibility-evidence.zip",
+    "owned-file-and-local-evidence.zip",
+    "prefix-correction-index.json",
+    "p1-compatibility-index.json",
+    "owned-file-and-local-index.json"
+  ],
+  "changed_files": [
+    "docs/handoff/2026-10-07/CLAUDE-PLAN.md",
+    "docs/handoff/2026-10-07/codex-deferred-20261011.md",
+    "docs/verification/fixture-admission-20261015/README.md",
+    "docs/verification/fixture-admission-20261015/independent-owned-file-final-review-4de9e2b9.json",
+    "docs/verification/fixture-admission-20261015/independent-owned-file-final-review-4de9e2b9.md"
+  ],
+  "decision": "APPROVE EXACT DOCUMENTATION-ONLY PUBLICATION CARRY; MINOR DOCUMENTATION CONDITION SATISFIED",
+  "documentation_condition_satisfied": "README now identifies the focused-runner safeguard instead of renderer safeguard.",
+  "input_equality_scope": "Exact current approved4de to publicationc4a carry. Earlier1f-to936 policy input difference remains separately recorded; no earlier-source full-manifest equality claim.",
+  "limits": [
+    "Original native90s lifecycle whole4/8/E4 and olddefault1/2/E1 remain failed/open.",
+    "Native Guards4/13 remains partial representative/SQLite-specific body coverage; nativeouter86/1671 retains26shared/195+5SQLiteRestore/527+46SQLitecanaries/932+9native/17 separation.",
+    "No repeated application/whole-packet/runtime/network/CI check or shared edit by reviewer; no fullF2/25counterpart/raw-worker/later-hook/native concurrency/host/provider/activation/release acceptance."
+  ],
+  "non_documentation_paths_byte_unchanged": 2659,
+  "open_p0": 0,
+  "open_p1": 0,
+  "open_p2": 0,
+  "pending": [
+    "Evidence-backed current P1/P2 replies/resolution.",
+    "Fresh cheap preflight at this exact head, complete current inventory and repository protections.",
+    "Expected-SHA merge and actual merge-ledger update."
+  ],
+  "remote_thread_status": "r4289377653 P1 and r4289377661 P2 remain fixed/eligible for closure based on approved source/evidence; remote replies/resolution are still pending and not claimed completed.",
+  "required_corrections": [],
+  "reviewed_sha": "c4a0bbe33ec815e4e90d4d6251b2fdff9e33f787",
+  "tested_native_policy_sha": "936a5c50241b6104180a54ed2513117075f0836a",
+  "tested_php_sqlite_sha": "1f7b6705f4a7d1a346779d87ec52c9080cf4ec57",
+  "verified_original_import_sha256": {
+    "docs/verification/fixture-admission-20261015/independent-owned-file-final-review-4de9e2b9.json": "5244be49eec18e560e4dd4c934153838f20ea39b6f34d7d4dd03402fb15d0494",
+    "docs/verification/fixture-admission-20261015/independent-owned-file-final-review-4de9e2b9.md": "4aacf37e5de403859a44ed8636acac0aa1764684bbab3baf4a74f30888355111"
+  }
+}

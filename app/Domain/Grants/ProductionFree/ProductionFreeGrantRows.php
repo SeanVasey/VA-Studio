@@ -3,12 +3,17 @@
 namespace App\Domain\Grants\ProductionFree;
 
 use App\Domain\Commerce\ProductionPolicy\CurrentRows;
+use Illuminate\Database\Connection;
+use Illuminate\Database\MySqlConnection;
+use Illuminate\Database\SQLiteConnection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Facade;
 use PDO;
 use Pdo\Mysql;
 use Pdo\Sqlite;
 use PDOStatement;
 use ReflectionClass;
+use ReflectionProperty;
 
 /** Fixed internal SQL with bound values on the captured primary; MySQL reads lock with FOR UPDATE. */
 final class ProductionFreeGrantRows
@@ -25,9 +30,10 @@ final class ProductionFreeGrantRows
 
     public function __construct()
     {
-        ProductionFreeGrantException::require(DB::transactionLevel() > 0, 'transaction_required');
-        $this->pdo = DB::connection()->getPdo();
-        $this->driver = DB::getDriverName();
+        $connection = self::admittedConnection();
+        ProductionFreeGrantException::require($connection->transactionLevel() > 0, 'transaction_required');
+        $this->pdo = $connection->getPdo();
+        $this->driver = $connection->getDriverName();
         $classes = match ($this->driver) {
             'sqlite' => [PDO::class, Sqlite::class],
             'mysql' => [PDO::class, Mysql::class],
@@ -39,6 +45,27 @@ final class ProductionFreeGrantRows
         $this->schema->assertOwned($this->pdo);
         $this->reader = new CurrentRows($this->pdo, $this->driver);
         $this->level = DB::transactionLevel();
+    }
+
+    /**
+     * The default connection, admitted from raw storage before any getter (the shared generic metadata P2, on the
+     * surfaces family 256 reaches: this reader's birth, the owned frame and its commit observer). The facade cache must
+     * be an actual array before `DB::connection()` reads it, and the connection's raw config, driver, name, database
+     * and prefix must be actual arrays and strings before a getter could offset or coerce them. Reflection only.
+     */
+    public static function admittedConnection(): Connection
+    {
+        $resolved = (new ReflectionProperty(Facade::class, 'resolvedInstance'))->getValue();
+        ProductionFreeGrantException::require(is_array($resolved), 'changed_connection');
+        $connection = DB::connection();
+        ProductionFreeGrantException::require(in_array($connection::class, [SQLiteConnection::class, MySqlConnection::class], true), 'changed_connection');
+        $configuration = (new ReflectionProperty(Connection::class, 'config'))->getRawValue($connection);
+        ProductionFreeGrantException::require(is_array($configuration) && is_string($configuration['driver'] ?? null)
+            && is_string($configuration['name'] ?? null)
+            && is_string((new ReflectionProperty(Connection::class, 'database'))->getRawValue($connection))
+            && is_string((new ReflectionProperty(Connection::class, 'tablePrefix'))->getRawValue($connection)), 'changed_connection');
+
+        return $connection;
     }
 
     /** @return array<string, mixed> one sealed, verified row with its decrypted payload under `payload`, or [] */

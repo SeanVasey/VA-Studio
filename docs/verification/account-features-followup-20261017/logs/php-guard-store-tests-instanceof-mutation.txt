@@ -1,0 +1,19 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/b4f/phpunit.xml
+
+...F                                                                4 / 4 (100%)
+
+Time: 00:22.724, Memory: 24.50 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionFeatures\ProductionAccountFeaturesHttpTest::test_request_guard_admits_exactly_the_two_framework_session_store_classes@other Store subclass with data ('custom', null, false)
+Failed asserting that null is an instance of class App\Domain\Customers\ProductionFeatures\ProductionFeatureException.
+
+/home/user/wt/b4f/tests/Feature/ProductionFeatures/ProductionAccountFeaturesHttpTest.php:192
+
+FAILURES!
+Tests: 4, Assertions: 61, Failures: 1.
+exit=1

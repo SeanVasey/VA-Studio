@@ -1,0 +1,141 @@
+{
+  "reviewed_sha": "a7963f4ea8b47789f21eba1ec3d29b53c2c2c6f3",
+  "decision": "APPROVE SOURCE WITH EXECUTION CONDITIONS",
+  "independent_non_author": true,
+  "scope": "narrow remaining487f source/policy corrections and meaningful test repair; not final evidence/merge approval",
+  "approved_design_sha": "fd06135d0fb7510aad27d3450ff2bbd458a7071e",
+  "prior_source_reviews_immutable": [
+    "3b4d34e6203e4aa745792cea5c82c89caf53da20",
+    "487f24618813b96ca27ef7a3cb1467c23ec8e1b8"
+  ],
+  "open_p0": 0,
+  "open_p1": 0,
+  "open_required_source_corrections": 0,
+  "closed_requirements": [
+    {
+      "id": "recursive dense-list cap",
+      "basis": "Every array_is_list node now requires count<=100 before SDK conversion; top-level list/data shape checks retained. Genuine nested red1/3/F1 on unchanged487fGuard admitted the old candidate; current source rejects that node."
+    },
+    {
+      "id": "SQLite historical pair order",
+      "basis": "All259 old pairs exact prefix; one reviewed native-only method appended. First150 SHA restored to unchanged golden d93da4e7a13a8c6aff8f97f363eb6d93dde884bad53c9ae50eeb0ed32514c71c; no fixture assertion changed."
+    },
+    {
+      "id": "initial4 fixture/control failures",
+      "basis": "Changed-row controls temporarily remove the exact immutable synthetic update guard, mutate retained payload and restore declaredDDL before terminal receipt; changed=true prevents early transport exception from masquerading as row closure. Partial-mint control forwards genuine original decrypt and withdraws at exactly one registered receipt; tracks used first owned receipt and held caller state. Unexpected helper/AssertionFailedError rethrown."
+    }
+  ],
+  "test_semantics": [
+    "Notice upper/lower/mixed spelling controls use actual error handler and require zero callbacks/foreign transport requests.",
+    "AfterCommit throw must execute, leave physical/framework closed and refuse all SDK dispatch; direct PDO commit must refuse original positive-commit substitution and dispatch zero.",
+    "Rows-corruption test is a declared damaged-restore synthetic fixture; native implicit DDL occurs only after original frame closed, not inside original held frame, and proves no general DDL/restore rollback acceptance.",
+    "Source-age native datasets use real unchanged birth and elapsed time; exact method pair declaration covers both kinds. Native execution pending.",
+    "Previous static-slot/custody/metadata repairs remain unchanged and closed by inspection; core one-shot/current policy/source/receipt/ownership/candidate boundaries retained."
+  ],
+  "reviewer_wording_correction": {
+    "preserve_originals": true,
+    "incorrect_earlier_mechanism": "Original487f/3b4 notes suggested FinancialObservation::plain would later reject any nested optional101 list.",
+    "actual_mechanism": "FinancialObservation::plain caps primitive shape/depth/nodes/bytes; items() caps financial refund/dispute lists. An optional nested101 field can pass old candidate normalization, as genuine red demonstrates. The current retrieval guard enforces its stronger pre-SDK dense-array contract. No original candidate/shared implementation was altered or broader defect asserted."
+  },
+  "historical_closed_evidence": {
+    "retrieval-whole-repaired-toolchain": {
+      "head": "487f24618813b96ca27ef7a3cb1467c23ec8e1b8",
+      "counts": {
+        "tests": 57,
+        "assertions": 474,
+        "failures": 4,
+        "errors": 0,
+        "skipped": 2
+      },
+      "php_exit": 1,
+      "recorder_exit": 1,
+      "os_exit": 1,
+      "source_input_count": 2437,
+      "stability": {
+        "source_unchanged": true,
+        "source_head_unchanged": true,
+        "source_status_unchanged": true,
+        "runner_unchanged": true,
+        "autoload_unchanged": true
+      },
+      "original_sha256": {
+        "result.json": "86b49a682273fe8fd29c97385c539fed72fcfce918c9155516a4414a81ca9382",
+        "junit.xml": "3b2472f474c3ebce945d9b846dbb3cbf540b2b7f90cfc564e748788f843ee629",
+        "log.txt": "f37c1fd115b5ab55246794620bde641518a8af5b8c4d0a6102f3441b25153023",
+        "supervisor-os-exit.json": "3cc515ee4803ec552aca9f3fc6938f570fcd52b7dab01435438b9f6d32170be9"
+      }
+    },
+    "recursive-list-regression-red": {
+      "head": "a94b623feedf02229a660b39037e0b279f5ae4f6",
+      "counts": {
+        "tests": 1,
+        "assertions": 3,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      },
+      "php_exit": 1,
+      "recorder_exit": 1,
+      "os_exit": 1,
+      "source_input_count": 2437,
+      "stability": {
+        "source_unchanged": true,
+        "source_head_unchanged": true,
+        "source_status_unchanged": true,
+        "runner_unchanged": true,
+        "autoload_unchanged": true
+      },
+      "original_sha256": {
+        "result.json": "4ad5c2a1aaf7dceb55306917e2e4128bd5b5cc3dfdb7e8ae809923949afb0ffd",
+        "junit.xml": "49e1fb8eb03c832a8cd6287027402f0b006ce8f1f0c1347e055cf7618abdc7bb",
+        "log.txt": "408ff6b15bf1eb79a25720aec4fe513564022f42c4f4e0401e846032838ff194",
+        "supervisor-os-exit.json": "3719735cbf50f1734df126ed03825ca17e856f44c0af7b7537bcd7df59690fff"
+      }
+    }
+  },
+  "current_execution_status": "Root-owned retrieval-whole-final launch PID228847/start9672261/UID1000 on clean a796 at14:50:33.583314Z is active as latest status. No completed current counts/exits/OS claim. Native server ready but no app native run yet.",
+  "execution_conditions": [
+    "Close current whole SQLite on exact frozen source and verify all actual counts/failures/errors/skips/PHP/recorder/launch-bound OS/source/runtime stability. Original failures remain failed.",
+    "Verify corrected Crypt partial-mint callback actually fires at intended boundary, guard restoration and changed=true row drift execute, afterCommit/direct commit controls reach required physical state.",
+    "Focused owned MySQL original source/positive commit/two receipt/age/callback/cleanup controls with direct actual runtime and case identity receipts; SQLite native skips do not prove them.",
+    "Cheap canonical selection/skip/self-tests, relevant contract/gateway carries, read-only Pint, exact immutable sealed packet/source/runtime claim reconciliation and fresh independent final decision.",
+    "Exact publication-head preflight/full inventory/expected-SHA merge only after final approval; defaultoff/unbound/no host/provider/durable ledger/effect acceptance unchanged."
+  ],
+  "changed_paths": [
+    "app/Domain/Commerce/ProductionFinancialRetrieval/GuardedSdkTransport.php",
+    "docs/verification/paid-financial-retrieval-20261015/source-review-487f2461-original.json",
+    "docs/verification/paid-financial-retrieval-20261015/source-review-487f2461-original.md",
+    "scripts/ci/database-sqlite-skips.json",
+    "tests/Feature/ProductionFinancialRetrieval/FinancialReadPlanTest.php"
+  ],
+  "changed_git_sha256": {
+    "app/Domain/Commerce/ProductionFinancialRetrieval/GuardedSdkTransport.php": "d43ea3ca85166781b91d38d6ac8fbf948920172c1ab857bfb39da098450bf819",
+    "docs/verification/paid-financial-retrieval-20261015/source-review-487f2461-original.json": "3d224907ef59a4dc269637f3e2e55a88450070c8f1359a491cf4e665cac3ebcb",
+    "docs/verification/paid-financial-retrieval-20261015/source-review-487f2461-original.md": "286848461005b723dd1e2a16226bc88efb99cc0acec8b4b669871ad887311882",
+    "scripts/ci/database-sqlite-skips.json": "567f3fdb7d4ec7e16c9b36225534e24ebed91d8209e336592db6816cc0666ab5",
+    "tests/Feature/ProductionFinancialRetrieval/FinancialReadPlanTest.php": "71059e2a9a70e5e5ea1f630707434daefff12dc95ce5767ae92934022cf5f816"
+  },
+  "selection_integrity": {
+    "old_sqlite_pairs": 259,
+    "current_pairs": 260,
+    "old_prefix_byte_value_equal": true,
+    "first150_sha256": "d93da4e7a13a8c6aff8f97f363eb6d93dde884bad53c9ae50eeb0ed32514c71c",
+    "mysql_selection": "Unchanged since487f sorted FinancialReadPlanTest inclusion; no gate weakening"
+  },
+  "reviewer_activity": {
+    "app_tests": false,
+    "PHPdiagnostic": false,
+    "database": false,
+    "provider_network": false,
+    "hostedCI": false,
+    "shared_edits": false,
+    "runtime_artifacts_only": true
+  },
+  "read_commands": [
+    "git exactHEAD/status/stat/diffs487f..a796 for Guard, policy, tests",
+    "rg source schema signatures; read original487f whole and a94 red log/result/OS and current launch",
+    "read FinancialObservation plain/items boundary to reconcile genuine nested red mechanism",
+    "Python immutable Git delta/hash, exact259pair prefix and original JUnit/exit/count reconciliation; own runtime write only"
+  ],
+  "preparation_failures_this_review": []
+}

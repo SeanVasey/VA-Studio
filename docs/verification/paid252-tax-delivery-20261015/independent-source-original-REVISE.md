@@ -1,0 +1,16 @@
+# Independent first Tax delivery source checkpoint
+
+DECISION: REVISE SOURCE at exact `f2cefff70473349c4273ff4dd1e1aab9880d48ff` against approved design `9a3eb4eab955c9dee8bb73677dc01259792d54fc`. Four material P2 repairs are required. No P0/P1 was identified in this bounded pass; this is not final tested-source/evidence/merge approval.
+
+1. **Issuance/history selectors:** authorize's recent-window check is absent from its receipt (Downloads112/131/235). A late ordinary committing append can exceed three-per60 while selected auth/attempts remain unchanged. Status's min-to-max history range65 misses a newer latest authorization. Capture exact bounded post-insert recent-set and append-sensitive latest-window selectors through prepared/closed/body proofs.
+2. **Live snapshot ceiling:** PrepareStream receives/checks a scalar deadline only (Downloads181). It cannot see original request min-only shortening inside permitted callbacks during its own copy/readback. Retain the exact Budget and min its live value at helper pre/post and owned copy/readback checkpoints; preserve frozenhelper/blocking-I/O interruption limits.
+3. **Later chunk callback time:** Transfer37–49 adjusts elapsed callback/proof time only on the first chunk. A later clock callback can return a sampled validtick after real delay past the original bound. Perform the pure elapsed-adjusted deadline check immediately before every handoff; keep authority/request-first-byte proof first-only.
+4. **Pending admission:** Rows218 makes deliveryInputs nonnull before full new-schema inspection/captured definitions finish, while public getter/qualification treat that as completion. Use a separate completed flag and private enrollment qualification; public new-table reads/Records must refuse during pending grammar/schema callbacks.
+
+Each has a concrete meaningful callback/state regression direction in the report; none was executed by this reviewer. The author has queued all four in a coherent repair batch. The later test-only mutation-persistence failure is author-reported and unresolved here, not retroactively assigned as a product/fixture cause.
+
+Sound bounded mechanics include separate own schema/Records without old-five incoming refs, captured raw HMAC key/technical config, original request arithmetic/identity, two authenticated frames with current maxattempt recheck, conservative transfer birth, first-nonempty source sibling after generic callbacks, and original observer abandonment on unused/failing transfer close. OldV1/schema/frozenprofile bytes remain unchanged. These positives do not waive the four repairs.
+
+Fresh repaired-source focused/whole affected selections, all targets/negative callbacks/physical cleanup and private native schema/duplicateauthorization/redemption/final-limit evidence remain necessary before final development approval. Default-off/unmounted, HTTP/root/provider/host/commercial/release and broader SQL/physical/cache conditions remain open. Frozen adjacent V1/identity/membership P2s remain outside scope.
+
+I performed read-only Git/source inspection and wrote only these runtime notes; no application/test/DB/container/network/CI operation or tracked edit occurred. Report SHA-256 `e56876a9d2c769f3d7a2907cf72d85b1296a96b2d88087c69d16bb1e626542ab`.

@@ -1,0 +1,444 @@
+{
+  "archive_members": 160,
+  "archive_sha256": "6745b6426fd90de5763ead2e29af206f6a80d1a1c9b472d0137027dce0f2f896",
+  "changed_php_files": [
+    "app/Domain/Grants/Paid/PaidGrantCommands.php",
+    "app/Domain/Grants/Paid/PaidGrantConsumerCommitAdmission.php",
+    "app/Domain/Grants/Paid/PaidGrantDeadline.php",
+    "app/Domain/Grants/Paid/PaidGrantDownloads.php",
+    "app/Domain/Grants/Paid/PaidGrantRequestBudget.php",
+    "app/Domain/Grants/Paid/PaidGrantTransfer.php",
+    "app/Http/Controllers/PaidGrantController.php",
+    "bootstrap/app.php",
+    "config/paid-grants.php",
+    "routes/web.php",
+    "tests/Feature/PaidGrantHttpJourneyTest.php",
+    "tests/Feature/PaidGrantRequestInstantTest.php",
+    "tests/Feature/PaidGrantRootRegistrationTest.php",
+    "tests/Feature/PaidGrantTransferDeadlineTest.php",
+    "tests/Support/PaidGrantRootHttpFixture.php"
+  ],
+  "current_inputs_equal_captured_and_final_git": 2339,
+  "current_loader_hashes_equal_captured": 13,
+  "current_operative_tests_identical_to_bd5ec10a": true,
+  "frozen_resources_database_locks_workflows_unchanged": true,
+  "git_bindings": [
+    {
+      "count": 2320,
+      "head": "05f9d5036c1f6e9e7b7d8f93faaddf516f1c4b77",
+      "routes": 0
+    },
+    {
+      "count": 2323,
+      "head": "09890cdf57b439d762e0447813199a56c9318fd3",
+      "routes": 0
+    },
+    {
+      "count": 2339,
+      "head": "09890cdf57b439d762e0447813199a56c9318fd3",
+      "routes": 16
+    },
+    {
+      "count": 2339,
+      "head": "3184877b4bf3a6b1938a486d4fd85ab5aec3025c",
+      "routes": 16
+    },
+    {
+      "count": 2321,
+      "head": "627743d04a4184245f4d5e3009a42af29b550d02",
+      "routes": 0
+    },
+    {
+      "count": 2323,
+      "head": "645863174c970091955fbe3b1c1fd80a29d5df52",
+      "routes": 0
+    },
+    {
+      "count": 2321,
+      "head": "8aaa69996bdd9349e52fae9734628e156fc7f3c9",
+      "routes": 0
+    },
+    {
+      "count": 2320,
+      "head": "910804af7d1fe39b1e23da245361bdf64dfea09b",
+      "routes": 0
+    },
+    {
+      "count": 2321,
+      "head": "b682e1214235f2eba8736cf0298984f8d0ee5770",
+      "routes": 0
+    },
+    {
+      "count": 2339,
+      "head": "bd5ec10a1ccbc55d3e65476232733867f96a8130",
+      "routes": 16
+    },
+    {
+      "count": 2339,
+      "head": "bd5ec10a1ccbc55d3e65476232733867f96a8130",
+      "routes": 16
+    },
+    {
+      "count": 2323,
+      "head": "e2e75fde9623b960d8b5460888f231e8be9f5a92",
+      "routes": 0
+    }
+  ],
+  "invocations": 13,
+  "only_runbook_readme_changes_since_0c18e664": true,
+  "original_failed": 4,
+  "packaging_helper_unchanged": true,
+  "passing": 9,
+  "pint_receipts": [
+    {
+      "files": 15,
+      "head": "09890cdf57b439d762e0447813199a56c9318fd3",
+      "inputs_bound_to_git": true,
+      "name": "pint-09890cdf.json",
+      "process_exit": 0
+    },
+    {
+      "files": 15,
+      "head": "bd5ec10a1ccbc55d3e65476232733867f96a8130",
+      "inputs_bound_to_git": true,
+      "name": "pint-bd5ec10a.json",
+      "process_exit": 0
+    }
+  ],
+  "records": [
+    {
+      "case_names": [
+        "test_elapsed_identity_work_cannot_start_a_new_download_budget_or_consume_an_attempt",
+        "test_a_final_committing_callback_cannot_shorten_the_request_and_commit_an_attempt",
+        "test_two_line_http_order_retains_its_first_original_across_second_line_failure_and_retry"
+      ],
+      "counts": {
+        "assertions": 155,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 3
+      },
+      "driver": "mysql",
+      "head": "bd5ec10a1ccbc55d3e65476232733867f96a8130",
+      "name": "mysql-paid-request-budget-and-whole-order",
+      "process": 0,
+      "seconds": 913.5287057700007,
+      "verifier": 0
+    },
+    {
+      "case_names": [
+        "test_only_an_explicit_boolean_mount_registers_paid_routes with data set #0",
+        "test_only_an_explicit_boolean_mount_registers_paid_routes with data set #1",
+        "test_only_an_explicit_boolean_mount_registers_paid_routes with data set #2",
+        "test_only_an_explicit_boolean_mount_registers_paid_routes with data set #3",
+        "test_the_explicit_mount_uses_root_privacy_before_any_paid_controller",
+        "test_root_handlers_sanitize_errors_thrown_before_paid_privacy_or_controller with data set #0",
+        "test_root_handlers_sanitize_errors_thrown_before_paid_privacy_or_controller with data set #1"
+      ],
+      "counts": {
+        "assertions": 77,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 7
+      },
+      "driver": "sqlite",
+      "head": "3184877b4bf3a6b1938a486d4fd85ab5aec3025c",
+      "name": "sqlite-paid-root-error-handlers-final",
+      "process": 0,
+      "seconds": 0.5651957759982906,
+      "verifier": 0
+    },
+    {
+      "case_names": [
+        "test_only_an_explicit_boolean_mount_registers_paid_routes with data set #0",
+        "test_only_an_explicit_boolean_mount_registers_paid_routes with data set #1",
+        "test_only_an_explicit_boolean_mount_registers_paid_routes with data set #2",
+        "test_only_an_explicit_boolean_mount_registers_paid_routes with data set #3",
+        "test_the_explicit_mount_uses_root_privacy_before_any_paid_controller"
+      ],
+      "counts": {
+        "assertions": 47,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 5
+      },
+      "driver": "sqlite",
+      "head": "e2e75fde9623b960d8b5460888f231e8be9f5a92",
+      "name": "sqlite-paid-root-registration",
+      "process": 0,
+      "seconds": 0.5151861140002438,
+      "verifier": 0
+    },
+    {
+      "case_names": [
+        "test_a_snapshot_started_late_in_the_observation_budget_gets_its_own_bound",
+        "test_a_snapshot_exceeding_snapshot_seconds_is_refused_with_nothing_recorded_and_the_authorization_stays_usable",
+        "test_the_commit_frame_and_first_byte_get_a_fresh_budget_after_a_long_first_frame_and_snapshot",
+        "test_the_fresh_commit_budget_is_still_bounded_before_the_first_byte",
+        "test_a_commit_frame_overrunning_its_own_budget_still_fails_the_unchanged_post_commit_proof",
+        "test_out_of_range_snapshot_seconds_refuses_with_503_before_anything_is_recorded",
+        "test_genuine_last_committing_callback_cannot_withdraw_current_consumer_authority_and_commit_new_origin with data set #0",
+        "test_genuine_last_committing_callback_cannot_withdraw_current_consumer_authority_and_commit_new_origin with data set #1",
+        "test_master_redemption_second_command_keeps_each_commit_observer_conjunct_within_the_original_authorization",
+        "test_refused_paid_frame_does_not_leak_after_commit_callbacks_into_next_unrelated_commit with data set #0",
+        "test_refused_paid_frame_does_not_leak_after_commit_callbacks_into_next_unrelated_commit with data set #1",
+        "test_exact_paid_master_and_original_pdf_are_one_attempt_each_with_token_free_bounded_status_and_consumed_replay_refusal",
+        "test_actual_mailbox_recovery_keeps_original_paid_origin_and_pdf_and_allows_only_fresh_same_account_download",
+        "test_actual_source_copy_withdrawal_cannot_consume_attempt_or_return_private_bytes",
+        "test_actual_final_commit_policy_withdrawal_refuses_stream_and_retains_truthful_consumed_attempt",
+        "test_held_transfer_rechecks_original_owner_before_first_byte_without_new_transaction_or_principal",
+        "test_three_lines_rendering_120_s_each_are_all_prepared_with_one_attempt_each",
+        "test_a_late_line_that_fails_is_marked_failed_under_its_own_budget",
+        "test_a_single_line_exceeding_its_own_300_s_is_still_refused_and_stays_claimed_until_its_lease_ends",
+        "test_a_two_line_order_whose_verification_outlasts_one_lease_is_fulfilled_and_still_downloads",
+        "test_a_line_exceeding_its_own_bound_is_refused_with_nothing_fulfilled_and_a_retry_resumes",
+        "test_a_retry_after_a_slow_completion_fulfils_without_restarting_from_an_expired_budget",
+        "test_preparing_an_already_fulfilled_order_hashes_no_file_and_returns_the_same_projection"
+      ],
+      "counts": {
+        "assertions": 1720,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 23
+      },
+      "driver": "sqlite",
+      "head": "bd5ec10a1ccbc55d3e65476232733867f96a8130",
+      "name": "sqlite-paid-shared-phase-regressions",
+      "process": 0,
+      "seconds": 297.5452179010026,
+      "verifier": 0
+    },
+    {
+      "case_names": [
+        "test_a_request_received_before_expiry_is_admitted_although_its_identity_proof_ends_after_it",
+        "test_an_identity_proof_longer_than_the_capture_age_bound_does_not_expire_a_request_received_in_time",
+        "test_a_captured_instant_admits_the_redemption_after_more_than_the_age_bound_has_passed",
+        "test_a_request_received_after_expiry_is_still_refused_with_nothing_recorded",
+        "test_a_missing_or_implausible_request_time_falls_back_to_now_and_never_widens_admission",
+        "test_the_admission_instant_rule",
+        "test_the_admitted_instant_can_only_be_obtained_by_capture_time_validation",
+        "test_elapsed_identity_work_cannot_start_a_new_download_budget_or_consume_an_attempt",
+        "test_a_request_budget_shortened_during_real_preparation_closes_the_snapshot_without_an_attempt",
+        "test_an_overall_request_refusal_before_bytes_keeps_its_committed_attempt_and_closes_the_snapshot",
+        "test_a_budget_cannot_be_paired_with_another_captured_instant",
+        "test_later_configuration_cannot_enlarge_the_captured_snapshot_phase",
+        "test_a_final_committing_callback_cannot_shorten_the_request_and_commit_an_attempt",
+        "test_the_first_chunk_rechecks_the_request_after_the_transfer_clock_callback",
+        "test_a_stream_that_outlasts_the_authorization_but_fits_the_derived_deadline_completes",
+        "test_a_stream_that_exceeds_the_derived_deadline_is_refused_mid_stream",
+        "test_the_request_first_byte_cap_does_not_replace_the_later_chunk_transfer_allowance",
+        "test_the_derived_deadline_is_capped_by_the_configured_maximum",
+        "test_redeeming_after_the_authorization_expired_is_still_refused_and_records_nothing",
+        "test_a_redemption_admitted_before_expiry_is_recorded_when_its_snapshot_finishes_after_expiry",
+        "test_shipped_defaults_policy_bounds_and_derived_formula",
+        "test_actual_typed_buyer_http_finalization_paid_pdf_and_native_file_delivery_preserve_originals",
+        "test_unknown_controller_failure_reaches_fixed_sanitized_reporter_without_request_or_exception_text",
+        "test_two_line_http_order_retains_its_first_original_across_second_line_failure_and_retry",
+        "test_actual_private_json_body_seal_closes_withdrawal_after_response_and_before_first_original_byte with data set #0",
+        "test_actual_private_json_body_seal_closes_withdrawal_after_response_and_before_first_original_byte with data set #1",
+        "test_actual_private_json_body_seal_closes_withdrawal_after_response_and_before_first_original_byte with data set #2",
+        "test_private_intake_and_original_typed_session_refuse_before_paid_origin_or_private_projection with data set #0",
+        "test_private_intake_and_original_typed_session_refuse_before_paid_origin_or_private_projection with data set #1",
+        "test_private_intake_and_original_typed_session_refuse_before_paid_origin_or_private_projection with data set #2",
+        "test_private_intake_and_original_typed_session_refuse_before_paid_origin_or_private_projection with data set #3",
+        "test_private_intake_and_original_typed_session_refuse_before_paid_origin_or_private_projection with data set #4",
+        "test_private_intake_and_original_typed_session_refuse_before_paid_origin_or_private_projection with data set #5",
+        "test_private_intake_and_original_typed_session_refuse_before_paid_origin_or_private_projection with data set #6",
+        "test_private_intake_and_original_typed_session_refuse_before_paid_origin_or_private_projection with data set #7",
+        "test_private_intake_and_original_typed_session_refuse_before_paid_origin_or_private_projection with data set #8",
+        "test_private_intake_and_original_typed_session_refuse_before_paid_origin_or_private_projection with data set #9",
+        "test_private_intake_and_original_typed_session_refuse_before_paid_origin_or_private_projection with data set #10",
+        "test_private_intake_and_original_typed_session_refuse_before_paid_origin_or_private_projection with data set #11",
+        "test_private_intake_and_original_typed_session_refuse_before_paid_origin_or_private_projection with data set #12",
+        "test_only_an_explicit_boolean_mount_registers_paid_routes with data set #0",
+        "test_only_an_explicit_boolean_mount_registers_paid_routes with data set #1",
+        "test_only_an_explicit_boolean_mount_registers_paid_routes with data set #2",
+        "test_only_an_explicit_boolean_mount_registers_paid_routes with data set #3",
+        "test_the_explicit_mount_uses_root_privacy_before_any_paid_controller"
+      ],
+      "counts": {
+        "assertions": 1106,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 45
+      },
+      "driver": "sqlite",
+      "head": "09890cdf57b439d762e0447813199a56c9318fd3",
+      "name": "sqlite-paid-timing-and-root-http-final",
+      "process": 0,
+      "seconds": 348.5164876359995,
+      "verifier": 0
+    },
+    {
+      "case_names": [
+        "test_two_line_http_order_retains_its_first_original_across_second_line_failure_and_retry"
+      ],
+      "counts": {
+        "assertions": 112,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      "driver": "sqlite",
+      "head": "09890cdf57b439d762e0447813199a56c9318fd3",
+      "name": "sqlite-paid-whole-order-http-reconciled",
+      "process": 0,
+      "seconds": 28.341621949999535,
+      "verifier": 0
+    },
+    {
+      "case_names": [
+        "test_two_line_http_order_retains_its_first_original_across_second_line_failure_and_retry"
+      ],
+      "counts": {
+        "assertions": 13,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "tests": 1
+      },
+      "driver": "sqlite",
+      "head": "645863174c970091955fbe3b1c1fd80a29d5df52",
+      "name": "sqlite-paid-whole-order-http",
+      "process": 1,
+      "seconds": 7.9335297210018325,
+      "verifier": 1
+    },
+    {
+      "case_names": [
+        "test_the_first_chunk_rechecks_the_request_after_the_transfer_clock_callback"
+      ],
+      "counts": {
+        "assertions": 14,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "tests": 1
+      },
+      "driver": "sqlite",
+      "head": "8aaa69996bdd9349e52fae9734628e156fc7f3c9",
+      "name": "sqlite-request-budget-first-chunk-old-source",
+      "process": 1,
+      "seconds": 13.15469254799973,
+      "verifier": 1
+    },
+    {
+      "case_names": [
+        "test_a_final_committing_callback_cannot_shorten_the_request_and_commit_an_attempt",
+        "test_the_first_chunk_rechecks_the_request_after_the_transfer_clock_callback",
+        "test_the_request_first_byte_cap_does_not_replace_the_later_chunk_transfer_allowance"
+      ],
+      "counts": {
+        "assertions": 56,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 3
+      },
+      "driver": "sqlite",
+      "head": "b682e1214235f2eba8736cf0298984f8d0ee5770",
+      "name": "sqlite-request-budget-review-fixed-source",
+      "process": 0,
+      "seconds": 39.58105428599811,
+      "verifier": 0
+    },
+    {
+      "case_names": [
+        "test_a_final_committing_callback_cannot_shorten_the_request_and_commit_an_attempt"
+      ],
+      "counts": {
+        "assertions": 14,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "tests": 1
+      },
+      "driver": "sqlite",
+      "head": "8aaa69996bdd9349e52fae9734628e156fc7f3c9",
+      "name": "sqlite-request-budget-review-old-source",
+      "process": 1,
+      "seconds": 12.60102774600091,
+      "verifier": 1
+    },
+    {
+      "case_names": [
+        "test_a_request_received_before_expiry_is_admitted_although_its_identity_proof_ends_after_it",
+        "test_an_identity_proof_longer_than_the_capture_age_bound_does_not_expire_a_request_received_in_time",
+        "test_a_captured_instant_admits_the_redemption_after_more_than_the_age_bound_has_passed",
+        "test_a_request_received_after_expiry_is_still_refused_with_nothing_recorded",
+        "test_a_missing_or_implausible_request_time_falls_back_to_now_and_never_widens_admission",
+        "test_the_admission_instant_rule",
+        "test_the_admitted_instant_can_only_be_obtained_by_capture_time_validation"
+      ],
+      "counts": {
+        "assertions": 129,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 7
+      },
+      "driver": "sqlite",
+      "head": "05f9d5036c1f6e9e7b7d8f93faaddf516f1c4b77",
+      "name": "sqlite-request-instant-baseline",
+      "process": 0,
+      "seconds": 71.0437074040019,
+      "verifier": 0
+    },
+    {
+      "case_names": [
+        "test_a_request_received_before_expiry_is_admitted_although_its_identity_proof_ends_after_it",
+        "test_an_identity_proof_longer_than_the_capture_age_bound_does_not_expire_a_request_received_in_time",
+        "test_a_captured_instant_admits_the_redemption_after_more_than_the_age_bound_has_passed",
+        "test_a_request_received_after_expiry_is_still_refused_with_nothing_recorded",
+        "test_a_missing_or_implausible_request_time_falls_back_to_now_and_never_widens_admission",
+        "test_the_admission_instant_rule",
+        "test_the_admitted_instant_can_only_be_obtained_by_capture_time_validation",
+        "test_elapsed_identity_work_cannot_start_a_new_download_budget_or_consume_an_attempt",
+        "test_a_request_budget_shortened_during_real_preparation_closes_the_snapshot_without_an_attempt",
+        "test_an_overall_request_refusal_before_bytes_keeps_its_committed_attempt_and_closes_the_snapshot",
+        "test_a_budget_cannot_be_paired_with_another_captured_instant",
+        "test_later_configuration_cannot_enlarge_the_captured_snapshot_phase"
+      ],
+      "counts": {
+        "assertions": 222,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 12
+      },
+      "driver": "sqlite",
+      "head": "627743d04a4184245f4d5e3009a42af29b550d02",
+      "name": "sqlite-request-start-fixed-source",
+      "process": 0,
+      "seconds": 126.82806970100137,
+      "verifier": 0
+    },
+    {
+      "case_names": [
+        "test_elapsed_identity_work_cannot_start_a_new_download_budget_or_consume_an_attempt"
+      ],
+      "counts": {
+        "assertions": 17,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "tests": 1
+      },
+      "driver": "sqlite",
+      "head": "910804af7d1fe39b1e23da245361bdf64dfea09b",
+      "name": "sqlite-request-start-old-source",
+      "process": 1,
+      "seconds": 14.651921553999273,
+      "verifier": 1
+    }
+  ],
+  "reviewed_sha": "f603f1a75bebc52fa04f25ed713d4f4f8ba89138",
+  "six_review_notes_unchanged": true,
+  "tests_executed_by_this_verifier": false
+}

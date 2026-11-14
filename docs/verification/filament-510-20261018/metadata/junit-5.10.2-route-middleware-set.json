@@ -1,0 +1,30 @@
+{
+ "BrowserLoginRateLimitFixtureTest.xml": {
+  "files": 1,
+  "tests": 2,
+  "assertions": 11,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "PublicTrackEmbedRouteCacheTest.xml": {
+  "files": 1,
+  "tests": 2,
+  "assertions": 750,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "total": {
+  "files": 2,
+  "tests": 4,
+  "assertions": 761,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0
+ }
+}

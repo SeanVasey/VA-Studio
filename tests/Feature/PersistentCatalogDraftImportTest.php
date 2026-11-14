@@ -29,6 +29,7 @@ use RuntimeException;
 use Symfony\Component\Process\Process;
 use Tests\Support\DisposableNativeDatabase;
 use Tests\Support\LicenseFixtures;
+use Tests\Support\MysqlSchemaSnapshot;
 use Tests\Support\NormalizedCatalogFixtures;
 use Tests\TestCase;
 
@@ -52,8 +53,10 @@ class PersistentCatalogDraftImportTest extends TestCase
                 ['database' => ':memory:', 'url' => null])]);
             DB::setDefaultConnection('catalog_private_fixture');
         }
-        // Each application owns an isolated database; no outer testing transaction masks standalone admission.
-        $this->artisan('migrate:fresh', ['--force' => true])->assertExitCode(0);
+        // Each application owns an isolated database; no outer testing transaction masks standalone admission. On MySQL an
+        // unchanged migrated schema is reset instead of rebuilt (MysqlSchemaSnapshot), leaving the same committed state.
+        MysqlSchemaSnapshot::migrateFresh(DB::connection(), ['--force' => true],
+            fn () => $this->artisan('migrate:fresh', ['--force' => true])->assertExitCode(0)->run());
         config(['app.key' => 'base64:'.base64_encode(str_repeat('s', 32))]);
         Filament::setCurrentPanel(Filament::getPanel('admin'));
     }

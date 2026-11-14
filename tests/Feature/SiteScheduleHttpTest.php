@@ -15,6 +15,7 @@ use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Tests\Support\FilamentNotifications;
 use Tests\Support\LicenseFixtures;
 use Tests\TestCase;
 
@@ -44,13 +45,10 @@ class SiteScheduleHttpTest extends TestCase
         return app(SiteContent::class)->schedule($release->id, CarbonImmutable::parse($time, 'UTC'), $revision, $actor);
     }
 
-    /** Read before assertNotified(), which pulls notifications from the session. Livewire requests move them to the claimed key. */
+    /** The body of the one queued notification with this title. Fails when it was not sent, so a body check cannot pass on nothing. */
     private function notificationBody(string $title): string
     {
-        $notification = collect(session('filament.claimed_notifications', session('filament.notifications', [])))->firstWhere('title', $title);
-        $this->assertNotNull($notification, "The {$title} notification was not sent.");
-
-        return (string) $notification['body'];
+        return (string) FilamentNotifications::sole($title)['body'];
     }
 
     public function test_editor_schedules_a_saved_release_and_shows_it_in_the_heading_badge_and_history(): void

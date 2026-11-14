@@ -93,3 +93,7 @@ The [reviewed recovery child](../verification/download-request-recovery.md) boun
 ## Cloud focused development child — October 7, 2026
 
 Private saved favorites/playlists are composed and independently reviewed;107 affected PHP passes/987 assertions and65 mounted frontend cases pass. Notes/export/clear and production identity adapter remain active children. This does not close delivery, library, privacy or full WP-08 criteria. See [shared source-bound evidence](../verification/cloud-listening-registration-20261007/README.md) and current checkpoint for publication/preflight.
+
+## Production contracts from Sean's templates (plan, 2026-11-07)
+
+The plan for branded production buyer contracts rendered from Sean's own license templates, including the decisions that block it (buyer address, legal name, counsel review, per-track tiers), is in [`production-contract-profile.md`](../production-contract-profile.md). Nothing there is implemented yet.

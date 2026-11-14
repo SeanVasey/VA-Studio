@@ -3,11 +3,12 @@
 namespace App\Domain\Customers\Preferences;
 
 use App\Domain\Catalog\Discovery\DiscoveryEpoch;
-use App\Support\MigrationDefinitions;
+use App\Domain\Customers\ProductionIdentity\AccountAdmissionGuards;
+use App\Domain\Customers\ProductionIdentity\CatalogLease;
+use App\Domain\Customers\ProductionIdentity\CatalogRead;
 use LogicException;
 use PDO;
 use PDOException;
-use ReflectionMethod;
 
 /** Read-only admission against the retained identity schema; never repairs/adopts dependencies. */
 final class ConsentMigrationAdmission
@@ -15,6 +16,16 @@ final class ConsentMigrationAdmission
     public function __construct(private PDO $pdo, private string $driver, private string $database) {}
 
     public function namespace(array $expected): void
+    {
+        $lease = CatalogLease::open($this->pdo);
+        try {
+            $this->namespaceCurrent($expected);
+        } finally {
+            $lease->close();
+        }
+    }
+
+    private function namespaceCurrent(array $expected): void
     {
         foreach ($expected as $name => [$kind, $owner]) {
             $this->shadow($name);
@@ -26,13 +37,13 @@ final class ConsentMigrationAdmission
             } else {
                 // Parameter comparison uses each actual dictionary column's native collation.
                 // PHP lowercasing / LOWER(column) cannot prove accent/case aliases or object kind.
-                $rows = [...$this->query("SELECT TABLE_NAME name,'table' type,TABLE_NAME tbl_name FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=?", [$name]),
-                    ...$this->query("SELECT TRIGGER_NAME name,'trigger' type,EVENT_OBJECT_TABLE tbl_name FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA=DATABASE() AND TRIGGER_NAME=?", [$name])];
+                $rows = [...$this->query(CatalogRead::QA8762690E619, [$name]),
+                    ...$this->query(CatalogRead::Q38A05D78DB1E, [$name])];
                 if (count($rows) > 1 || ($rows !== [] && $rows[0] !== ['name' => $name, 'type' => $kind, 'tbl_name' => $owner])) {
                     $this->refuse();
                 }
                 foreach ([['STATISTICS', 'TABLE_SCHEMA', 'INDEX_NAME'], ['TABLE_CONSTRAINTS', 'CONSTRAINT_SCHEMA', 'CONSTRAINT_NAME'], ['ROUTINES', 'ROUTINE_SCHEMA', 'ROUTINE_NAME'], ['EVENTS', 'EVENT_SCHEMA', 'EVENT_NAME']] as [$dictionary, $schema, $column]) {
-                    if ($this->query("SELECT $column FROM information_schema.$dictionary WHERE $schema=DATABASE() AND $column=?", [$name]) !== []) {
+                    if ($this->query(CatalogRead::namespace($dictionary), [$name]) !== []) {
                         $this->refuse();
                     }
                 }
@@ -42,14 +53,39 @@ final class ConsentMigrationAdmission
 
     public function dependencies(): void
     {
+        $lease = CatalogLease::open($this->pdo);
+        try {
+            $this->dependenciesCurrent();
+        } finally {
+            $lease->close();
+        }
+    }
+
+    private function dependenciesCurrent(): void
+    {
+        $this->inspectDependencies(AccountAdmissionGuards::stable($this->pdo, $this->driver)['guards']);
+    }
+
+    /** Migration-only exact overlap admission; ordinary dependencies() never takes this path. */
+    public function dependenciesForAccountUpgrade(): void
+    {
+        $lease = CatalogLease::open($this->pdo);
+        try {
+            $this->dependenciesForAccountUpgradeCurrent();
+        } finally {
+            $lease->close();
+        }
+    }
+
+    private function dependenciesForAccountUpgradeCurrent(): void
+    {
+        $this->inspectDependencies(AccountAdmissionGuards::migrationState($this->pdo, $this->driver)['guards']);
+    }
+
+    private function inspectDependencies(array $guards): void
+    {
         if ((int) $this->pdo->query($this->driver === 'sqlite' ? 'PRAGMA foreign_keys' : 'SELECT @@SESSION.foreign_key_checks')->fetchColumn() !== 1) {
             $this->refuse();
-        }
-        $migration = MigrationDefinitions::load('2026_10_06_000040_customer_accounts.php');
-        // Reuse the unchanged authoritative guard definitions without running up/down or DDL.
-        $guards = [];
-        foreach ((new ReflectionMethod($migration, 'guards'))->invoke($migration) as $name => $guard) {
-            $guards[$name] = ['table' => 'customer_accounts', 'event' => $guard['operation'], 'timing' => 'BEFORE', 'body' => $guard['body'], 'sql' => $guard['statement']];
         }
         foreach (DiscoveryEpoch::guards($this->driver) as $name => $guard) {
             if ($guard['table'] === 'users') {
@@ -84,7 +120,7 @@ final class ConsentMigrationAdmission
             }
         } else {
             foreach ($this->columns() as $table => $columns) {
-                if ($this->query('SELECT ENGINE,TABLE_TYPE,TABLE_COMMENT,TABLE_COLLATION,CREATE_OPTIONS FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=?', [$table]) !== [['ENGINE' => 'InnoDB', 'TABLE_TYPE' => 'BASE TABLE', 'TABLE_COMMENT' => '', 'TABLE_COLLATION' => 'utf8mb4_unicode_ci', 'CREATE_OPTIONS' => '']]) {
+                if ($this->query(CatalogRead::Q9D29C0ADA7EE, [$table]) !== [['ENGINE' => 'InnoDB', 'TABLE_TYPE' => 'BASE TABLE', 'TABLE_COMMENT' => '', 'TABLE_COLLATION' => 'utf8mb4_unicode_ci', 'CREATE_OPTIONS' => '']]) {
                     $this->refuse();
                 }
                 $expected = [];
@@ -93,13 +129,13 @@ final class ConsentMigrationAdmission
                     $expected[] = ['COLUMN_NAME' => $column, 'COLUMN_TYPE' => $type, 'IS_NULLABLE' => $nullable ? 'YES' : 'NO', 'COLUMN_DEFAULT' => $default, 'EXTRA' => $extra,
                         'COLLATION_NAME' => $text ? 'utf8mb4_unicode_ci' : null, 'COLUMN_COMMENT' => '', 'GENERATION_EXPRESSION' => ''];
                 }
-                if ($this->query('SELECT COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,EXTRA,COLLATION_NAME,COLUMN_COMMENT,GENERATION_EXPRESSION FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=? ORDER BY ORDINAL_POSITION', [$table]) !== $expected) {
+                if ($this->query(CatalogRead::Q17E73B0D4F9F, [$table]) !== $expected) {
                     $this->refuse();
                 }
                 $this->mysqlIndexes($table);
                 $this->mysqlForeign($table);
                 $count = count($this->indexes($table)) + ($table === 'customer_accounts' ? 2 : 0);
-                if ($this->query('SELECT COUNT(*) count FROM information_schema.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=?', [$table]) !== [['count' => $count]]) {
+                if ($this->query(CatalogRead::QB894B1A4D034, [$table]) !== [['count' => $count]]) {
                     $this->refuse();
                 }
             }
@@ -108,14 +144,14 @@ final class ConsentMigrationAdmission
             $expected = $this->driver === 'sqlite' ? [['sql' => $guard['sql']]]
                 : [['EVENT_OBJECT_TABLE' => $guard['table'], 'EVENT_MANIPULATION' => $guard['event'], 'ACTION_TIMING' => $guard['timing'], 'ACTION_STATEMENT' => $guard['body']]];
             $actual = $this->driver === 'sqlite' ? $this->query("SELECT sql FROM main.sqlite_master WHERE type='trigger' AND name=?", [$name])
-                : $this->query('SELECT EVENT_OBJECT_TABLE,EVENT_MANIPULATION,ACTION_TIMING,ACTION_STATEMENT FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA=DATABASE() AND TRIGGER_NAME=?', [$name]);
+                : $this->query(CatalogRead::Q95556A0350AB, [$name]);
             if ($actual !== $expected) {
                 $this->refuse();
             }
         }
         foreach (['users', 'customer_accounts', 'quote_owners'] as $table) {
             $rows = $this->driver === 'sqlite' ? $this->query("SELECT name FROM main.sqlite_master WHERE type='trigger' AND tbl_name=? ORDER BY name", [$table])
-                : $this->query('SELECT TRIGGER_NAME name FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA=DATABASE() AND EVENT_OBJECT_TABLE=? ORDER BY TRIGGER_NAME', [$table]);
+                : $this->query(CatalogRead::QB2684ECFE856, [$table]);
             $names = array_keys(array_filter($guards, fn ($guard) => $guard['table'] === $table));
             sort($names);
             if ($rows !== array_map(fn ($name) => ['name' => $name], $names)) {
@@ -179,7 +215,7 @@ final class ConsentMigrationAdmission
 
     private function mysqlIndexes(string $table): void
     {
-        $rows = $this->query('SELECT INDEX_NAME,COLUMN_NAME,NON_UNIQUE,SEQ_IN_INDEX,INDEX_TYPE,SUB_PART,COLLATION,EXPRESSION,IS_VISIBLE FROM information_schema.STATISTICS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=? ORDER BY INDEX_NAME,SEQ_IN_INDEX', [$table]);
+        $rows = $this->query(CatalogRead::Q6BD010449A99, [$table]);
         usort($rows, fn ($left, $right) => strcmp($left['INDEX_NAME'], $right['INDEX_NAME']) ?: $left['SEQ_IN_INDEX'] <=> $right['SEQ_IN_INDEX']);
         $expected = $this->indexes($table);
         ksort($expected);
@@ -196,7 +232,7 @@ final class ConsentMigrationAdmission
 
     private function mysqlForeign(string $table): void
     {
-        $rows = $this->query('SELECT k.CONSTRAINT_NAME,k.COLUMN_NAME,k.REFERENCED_TABLE_SCHEMA,k.REFERENCED_TABLE_NAME,k.REFERENCED_COLUMN_NAME,r.UPDATE_RULE,r.DELETE_RULE FROM information_schema.KEY_COLUMN_USAGE k JOIN information_schema.REFERENTIAL_CONSTRAINTS r ON r.CONSTRAINT_SCHEMA=k.CONSTRAINT_SCHEMA AND r.CONSTRAINT_NAME=k.CONSTRAINT_NAME AND r.TABLE_NAME=k.TABLE_NAME WHERE k.TABLE_SCHEMA=DATABASE() AND k.TABLE_NAME=? AND k.REFERENCED_TABLE_NAME IS NOT NULL ORDER BY k.COLUMN_NAME', [$table]);
+        $rows = $this->query(CatalogRead::Q3A0D56156905, [$table]);
         $expected = [];
         if ($table === 'customer_accounts') {
             foreach (['owner_key' => ['quote_owners', 'owner_key'], 'user_id' => ['users', 'id']] as $column => [$target, $key]) {
@@ -229,8 +265,14 @@ final class ConsentMigrationAdmission
         }
     }
 
-    private function query(string $sql, array $values): array
+    private function query(CatalogRead|string $sql, array $values): array
     {
+        if ($sql instanceof CatalogRead) {
+            return CatalogLease::read($this->pdo, $sql, $values);
+        }
+        if ($this->driver !== 'sqlite') {
+            $this->refuse();
+        }
         $statement = $this->pdo->prepare($sql);
         $statement->execute($values);
 

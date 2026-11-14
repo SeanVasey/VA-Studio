@@ -7,6 +7,7 @@ use App\Domain\Customers\ProductionFeatures\Models\ProductionFeatureBinding;
 use App\Domain\Customers\ProductionIdentity\Features\ProductionAccountFeatureAccess;
 use App\Domain\Customers\ProductionIdentity\Features\ProductionAccountFeatureIdentity;
 use App\Domain\Customers\ProductionIdentity\IdentityCommittedFrame;
+use App\Domain\Customers\ProductionIdentity\IdentityMetadataAdmission;
 use App\Support\CanonicalJson;
 use Illuminate\Database\Connection;
 use Illuminate\Support\Facades\Crypt;
@@ -48,6 +49,7 @@ final class ProductionFeatureContext
         private readonly int $deadline,
         private readonly ProductionFeatureConfiguration $configuration,
         private readonly ProductionFeatureTransaction $transaction,
+        private readonly IdentityMetadataAdmission $metadata,
     ) {
         $this->connection = DB::connection();
         $this->primary = $currentReader->identityPrimary();
@@ -66,15 +68,16 @@ final class ProductionFeatureContext
 
     /** Only this factory can mint the held module context, after the exact typed identity floor. */
     public static function locked(ProductionAccountFeatureIdentity $identity, ProductionAccountFeatureAccess $access,
-        CurrentRows $reader, ProductionFeatureTransaction $frame, int $deadline, ProductionFeatureConfiguration $configuration): self
+        CurrentRows $reader, ProductionFeatureTransaction $frame, int $deadline, ProductionFeatureConfiguration $configuration, ?IdentityMetadataAdmission $metadata = null): self
     {
+        $metadata ??= IdentityMetadataAdmission::capture($reader->identityPrimary());
         $configuration->admit();
         ProductionFeatureConfiguration::plainPrimary($reader->identityPrimary());
         $authority = $access->lock($identity, $reader);
         $frame->admit();
         $configuration->admit();
 
-        return new self($identity, $access, $reader, $authority, $deadline, $configuration, $frame);
+        return new self($identity, $access, $reader, $authority, $deadline, $configuration, $frame, $metadata);
     }
 
     /** Releasing an outer SQLite savepoint removes later child markers. Re-arm only after
@@ -89,6 +92,7 @@ final class ProductionFeatureContext
 
     public function admitConfiguration(): void
     {
+        $this->metadata->requireCurrent($this->primary);
         $this->configuration->admit();
         ProductionFeatureConfiguration::plainPrimary($this->primary);
     }
@@ -280,6 +284,7 @@ final class ProductionFeatureContext
 
     private function resolveSources(): void
     {
+        $this->metadata->requireCurrent($this->primary);
         $previous = null;
         // A lazy secondary resolver may register/replace another connection. Resolve to stability
         // before any final pure module guard; never authorize a fresh source or transaction.

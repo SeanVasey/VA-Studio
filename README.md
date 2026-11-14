@@ -1,11 +1,14 @@
 # VASEY.AUDIO
 
-The [live payment and production preparation queue](docs/live-payment-and-production-preparation-queue.md)
-assigns the six current agents executable preparation work alongside the remaining
-implementation. Real payment activation and production cutover retain their
-separate authorization and exact-candidate acceptance steps.
+**Current state: see the [November 12 checkpoint](docs/handoff/2026-11-05/HANDOFF.md#checkpoint-2026-11-12) and the [staging alpha test guide](docs/alpha/staging-alpha-test-guide.md). The paragraph that follows records October 17, 2026 UTC and is kept for provenance.**
 
-**Current cloud handoff — October 7 UTC:** finished development batches and all six agent checkpoints are preserved in the [detailed Claude Code handoff](docs/handoff/2026-10-07/README.md), including a ready-to-use continuation prompt,42 verified worker branch heads, source-bound reviews, original failures and exact next steps. Support37 and identity/SMTP/history38 are merged. The final checkpoint composes reviewed suppression251 and the independently approved original-frame cleanup correction. Remaining checkout, paid delivery, production feature/free/membership/billing, content and host work is explicitly handed forward. Full final acceptance and live activation remain outstanding. [Named ownership](docs/development-agent-queue.md) and the [checkpoint](docs/verification/cloud-primary-checkpoint-20261007.md) preserve the complete scope.
+**October 17, 2026 UTC.** Development continues on `main` of [SeanVasey/VA-Studio](https://github.com/SeanVasey/VA-Studio). When this was written `main` was `34562862` (PR #137, documentation only) over the native fixture lifecycle merge of PR #132 (`efa6eea5`). The [development agenda](docs/handoff/2026-10-15/DEVELOPMENT-AGENDA.md) lists the completed development and the remaining work for each area. The [October 17 resumption note](docs/handoff/2026-10-17/RESUMPTION.md) records the open work lanes, the CI cost posture and the items that wait on Sean. The [Claude Code plan and merge ledger](docs/handoff/2026-10-07/CLAUDE-PLAN.md) remains the long record of every merged batch.
+
+Commerce, customer identity, memberships, paid and free delivery and tax run only behind default-off, test-only policies. They are admitted in `local` and `testing`, and the Stripe-test chain also in the hosted `staging` rehearsal (Stripe test mode only, staff MFA required); some rehearsals stay `local` and `testing` only. BeatStars remains the live store. No live payment, production deployment, DNS change, customer import or launch acceptance is claimed. The [remaining development plan](docs/remaining-development-plan.md#parity-status-source-read-october-17-2026) records a source-read status for each of the 103 parity requirements; that table is a reading of the code on October 17, not test or release acceptance.
+
+**Historical record, October 7:** the [detailed Claude Code handoff](docs/handoff/2026-10-07/README.md), its [named ownership](docs/development-agent-queue.md), the [cloud checkpoint](docs/verification/cloud-primary-checkpoint-20261007.md) and the [live payment and production preparation queue](docs/live-payment-and-production-preparation-queue.md) preserve that day's branch inventory, reviews, original failures and agent assignments. They describe October 7 and are not a current roster or status.
+
+*The dated checkpoint paragraphs below (October 6 and 7) are kept for provenance and are superseded by the current state above.*
 
 **Preserved original PR25 branch checkpoint — before cloud recovery:** PRs [#17](https://github.com/SeanVasey/VA-Studio/pull/17) through [#24](https://github.com/SeanVasey/VA-Studio/pull/24) are merged. Membership rollback retains data and migration bookkeeping; private consumers, canonical page sitemap/index/robots and atomic test-only PDF v2 adoption are integrated. Dependency PRs #1–#3 are reconciled. [Bounded track discovery](docs/verification/track-discovery-composition-20261007/README.md) has independent final MySQL 14/362 approval, all 14 actual stopped-copy checks and an exact pre-epoch 60→61 migration upgrade proof. Its publication uses cheap preflight; no track URLs are advertised yet. Authenticated read-only amount requirements also have corrected MySQL/SQLite and final V2-graph approval and follow on fresh main. Private identity generation and untrusted amount consistency implementation continue in parallel. Full final acceptance, production commerce and cutover remain open; [the queue](docs/development-control.md) records next dependencies.
 
@@ -33,6 +36,7 @@ Use the [current agent queue](docs/development-agent-queue.md) for ownership and
 
 - [Remaining development plan](docs/remaining-development-plan.md): 40 tracked completion deliverables, dependency order, design coverage and reviewable development batches.
 - [Task register](docs/remaining-development-tasks.csv) and [parity coverage](docs/remaining-parity-coverage.csv): completion criteria and ownership for every baseline capability.
+- [Production cleanup ledger](docs/production-cleanup-ledger.md): every staging placeholder, synthetic value and default-off switch to replace, decide or flip before production, with the 2026-11-10 delegated decisions in the [decision register](docs/architecture/decision-register.md) and the [work they unblock](docs/handoff/2026-11-10/UNBLOCKED-WORK.md).
 - [CI development strategy](docs/ci-development-strategy.md): accepted focused routing and exact receipts, measured bottlenecks and the remaining provenance/deduplication proposals; existing runtime gates remain required.
 
 Recovery checkpoint, September 30: [PR #84](https://github.com/VASEYDEV/VASEYAUDIO/pull/84) merged as `bfd5448` after all ten CI jobs passed, preserving Claude's scanner increment and adding the shared worker budget and mobile browser-test correction. The [PR #85 reconciliation](docs/verification/pr-85-reconciliation.md) accounts for every original commit and changed path: all useful work is already incorporated through PRs #78, #81 and #82. [PR #86](https://github.com/VASEYDEV/VASEYAUDIO/pull/86) then merged as `3833547`, protecting track-media revisions after an uncertain database commit. [PR #87](https://github.com/VASEYDEV/VASEYAUDIO/pull/87) merged encoder diagnostics as `8be3bd7` after all ten CI jobs and independent review. That historical recovery queue is superseded by the current development queue; the six media hardening groups are accepted.
@@ -43,12 +47,13 @@ Recovery checkpoint, September 30: [PR #84](https://github.com/VASEYDEV/VASEYAUD
 - [Operator setup and diagnostics](docs/operator-setup-and-verification.md): audited console provisioning, installation checks and isolated browser verification.
 - [Agent instructions](AGENTS.md): shared rules for Astra, Codex, Claude, and other contributors.
 - [Architecture](docs/architecture/): domain boundaries, decision register, contracts, and roadmap.
-- [Development order](docs/development-order.md): current increment, earlier gaps, and the ordered handoff across all 14 packages.
+- [Development order](docs/development-order.md): the dated record of merged increments and their evidence across all 14 packages, with a current-status pointer at the top.
 - [Work packages](docs/work-packages/): dependency-scoped implementation assignments with acceptance criteria.
 - [Migration evidence](docs/migration/): reconciled research, feature parity, field mapping, and cutover requirements.
 - [Brand evidence](docs/brand/): current published theme, exact identity assets, and source provenance.
 - [Verification](docs/verification/): actual local checks and remaining gates.
 - [Media operations](docs/media-processing.md): worker prerequisites, approved preview tag, processing and recovery.
+- [Staging alpha test guide](docs/alpha/staging-alpha-test-guide.md): browser test scripts for the owner on the staging store (Stripe test mode), with expected results and known limits.
 - [Licensing and offers](docs/licensing-and-offers.md): review submission, successor versions, published prices/files and legacy upgrade steps.
 - [Provisional selection reviews](docs/provisional-quotes.md): server snapshots, session ownership, retries, expiry and the boundary before payable checkout.
 - [Quote license disclosure](docs/quote-license-disclosure.md): full frozen terms tied to the owning selection review, disclosure identity and recovery.
@@ -67,12 +72,15 @@ Recovery checkpoint, September 30: [PR #84](https://github.com/VASEYDEV/VASEYAUD
 - [Dependency PR integration and compatibility decisions](docs/dependency-pr-integration.md), including the [September 26 reconciliation](docs/dependency-pr-integration-2026-09-26.md)
 - [Shared rights inventory](docs/shared-rights-inventory.md): internal scope/revision linkage, guarded test reservations and the boundary before exclusive sales.
 - [Promotion pricing](docs/promotion-pricing.md): versioned discount allocations, shared test campaign limits and guarded usage holds.
+- [Collaborator splits](docs/collaborator-splits.md): credited collaborators and per-track shares in basis points as staff metadata; database-held totals, audited edits, reported to publication readiness without blocking; no payouts.
+- [Albums page](docs/albums.md): default-off public page for Sean's own releases with staff-entered tracklists, allow-listed https listening links and cover art through the site image pipeline; no purchase path.
 - [Catalog administration](docs/catalog-administration.md): audited metadata saves, edit conflicts and stable published track URLs.
 - [Reusable metadata presets](docs/verification/track-metadata-presets.md): named descriptive defaults, stale-edit protection and explicit copied-value review before private draft creation.
 - [Reviewed bulk metadata edits](docs/verification/bulk-track-metadata.md): current-page Keep/Set/Clear choices, exact before/after review and atomic optimistic saves.
 - [Protected operator track review](docs/verification/private-track-review.md): current descriptive metadata, actual publication blockers and verified artwork/tagged audio in a close-only staff modal.
 - [Reviewed manual publication guards](docs/verification/track-publication-guards.md): confirmations bound to current metadata/publication revisions with fresh authority and atomic counter/audit writes; track scheduling remains open.
 - [Read-only publication manifest foundation](docs/verification/track-publication-manifest-foundation.md): immutable internal identity for current ready metadata, rights, derivatives and active commercial evidence; later reviewed apply and scheduling remain separate.
+- [Staff reporting and operations views](docs/staff-reporting.md): read-only operational health widgets, a sales and conversion report with an audited CSV export (test and production never mixed, refunds netted status-aware) and a default-off consent-aware customer segment export.
 - [Catalog pagination](docs/catalog-pagination.md): bounded server browsing and off-page saved-selection reconciliation.
 - [Public track sharing](docs/track-sharing.md): canonical URLs, server-rendered social metadata, Inertia navigation and publication privacy.
 - [Track details and full license terms](docs/track-detail-and-license-disclosure.md): published offer disclosure, resilient selection, persistent playback and browser verification scope.
@@ -82,15 +90,17 @@ Recovery checkpoint, September 30: [PR #84](https://github.com/VASEYDEV/VASEYAUD
 
 | Surface | Initial implementation | Remaining delivery |
 | --- | --- | --- |
-| Storefront | Paginated catalog/search/sort, dedicated track pages, frozen full license disclosure, reconciled cart, social metadata and persistent audio transport | Production catalog import, collections, physical-device and broader accessibility/performance acceptance |
-| Admin | Authenticated Filament catalog/licensing management, audited metadata edits, permanent published track URLs, accepted versioned site-content publication/rollback, test promotion administration and persisted contact/about/blog/video content; scheduled site publication | Asset controls, inbound contact delivery, consent-aware embeds, detailed RBAC, recovery verification, customers and fulfillment operations |
-| Media | Private WAV/artwork and bounded WAV-stems ZIP intake, queued verification, immutable master/MP3 revisions, tagged previews, measured waveforms, admin retry controls and audited stems/master associations frozen in offers | Production scanner acceptance, worker isolation, real stems alignment acceptance, resumable uploads and managed object storage |
+| Storefront | Paginated catalog/search/sort, dedicated track pages, frozen full license disclosure, reconciled cart, social metadata and persistent audio transport | Production catalog import; public collection and album pages and checkout (private drafts exist); a legal page type, structured data (JSON-LD) and legacy-URL redirects; physical-device, screen-reader and broader accessibility/performance acceptance |
+| Admin | Authenticated Filament catalog/licensing management, audited metadata edits, permanent published track URLs, accepted versioned site-content publication/rollback, test promotion administration and persisted contact/about/blog/video content; scheduled site publication; a private contact inbox with in-app replies; video embeds that load a provider only after a visitor's explicit choice | Media delete, orphan and quota tooling, dashboard widgets, granular production permissions, customer administration and fulfillment operations, and restore verification on a real host. Contact inquiries stay in the private inbox: nothing is sent by email or any other outbound channel |
+| Media | Private WAV/artwork and bounded WAV-stems ZIP intake, queued verification, immutable master/MP3 revisions, tagged previews with an untagged variant that staff switch on per track or by a store default (default on), measured waveforms, admin retry controls and audited stems/master associations frozen in offers; resumable private uploads for track media and sound kits (sequential 8 MiB parts, 24-hour sessions, 200 MiB source ceiling) | Production scanner acceptance, worker isolation, real stems alignment acceptance and managed object storage. The resumable limits are application bounds: that a production proxy and PHP configuration admit them is not demonstrated |
 | Licensing | Exact submitted review payloads, independent approval evidence, source/summary preview, successor diffs and effective dates | Approved production terms, a complete typed rights schema and production archival/legal validation |
 | Offers | Editable drafts separated from immutable published price/license/file revisions; revision history and cart invalidation; scope-bound exclusive preparation and explicit test activation/selection | Production exclusive policy and fulfillment |
-| Commerce | Immutable selection/disclosure/pricing, promotion limits/shared inventory, private order/assent, hosted test sessions and verified payments; merged #64 adds terminal resource effects, grants and pending fulfillment; merged #66 adds read-only staff visibility | Operator exception/refund resolution and production identity/legal/tax policy |
+| Commerce | Immutable selection/disclosure/pricing, promotion limits/shared inventory, private order/assent, hosted test sessions and verified payments; merged #64 adds terminal resource effects, grants and pending fulfillment; merged #66 adds read-only staff visibility. In VA-Studio, default-off whole-order paid delivery and typed Tax V2 composition (PRs #118 to #124) and default-off, unattested refund and dispute prerequisites (PRs #125 and #126) are merged | Operator exception/refund resolution beyond the narrow test cases: the refund and dispute lifecycle has no provider acceptance, durable observation ledger or financial, access, rights or inventory effect yet. Also production identity/legal/tax policy |
 | Contracts and delivery | Merged #65 pins renderer/private originals/recovery; #67 records whole-order activation; #69 implements internal controls/authorization; #71 adds owner HTTP/privacy/native attachments and bounded order history | Complete cross-order library/recovery and production archival/storage/restore remain. Actual PR acceptance is tracked in the ordered record |
 | Payment evidence | Stripe test-only snapshot webhook, immutable encrypted receipts, hosted sessions, durable work claims, authoritative confirmations and console recovery | Actual test-account interoperability and production payment/refund/dispute policy |
-| Full parity | Documented work packages and evidence gates | Memberships, kits, services, merch, CRM, production promotions, remaining editorial/media flows, integrations and migration |
+| Product families | Private, default-off drafts and test workflows only: collection and album drafts with immutable ordered track snapshots; WAV sound-kit drafts, verified archive revisions and resumable upload; service and merchandise drafts with captured revisions; and a synthetic service-project journey (brief, operator quote, exact accept or decline, milestone scope review, included revisions) | Public storefront pages, purchase and delivery for collections, kits, services and merchandise. Service payment is not collected and no deposit or invoice exists. Merchandise stock, shipping, provider submission and returns do not exist |
+| Memberships | Synthetic plans, an append-only credit ledger (award, reserve, consume, release, expire, atomic consume and activation), read-only Stripe billing evidence adapters, member-original preparation, staff administration and read-only customer credit history, all default-off | Member-facing HTTP and redemption, a public plan page, recurring-billing activation, renewal, cancellation and dunning policy, legacy member continuity, commercial inputs and runtime activation |
+| Full parity | Documented work packages, evidence gates and a [source-read parity status](docs/remaining-development-plan.md#parity-status-source-read-october-17-2026); a BeatStars export normalizer, read-only dry run and catalog-draft importer tested on synthetic data | CRM and delivered email (no outbound contact or marketing delivery and no ESP adapter), production promotions, sales reporting, remaining editorial/media flows, integrations and migration of a real BeatStars export, which has not been supplied or imported |
 
 Public metadata observed on BeatStars is evidence, not an imported production catalog. Design fixtures are development-only and carry no saleable rights. The local cart pins the advertised offer revision and invalidates selections when that revision changes. **Review selection** asks the server to revalidate the exact selection and freeze its price, license and file evidence. The returned subtotal is provisional: tax and total are unknown, `payable` is false, and no order, reservation, assent or purchase rights are created.
 
@@ -98,13 +108,13 @@ The separate **Test order preparation** action requires explicit local/testing o
 
 ## Stack
 
-Laravel 13 / PHP 8.4+, Inertia 3 / React / TypeScript, Filament 5. MySQL 8.4 is the production database target; SQLite is supported for local development. Redis jobs and private S3-compatible storage are staged behind later work packages. Keep the stack modular within one application and one transactional database.
+Laravel 13 / PHP 8.4.1+, Inertia 3 / React / TypeScript, Filament 5. MySQL 8.4 is the production database target; SQLite is supported for local development. Redis jobs and private S3-compatible storage are staged behind later work packages. Keep the stack modular within one application and one transactional database.
 
 No LLM is required by the storefront runtime. Astra is the requested development lead, not a dependency exposed to customers.
 
 ## Run locally
 
-Prerequisites: a currently patched PHP 8.4 or 8.5 with `pdo_sqlite`, `pdo_mysql`, `mbstring`, `intl`, `bcmath`, `gd`, `fileinfo`, `zip`, and `curl`; Composer 2; Node 24.15+ (within Node 24); npm. Use your platform's supported installers.
+Prerequisites: a currently patched PHP 8.4.1+ or 8.5 with `pdo_sqlite`, `pdo_mysql`, `mbstring`, `intl`, `bcmath`, `gd`, `fileinfo`, `zip`, and `curl`; Composer 2; Node 24.15+ (within Node 24); npm. Use your platform's supported installers.
 
 ```sh
 composer install
@@ -135,26 +145,40 @@ composer audit
 npm audit --audit-level=high
 ```
 
+Check PHP formatting locally the way preflight does, on the files your branch changes
+(Laravel Pint, `laravel` preset in `pint.json`; the whole-repository format sweep is a
+separate later PR, so untouched files may still fail):
+
+```sh
+vendor/bin/pint --test --diff=origin/main
+```
+
 Routine PRs run **Development preflight**: frontend tests/build, client secret
 scans, dependency audits and PHP/tooling quality checks. Pushes and merges do not
 start full database/browser matrices. Sean's October 6 policy in [AGENTS.md](AGENTS.md)
 allows development merges using meaningful focused evidence with untested
-conditions recorded. Prefer local affected checks; manually request
-[focused feedback](docs/verification/focused-ci.md) only when needed.
+conditions recorded. Preflight runs no PHPUnit: PHP tests run locally per change and in the
+manual final verification. Prefer local affected checks; manually request
+[focused feedback](docs/verification/focused-ci.md) only when needed. Its browser specs are
+split into nine `browser-*` suites plus `accessibility-browser` (the single `browser` suite no longer exists).
 
 **Foundation CI** is manual final verification through
 `.github/workflows/final-verification.yml`, requiring the exact reviewed
 `expected_sha`. SQLite runs the complete PHP suite. MySQL runs only the reviewed
 [native selection](docs/verification/mysql-native-selection-20261009/README.md):
 files owning a method in the SQLite skip census, migration test files and a reviewed
-include list (163 of 557 files, 1,765 of 7,642 cases). Other tests no longer run on
-MySQL in Foundation CI, including 47 driver-branching test files pinned in its `residual_files`.
-MySQL may skip only the 58 reviewed SQLite-only cases in `scripts/ci/database-mysql-skips.json`,
-and each of them must have run on SQLite. GitHub and the GitLab workflow both split that selection
-into 24 MySQL shards, weighted by hosted timings from Foundation run 37967128232. GitLab's 175-minute
-job limit stays under its hosted runners' 3-hour cap; whether every shard finishes inside the GitHub
-and GitLab limits is unproven until the next hosted run. Dispatch GitLab only after a hosted GitHub run
-has measured MySQL shard 1 (`BulkReplaceLicenseDraftSourceTest` alone, about 122 minutes on GitHub).
+include list (233 files and 2,432 of 9,202 cases in list-only discovery, as recorded in
+`final-verification.yml`; these are discovery counts, not executed tests or skips). Other tests
+no longer run on MySQL in Foundation CI, including 49 driver-branching test files pinned in its `residual_files`.
+MySQL may skip only the 25 reviewed SQLite-only methods in `scripts/ci/database-mysql-skips.json`
+(lane F2c in the [resumption note](docs/handoff/2026-10-17/RESUMPTION.md) is replacing them with native counterparts), and each of them must have run on SQLite.
+GitHub and the GitLab workflow both split that selection into 24 MySQL shards, weighted by hosted
+timings from Foundation run 38037183233; newer selected files use fallback weights. The only
+complete Foundation pass so far, run 38077166247 on `0f23e63f` (2026-10-10), finished all 24 hosted
+MySQL shards in 56 to 132 minutes (shard 1, `BulkReplaceLicenseDraftSourceTest` alone, took about
+123). That pass covers neither the merges since nor GitLab, which has not been dispatched. GitLab's
+175-minute job limit stays under its hosted runners' 3-hour cap, and its small runners are unmeasured;
+do not dispatch GitLab without Sean's cost go-ahead.
 All browser checks remain. Do not re-enable the retired `ci.yml` or `focused.yml` workflows. See
 [CI cadence and coordination](docs/verification/ci-trigger-efficiency.md).
 A preflight or focused pass is not a full-suite pass or launch approval; real

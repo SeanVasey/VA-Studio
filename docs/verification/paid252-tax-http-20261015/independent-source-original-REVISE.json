@@ -1,0 +1,243 @@
+{
+  "baseline_sha": "9d1a67db975b9061e2e156c4f85ba1969b678c34",
+  "changed_paths": [
+    {
+      "git_blob": "846c01795c71d1a3358da365ff5b8fd14148d64e",
+      "path": "app/Domain/Grants/PaidTax/PaidTaxForm.php",
+      "sha256": "ec313a422ea8e7febbcc6d1a3adc16199a4f9f9790b2b24295d8c3b6fe87b0ac"
+    },
+    {
+      "git_blob": "565107c5985ca109aea4ab3ff043d752f68e2c9b",
+      "path": "app/Domain/Grants/PaidTax/PaidTaxJson.php",
+      "sha256": "fe79e445a45f7abf4dcf7145cb9ca20f29fd69b7fc2b612ec205fb5e7f77f2f8"
+    },
+    {
+      "git_blob": "770eb355440fffd7245b9df0a7680fbeb4092e96",
+      "path": "app/Domain/Grants/PaidTax/PaidTaxReads.php",
+      "sha256": "a2e0b261203eb4287146d86ed71eea8b80245492aaedd2f1e479eb08161818c7"
+    },
+    {
+      "git_blob": "db47dad4f6e33432685a15f02b02995cc39cc03f",
+      "path": "app/Http/Controllers/PaidTaxController.php",
+      "sha256": "370fb1fb85bfa82bd24c77ca8f6922edb76ae522c4d200cdb9d3f427624163e8"
+    },
+    {
+      "git_blob": "92644c097c54100cf5420d09155d67ae48f420a5",
+      "path": "app/Http/Middleware/PaidTaxPrivacy.php",
+      "sha256": "bcd68ea21b34b8635cfd89dd5428b2924fda6b62a648e33700ef857c315cd310"
+    },
+    {
+      "git_blob": "3f5d208a7fa308e51d444227826b2895cb9cf551",
+      "path": "app/Http/Middleware/TaxRootPrivacy.php",
+      "sha256": "7466c2e35f028b4609217045098969076cad89adb3d0dd79619bbec65dcd025b"
+    },
+    {
+      "git_blob": "efd60b6e490fec91ea421fa7fa5a62fd9b329263",
+      "path": "app/Http/Tax/PaidTaxRequestContext.php",
+      "sha256": "42f7fb0fbca3fe8f8cfe1fcc76da489b3233ca1c287d3cc6a510ed041ac33ec8"
+    },
+    {
+      "git_blob": "c0cbe072bfd25f9dd033baf7babac1545019eb2d",
+      "path": "app/Http/Tax/PaidTaxResponseOwner.php",
+      "sha256": "a63bb2d1b88a9bbb5338fb77a79d2cfb6f585dbfb035823ae8e2fb8eabe05e1c"
+    },
+    {
+      "git_blob": "f6ecae5bb6d2d1c025ed537a79e5822e37d8dbdd",
+      "path": "app/Http/Tax/PaidTaxStreamResponse.php",
+      "sha256": "23509c445d226f24e48ee50c856ab5c13db7500fce13f0f09fe2ab664340b3cc"
+    },
+    {
+      "git_blob": "bbde9159ab19ff7acd198d82e3bd29f115ea7a3e",
+      "path": "app/Http/Tax/TaxHttpMount.php",
+      "sha256": "0465bd8c2fd739fc2cf1cc1cb066b1f86e97d109fe6c54d2271a11519cd0bd13"
+    },
+    {
+      "git_blob": "a02759e72ceb73333c09423f30ab02e57d334635",
+      "path": "app/Providers/AppServiceProvider.php",
+      "sha256": "8ffd6b079b16b468a849062e4e093408e401b1173df1c0c7eeab2ae2f332695e"
+    },
+    {
+      "git_blob": "de8a0656f82b37355ba4baba13e235a9f3488b84",
+      "path": "bootstrap/app.php",
+      "sha256": "9682fbe3ded094d4867e108848eeb18e4058dab9957f9e5bdb3eaa4ed1dd7f70"
+    },
+    {
+      "git_blob": "89a1d011dae1b5ab4b5058b5018f41bdaa3cf6fc",
+      "path": "config/production-tax-checkout.php",
+      "sha256": "115fb8a013cffadd0811816127ecc586c4437f4f0dd5dfd89c02d019a1f4ae4d"
+    },
+    {
+      "git_blob": "ce0b86bdacd8a412548f6f72b38cf7b71cfa43e6",
+      "path": "docs/verification/paid252-tax-http-20261015/independent-design-DECISION.json",
+      "sha256": "5bed6b7d1ba16e8ddffdf2e3b5c51f328a1a241bce8af2be0a591bc9b1dc2d93"
+    },
+    {
+      "git_blob": "0f912380a9415a44bf8eaea27b979fb867b98721",
+      "path": "docs/verification/paid252-tax-http-20261015/independent-design-DECISION.md",
+      "sha256": "e792e95cf472aba1871ca5e19ac92244b2eed3ac535f56a1a9144f4c4479240e"
+    },
+    {
+      "git_blob": "497f503467978ff182cb75e27a9ce50e20038099",
+      "path": "routes/paid-tax-grants.php",
+      "sha256": "45e12603ad2c116535d2f821526d2be0dd5b0e00aad589989f443f784dae665d"
+    },
+    {
+      "git_blob": "b8d7246bd10d6d1fc6631e6671406e3b1ac762d0",
+      "path": "routes/production-tax-checkout.php",
+      "sha256": "eccfa2099cdc4d5731633cc31be0536cf6dc18d1ddbbdaf6634dd755a4edd444"
+    },
+    {
+      "git_blob": "ad7c46f4a09a41c9850395c6f012c9eb691659e1",
+      "path": "routes/web.php",
+      "sha256": "70021f63b4b755380a332d597a5fe186ef421a682ec41bf9bcf5c06f4cd60324"
+    },
+    {
+      "git_blob": "a27a76c6af99f7378e5429ba7a90b9b43432f682",
+      "path": "tests/Feature/PaidTaxHttpJourneyTest.php",
+      "sha256": "b985dd123ee9c7cdf15219aae7a5ea705f495225b30a0f720bf049aa9d08c877"
+    },
+    {
+      "git_blob": "d89e2fb3b6bff7a856b60f40e0fb5712cd366151",
+      "path": "tests/Feature/PaidTaxRootHttpBoundaryTest.php",
+      "sha256": "3b72d42ff61be731f40834472d40ff8da82f8fb4adf9552f2438c57906d62b1e"
+    },
+    {
+      "git_blob": "b4347a76611b4695adf994a8e59af51e59176ee3",
+      "path": "tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutHttpBoundaryTest.php",
+      "sha256": "5b225a2af2825abe24bcd9d6d0d921af71a0a64d9b52edefe7357705f935d705"
+    },
+    {
+      "git_blob": "53b54585b7d1689aa6a54ebc21897d13bc231ba2",
+      "path": "tests/Support/PaidTaxRootHttpFixture.php",
+      "sha256": "93e6a3165d294a7cd884f5187fd0b63821273284d99768bd84acd9dde977763f"
+    }
+  ],
+  "decision": "REVISE",
+  "engineering_verdict": "REVISE before a fresh source/evidence approval.",
+  "execution_boundary": {
+    "reviewer_app_tests": 0,
+    "reviewer_database_operations": 0,
+    "reviewer_network_or_hosted_actions": 0,
+    "reviewer_tracked_mutations": 0
+  },
+  "findings": [
+    {
+      "confidence": "high",
+      "consequence": "Explicitly mounted producer requests can be refused as 404 before their retained producer runs.",
+      "evidence": "Immutable source plus installed LoadConfiguration/Application/Container mechanics; root reports the completed 760 run has 16 producer 404 failures. The run classification is not a reviewer execution.",
+      "finding": "Admission recognizes only an already-instantiated env value. LoadConfiguration calls detectEnvironment; Application writes through Container::offsetSet, storing a standard binding closure rather than necessarily an instances entry. The explicit new root fixture instantiates env and masks this ordinary cold-bootstrap representation.",
+      "id": "HTTP-01",
+      "path": "app/Http/Tax/TaxHttpMount.php",
+      "repair": "Raw-admit instances and bindings arrays before indexing; accept either the retained literal env instance or the authenticated standard offsetSet binding descriptor and its captured literal value, without invoking the closure or resolving env.",
+      "requirement": "Admit genuine local/testing Laravel bootstrap without resolving services.",
+      "severity": "P1",
+      "state": "open in a565 and 760"
+    },
+    {
+      "confidence": "high",
+      "finding": "The helper indexes instances[config] before is_array(instances). A noncanonical ArrayAccess value can execute offsetGet before the guard and before original timing capture, even if admission ultimately refuses.",
+      "id": "HTTP-02",
+      "path": "app/Http/Tax/TaxHttpMount.php",
+      "repair": "Require actual raw maps before every own offset, including the standard environment binding descriptor. Add a targeted offset sentinel and genuine standard-binding positive.",
+      "requirement": "Callback-free literal mount admission before budget/policy/identity/body work.",
+      "severity": "P2",
+      "state": "open in a565 and 760"
+    },
+    {
+      "confidence": "high",
+      "finding": "RequestContext evaluates request.server.get(REQUEST_TIME_FLOAT) before entering RequestBudget::capture and therefore before that factory samples hrtime. ServerBag::get is virtual. A subclass can execute arbitrary work or return a replacement/fallback instant before the budget starts. With an unchanged valid server instant the later wall-age deduction may account for delay; that does not make this virtual getter callback-free or generally preserve the original allowance.",
+      "id": "HTTP-03",
+      "path": "app/Http/Tax/PaidTaxRequestContext.php",
+      "repair": "Raw-read the Request server property without a property hook, require the supported exact bag and raw parameters array, and obtain the primitive start field without virtual getters or coercion. Retain the existing factory clock/arithmetic and one-use tombstone. Add callback sentinel/refusal and normal-bag positive; retain a genuine elapsed post-capture delay regression.",
+      "requirement": "Capture original monotonic allowance before callback-producing intake work.",
+      "severity": "P2",
+      "state": "open in a565 and 760"
+    },
+    {
+      "confidence": "high",
+      "evidence": "Immutable a565/760 diff and installed Symfony Response signature; original autoload diagnostic and empty-JUnit outcomes are root-reported, not a reviewer reproduction.",
+      "finding": "a565 declares private __clone while Symfony Response declares public __clone. The visibility restriction prevents class loading.",
+      "id": "HTTP-04",
+      "path": "app/Http/Tax/PaidTaxStreamResponse.php",
+      "repair": "The inspected 760 successor makes __clone public, detaches only the clone holder before throwing, and rejects serialization/deserialization. This closes the identified visibility issue at source level.",
+      "severity": "P1",
+      "state": "historical a565 source blocker; narrow 760 repair inspected, runtime verification not performed by reviewer"
+    },
+    {
+      "confidence": "high",
+      "finding": "Changing the promoted constructor argument to nullable permits construction without a holder; its constructor catch still calls owner.close unconditionally. Existing controller callers pass a holder, so this is an API/cleanup-contract defect rather than evidence of an ordinary caller authorization bypass.",
+      "id": "HTTP-05",
+      "path": "app/Http/Tax/PaidTaxStreamResponse.php",
+      "repair": "Keep constructor parameter PaidTaxResponseOwner non-null, assign it to a separate nullable private property before callbacks, and use null only to detach a refused clone. Preserve explicit close/destructor idempotence.",
+      "requirement": "Owned responses always receive a mandatory plain original holder.",
+      "severity": "P2",
+      "state": "introduced by inspected 760 clone repair"
+    }
+  ],
+  "generated_at_utc": "2026-10-15T11:37:47.012889+00:00",
+  "narrow_inspected_successor_sha": "760c9388b8f07f250fc67d5489f93feb85420051",
+  "open_P0": false,
+  "open_P1": true,
+  "positive_source_assessment": [
+    "Private WeakMap values do not strongly retain their Request key; failed capture retains a tombstone; successful controller claim is one-use and returns the same original instance.",
+    "Controllers allocate the plain owner before domain projection work and establish transfer ownership before constructing the response; owner cleanup detaches and best-effort closes only captured handles.",
+    "Response callbacks capture owner/payload rather than the response; source-level explicit close and destructor avoid a response self-cycle. JSON positive handoff calls original proof immediately before echo; attachment path retains domain first-byte closure and emits no appended JSON.",
+    "Production checkout fixture removes its extra global producer privacy middleware, sets the explicit flag, and retains manual route/provider mounting; root delegates once. This source observation does not itself prove one raw stream read at runtime.",
+    "No original producer/consumer authority, schema, V1, dependency or frozen profile source was changed by the initial HTTP patch."
+  ],
+  "read_commands": [
+    "cat AGENTS.md",
+    "skills.read c38/code-verification",
+    "git status --porcelain=v1; git rev-parse HEAD",
+    "git show a565:<changed source and original RequestBudget>; git diff 9d1a..a565",
+    "git diff a565..760 -- app tests bootstrap config routes",
+    "sed/rg installed LoadConfiguration, Application::detectEnvironment, Container::offsetSet, ParameterBag::get, Request server and Response::__clone",
+    "git diff 9d1a..a565 -- tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutHttpBoundaryTest.php",
+    "rg --files runtime evidence (discovery only)",
+    "git immutable blob and SHA-256 bindings for the 22 changed paths"
+  ],
+  "reported_original_outcomes_not_independently_reconciled_here": [
+    {
+      "assertions": 34,
+      "classification": "incorrect db-unresolved fixture assertion; root reports original exits preserved",
+      "failures": 1,
+      "source": "a565",
+      "tests": 1
+    },
+    {
+      "classification": "stream class visibility fatal; 31 progress dots with empty JUnit; no test count inferred; root reports PHP2/recorder1/OS1",
+      "source": "dfb45468 test-only successor"
+    },
+    {
+      "assertions": 733,
+      "classification": "root reports 16 producer mount 404 failures and one invalid assertDatabaseCount connection argument; fresh raw reconciliation remains root/final evidence work",
+      "errors": 1,
+      "failures": 16,
+      "skips": 0,
+      "source": "760c9388b8f07f250fc67d5489f93feb85420051",
+      "tests": 65
+    }
+  ],
+  "required_focused_evidence": [
+    "Red/green raw mount-map, standard unresolved env binding and virtual server getter controls; a genuine cold root producer positive without manually instantiating env.",
+    "Real captured-read encoding/constructor/disposal/clone cleanup, actual response destruction and fresh command after release; preserve unowned/reopened/replacement frames.",
+    "Genuine elapsed body/resolver/identity work after original root capture. The existing named identity-delay test shortens the original budget; it is a live-cap regression, not measured slow identity evidence.",
+    "Throwing actual afterCommit retains truthful durable effects/spent attempt and allows only fresh authorization; multi-line retained-first-original retry followed by exact PDF and purchased bytes for both lines.",
+    "Late projection/token/budget withdrawal suppresses positive bytes; genuine pre-privacy session/419 and bounded propagated headers should be reconciled against the approved design.",
+    "Whole affected HTTP/root/producer/V1 selections on the repaired frozen source, meaningful case/count/exit reconciliation, then independent final sealed-packet review and exact-head cheap preflight/expected-SHA merge."
+  ],
+  "review_kind": "independent non-author bounded source checkpoint; not final tested-source/evidence approval",
+  "reviewed_sha": "a565e54a47fd46a3cf62eeab40826674f8c84988",
+  "reviewer_preparation_limits": [
+    "One rg used the wrong top-level ProductionTaxCheckoutHttpBoundary glob and returned no-such-file status 2; corrected with rg --files and read the actual nested path. This was read-only reviewer path discovery, not an application failure.",
+    "No current run outcome was inferred from progress dots. Root original receipts are not claimed independently reconciled in this source checkpoint.",
+    "Broader metadata/host/output-buffer guarantees, adjacent frozen V1/Identity and ordinary membership P2 findings remain outside this patch review."
+  ],
+  "snapshot_head_at_report": "e430832785ad8e3911240e350278f875e4aba82e",
+  "snapshot_status_at_report": "",
+  "specification_verdict": "Fail/partial: required source corrections remain and meaningful execution evidence is incomplete.",
+  "successor_delta": [
+    "M\tapp/Http/Tax/PaidTaxStreamResponse.php",
+    "M\ttests/Feature/PaidTaxRootHttpBoundaryTest.php"
+  ]
+}

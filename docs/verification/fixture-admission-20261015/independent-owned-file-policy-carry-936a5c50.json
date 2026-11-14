@@ -1,0 +1,148 @@
+{
+  "approved_php_test_source_sha": "1f7b6705f4a7d1a346779d87ec52c9080cf4ec57",
+  "completed_prior_source_sqlite_scopes": {
+    "owned-file-admission-and-restore-recipe-corrected-original": {
+      "counts": {
+        "assertions": 722,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 31
+      },
+      "php_exit": 0,
+      "recorder_exit": 0,
+      "result_sha256": "6429657f0caeae2c15059c4e04615db9847f7f745b3826e0992c62d69859c2b2",
+      "selected_files": [
+        "tests/Feature/FixtureDatabaseAdmissionTest.php",
+        "tests/Feature/SyntheticPrivateRestoreTest.php"
+      ],
+      "source": "1f7b6705f4a7d1a346779d87ec52c9080cf4ec57"
+    },
+    "owned-file-sqlite-surrounding-whole-original": {
+      "counts": {
+        "assertions": 1288,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 112
+      },
+      "php_exit": 0,
+      "recorder_exit": 0,
+      "result_sha256": "dc109c280110389a129844c362dd15a716df52335d4e5919359294701c85dbee",
+      "selected_files": [
+        "tests/Unit/DisposableTestDatabaseTest.php",
+        "tests/Unit/DisposableNativeDatabaseTest.php",
+        "tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php",
+        "tests/Feature/ProductionTrackPreparationPacketMigrationTest.php",
+        "tests/Feature/OperatorMfaTest.php",
+        "tests/Feature/StagingOperatorMfaTest.php",
+        "tests/Feature/FinalizationDatabaseLifecycleTest.php",
+        "tests/Feature/ProductionTrackCapabilitiesGuardsTest.php"
+      ],
+      "source": "1f7b6705f4a7d1a346779d87ec52c9080cf4ec57"
+    }
+  },
+  "corrected_policy_quality": {
+    "owned-file-declared-cadence-original": {
+      "exit": 0,
+      "receipt_sha256": "d798b5f1a61c94dcd5c7f57e9d00bb6b5cfc7bf9efbe09f4bd8e2615b8a3c54b",
+      "source": "936a5c50241b6104180a54ed2513117075f0836a",
+      "tests": 14
+    },
+    "owned-file-declared-shard-policy-original": {
+      "exit": 0,
+      "receipt_sha256": "ab9a17776c4b972f674b7dbbbfdf3050e48150bd0d69dc4a016648af007da23b",
+      "source": "936a5c50241b6104180a54ed2513117075f0836a",
+      "tests": 52
+    }
+  },
+  "decision": "APPROVE NARROW DRIVER-HELPER POLICY AND SOURCE CARRY; FINAL NATIVE EVIDENCE PENDING",
+  "limits": [
+    "Remote P1/P2 remain open pending completed final evidence; no new source P0/P1 or required policy correction found.",
+    "Completed local/CI marker evidence is distinct from pending native whole-file scopes; no hosted Focused feedback claim.",
+    "Native Guards selection remains partial and its body mechanisms SQLite-specific; no whole native Guards/native DDL/rollback/concurrency acceptance.",
+    "Original native lifecycle whole4/8/E4 and olddefault1/2/E1 remain failed/open; full F2/raw-worker/host/provider/activation/release conditions remain.",
+    "No duplicate application/database/network/CI execution or shared edits by reviewer."
+  ],
+  "native_discovery": {
+    "discovered_cases_files": [
+      9202,
+      677
+    ],
+    "execution": false,
+    "exit": 0,
+    "generated_files_hashed_and_owned_paths_removed": 18,
+    "selected_cases_files": [
+      2432,
+      233
+    ],
+    "source": "936a5c50241b6104180a54ed2513117075f0836a"
+  },
+  "native_listings": {
+    "guards-four-exact-datasets-list-original": {
+      "argv": [
+        "php",
+        "-r",
+        "require \"vendor/autoload.php\"; exit((new PHPUnit\\TextUI\\Application)->run(json_decode($argv[1], true, 32, JSON_THROW_ON_ERROR)));",
+        "[\"phpunit\", \"--list-tests\", \"--filter\", \"test_sql_history_cannot_update_delete_or_replace_even_without_recursive_triggers.*production_track_capability_candidates update|test_adapter_source_edit_is_rolled_back_with_every_adapter_side_effect|test_audit_created_callback_source_edit_cannot_escape_post_callback_graph_proof|test_authenticated_history_refuses_current_and_retained_raw_evidence_damage.*current candidate hash\", \"tests/Feature/ProductionTrackCapabilitiesGuardsTest.php\"]"
+      ],
+      "execution_limit": "Listing only; no passing execution inferred.",
+      "exit": 0,
+      "listed_cases": 4,
+      "receipt_sha256": "d4d7496842497e52289b10658822c044b95dc63ebc783aa879df20ff338a59e6",
+      "source": "936a5c50241b6104180a54ed2513117075f0836a"
+    },
+    "owned-file-native-compatibility-selection-list-original": {
+      "argv": [
+        "php",
+        "-r",
+        "require \"vendor/autoload.php\"; exit((new PHPUnit\\TextUI\\Application)->run(json_decode($argv[1], true, 32, JSON_THROW_ON_ERROR)));",
+        "[\"phpunit\", \"--list-tests\", \"tests/Feature/FixtureDatabaseAdmissionTest.php\", \"tests/Feature/SyntheticPrivateRestoreTest.php\", \"tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php\", \"tests/Feature/ProductionTrackPreparationPacketMigrationTest.php\", \"tests/Feature/FixtureDatabaseAdmissionNativeTest.php\"]"
+      ],
+      "execution_limit": "Listing only; no passing execution inferred.",
+      "exit": 0,
+      "listed_cases": 86,
+      "receipt_sha256": "9da7106bd4cea2d5493f31eaf643031c9aa2365090f6743a493eb5819ad57916",
+      "source": "936a5c50241b6104180a54ed2513117075f0836a"
+    }
+  },
+  "new_source_p0": 0,
+  "new_source_p1": 0,
+  "open_p0": 0,
+  "open_p1": 1,
+  "open_p2": 1,
+  "pending_conditions": [
+    "Corrected exact four-entrypoint native execution outcome; listing4 is not a pass.",
+    "Listed86-case/five-file native compatibility execution; no pass inferred.",
+    "Final sealed-evidence/source review and exact documentation-head carry, evidence-backed current P1/P2 resolution, fresh preflight/current complete inventory and expected-SHA merge."
+  ],
+  "policy_change": {
+    "added_branching_helper": "tests/TestCase.php",
+    "current_sha256": "995aa8958bc59763a3f95a79e1e24b09f695c84fa37387591ddb16491d03e9cf",
+    "full_manifest_equality_claimed": false,
+    "only_one_input_changed": true,
+    "other_policy_fields_and_prior_helper_order_unchanged": true,
+    "path": "scripts/ci/database-mysql-selection.json",
+    "php_tests_docs_workflows_assets_unchanged": true,
+    "previous_sha256": "1404eaec22ccbe1ff4e8eb3973d4860f29dde8456a9f8b007cd1a53c451364e2",
+    "sqlite_skip_prefix_and_assertions_unchanged": true
+  },
+  "required_corrections": [],
+  "retained_interrupted_original": {
+    "junit_counts": null,
+    "junit_error": "ParseError: no element found: line 1, column 0",
+    "php_exit": -15,
+    "recorder_exit": 1,
+    "result_sha256": "112b7647f81790d6d196f34ec2d38bd929d658f972d7f8a440e4895733999394",
+    "scope": "Mistaken filter expanded to15 rather than4 selected cases; owned process deliberately stopped, empty JUnit, no partial pass.",
+    "source": "936a5c50241b6104180a54ed2513117075f0836a",
+    "wall_seconds": 709.895664458003
+  },
+  "retained_prior_shard_failure": {
+    "failures": 1,
+    "process_exit": 1,
+    "source": "1f7b6705f4a7d1a346779d87ec52c9080cf4ec57",
+    "tests": 52
+  },
+  "reviewed_sha": "936a5c50241b6104180a54ed2513117075f0836a"
+}

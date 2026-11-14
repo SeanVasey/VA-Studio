@@ -17,6 +17,7 @@ use Livewire\Livewire;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Tests\Support\FilamentNotifications;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\LicenseFixtures;
 use Tests\Support\QuoteFixtures;
@@ -300,13 +301,13 @@ class OfferDraftAuthoringActionTest extends TestCase
         Log::spy();
         AuditEvent::creating(fn () => throw new RuntimeException('Synthetic private offer failure detail'));
         $page->callMountedAction()->assertHasTableActionErrors(['price_minor']);
+        // Read the queue while it is still full, and require the expected notification so the privacy checks cannot pass on nothing.
+        FilamentNotifications::sole('The offer save could not be confirmed', 'danger');
+        FilamentNotifications::assertNoneContain(['Synthetic private offer failure detail', '"title":"Saved"']);
         $page->assertNotified('The offer save could not be confirmed');
         $this->assertRecovery($page, 6999);
         $this->assertSame($before, $this->evidence());
         Log::shouldHaveReceived('warning')->once()->with('Offer draft UI could not confirm the result.', ['exception_class' => RuntimeException::class]);
-        $notifications = json_encode(session('filament.claimed_notifications') ?? session('filament.notifications'), JSON_THROW_ON_ERROR);
-        $this->assertStringNotContainsString('Synthetic private offer failure detail', $notifications);
-        $this->assertStringNotContainsString('"title":"Saved"', $notifications);
         $page->callMountedAction()->assertHasTableActionErrors(['price_minor'])->assertNotified('Reopen offer draft to continue');
         $this->assertSame($before, $this->evidence());
     }

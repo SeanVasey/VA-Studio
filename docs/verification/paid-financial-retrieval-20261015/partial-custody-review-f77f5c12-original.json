@@ -1,0 +1,106 @@
+{
+  "reviewed_sha": "f77f5c12e590b2d9295ebff582b142b4091ff8c2",
+  "decision": "APPROVE TEST-CONTROL AND UNCHANGED APPLICATION CARRY WITH CONDITIONS",
+  "independent_non_author": true,
+  "carried_source_approval": "a7963f4ea8b47789f21eba1ec3d29b53c2c2c6f3",
+  "scope": "Only two test/support files changed; original app/config/schema/policies/routes/SDK/dependencies/frozen assets unchanged. Not whole manifest equality or final evidence/merge approval.",
+  "changed_paths": [
+    "tests/Feature/ProductionFinancialRetrieval/FinancialReadPlanTest.php",
+    "tests/Support/FinancialRetrievalClockFixture.php"
+  ],
+  "changed_git_sha256": {
+    "tests/Feature/ProductionFinancialRetrieval/FinancialReadPlanTest.php": "ba8261662ef5195b548cb1e3dc1a28b0fe30dca95b90e88c508c180e0a278f56",
+    "tests/Support/FinancialRetrievalClockFixture.php": "faf0babc87e1ebe85b0b52c1f4c62de5acdaf4293bb56ae426cc9bda1b10f4b5"
+  },
+  "operational_scopes_git_delta_empty": [
+    "app",
+    "bootstrap",
+    "config",
+    "database",
+    "contracts",
+    "routes",
+    "scripts",
+    "resources",
+    ".github",
+    "composer.json",
+    "composer.lock",
+    "phpunit.xml"
+  ],
+  "clock_mechanism": {
+    "test_only": "File-scope require_once in focused test; Composer/production bindings unchanged. Function introduced only in new ProductionFinancialRetrieval namespace; original source/observer/identity namespaces untouched.",
+    "forwarding": "Unchanged global hrtime result returned; no override of time value, original birth, source/receipt/observer graph or authority.",
+    "probe": "One-shot bounded DEBUG_BACKTRACE_IGNORE_ARGS inspection finds ReadOwnership::attach; hook cleared before executing callback, after actual first receipt retention; callback independently requires exactly one registered receipt.",
+    "reset": "setUp/tearDown/finally clear probe; genuine Tax encrypter restored in finally; namespace function defaults to pure global forwarding.",
+    "v1_classification": "Synthetic new-wrapper partial-custody fault injection; not a genuine V1 decrypt seam or native elapsed source-cap proof.",
+    "tax_classification": "Genuine retained Crypt decrypt callback forwarding the actual original encrypter."
+  },
+  "meaningful_control_assertions": [
+    "Probe exactly1 and triggered=true",
+    "Actual first receipt used and exact observer receipt count1",
+    "Framework depth1 and native original PDO held until caller rollback",
+    "No SDK sentinel dispatch and saved slot retained",
+    "Original observer restored, flag restored, fresh original source/read frame positively committed, six guarded GET retry returns providerAuthenticated=false"
+  ],
+  "focused_observed_result": {
+    "name": "partial-custody-clock-control",
+    "head": "f77f5c12e590b2d9295ebff582b142b4091ff8c2",
+    "counts": {
+      "tests": 2,
+      "assertions": 38,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "php_exit": 0,
+    "recorder_exit": 0,
+    "source_input_count": 2438,
+    "source_runner_loader_head_status_stable": true,
+    "observed_os_exit": "separate receipt not read/claimed yet"
+  },
+  "original_hashes": {
+    "command.json": "38e7a2a5c21d438772f8a3f843d308e66fbb7059fbb6043887fde18f84b6378c",
+    "result.json": "e4604326bbc43c2e4338bca4fec24b311b1a22258985b76bd0ff913eb96193b1",
+    "junit.xml": "da06e66786f93a00af1d0150df344f6074ea69b1d0b14ba04c1befd0522f7064",
+    "log.txt": "7648c9b55a4699728976850637392f46ab57a07dbb9492560f1aaca8c824f0b4",
+    "process.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "prior_whole_preserved": {
+    "head": "a7963f4ea8b47789f21eba1ec3d29b53c2c2c6f3",
+    "tests": 64,
+    "assertions": 549,
+    "failures": 1,
+    "errors": 0,
+    "skipped": 2,
+    "php_recorder_os_exits": [
+      1,
+      1,
+      1
+    ],
+    "classification": "Whole failed because V1 no-decrypt seam did not trigger; Tax counterpart passed. Do not turn aggregate green or sum overlapping focused run."
+  },
+  "original_preparation_receipt": "Root reported duplicate OS close attempt refused overwrite with exit1; immutable original whole OS1 preserved. This is recorder observation preparation, not app failure or replacement OS result.",
+  "open_p0": 0,
+  "open_p1": 0,
+  "required_test_or_source_correction": [],
+  "remaining_conditions": [
+    "Launch-bound actual focused OS exit receipt",
+    "Fresh whole new SQLite source/input/runtime receipts and exact two native-only skips",
+    "Focused owned MySQL original commit/two-receipt/callback/actual older-source age controls; none executed yet",
+    "Canonical policy/Pint/cheap safeguards and sealed immutable exact-candidate independent evidence review",
+    "Exact-head preflight/full inventory/expected-SHA merge; actual account/provider/host/durable financial effects/business policies remain open"
+  ],
+  "reviewer_activity": {
+    "app_tests": false,
+    "php_diagnostics": false,
+    "database_native": false,
+    "network_provider": false,
+    "hosted_ci": false,
+    "shared_edit": false
+  },
+  "read_commands": [
+    "git rev-parse/status/diffstat/diff a796..f77 -- tests",
+    "read focused result/log and prior whole result/OS",
+    "Python exact immutable2-path and operational delta, JUnit/count/exit/stability/hash reconciliation; own runtime writes"
+  ],
+  "reviewer_prep_failure": []
+}

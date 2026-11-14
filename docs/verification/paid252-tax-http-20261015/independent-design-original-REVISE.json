@@ -1,0 +1,100 @@
+{
+  "base_actual_merge": "d95e4a74606ee257a2cda06d0793c1cedf165137",
+  "batch_size_assessment": "Six related consumer routes, their codec/privacy/lifetime wrappers and existing producer root seam form one coherent integration batch; separate UI/activation/global SQL/I/O repairs remain outside scope.",
+  "commands_read": [
+    "Read-only git target/status; governing AGENTS, proposed design and actual PR123 receipt; bootstrap/routes/providers; existing V1 controller/privacy/form; producer controller/privacy/response/manual fixtures; Tax command/project/ProjectionRead/Budget/Transfer/Policy/raw config."
+  ],
+  "decision": "REVISE BEFORE IMPLEMENTATION",
+  "design_sha256": "50fab68ad658577ea5877d6c4117b1a277f67c741a602707b6cbf4615c3aaed0",
+  "engineering_quality_verdict": "Feasible with required early timing context, original response lifetime, root exception and cache/intake mechanics; actual source/evidence review remains required.",
+  "limits": [
+    "Design only: unimplemented/untested, no source approval or passing execution claim.",
+    "No Foundation/GitLab/host/provider/live/account/customer import/activation/release/commercial/legal acceptance.",
+    "Existing-request final provider-I/O, global SQL/isolation/deadlock/DDL/invisible-reopen/damaged-restore, FPM/distributed capacity and frozen shared V1/Identity/membership P2 conditions remain.",
+    "Late streamed refusal may have200 headers but must suppress original body; attachment error must not append JSON.",
+    "Server timing fallback and uninterruptible I/O are not strict unknown-host/proxy/send-timeout proof."
+  ],
+  "no_new_authority": [
+    "Identifier-only routes invoke actual typed Tax APIs and exact current/historical SourceV2 receipts; no V1 casting/copied-row entitlement.",
+    "Show is an owned command/project seam; no new UI/index/history discovery authority.",
+    "No merchant facts/live transport/SDK/provider admission are enabled; Unbound remains default.",
+    "No original domain/commit/receipt/schema/vendor/profile or numerical cap changes."
+  ],
+  "not_performed": [
+    "No implementation/source/test/docs/vendor/Git mutation",
+    "No tests/DB/network/CI/container/Composer execution"
+  ],
+  "reader_preparation_errors": [
+    {
+      "issue": "Wrong guessed provider directory; corrected to app/Providers.",
+      "path": "app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxCheckoutServiceProvider.php"
+    },
+    {
+      "issue": "Proposed new codec not yet present; no missing-implementation defect inferred.",
+      "path": "app/Domain/Grants/PaidTax/PaidTaxJson.php"
+    }
+  ],
+  "receipt_only_base": "64ababa3",
+  "recorded_utc": "2026-10-15T11:16:37.592404+00:00",
+  "required_execution_later": [
+    "Real root bootstrap fixture overrides only explicit config after LoadConfiguration before providers; no manual root route/privacy/exception installation.",
+    "Actual synthetic enrolled/current session buyer, reviewed Tax provider preview/order/hosted/reconcile and retained grants/originals/multiline failure+retry, JSON/native-form exact-byte redemption.",
+    "CSRF/staff/session/owner/producer/raw duplicate/extra/nested/method/encoding/origin/query/range/length rejection and late projection/token/key/owner/policy/source/budget withdrawal.",
+    "Whole new focused SQLite HTTP/root files plus affected existing producer/V1 root HTTP; app-keyed recorder, exact source/runner/loader/command/JUnit/PHP/recorder/OS receipts.",
+    "Pint affected source and all10 cheap policy checks; discovery if selection/skip metadata changes.",
+    "Native historical unchanged primitives may carry for pure route/codec/root integration; new native claim or material driver repair needs appropriate focused owned native evidence.",
+    "Fresh independent actual-source/final sealed evidence review, exact-head cheap preflight and expected-SHA merge."
+  ],
+  "requirements_before_code": [
+    {
+      "basis": "Factory samples original monotonic time before validation/policy callbacks, but a controller-method-only capture would occur after earlier root/body/controller-resolution work. Current typed Budget can legitimately be captured anew; a mutable attribute alone does not prove original ownership.",
+      "id": "D1",
+      "meaningful_tests": [
+        "Delay actual bounded body/policy/controller resolution before identity under fixed wall/server instant and observe initial original60-second refusal with no attempt.",
+        "Replace public cached budget/attributes with another genuine budget and require refusal/original object, not renewed admission.",
+        "Preserve valid-at-arrival semantics, missing/implausible server-time honest fallback and strict no client header authority."
+      ],
+      "requirement": "Name an early mounted-root seam that captures the original PaidTaxRequestBudget before body parsing, identity or controller/dependency resolution callbacks. Default-off returns private404 without budget/domain resolution. Retain exact request/budget identity privately once; public request-attribute replacement/recapture must refuse, not renew time. Controller passes only that original budget and its exact receivedAt.",
+      "topic": "Original redemption timing/context ownership"
+    },
+    {
+      "basis": "PaidTaxProjectionRead has explicit abandon but no destructor; ordinary StreamedResponse cannot by itself abandon a never-started read. Existing transfer has close/destructor, but response construction failures and cycles must not strand it.",
+      "id": "D2",
+      "meaningful_tests": [
+        "Actual response never started/destructor-only disposal and encoding/factory/protect/reporter failure release original observer/descriptor/lease; fresh authorized same-owner retry succeeds.",
+        "Durable committed attempt remains spent after late refusal/throwing afterCommit; repeated callback/close fails closed or is harmless, no replacement proof.",
+        "Reopened/peer frame and dispatcher replacements are preserved by cleanup."
+      ],
+      "requirement": "Use a plain original owner/holder before callback-capable domain/result/encoding/factory/protect operations. Successful JSON/attachment response retains it; callback-free proof immediately precedes primitive positive echo. Explicit close/destructor must be idempotent and own only captured read/transfer handles, remain available after policy/deadline refusal, preserve initial errors and unrelated frames/dispatchers, and avoid response/self-capturing cycles. Do not make this ownership optional.",
+      "topic": "Mandatory original response resource lifetime"
+    },
+    {
+      "basis": "Current shouldRenderJsonWhen relies partly on expectsJson and does not cover new prefixes. A root respond hook runs after a validation response may have flashed inputs; generic JSON replacement alone does not undo that.",
+      "id": "D3",
+      "meaningful_tests": [
+        "Native/Accept:text-html pre-privacy Validation422 and CSRF419, plus Runtime500/LockTimeout503, stay private JSON with no Location, token/nonce/session-flash or exception/query sentinel.",
+        "Actual CSRF equality and session rotation exercised with Laravel runningUnitTests bypass explicitly defeated, not a default test-client assumption.",
+        "Malicious/oversized Allow or Retry-After values suppressed; useful fixed bounded values retained."
+      ],
+      "requirement": "Explicitly force private JSON/no redirect for both prefixes independent of Accept, including pre-privacy errors; prevent validation/session flashing of token,nonce and other sensitive payload fields. Preserve only validated bounded Allow/Retry-After/rate headers, never arbitrary exception headers/text. Define body-first-byte proof versus already-constructed headers honestly.",
+      "topic": "Root JSON/no-flash and bounded error headers"
+    },
+    {
+      "basis": "Producer middleware has no once-only checked guard, while existing fixture explicitly prepends it and manually registers provider/routes. Root registration/cached routing alone cannot provide a runtime kill gate.",
+      "id": "D4",
+      "meaningful_tests": [
+        "Cold defaultfalse/nonboolean and production flags show private404 before identity/body/SQL and provider absent; explicitly mounted/disabled producer retains503.",
+        "Stale cached mounted routes plus withdrawn flag/production environment refuse without domain/provider I/O; rebuild semantics recorded.",
+        "Spy one producer raw intake; preserve duplicate/nested/escaped-key refusal and old limits via real root fixture.",
+        "Explicitly mounted default transport remains Unbound with zero calls; synthetic fixture override happens after default registration."
+      ],
+      "requirement": "Specify build-time exact-true/local-testing registration and route/config cache rebuild, plus current per-request flag/environment refusal even when stale cached routes exist. Root producer wrapper delegates exactly once and old manual fixtures stop attaching another privacy/provider/routes layer. Preserve producer16KiB/depth8 and its deliberate two-pass duplicate-check decoding; do not apply new consumer64KiB/depth16 to it. Conditional provider remains only Unbound by default.",
+      "topic": "Build/runtime mount and exactly-once producer intake"
+    }
+  ],
+  "reviewed_sha": "d8ecca688732d55735309c2a27796c6a2c02abb6",
+  "reviewer_role": "Separate independent non-author, read-only design reviewer",
+  "schema_version": 1,
+  "scope": "Coherent six typed Tax consumer HTTP endpoints plus conditional default-false producer/root/provider composition; no implementation/test execution acceptance.",
+  "specification_verdict": "Partial: intended domain/API and default-off boundary are coherent; four precise ownership/root contracts must be explicit before implementation."
+}

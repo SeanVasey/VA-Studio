@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMemberOriginals\MemberOriginalRendererTest" file="/workspace/VA-Studio-member-original-renderer/tests/Feature/ProductionMemberOriginals/MemberOriginalRendererTest.php" tests="2" assertions="1" errors="1" failures="1" skipped="0" time="0.404307">
+    <testcase name="test_observation_hook_cannot_substitute_a_pdf_looking_transport_result" file="/workspace/VA-Studio-member-original-renderer/tests/Feature/ProductionMemberOriginals/MemberOriginalRendererTest.php" line="205" class="Tests\Feature\ProductionMemberOriginals\MemberOriginalRendererTest" classname="Tests.Feature.ProductionMemberOriginals.MemberOriginalRendererTest" assertions="1" time="0.249032">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMemberOriginals\MemberOriginalRendererTest::test_observation_hook_cannot_substitute_a_pdf_looking_transport_result
+Failed asserting that two strings are not identical.
+
+/workspace/VA-Studio-member-original-renderer/tests/Feature/ProductionMemberOriginals/MemberOriginalRendererTest.php:218</failure>
+    </testcase>
+    <testcase name="test_real_child_preserves_crlf_and_bare_cr_source_with_exact_text_digest" file="/workspace/VA-Studio-member-original-renderer/tests/Feature/ProductionMemberOriginals/MemberOriginalRendererTest.php" line="223" class="Tests\Feature\ProductionMemberOriginals\MemberOriginalRendererTest" classname="Tests.Feature.ProductionMemberOriginals.MemberOriginalRendererTest" assertions="0" time="0.155275">
+      <error type="App\Domain\Contracts\ContractIssuanceException">Tests\Feature\ProductionMemberOriginals\MemberOriginalRendererTest::test_real_child_preserves_crlf_and_bare_cr_source_with_exact_text_digest
+App\Domain\Contracts\ContractIssuanceException: Test contract issuance is unavailable.
+
+/workspace/VA-Studio-member-original-renderer/app/Domain/Grants/Member/MemberOriginalRendererProcess.php:139
+/workspace/VA-Studio-member-original-renderer/tests/Feature/ProductionMemberOriginals/MemberOriginalRendererTest.php:228</error>
+    </testcase>
+  </testsuite>
+</testsuites>

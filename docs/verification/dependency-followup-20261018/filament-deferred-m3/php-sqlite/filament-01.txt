@@ -1,0 +1,36 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: {worktree}/phpunit.xml
+
+........................................SSSSSSSSS..............  63 / 753 (  8%)
+............................................................... 126 / 753 ( 16%)
+............................................................... 189 / 753 ( 25%)
+............................................................... 252 / 753 ( 33%)
+............................................................... 315 / 753 ( 41%)
+.................................SSSSSSSSS..................... 378 / 753 ( 50%)
+....SSSSSSSSSSSS..............................SSSSSSSSSSSSSS... 441 / 753 ( 58%)
+............................................................... 504 / 753 ( 66%)
+.......................SSSSSSSSSSSSSSSSSSSSSSSSSSSS............ 567 / 753 ( 75%)
+............................................................... 630 / 753 ( 83%)
+..............SSSSSSSSSSS.....................................S 693 / 753 ( 92%)
+SSS....S.....F................................F.............    753 / 753 (100%)
+
+Time: 26:23.937, Memory: 151.00 MB
+
+There were 2 failures:
+
+1) Tests\Feature\SiteContentDamagedPublicationTest::test_a_damaged_publication_record_refuses_publishing_and_sends_staff_to_a_backup
+Failed asserting that null is not null.
+
+{worktree}/tests/Feature/SiteContentDamagedPublicationTest.php:97
+{worktree}/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\SiteContentUnavailableHttpTest::test_new_content_draft_reports_unavailable_published_content_instead_of_opening
+Failed asserting that null is not null.
+
+{worktree}/tests/Feature/SiteContentUnavailableHttpTest.php:162
+{worktree}/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 753, Assertions: 4891, Failures: 2, Skipped: 88.

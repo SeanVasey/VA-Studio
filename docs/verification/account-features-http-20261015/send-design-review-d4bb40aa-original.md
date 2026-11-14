@@ -1,0 +1,11 @@
+DECISION: REVISE DESIGN BEFORE HTTP IMPLEMENTATION — MAKE THE COMPLETED-ROOT RELEASE GATE EXPLICIT
+
+Reviewed exact clean `d4bb40aa884ad737bb170ddec14e5566138ff84b`. The deferred original closure is feasible: retain the positively committed operation/context and original ten-second deadline, keep provisional bytes private, and create/consume the single read-only closing frame only after session saving and RequestHandled. Non-HTTP immediate closure and original-only cleanup remain intact. This docs-only refinement preserves the approved metadata component; no implementation or execution approval is implied.
+
+One release-contract condition is still required. Calling public `send()` does not prove all root callbacks have finished: a RequestHandled listener can call it before a later listener withdraws scope. Native `sendHeaders`, `sendContent` and stringification are also separate entry points. Specify a trusted completed-root release phase, or refuse emission while the original root callback execution is active. Route all emission paths through the same one-use original boundary; premature/reentrant/second private release emits no headers or prepared bytes. Refuse private release when headers are already sent. No caller-authored flag or renewed authority/time may substitute.
+
+Required meaningful controls are early send from a real RequestHandled listener followed by late withdrawal, direct emission/stringification, reentrant/second/failed send and already-sent headers, plus genuine ordinary post-kernel send/session-save positives. Actual finalized status/body is required; unsent TestResponse/getContent remains provisional. The controls-only page must retain its separately stated public-data scope.
+
+No established P0/P1 is reported in this planning review. After this clarification, actual frozen source/tests/native evidence and final coherent review remain necessary. Default-off/unmounted, original numerical caps and deferred adjacent scopes remain unchanged.
+
+Verification: operative app/test/config/bootstrap/routes bytes are unchanged from `c978a63a7babcc41d23c6360800a83aad72969fe`; both imported component approval originals have exact prior hashes. Amended design SHA256 `9b1a014010d79adbd589e5a89aa0d63bbc84da8d8c25a2e12b703e2716d3c252`. No app/DB/network/CI execution, shared edit or preparation failure occurred.

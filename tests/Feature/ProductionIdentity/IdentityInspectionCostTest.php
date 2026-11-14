@@ -2,11 +2,11 @@
 
 namespace Tests\Feature\ProductionIdentity;
 
+use App\Domain\Customers\ProductionIdentity\CurrentCatalog;
 use App\Domain\Customers\ProductionIdentity\IdentityMigrationOwnership;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use PDO;
-use PDOStatement;
 use Tests\TestCase;
 
 /**
@@ -25,44 +25,30 @@ class IdentityInspectionCostTest extends TestCase
             $this->markTestSkipped('The statement volume is a native MySQL dictionary cost.');
         }
         $this->assertSame(0, Artisan::call('migrate:fresh', ['--force' => true]), Artisan::output());
-        $config = DB::connection()->getConfig();
-        $counted = new class('mysql:host='.$config['host'].';port='.$config['port'].';dbname='.$config['database'].';charset=utf8mb4', $config['username'], $config['password'], [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_EMULATE_PREPARES => false]) extends PDO
-        {
-            public int $statements = 0;
-
-            public function query(string $query, ?int $fetchMode = null, mixed ...$fetchModeArgs): PDOStatement|false
-            {
-                $this->statements++;
-
-                return $fetchMode === null ? parent::query($query) : parent::query($query, $fetchMode, ...$fetchModeArgs);
-            }
-
-            public function prepare(string $query, array $options = []): PDOStatement|false
-            {
-                $this->statements++;
-
-                return parent::prepare($query, $options);
-            }
-
-            public function exec(string $statement): int|false
-            {
-                $this->statements++;
-
-                return parent::exec($statement);
-            }
-        };
-        $counted->exec("SET NAMES 'utf8mb4' COLLATE 'utf8mb4_unicode_ci'");
+        // Native canonical writer; a PDO subclass cannot stand in for the factory admission boundary.
+        $counted = DB::connection()->getPdo();
         $expected = (new IdentityMigrationOwnership)->inspect(DB::connection()->getPdo(), 'mysql');
         $this->assertNotContains(false, $expected[0]);
         $this->assertFalse($expected[1]);
 
-        $counted->statements = 0;
+        $beforeCompanion = CurrentCatalog::accounting();
+        $beforePrimary = (int) $counted->query("SHOW SESSION STATUS LIKE 'Questions'")->fetch(PDO::FETCH_NUM)[1];
         $started = hrtime(true);
         $actual = (new IdentityMigrationOwnership)->inspect($counted, 'mysql');
         $elapsed = (hrtime(true) - $started) / 1e6;
 
+        $afterPrimary = (int) $counted->query("SHOW SESSION STATUS LIKE 'Questions'")->fetch(PDO::FETCH_NUM)[1];
+        $afterCompanion = CurrentCatalog::accounting();
+        // Exclude only the terminal Questions measurement itself; every primary proof/context SQL remains.
+        $primaryStatements = $afterPrimary - $beforePrimary - 1;
+        $companionStatements = $afterCompanion['companion_sql'] - $beforeCompanion['companion_sql'];
+        $total = $primaryStatements + $companionStatements;
         $this->assertSame($expected, $actual);
-        fwrite(STDERR, sprintf("identity inspection: %d statements, %.1f ms\n", $counted->statements, $elapsed));
-        $this->assertLessThanOrEqual(self::STATEMENT_BOUND, $counted->statements);
+        $this->assertGreaterThan(0, $primaryStatements);
+        $this->assertGreaterThan(0, $companionStatements);
+        fwrite(STDERR, sprintf("identity inspection: %d total SQL (%d primary + %d companion), %d native handshakes/%.1f ms, %.1f ms total\n",
+            $total, $primaryStatements, $companionStatements, $afterCompanion['connections'] - $beforeCompanion['connections'],
+            ($afterCompanion['connect_ns'] - $beforeCompanion['connect_ns']) / 1e6, $elapsed));
+        $this->assertLessThanOrEqual(self::STATEMENT_BOUND, $total);
     }
 }

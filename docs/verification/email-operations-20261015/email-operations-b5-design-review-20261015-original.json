@@ -1,0 +1,92 @@
+{
+  "actions_performed": [
+    "Read-only requested design, actual source/config/plan inspection",
+    "Exclusive reviewer runtime decision/report creation"
+  ],
+  "app_db_network_ci_execution": false,
+  "confirmed_runtime_facts": {
+    "durable_identity_lease_seconds": 120,
+    "durable_max_attempts": 3,
+    "identity_delivery_wakeup": "DeliverProductionIdentityNotice implementsShouldQueue, tries1, afterCommit, noticeId-only; invokes WorkIdentityNotice",
+    "identity_ttl_seconds": 600,
+    "recovery_command": "customers:process-identity-notices --limit=50; integer1..100",
+    "registered_schedule": "vasey:publish-scheduled-site-release everyMinute withoutOverlapping5",
+    "retry_outcome": "definitely_not_submitted only;30*attempt.number seconds",
+    "smtp_security_modes": [
+      "implicit_tls",
+      "starttls"
+    ],
+    "smtp_socket_timeout_seconds": 5,
+    "suppression_default": "enabledfalse/providernull; no queue/provider binding; inspect-only unknown reconciliation",
+    "terminal_outcomes": [
+      "accepted",
+      "unknown",
+      "blocked"
+    ]
+  },
+  "decision": "REVISE ONE DESIGN CLAUSE BEFORE IMPLEMENTATION",
+  "design_path": "/workspace/runtime/email-operations-b5-design-20261015.md",
+  "design_sha256": "4f09ab1f5a97e0561dfa0f1bf257bf717d52994f181c5ca61be02143c099870f",
+  "findings": [
+    {
+      "confidence": "confirmed",
+      "consequence": "An operational checker/runbook could incorrectly omit queue worker/delivery facts or misstate how wake-ups reach the durable state machine.",
+      "id": "B5-D1",
+      "location": "email-operations-b5-design-20261015.md paragraph3: not ordinary Laravel Mail/queue jobs",
+      "problem": "The queue-job exclusion contradicts actual retained identity wake-up behavior. IdentityRequests dispatches DeliverProductionIdentityNotice, which implements ShouldQueue, uses Queueable, tries=1 and afterCommit, with noticeId only. Its handle invokes WorkIdentityNotice.",
+      "severity": "P2",
+      "smallest_correction": "Say identity SMTP is not ordinary Laravel Mail; one-attempt Laravel queue wake-ups carry noticeId only and invoke WorkIdentityNotice, while customers:process-identity-notices separately performs bounded retained recovery. Keep Laravel worker/retry timing facts distinct from the durable attempt policy."
+    }
+  ],
+  "implementation_conditions": [
+    "Define explicit closed versioned template/operator schema before claiming complete configuration-facts validation; null/unset/template placeholders must remain blocked in operator scope, and completeness remains unverified operator declarations. Never return input values or resolved file paths.",
+    "Bind actual recovery facts: command default50/allowed1..100,120second durable lease,600second identity TTL,maximum3 durable attempts,30*attempt-number delay only after definitely_not_submitted; accepted/unknown/blocked terminal. Fix ambiguous bounded50/default100max phrasing.",
+    "Keep generic Laravel worker timeout/retry_after ordering distinct from retained attempt lease/SMTP socket timeout and the ShouldQueue wake-up. SMTP socket timeout5 is per socket I/O, not whole submission or wall-time guarantee.",
+    "Match actual SMTP mode/security/provenance/origin admission or identify a stricter planned installation policy as such; source accepts ports1..65535 with implicit_tls/starttls and does not prove conventional-port-only or sender/public-origin same-domain rules. No credentials, derived capability authentication or provider attestation from JSON facts.",
+    "Keep production suppression254 provider descriptor distinct (adapter/version/scope/reviewReference), unbound/default-off; unknown reconciliation inspect-only and at-most-one suppress attempt, never generic queue resend or confirmed delivery.",
+    "Bound protected file reading from one admitted opened descriptor; reject symlink/hardlink/overexposure/change without echoing values, exceptions or arbitrary path text. Do not execute configured references or follow provider/retention references. File checks do not prove a trusted host or hostile-parent atomicity beyond tested scope.",
+    "Retain append-only evidence; scheduler and retention references are operator inputs, not installed schedule/purge policy. Only site-release schedule is registered now. No schema/database/route/provider binding/runtime settings/host changes in this batch.",
+    "Use isolated synthetic CLI controls/source-bound exact commands and independent final source/evidence review plus cheap exact-SHA preflight. No SQL/native tests warranted for pure JSON/filesystem checker. Real sender/provider/approved retention/install/delivery remains dependent on Sean inputs/authorization."
+  ],
+  "observed_source_head": "0902be9ed5c3202444521d697f79ce8641f1fa89",
+  "observed_source_status": "",
+  "open_p0": 0,
+  "open_p1": 0,
+  "overall_scope_assessment": "Coherent bounded B5 development checker aligned to original plan after the queued-wake-up correction. Read-only configuration consistency only; no runtime setup or sender/DNS/TLS/provider/host attestation.",
+  "preparation_errors": [
+    {
+      "command_scope": "Initial independent source lookup",
+      "failure": "Guessed nonexistent app/Domain/Customers/ProductionIdentity/Notifications/RecoverIdentityNotices.php produced cat/rg exit2",
+      "reconciliation": "Actual bounded scanner located and inspected at app/Console/Commands/ProcessProductionIdentityNotices.php; no application command or test ran."
+    }
+  ],
+  "recorded_utc": "2026-10-15T20:12:54.397451+00:00",
+  "reviewer_session": "/root/account_features_final_review",
+  "shared_files_modified": false,
+  "source_scope_sha256": {
+    "AGENTS.md": "87737fbd65a37de56cd55de13ef97f773466620fa814cb783d7c0328ce7e0ac8",
+    "app/Console/Commands/ProcessProductionIdentityNotices.php": "1d7cdcd3cd5facc769df0f69e0c87997cb7753f06cbe92837648e164da6dcdb7",
+    "app/Domain/Customers/ProductionFeatures/Suppression/ProductionSuppressionConfiguration.php": "2040beebae676750167ea1435a36ed035fa992f78c1033093d5f67750df74b56",
+    "app/Domain/Customers/ProductionFeatures/Suppression/ProductionSuppressionIntents.php": "048da1c023d7131489e105435f944ca59224feb1e7beb23302fddce128f906da",
+    "app/Domain/Customers/ProductionFeatures/Suppression/UnboundProductionSuppressionProvider.php": "e509f683cd908972c9af78a226b35f47cacc01ef772284b02f7652fb14b473f7",
+    "app/Domain/Customers/ProductionIdentity/IdentityPolicy.php": "8825d44b84067699e69236ee823748eba70967a2b1e5c90fb604265f59656775",
+    "app/Domain/Customers/ProductionIdentity/IdentityRequests.php": "186f76459a29f999dcd2cf59c408b5230fd1d3b5f0005f256f75b91fe7f5efdc",
+    "app/Domain/Customers/ProductionIdentity/Notifications/ConfiguredSmtpIdentityTransport.php": "75068247694ea5024387ac66b97698aeafd3c5993ac34442f85f72d4c3f316f0",
+    "app/Domain/Customers/ProductionIdentity/Notifications/IdentitySmtpFactory.php": "a294f78b62fa353eb1a80e1adacac8b93acae14aba0e7b5b5b8b6fd5db0e41b9",
+    "app/Domain/Customers/ProductionIdentity/Notifications/SmtpIdentitySettings.php": "f3cdee9241b59020beb6f5b2d73f02a7e42f55b10e6b05f12064d8a3cf89f51f",
+    "app/Domain/Customers/ProductionIdentity/Notifications/WorkIdentityNotice.php": "37462eb8e71546483d61047b67db49ea5b091a529a82c3cd10e1760642775c8e",
+    "app/Jobs/DeliverProductionIdentityNotice.php": "061de336297e398ded168dad925457b69dbf4c05242bde6f9591e7837280e539",
+    "config/production-customer-identity.php": "5e4bf0c3b2505a735c833a195e441d67913e71a62438f083a30c353f73c34188",
+    "config/production-identity-smtp.php": "75413404f81d57f54eb4c4d838c795c50a18a0b44cbb50e0d3363961df75b3f9",
+    "config/production-suppression.php": "84a6654f8917351ff5bcf2c28cf1e7041a272e655030c594f0825a6528fe9e49",
+    "config/queue.php": "ac9e8848df5b652431e71c31f243f70aa0d94ab0e722194993493b196f80c5e3",
+    "docs/handoff/2026-10-07/CLAUDE-PLAN.md": "51941a91c33bd463752bcaa1693ed05bf19f67760a51d1f5735efab20a05610c",
+    "routes/console.php": "a8f59fe29174f0ea5714cdc1ac1731af09e0d413825eb877a159d96bb157c2a3"
+  },
+  "untested": [
+    "No checker implementation exists in reviewed design",
+    "No operator facts supplied or observed",
+    "No sender/DNS/network/SMTP/TLS/provider/queue/scheduler/retention/host validation",
+    "No delivery, provider completion, activation or installation acceptance"
+  ]
+}

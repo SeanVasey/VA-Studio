@@ -1,0 +1,192 @@
+{
+  "kind": "Independent clarified-design feasibility decision; no implementation approval",
+  "reviewed_commit": "9a3eb4eab955c9dee8bb73677dc01259792d54fc",
+  "original_design_commit": "a65bb292e800bfa45ed64a5bbd2f33be242b15f2",
+  "baseline_actual_merge": "0fc2391cfd624cfa97fb5d02cc8be94492d8df36",
+  "decision": "APPROVE DESIGN WITH CONDITIONS",
+  "design_sha256": "130160ccbdfbfbabc8c69a8e7ba88d8f41f68946cd9501859e26ab6fa49b4c4b",
+  "observed_clean_head": true,
+  "exact_original_to_final_delta": [
+    "docs/verification/paid252-tax-delivery-20261015/design.md"
+  ],
+  "no_product_or_test_changes_since_actual_pr122": true,
+  "required_design_clarifications": [
+    {
+      "id": "D1",
+      "priority": "Required authority-order clarification",
+      "finding": "An entry-time sibling proof is too early for PreparedDeliveryStream::writeTo, which resolves generic DB/outsideTransactions and calls stream/seek/read before first chunk. Injectable transfer clock may also run after a naive proof.",
+      "required": "Fence inside FIRST NONEMPTY chunk after those callbacks; consumer callback-phase then original source sibling then owner raw closure, only captured pure timing before private chunk handoff.",
+      "disposition": "Explicitly corrected in315 and retained9a3."
+    },
+    {
+      "id": "D2",
+      "priority": "Required original-time clarification",
+      "finding": "Sampling the transfer origin after Commands::run returns lets afterCommit/closed-proof callbacks renew its claimed commit-based lifetime.",
+      "required": "Original monotonic transfer tick no later than physical commit; conservative sample before initiating command acceptable, never post-return restart.",
+      "disposition": "Explicitly corrected in315 and retained9a3."
+    },
+    {
+      "id": "D3",
+      "priority": "Required capture/arithmetic clarification",
+      "finding": "Same numeric timing semantics must preserve the original age debit and exact receivedAt object rather than independent wall-clock/deadline recapture.",
+      "required": "Tick before Carbon/config/identity; initial=start+60-age; overall=initial+capturedSnapshot+60; exact receivedAt identity; min captured/current snapshot and live overall; fresh60 phase capped by same original overall.",
+      "disposition": "Explicitly corrected in315 and retained9a3."
+    },
+    {
+      "id": "D4",
+      "priority": "Required literal key/technical-state closure",
+      "finding": "Token/key/technical settings resolved separately from original receipt could change after token construction or invalidate a returned authorization. Frozen helper calls cannot promise immediate live cancellation.",
+      "required": "Private literal delivery admission inputs incl current app.key separate from retained purchase policy; raw equality in every current/prepared/closed assertion; token uses captured key only; frozen helper pre/post/own-copy checks with no in-helper interruption claim.",
+      "disposition": "Explicitly corrected in315 and retained9a3."
+    },
+    {
+      "id": "D5",
+      "priority": "Required lifecycle cleanup",
+      "finding": "Failure/abandonment before proveBeforeBytes is invoked leaves original SourceV2 sibling observer installed even when descriptor closes. Current ProjectionRead abort exists only in proof catch.",
+      "required": "Idempotent original-handle abandonment plus transfer close/destructor, independent withdrawn policy/spent deadline; preserve refusal/durable attempt/unrelated roots/peers/replacements, no generic rollback/proof renewal.",
+      "disposition": "Explicitly corrected in315 and retained9a3."
+    },
+    {
+      "id": "D6",
+      "priority": "Required snapshot availability clarification",
+      "finding": "An1800-second admitted snapshot may outlive a copied660-second document-heavy availability lease.",
+      "required": "Exact existing key/owner release but snapshot TTL covers admitted phase+cleanup without authority renewal; retain host/blocking/cache limitations.",
+      "disposition": "9a3 states max(660,ceil(remaining snapshot)+60), cap1860; existing document660 untouched."
+    }
+  ],
+  "remaining_required_design_corrections": [],
+  "specification_assessment": "Coherent dependency-ready internal authorization/history/redemption/private-transfer scope. Two separately owned immutable tables soft-join original graph with sealed public UUID/hash facts; no purchase/source authority is inferred from byte descriptors or copied inputs.",
+  "engineering_assessment": "Feasible with existing SourceV2/Commands raw receipts, optional exact Rows/schema/config admission and new fixed Records specs. Critical callback-order/time/cleanup/availability gaps in initial contract are explicitly resolved in final design.",
+  "conditions": [
+    "This approves only design feasibility at exact9a3, not source implementation, migration execution, passing tests, native concurrency, HTTP composition or final development/merge acceptance.",
+    "Implement literal optional delivery config/key/schema state separate from retained purchase policy; all new table access requires completed admission and own Records specs. Keep old five-table/frozen profiles/V1/shared code unchanged.",
+    "Bound every current selector: exact account/request, authorization public UUID and origin UUID/hash/target, recent authorization limit4 for three-per60s, history20 and all current origin attempts up to policy100 plus sentinel. Capture post-DML expected attempt state in original receipt; do not reuse first-frame counters as current authority.",
+    "Idempotent authorization replay remains subject to current owner/purpose/key, unchanged request/origin/batch/target and unexpired/unspent admission; it must not resurrect an expired/spent row or silently replace its token hash.",
+    "Exact token/key/config proof covers selected callback drift; does not claim a general key-rotation/revocation policy or repair unwrapped V1/identity metadata P2s.",
+    "Before-chunk authority boundary is private chunk handoff to trusted consumer; future HTTP/mount must independently retain the same no-callback-after-proof path to actual write, privacy/error handling and host/proxy time conditions.",
+    "Transfer/request capabilities reject bypass construction/serialization/cloning/replay; pre-proof/cancel/never-started disposal abandons original observer and descriptor, including after policy/budget drift, preserves initial failure and durable/unrelated work.",
+    "Native currentness/uniqueness under actual supported isolation, duplicate authorization/redemption/final-limit races, exact permanent engine/temp refusal and populated old/new schema restart/refusal require source-bound executions. No missing-API baseline may be labelled behavioral oracle.",
+    "Snapshot availability lease covers original admitted phase (max660 or phase+60, cap1860), not authority. This key coordinates actual participating document/new snapshot paths; unchanged V1 snapshot code is not silently claimed to acquire it. All-family spool capacity, uninterruptible-I/O overlap and distributed-cache semantics remain host conditions.",
+    "Frozen PDF verify/copyVerified calls are bounded/checkable, not interruptible; use exact retained targets and admitted arrays, enforce pure live checks before/after and own copy/readback. Close only owned temp/descriptors/leases, never original paths/replacements.",
+    "Private whole SQLite/affected family/V1 and focused owned native evidence, Pint/CI-policy checks, independent tested-source/final packet decision, cheap exact-head preflight/protections and expected-SHA merge remain required. Keep all flags default-off and HTTP/root/live/provider/commercial/release conditions open.",
+    "Preserve sharedV1/identity metadata and ordinary-membership afterCommit P2s for their related batches. No scope expansion or idle-PDO commit inference."
+  ],
+  "source_mechanics_bindings": [
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxCommands.php",
+      "git_blob": "dcf00f01ed95f141b38fa868053dfc12c6762170",
+      "sha256": "808986674554e7b344559b6334ccd1c6f296eb292a15745701f3b9b3e221f8a6"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxRows.php",
+      "git_blob": "df6a747c2944e14a068342521ee1ff64c75603f6",
+      "sha256": "095fcd908543982f81a1ac5311ac214ae6659dfad30e65698c2bf13be3348a58"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxReadReceipt.php",
+      "git_blob": "52af6aa78b01386609b1bca74c153d4ba9f8bf37",
+      "sha256": "561e860f2e0fc1ff715e1550219b7753a93997dcd3f5d4a591a167069b476d65"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxProjectionRead.php",
+      "git_blob": "0a66ee96603ea0bdd98d061b5ed453a88f3c144a",
+      "sha256": "b454460b305025aab9343d7617fbdc8158bb81e84cf740b9e827374f88f573a9"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxPolicy.php",
+      "git_blob": "37fd35ed43d993eb620229a3372ba7ee7c1c103c",
+      "sha256": "6bad0dac1f0c3ff2353ada0c18619def4b956f9b3b54361524823863d2a3128f"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxConfiguration.php",
+      "git_blob": "98ced3ba6dd7b9f2ec2b753dd23e7db0f38bb2c4",
+      "sha256": "14cf7fec8255f59d794eb81f52479ce1e9542376fa8fba963c153bb09b18663b"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxRecords.php",
+      "git_blob": "1adb79f21e79095fe2a3dcbadb7f82040927ecb2",
+      "sha256": "7df5473d5bb2dfc5850dbe3e41c9b3a42874faf3f6d49ae78478dc503a8e3072"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxSchema.php",
+      "git_blob": "3afee46b99b78b9c7f87037bae34f611b7295e3b",
+      "sha256": "44ed9d8a83221a386db3fa4f79c64fb580b4a8eef5dbddca92a3ca5f2e16254f"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxFiles.php",
+      "git_blob": "4d1dd2a9013ed71ab2fefb7b75fbb705cbd3724a",
+      "sha256": "afda6760090cde95ee623223fe4899d65e5bc4e09fc0c3d96d57171cdede21db"
+    },
+    {
+      "path": "app/Domain/Grants/Paid/PaidGrantDownloads.php",
+      "git_blob": "d12e7aaa7298945e4afe6f3b86d3b89dacf7ae62",
+      "sha256": "987fe025f72d347286f46b9c00eca6fbbfea0396d071e88aada8ee9248fdfd3c"
+    },
+    {
+      "path": "app/Domain/Grants/Paid/PaidGrantTransfer.php",
+      "git_blob": "631cc50eacbdd034ff51e54ee89f1be6f0683404",
+      "sha256": "1d6fec2a2b47cf298b57f3d5dfcb152bcc2aede7b0c599455f774a2821dbe69d"
+    },
+    {
+      "path": "app/Domain/Grants/Paid/PaidGrantRequestBudget.php",
+      "git_blob": "9663b676e4464df184b59ca89db9d0fc004b61a0",
+      "sha256": "315c0cb4a9a19d146f745084cf75fc764e5f20211f1b886a6fdc01b19f569b12"
+    },
+    {
+      "path": "app/Domain/Grants/Paid/PaidGrantRequestInstant.php",
+      "git_blob": "1b9a193ac7f21a23270218847e7788ae1bff95c0",
+      "sha256": "bf82b218b134c9c291bd0b61213aeb78ea7676199244fc7fa72f92ed03f40292"
+    },
+    {
+      "path": "app/Domain/Grants/Paid/PaidGrantPrepareStream.php",
+      "git_blob": "8aee868707f60084908b960f93642f8cda8d63d3",
+      "sha256": "3fb3f9e02d4fbbc8672406acf1bb9ecf1e5dbb4fceda28bbebab04525c4cbe38"
+    },
+    {
+      "path": "app/Domain/Grants/Paid/PaidGrantPolicy.php",
+      "git_blob": "910283abba8fff13c76e0ee9f889ce017a9fb444",
+      "sha256": "0d6337420821c4be5a89f4f57a90485560a0ff4697955117933528b9d81c80a5"
+    },
+    {
+      "path": "app/Domain/Delivery/PreparedDeliveryStream.php",
+      "git_blob": "eaf2758babd8b71b413230db2b51ea348383ea71",
+      "sha256": "e976fc7d0803cde84a769d83f1ca28b2449f7c1dcdd7effda0b8bf42e8c12e13"
+    },
+    {
+      "path": "app/Domain/Delivery/DeliveryAssetFiles.php",
+      "git_blob": "934b4be4216916e5c3f9792b49ffa367f6f1d10f",
+      "sha256": "3a3771443bf527d56c4a521c01b9840c847b33a9da23b7ad455c96d52820764c"
+    },
+    {
+      "path": "app/Domain/Delivery/ActivationPolicy.php",
+      "git_blob": "e220bbd54a02d6d859411e8f26632a266782beda",
+      "sha256": "38d51e78fbdec221671b909f961ea4965fbc11f18543fab91b16f2ebf9106c95"
+    },
+    {
+      "path": "docs/ops/paid-delivery-runtime.md",
+      "git_blob": "38a934c3f2703533ead9ad91efac696015f9dfa1",
+      "sha256": "9f59c8804c6182f5a333014f4e8f58e9a24063b4069ab630e7bfa2d3901ebd0a"
+    },
+    {
+      "path": "docs/verification/paid252-composition-20261007/independent-review/ADDENDUM-15.md",
+      "git_blob": "728a5119ce86c3e00a8eaeec0262cae7c1e5bd83",
+      "sha256": "77dbd776668f3de446d8809fcc44a987f420cd91143f52a2239e889801b75ec6"
+    },
+    {
+      "path": "docs/verification/paid252-composition-20261007/independent-review/ADDENDUM-18.md",
+      "git_blob": "3e8bb9fd0cd8ba11d107c265d32589564d180cb7",
+      "sha256": "06e8309bb2f58a779e9a1b2260a87fbf00e712fb28e7eac03c11ed23f11ea65c"
+    }
+  ],
+  "read_commands": [
+    "git rev-parse/status/diff/show at immutable design heads and baseline",
+    "Read/rg exact PaidTaxCommands/Rows/ReadReceipt/ProjectionRead/Policy/Configuration/Records/Schema/Files mechanics",
+    "Read/rg existing PaidGrantDownloads/Transfer/RequestBudget/RequestInstant/PrepareStream/Policy timing and spool semantics",
+    "Read PreparedDeliveryStream/DeliveryAssetFiles/ActivationPolicy; ops C11 and original Addenda15/18 conditions"
+  ],
+  "original_critique_sha256": {
+    "md": "75b5b4c207f5a4f33c3ac0e25368d34ab5a36c922babdd028b32a99e1c14ce28",
+    "json": "88c6c725e4126a4f2e6092e68963e820127a3041b2d1d6461649b5ea7dd4cbfa"
+  },
+  "actions": "Read-only original/revised design and actual related source/Git mechanics; original runtime review artifacts only. No implementation/tests/DB/container/network/CI or tracked edits."
+}

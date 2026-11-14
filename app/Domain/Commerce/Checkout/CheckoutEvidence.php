@@ -14,7 +14,13 @@ use Throwable;
 /** Versioned provider mapping; no payment confirmation or rights decision. */
 final class CheckoutEvidence
 {
-    public function request(Order $order, array $orderEvidence, string $intentId, array $policy, string $account, CarbonImmutable $at): array
+    /**
+     * `$storedEmail` replays a stored request: false for one without `customer_email` (it predates the prefill or its address
+     * was not sent), a string for the exact stored value, which `verifyIntent()` has bound to the order snapshot. Null builds a
+     * new request, where `buyerEmail()` alone decides whether the address is sent, so a later tightening never rewrites a
+     * stored request.
+     */
+    public function request(Order $order, array $orderEvidence, string $intentId, array $policy, string $account, CarbonImmutable $at, ?array $paymentMethodTypes = null, string|false|null $storedEmail = null): array
     {
         app(CheckoutPolicy::class)->validate($policy);
         $pricing = $orderEvidence['pricing']['snapshot'];
@@ -34,11 +40,17 @@ final class CheckoutEvidence
         }
         $metadata = ['order_id' => $order->public_id, 'attempt_id' => $orderEvidence['attempt_id'], 'intent_id' => $intentId, 'schema_version' => '1'];
         $return = $policy['return_origin'].'/orders/'.$order->public_id.'/checkout/return';
-        $params = ['mode' => 'payment', 'payment_method_types' => ['card'], 'client_reference_id' => $order->public_id,
+        $params = ['mode' => 'payment', 'payment_method_types' => $paymentMethodTypes ?? CheckoutPaymentMethods::offered(), 'client_reference_id' => $order->public_id,
             'metadata' => $metadata, 'payment_intent_data' => ['metadata' => $metadata], 'line_items' => $items,
             'automatic_tax' => ['enabled' => false], 'adaptive_pricing' => ['enabled' => false], 'allow_promotion_codes' => false,
             'customer_creation' => 'if_required', 'success_url' => $return, 'cancel_url' => $return,
             'expires_at' => $at->addSeconds($policy['provider_lifetime_seconds'])->timestamp, 'expand' => ['line_items']];
+        // Pre-fills Stripe's email field with the address the buyer gave for this order, nothing else. No `customer` id is ever
+        // sent (Stripe refuses both together). The address Stripe returns is never read back as identity or a mail recipient.
+        $email = $storedEmail ?? self::buyerEmail($orderEvidence['request']['buyer']['email'] ?? null);
+        if (is_string($email)) {
+            $params['customer_email'] = $email;
+        }
 
         return ['schema_version' => 1, 'purpose' => 'stripe_test_checkout', 'mapping' => 'post_discount_zero_test_tax_v1',
             'api_version' => CheckoutPolicy::API_VERSION, 'order_id' => $order->public_id,
@@ -51,7 +63,16 @@ final class CheckoutEvidence
         $payload = $this->decrypt($intent->request_ciphertext, $intent->request_hash, $intent->canonicalization_version);
         // The finalization reader already verified the original order; this avoids recursive graph reads.
         $evidence = $verifiedOrderEvidence ?? app(ReadOrder::class)->verify($order);
-        $expected = $this->request($order, $evidence, $intent->public_id, $payload['policy'] ?? [], $intent->account_id, $intent->created_at);
+        $storedEmail = false;
+        if (is_array($payload['params'] ?? null) && array_key_exists('customer_email', $payload['params'])) {
+            // Bound to the order snapshot, not to today's shape check: only the order's own address may have been sent.
+            $storedEmail = $payload['params']['customer_email'];
+            if (! is_string($storedEmail) || $storedEmail !== ($evidence['request']['buyer']['email'] ?? null)) {
+                throw new QuoteException('CHECKOUT_CHANGED', 409);
+            }
+        }
+        $expected = $this->request($order, $evidence, $intent->public_id, $payload['policy'] ?? [], $intent->account_id, $intent->created_at,
+            CheckoutPaymentMethods::forStored($payload['params']['payment_method_types'] ?? null), $storedEmail);
         if ($intent->order_id !== $order->id || $intent->order_attempt_id !== $order->attempt()->sole()->id || $intent->mode !== 'test' ||
             ! $intent->initiate_before->equalTo(CarbonImmutable::parse($evidence['attempt']['expires_at'])) ||
             ! $intent->created_at->lessThan($intent->initiate_before) || $intent->created_at->lessThan($order->created_at) ||
@@ -64,10 +85,27 @@ final class CheckoutEvidence
         return $expected;
     }
 
+    /**
+     * The order's buyer email only when it has a conservative ASCII shape Stripe accepts (local part letters, digits and
+     * `. _ % + ' -`); otherwise null and the buyer types it on Stripe's page as before. A refused address would fail the frozen
+     * create on every retry, so doubt means omit. Decides only new requests; stored ones replay their own value.
+     */
+    public static function buyerEmail(mixed $email): ?string
+    {
+        if (! is_string($email) || strlen($email) > 254 || filter_var($email, FILTER_VALIDATE_EMAIL) === false
+            || preg_match('/\A[A-Za-z0-9._%+\'-]{1,64}@(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)+[A-Za-z]{2,63}\z/D', $email) !== 1) {
+            return null;
+        }
+
+        return $email;
+    }
+
     public function encrypt(array $payload): array
     {
         $canonical = CanonicalJson::encode($payload);
-        if (strlen($canonical) > 262144) { throw new QuoteException('CHECKOUT_CHANGED', 409); }
+        if (strlen($canonical) > 262144) {
+            throw new QuoteException('CHECKOUT_CHANGED', 409);
+        }
         $ciphertext = Crypt::encryptString($canonical);
 
         return [$ciphertext, hash('sha256', $ciphertext)];
@@ -76,21 +114,30 @@ final class CheckoutEvidence
     public function decrypt(string $ciphertext, string $hash, string $version): array
     {
         try {
-            if ($version !== CanonicalJson::VERSION || ! hash_equals($hash, hash('sha256', $ciphertext))) { throw new \UnexpectedValueException; }
+            if ($version !== CanonicalJson::VERSION || ! hash_equals($hash, hash('sha256', $ciphertext))) {
+                throw new \UnexpectedValueException;
+            }
             $canonical = Crypt::decryptString($ciphertext);
-            if (strlen($canonical) > 262144) { throw new \UnexpectedValueException; }
+            if (strlen($canonical) > 262144) {
+                throw new \UnexpectedValueException;
+            }
             $payload = json_decode($canonical, true, 32, JSON_THROW_ON_ERROR);
-            if (! is_array($payload) || CanonicalJson::encode($payload) !== $canonical) { throw new \UnexpectedValueException; }
+            if (! is_array($payload) || CanonicalJson::encode($payload) !== $canonical) {
+                throw new \UnexpectedValueException;
+            }
 
             return $payload;
-        } catch (Throwable) { throw new QuoteException('CHECKOUT_CHANGED', 409); }
+        } catch (Throwable) {
+            throw new QuoteException('CHECKOUT_CHANGED', 409);
+        }
     }
 
     public function session(array $session, array $request): array
     {
         $params = $request['params'];
         $total = array_sum(array_column(array_column($params['line_items'], 'price_data'), 'unit_amount'));
-        $id = $session['id'] ?? null; $status = $session['status'] ?? null;
+        $id = $session['id'] ?? null;
+        $status = $session['status'] ?? null;
         if (! is_string($id) || ! preg_match('/\Acs_test_[A-Za-z0-9]{1,120}\z/', $id) ||
             ($session['object'] ?? null) !== 'checkout.session' || ($session['livemode'] ?? null) !== false ||
             ($session['account'] ?? null) !== null || ($session['context'] ?? null) !== null ||
@@ -101,14 +148,15 @@ final class CheckoutEvidence
             ($session['expires_at'] ?? null) !== $params['expires_at'] ||
             ($session['total_details']['amount_discount'] ?? null) !== 0 || ($session['total_details']['amount_tax'] ?? null) !== 0 ||
             ($session['total_details']['amount_shipping'] ?? null) !== 0 || ($session['automatic_tax']['enabled'] ?? null) !== false ||
-            ($session['payment_method_types'] ?? null) !== ['card'] ||
+            ! CheckoutPaymentMethods::matchesRequest($session['payment_method_types'] ?? null, $request) ||
             ! in_array($status, ['open', 'complete', 'expired'], true) ||
             ! in_array($session['payment_status'] ?? null, ['paid', 'unpaid', 'no_payment_required'], true) ||
             ($session['line_items']['has_more'] ?? null) !== false || ! is_array($session['line_items']['data'] ?? null) ||
             count($session['line_items']['data']) !== count($params['line_items'])) {
             throw new QuoteException('CHECKOUT_CHANGED', 409);
         }
-        $expected = array_column(array_column($params['line_items'], 'price_data'), 'unit_amount'); $actual = [];
+        $expected = array_column(array_column($params['line_items'], 'price_data'), 'unit_amount');
+        $actual = [];
         foreach ($session['line_items']['data'] as $line) {
             $amount = $line['price']['unit_amount'] ?? null;
             if (! is_int($amount) || ($line['quantity'] ?? null) !== 1 || ($line['currency'] ?? null) !== 'usd' ||
@@ -118,17 +166,23 @@ final class CheckoutEvidence
             }
             $actual[] = $amount;
         }
-        sort($actual); sort($expected);
-        if ($actual !== $expected) { throw new QuoteException('CHECKOUT_CHANGED', 409); }
+        sort($actual);
+        sort($expected);
+        if ($actual !== $expected) {
+            throw new QuoteException('CHECKOUT_CHANGED', 409);
+        }
         $url = $session['url'] ?? null;
         if (($status === 'open' && ! $this->url($url, $id)) || ($status !== 'open' && $url !== null)) {
             throw new QuoteException('CHECKOUT_CHANGED', 409);
         }
         $payment = $session['payment_intent'] ?? null;
-        if (is_array($payment)) { $payment = $payment['id'] ?? false; }
+        if (is_array($payment)) {
+            $payment = $payment['id'] ?? false;
+        }
         if ($payment !== null && (! is_string($payment) || ! preg_match('/\Api_[A-Za-z0-9]{1,120}\z/', $payment))) {
             throw new QuoteException('CHECKOUT_CHANGED', 409);
         }
+
         // Whitelist retained fields. Provider customer details and raw error bodies are never copied.
         return ['schema_version' => 1, 'intent_id' => $request['intent_id'], 'account_id' => $request['account_id'],
             'mode' => 'test', 'session_id' => $id, 'status' => $status, 'provider_payment_status' => $session['payment_status'],
@@ -138,7 +192,9 @@ final class CheckoutEvidence
 
     public function url(mixed $url, ?string $sessionId = null): bool
     {
-        if (! is_string($url) || strlen($url) > 4096 || preg_match('/[\x00-\x20\x7f\\\\]/', $url)) { return false; }
+        if (! is_string($url) || strlen($url) > 4096 || preg_match('/[\x00-\x20\x7f\\\\]/', $url)) {
+            return false;
+        }
         $parts = parse_url($url);
 
         return is_array($parts) && ($parts['scheme'] ?? null) === 'https' && ($parts['host'] ?? null) === 'checkout.stripe.com' &&

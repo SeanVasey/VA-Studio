@@ -9,7 +9,8 @@ type Captured = { requestUrl: string; responseUrl: string; status: number; cache
 
 function fixture(mode: 'prepare' | 'withdraw' | 'verify', project: string) {
   return JSON.parse(execFileSync('php', ['tests/browser/prepare-customer-history.php', mode, project], {
-    cwd: process.cwd(), env: process.env, timeout: 120_000, encoding: 'utf8',
+    // Preparing 41 orders took about 90 s on a normal runner and passed 120 s on a slow one (Foundation 43455392026).
+    cwd: process.cwd(), env: process.env, timeout: 240_000, encoding: 'utf8',
   }));
 }
 
@@ -56,7 +57,7 @@ async function login(page: Page, email: string) {
 }
 
 test('account library browses three fresh pages of original snapshots and clears private results on sign-out and withdrawal', async ({ page }, testInfo) => {
-  test.setTimeout(180_000);
+  test.setTimeout(360_000);
   resetBrowserLoginRateLimit();
   const prepared: Fixture = fixture('prepare', testInfo.project.name);
   expect(prepared.orders).toHaveLength(41);

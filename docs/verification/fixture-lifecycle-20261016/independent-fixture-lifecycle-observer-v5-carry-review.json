@@ -1,0 +1,50 @@
+{
+  "decision": "APPROVE BOUNDED V5 PROCFS COMPATIBILITY CARRY FOR ACTUAL CHECKS",
+  "execution_eligibility": [
+    "Eligible to repeat existing SQLite12 with corrected collector, then evaluate bounded native default calibration1.",
+    "Whole four native lifecycle datasets and final sealed source/evidence review remain required before later bounded acceptance."
+  ],
+  "immutable_sha256": {
+    "capability_diagnosis": "caf0fa3bfe24a094394b0e32431abb3dcbc0ceb928114fe4ac690c661e3b4925",
+    "observer_v4": "0bdd86bf0013c81fe00175c8b7f6c9a02225653d5e02ce0f8830f25e4aac3044",
+    "observer_v5": "436722cb7e5e8c2cc6f6b2d06d6fdf5c6af87ca04620bd92cfba4ebfcee03835",
+    "runner_v4": "dde5280069f6c82ca2dcba770ae4d2f76c445edb92c815321fadca077e43e966",
+    "runner_v5": "3c121264f26d0cd638c6f39d361b764a4252ebef2123decef34d14bd80e5d323"
+  },
+  "limits": [
+    "Read-only inspection/hash/AST/JUnit reconciliation only; no observer/app/tests/DB/network/CI execution, shared edits or agents.",
+    "No combined pass inferred from V4 PHP0/12/181 with recorder1 and zero groups; source c96 unchanged.",
+    "Native300 remains untested; first52-second -15/NULL-count calibration remains unaccepted; prior native4/E4 and old1/E1 remain failed/open.",
+    "No raw child output/wait-status, full F2/native counterpart/host/provider/activation/release claim."
+  ],
+  "open_p0": 0,
+  "open_p1": 0,
+  "required_corrections": [],
+  "retained_v4_application_scope": {
+    "capture_sha256": "9853aa140f1c00969e3f8c0ba473dfabcbbf7aa8e0d9c0abafd8511cf8d32c47",
+    "captured_groups": 0,
+    "counts": {
+      "assertions": 181,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 12
+    },
+    "junit_sha256": "a582610fd5c2e0f06a8822fb6537a05bca63f2713b08798f1e299dda24e25027",
+    "php_exit": 0,
+    "recorder_exit": 1,
+    "result_sha256": "d817b3050dd837d8ce52ec9d2de65027df0cbe50608206eb4fa7bfe8a7c103b9",
+    "status": "Application-only SQLite result; missing child capture prevents combined acceptance."
+  },
+  "reviewed_sha": "c96da8e29999838ca14477e7dc8f236d6f00ad4a",
+  "source_sha256": {
+    "tests/Feature/FinalizationDatabaseLifecycleTest.php": "d571195075cd5dff116a04057bc094f65ad171e046d4b50e1d80709d28473fd7",
+    "tests/Support/FinalizationLifecycleFixture.php": "7ef29a58fae5d0ce0a81b5c381d9261824b773432bd6051de93b120d91f852f6"
+  },
+  "verified_carry": [
+    "Observer changes only descendants discovery: actual stat PPID field builds owned-UID graph; disappeared processes are ignored. Existing exact executable/argv/cwd/PID birth and ancestry recheck still govern admission.",
+    "Runner changes only V5 import/hash/storage names; V4 original reviewed hashes preserved.",
+    "Previously approved FD/process-group cleanup, finite bounds, byte completeness and copied XML/receipt/warning/dataset checks are unchanged.",
+    "Retained capability diagnosis records stat/task directory present and task children absent; no app scope derives from the preparation probe."
+  ]
+}

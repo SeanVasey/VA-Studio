@@ -1,0 +1,33 @@
+{
+  "head": "670f9caa158e436746ed9aed85667c10b9905f35",
+  "command": [
+    "php",
+    "vendor/bin/phpunit",
+    "tests/Unit/MembershipRedemptionPolicyTest.php",
+    "tests/Feature/ProductionMembership/MembershipRedemptionPolicyFactsTest.php",
+    "tests/Feature/ProductionMembership/MembershipPolicyFactsTest.php",
+    "tests/Feature/ProductionMembership/MembershipPolicyClockTest.php",
+    "tests/Feature/ProductionMembership/MembershipPreparationTest.php",
+    "--log-junit",
+    "/workspace/runtime/membership-reservation-policy-evidence/sqlite-policy.xml"
+  ],
+  "environment": {
+    "APP_ENV": "testing",
+    "APP_DEBUG": "false",
+    "DB_CONNECTION": "sqlite",
+    "DB_DATABASE": ":memory:",
+    "DB_URL": "",
+    "DB_SOCKET": "",
+    "CACHE_STORE": "array",
+    "SESSION_DRIVER": "array",
+    "QUEUE_CONNECTION": "sync",
+    "TMPDIR": "/tmp/va-studio-membership-redemption-policy-20261013"
+  },
+  "sha256": {
+    "app/Domain/Memberships/Production/MembershipPolicyDocument.php": "1545367e9c167458e401ba90950c286e8fadb7aa9918360de9170328e613092e",
+    "app/Domain/Memberships/Production/MembershipPolicyBinding.php": "96b62f5f6b3fc4603fd9df5f1a4c0c5f6060e20e54c3e8249ce04e0d999c8e86",
+    "app/Domain/Memberships/Production/MembershipRedemptionTerms.php": "2efe4b182a46549b7beff5b620473a36ac154ff9174ba11b311edd7c444abeea",
+    "tests/Unit/MembershipRedemptionPolicyTest.php": "14cf960cef4ce27a6e46addf9dede0e5cccd701a358fa0d0582e735ba10c28bd",
+    "tests/Feature/ProductionMembership/MembershipRedemptionPolicyFactsTest.php": "b860bee8e071239963c65b4e390eb4b67e0a6bd08aa4997991fab359d701d846"
+  }
+}

@@ -44,7 +44,7 @@ test('track navigation preserves filters, a single native audio owner and seekin
   expect(await page.evaluate(() => window.__nativePreviews.length)).toBe(1);
   expect(await page.evaluate(() => window.__nativePreviews[0].paused)).toBe(false);
   expect(await page.evaluate(() => window.__nativePreviews[0].currentTime)).toBeGreaterThanOrEqual(timeBefore);
-  await expect(page.getByRole('button', { name: `Pause ${fixtureTrack.title}`, exact: true }).first()).toBeVisible();
+  await expect(page.getByRole('button', { name: `Pause preview of ${fixtureTrack.title}`, exact: true }).first()).toBeVisible();
   await expect(page.getByRole('link', { name: 'Back to results' })).toHaveAttribute('href', '/' + query);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.screenshot({ path: testInfo.outputPath('track-detail-playing.png'), fullPage: true });

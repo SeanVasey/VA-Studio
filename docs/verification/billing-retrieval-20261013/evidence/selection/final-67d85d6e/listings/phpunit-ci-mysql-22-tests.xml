@@ -1,0 +1,193 @@
+<?xml version="1.0"?>
+<testSuite xmlns="https://xml.phpunit.de/testSuite">
+ <tests>
+  <testClass name="Tests\Feature\CustomerSuppressionKeyAdmissionTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/CustomerSuppressionKeyAdmissionTest.php">
+   <testMethod id="Tests\Feature\CustomerSuppressionKeyAdmissionTest::test_exact_complete_owned_graph_still_revalidates" name="test_exact_complete_owned_graph_still_revalidates"/>
+   <testMethod id="Tests\Feature\CustomerSuppressionKeyAdmissionTest::test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl#customer_suppression_targets_public_unique" name="test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl"/>
+   <testMethod id="Tests\Feature\CustomerSuppressionKeyAdmissionTest::test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl#customer_suppression_targets_recipient_unique" name="test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl"/>
+   <testMethod id="Tests\Feature\CustomerSuppressionKeyAdmissionTest::test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl#customer_suppression_targets_customer_account_id_fk" name="test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl"/>
+   <testMethod id="Tests\Feature\CustomerSuppressionKeyAdmissionTest::test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl#customer_suppression_intents_public_unique" name="test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl"/>
+   <testMethod id="Tests\Feature\CustomerSuppressionKeyAdmissionTest::test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl#customer_suppression_intents_event_unique" name="test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl"/>
+   <testMethod id="Tests\Feature\CustomerSuppressionKeyAdmissionTest::test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl#customer_suppression_intents_target_index" name="test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl"/>
+   <testMethod id="Tests\Feature\CustomerSuppressionKeyAdmissionTest::test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl#customer_suppression_intents_consent_event_id_fk" name="test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl"/>
+   <testMethod id="Tests\Feature\CustomerSuppressionKeyAdmissionTest::test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl#customer_suppression_intents_target_id_fk" name="test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl"/>
+   <testMethod id="Tests\Feature\CustomerSuppressionKeyAdmissionTest::test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl#customer_suppression_attempts_public_unique" name="test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl"/>
+   <testMethod id="Tests\Feature\CustomerSuppressionKeyAdmissionTest::test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl#customer_suppression_attempts_target_unique" name="test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl"/>
+   <testMethod id="Tests\Feature\CustomerSuppressionKeyAdmissionTest::test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl#customer_suppression_attempts_target_id_fk" name="test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl"/>
+   <testMethod id="Tests\Feature\CustomerSuppressionKeyAdmissionTest::test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl#customer_suppression_confirmations_attempt_unique" name="test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl"/>
+   <testMethod id="Tests\Feature\CustomerSuppressionKeyAdmissionTest::test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl#customer_suppression_confirmations_attempt_id_fk" name="test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl"/>
+   <testMethod id="Tests\Feature\CustomerSuppressionKeyAdmissionTest::test_foreign_reserved_native_foreign_key_refuses_before_owned_ddl" name="test_foreign_reserved_native_foreign_key_refuses_before_owned_ddl"/>
+   <testMethod id="Tests\Feature\CustomerSuppressionKeyAdmissionTest::test_native_dictionary_collation_alias_of_reserved_constraint_refuses_before_ddl" name="test_native_dictionary_collation_alias_of_reserved_constraint_refuses_before_ddl"/>
+   <testMethod id="Tests\Feature\CustomerSuppressionKeyAdmissionTest::test_reserved_key_used_by_another_object_kind_refuses_before_ddl" name="test_reserved_key_used_by_another_object_kind_refuses_before_ddl"/>
+   <testMethod id="Tests\Feature\CustomerSuppressionKeyAdmissionTest::test_temporary_reserved_key_refuses_before_ddl" name="test_temporary_reserved_key_refuses_before_ddl"/>
+   <testMethod id="Tests\Feature\CustomerSuppressionKeyAdmissionTest::test_final_ddl_callback_cannot_record_a_late_foreign_reserved_index" name="test_final_ddl_callback_cannot_record_a_late_foreign_reserved_index"/>
+  </testClass>
+  <testClass name="Tests\Feature\FreeGrantSchemaRecoveryTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/FreeGrantSchemaRecoveryTest.php">
+   <testMethod id="Tests\Feature\FreeGrantSchemaRecoveryTest::test_every_sqlite_statement_and_selected_native_create_fk_index_guard_boundaries_retry_exactly" name="test_every_sqlite_statement_and_selected_native_create_fk_index_guard_boundaries_retry_exactly"/>
+   <testMethod id="Tests\Feature\FreeGrantSchemaRecoveryTest::test_completed_installation_with_retained_rows_survives_log_uncertainty_idempotently_and_refuses_down" name="test_completed_installation_with_retained_rows_survives_log_uncertainty_idempotently_and_refuses_down"/>
+   <testMethod id="Tests\Feature\FreeGrantSchemaRecoveryTest::test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write#0" name="test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write"/>
+   <testMethod id="Tests\Feature\FreeGrantSchemaRecoveryTest::test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write#1" name="test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write"/>
+   <testMethod id="Tests\Feature\FreeGrantSchemaRecoveryTest::test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write#2" name="test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write"/>
+   <testMethod id="Tests\Feature\FreeGrantSchemaRecoveryTest::test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write#3" name="test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write"/>
+   <testMethod id="Tests\Feature\FreeGrantSchemaRecoveryTest::test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write#4" name="test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write"/>
+   <testMethod id="Tests\Feature\FreeGrantSchemaRecoveryTest::test_sqlite_composite_dependency_primary_key_is_not_a_unique_id_target" name="test_sqlite_composite_dependency_primary_key_is_not_a_unique_id_target"/>
+  </testClass>
+  <testClass name="Tests\Feature\ProductDraftMigrationTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/ProductDraftMigrationTest.php">
+   <testMethod id="Tests\Feature\ProductDraftMigrationTest::test_populated_down_preserves_all_evidence_and_unjournaled_retry_refuses_before_ddl" name="test_populated_down_preserves_all_evidence_and_unjournaled_retry_refuses_before_ddl"/>
+   <testMethod id="Tests\Feature\ProductDraftMigrationTest::test_interrupted_prefix_is_preserved_for_explicit_recovery" name="test_interrupted_prefix_is_preserved_for_explicit_recovery"/>
+   <testMethod id="Tests\Feature\ProductDraftMigrationTest::test_foreign_view_identity_is_preserved" name="test_foreign_view_identity_is_preserved"/>
+   <testMethod id="Tests\Feature\ProductDraftMigrationTest::test_temporary_shadow_prevents_any_permanent_creation" name="test_temporary_shadow_prevents_any_permanent_creation"/>
+   <testMethod id="Tests\Feature\ProductDraftMigrationTest::test_foreign_trigger_identity_is_preserved" name="test_foreign_trigger_identity_is_preserved"/>
+  </testClass>
+  <testClass name="Tests\Feature\ProductMemberRefreshConcurrencyTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/ProductMemberRefreshConcurrencyTest.php">
+   <testMethod id="Tests\Feature\ProductMemberRefreshConcurrencyTest::test_native_draft_wait_allows_one_refresh_or_preserves_the_winning_edit#duplicate refresh" name="test_native_draft_wait_allows_one_refresh_or_preserves_the_winning_edit"/>
+   <testMethod id="Tests\Feature\ProductMemberRefreshConcurrencyTest::test_native_draft_wait_allows_one_refresh_or_preserves_the_winning_edit#edit before refresh" name="test_native_draft_wait_allows_one_refresh_or_preserves_the_winning_edit"/>
+   <testMethod id="Tests\Feature\ProductMemberRefreshConcurrencyTest::test_native_draft_wait_allows_one_refresh_or_preserves_the_winning_edit#refresh before edit" name="test_native_draft_wait_allows_one_refresh_or_preserves_the_winning_edit"/>
+   <testMethod id="Tests\Feature\ProductMemberRefreshConcurrencyTest::test_native_source_wait_rejects_a_review_changed_by_the_committing_source_writer#root transaction" name="test_native_source_wait_rejects_a_review_changed_by_the_committing_source_writer"/>
+   <testMethod id="Tests\Feature\ProductMemberRefreshConcurrencyTest::test_native_source_wait_rejects_a_review_changed_by_the_committing_source_writer#old repeatable-read snapshot" name="test_native_source_wait_rejects_a_review_changed_by_the_committing_source_writer"/>
+   <testMethod id="Tests\Feature\ProductMemberRefreshConcurrencyTest::test_native_actor_wait_observes_authority_withdrawal_despite_an_older_snapshot#review / role" name="test_native_actor_wait_observes_authority_withdrawal_despite_an_older_snapshot"/>
+   <testMethod id="Tests\Feature\ProductMemberRefreshConcurrencyTest::test_native_actor_wait_observes_authority_withdrawal_despite_an_older_snapshot#refresh / role" name="test_native_actor_wait_observes_authority_withdrawal_despite_an_older_snapshot"/>
+   <testMethod id="Tests\Feature\ProductMemberRefreshConcurrencyTest::test_native_actor_wait_observes_authority_withdrawal_despite_an_older_snapshot#review / MFA" name="test_native_actor_wait_observes_authority_withdrawal_despite_an_older_snapshot"/>
+   <testMethod id="Tests\Feature\ProductMemberRefreshConcurrencyTest::test_native_actor_wait_observes_authority_withdrawal_despite_an_older_snapshot#refresh / MFA" name="test_native_actor_wait_observes_authority_withdrawal_despite_an_older_snapshot"/>
+  </testClass>
+  <testClass name="Tests\Feature\ProductionCheckoutNativeRaceTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/ProductionCheckoutNativeRaceTest.php">
+   <testMethod id="Tests\Feature\ProductionCheckoutNativeRaceTest::test_competing_assent_waits_on_exact_original_buyer_and_preserves_one_order#0" name="test_competing_assent_waits_on_exact_original_buyer_and_preserves_one_order"/>
+   <testMethod id="Tests\Feature\ProductionCheckoutNativeRaceTest::test_competing_assent_waits_on_exact_original_buyer_and_preserves_one_order#1" name="test_competing_assent_waits_on_exact_original_buyer_and_preserves_one_order"/>
+  </testClass>
+  <testClass name="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/ProductionMemberOriginals/MemberOriginalSchemaPreparationTest.php">
+   <testMethod id="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_owned_retry_preserves_all_parent_originals_without_identity_child_dependencies" name="test_owned_retry_preserves_all_parent_originals_without_identity_child_dependencies"/>
+   <testMethod id="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_contiguous_empty_tail_can_restart_but_an_earlier_guard_hole_is_not_owned" name="test_contiguous_empty_tail_can_restart_but_an_earlier_guard_hole_is_not_owned"/>
+   <testMethod id="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_data_bearing_unguarded_prefix_cannot_be_adopted_or_deleted" name="test_data_bearing_unguarded_prefix_cannot_be_adopted_or_deleted"/>
+   <testMethod id="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_reserved_guard_table_collision_retains_foreign_marker_on_both_drivers" name="test_reserved_guard_table_collision_retains_foreign_marker_on_both_drivers"/>
+   <testMethod id="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_profiles_definitions_cannot_adopt_an_old_family_or_rewrite_original_terms" name="test_profiles_definitions_cannot_adopt_an_old_family_or_rewrite_original_terms"/>
+   <testMethod id="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_pending_original_requires_bounded_contiguous_artifacts_before_structural_activation" name="test_pending_original_requires_bounded_contiguous_artifacts_before_structural_activation"/>
+   <testMethod id="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_down_refuses_before_mutating_originals_or_parent_history" name="test_down_refuses_before_mutating_originals_or_parent_history"/>
+   <testMethod id="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_native_global_check_reservation_is_inspected_before_the_first_owned_ddl" name="test_native_global_check_reservation_is_inspected_before_the_first_owned_ddl"/>
+   <testMethod id="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_original_cannot_bind_the_same_redemption_to_a_different_current_account" name="test_original_cannot_bind_the_same_redemption_to_a_different_current_account"/>
+   <testMethod id="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_original_cannot_bind_a_redemption_to_another_source_invoice" name="test_original_cannot_bind_a_redemption_to_another_source_invoice"/>
+  </testClass>
+  <testClass name="Tests\Feature\StemsRecordingConcurrencyTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/StemsRecordingConcurrencyTest.php">
+   <testMethod id="Tests\Feature\StemsRecordingConcurrencyTest::test_conflicting_associations_wait_on_the_track_and_preserve_the_winning_attestation#conflicting / root transaction" name="test_conflicting_associations_wait_on_the_track_and_preserve_the_winning_attestation"/>
+   <testMethod id="Tests\Feature\StemsRecordingConcurrencyTest::test_conflicting_associations_wait_on_the_track_and_preserve_the_winning_attestation#identical / root transaction" name="test_conflicting_associations_wait_on_the_track_and_preserve_the_winning_attestation"/>
+   <testMethod id="Tests\Feature\StemsRecordingConcurrencyTest::test_conflicting_associations_wait_on_the_track_and_preserve_the_winning_attestation#conflicting / old caller snapshot" name="test_conflicting_associations_wait_on_the_track_and_preserve_the_winning_attestation"/>
+   <testMethod id="Tests\Feature\StemsRecordingConcurrencyTest::test_conflicting_associations_wait_on_the_track_and_preserve_the_winning_attestation#identical / old caller snapshot" name="test_conflicting_associations_wait_on_the_track_and_preserve_the_winning_attestation"/>
+  </testClass>
+  <testClass name="Tests\Feature\TestPaymentEvidenceMigrationTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/TestPaymentEvidenceMigrationTest.php">
+   <testMethod id="Tests\Feature\TestPaymentEvidenceMigrationTest::test_empty_payment_migration_roundtrip_preserves_existing_private_evidence_and_pending_resources" name="test_empty_payment_migration_roundtrip_preserves_existing_private_evidence_and_pending_resources"/>
+   <testMethod id="Tests\Feature\TestPaymentEvidenceMigrationTest::test_work_state_is_mutable_while_receipt_identity_and_evidence_remain_unchanged" name="test_work_state_is_mutable_while_receipt_identity_and_evidence_remain_unchanged"/>
+   <testMethod id="Tests\Feature\TestPaymentEvidenceMigrationTest::test_invalid_work_claims_are_rejected_by_models_and_direct_sql#unknown state" name="test_invalid_work_claims_are_rejected_by_models_and_direct_sql"/>
+   <testMethod id="Tests\Feature\TestPaymentEvidenceMigrationTest::test_invalid_work_claims_are_rejected_by_models_and_direct_sql#uppercase state" name="test_invalid_work_claims_are_rejected_by_models_and_direct_sql"/>
+   <testMethod id="Tests\Feature\TestPaymentEvidenceMigrationTest::test_invalid_work_claims_are_rejected_by_models_and_direct_sql#processing without claim" name="test_invalid_work_claims_are_rejected_by_models_and_direct_sql"/>
+   <testMethod id="Tests\Feature\TestPaymentEvidenceMigrationTest::test_invalid_work_claims_are_rejected_by_models_and_direct_sql#processing without lease" name="test_invalid_work_claims_are_rejected_by_models_and_direct_sql"/>
+   <testMethod id="Tests\Feature\TestPaymentEvidenceMigrationTest::test_invalid_work_claims_are_rejected_by_models_and_direct_sql#processing without token" name="test_invalid_work_claims_are_rejected_by_models_and_direct_sql"/>
+   <testMethod id="Tests\Feature\TestPaymentEvidenceMigrationTest::test_invalid_work_claims_are_rejected_by_models_and_direct_sql#short token" name="test_invalid_work_claims_are_rejected_by_models_and_direct_sql"/>
+   <testMethod id="Tests\Feature\TestPaymentEvidenceMigrationTest::test_invalid_work_claims_are_rejected_by_models_and_direct_sql#nonprocessing token" name="test_invalid_work_claims_are_rejected_by_models_and_direct_sql"/>
+   <testMethod id="Tests\Feature\TestPaymentEvidenceMigrationTest::test_invalid_work_claims_are_rejected_by_models_and_direct_sql#nonprocessing lease" name="test_invalid_work_claims_are_rejected_by_models_and_direct_sql"/>
+   <testMethod id="Tests\Feature\TestPaymentEvidenceMigrationTest::test_invalid_work_claims_are_rejected_by_models_and_direct_sql#negative attempts" name="test_invalid_work_claims_are_rejected_by_models_and_direct_sql"/>
+   <testMethod id="Tests\Feature\TestPaymentEvidenceMigrationTest::test_invalid_work_claims_are_rejected_by_models_and_direct_sql#unbounded outcome" name="test_invalid_work_claims_are_rejected_by_models_and_direct_sql"/>
+   <testMethod id="Tests\Feature\TestPaymentEvidenceMigrationTest::test_payment_evidence_and_receipt_work_identity_reject_model_and_bulk_mutation#0" name="test_payment_evidence_and_receipt_work_identity_reject_model_and_bulk_mutation"/>
+   <testMethod id="Tests\Feature\TestPaymentEvidenceMigrationTest::test_payment_evidence_and_receipt_work_identity_reject_model_and_bulk_mutation#1" name="test_payment_evidence_and_receipt_work_identity_reject_model_and_bulk_mutation"/>
+   <testMethod id="Tests\Feature\TestPaymentEvidenceMigrationTest::test_payment_evidence_and_receipt_work_identity_reject_model_and_bulk_mutation#2" name="test_payment_evidence_and_receipt_work_identity_reject_model_and_bulk_mutation"/>
+   <testMethod id="Tests\Feature\TestPaymentEvidenceMigrationTest::test_payment_evidence_and_receipt_work_identity_reject_model_and_bulk_mutation#3" name="test_payment_evidence_and_receipt_work_identity_reject_model_and_bulk_mutation"/>
+   <testMethod id="Tests\Feature\TestPaymentEvidenceMigrationTest::test_append_only_observations_retain_private_evidence_and_model_relationships" name="test_append_only_observations_retain_private_evidence_and_model_relationships"/>
+   <testMethod id="Tests\Feature\TestPaymentEvidenceMigrationTest::test_unique_confirmation_bindings_and_case_sensitive_provider_scopes_are_retained" name="test_unique_confirmation_bindings_and_case_sensitive_provider_scopes_are_retained"/>
+   <testMethod id="Tests\Feature\TestPaymentEvidenceMigrationTest::test_sql_rejects_incoherent_bindings_unsupported_states_and_non_test_payment_evidence" name="test_sql_rejects_incoherent_bindings_unsupported_states_and_non_test_payment_evidence"/>
+   <testMethod id="Tests\Feature\TestPaymentEvidenceMigrationTest::test_sql_rejects_orphan_records_and_foreign_keys_restrict_evidence_deletion" name="test_sql_rejects_orphan_records_and_foreign_keys_restrict_evidence_deletion"/>
+  </testClass>
+  <testClass name="Tests\Feature\TrackMetadataPresetsConcurrencyTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/TrackMetadataPresetsConcurrencyTest.php">
+   <testMethod id="Tests\Feature\TrackMetadataPresetsConcurrencyTest::test_overlapping_edits_wait_on_the_exact_preset_row_and_only_one_revision_is_saved" name="test_overlapping_edits_wait_on_the_exact_preset_row_and_only_one_revision_is_saved"/>
+   <testMethod id="Tests\Feature\TrackMetadataPresetsConcurrencyTest::test_snapshot_and_archive_serialize_on_the_exact_preset_row#snapshot locks first" name="test_snapshot_and_archive_serialize_on_the_exact_preset_row"/>
+   <testMethod id="Tests\Feature\TrackMetadataPresetsConcurrencyTest::test_snapshot_and_archive_serialize_on_the_exact_preset_row#archive locks first" name="test_snapshot_and_archive_serialize_on_the_exact_preset_row"/>
+   <testMethod id="Tests\Feature\TrackMetadataPresetsConcurrencyTest::test_every_domain_operation_rejects_revocation_hidden_by_an_old_repeatable_read_snapshot#staff role" name="test_every_domain_operation_rejects_revocation_hidden_by_an_old_repeatable_read_snapshot"/>
+   <testMethod id="Tests\Feature\TrackMetadataPresetsConcurrencyTest::test_every_domain_operation_rejects_revocation_hidden_by_an_old_repeatable_read_snapshot#verified email" name="test_every_domain_operation_rejects_revocation_hidden_by_an_old_repeatable_read_snapshot"/>
+   <testMethod id="Tests\Feature\TrackMetadataPresetsConcurrencyTest::test_every_domain_operation_rejects_revocation_hidden_by_an_old_repeatable_read_snapshot#MFA enrollment" name="test_every_domain_operation_rejects_revocation_hidden_by_an_old_repeatable_read_snapshot"/>
+  </testClass>
+ </tests>
+ <groups>
+  <group name="default">
+   <test id="Tests\Feature\CustomerSuppressionKeyAdmissionTest::test_exact_complete_owned_graph_still_revalidates"/>
+   <test id="Tests\Feature\CustomerSuppressionKeyAdmissionTest::test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl#customer_suppression_targets_public_unique"/>
+   <test id="Tests\Feature\CustomerSuppressionKeyAdmissionTest::test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl#customer_suppression_targets_recipient_unique"/>
+   <test id="Tests\Feature\CustomerSuppressionKeyAdmissionTest::test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl#customer_suppression_targets_customer_account_id_fk"/>
+   <test id="Tests\Feature\CustomerSuppressionKeyAdmissionTest::test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl#customer_suppression_intents_public_unique"/>
+   <test id="Tests\Feature\CustomerSuppressionKeyAdmissionTest::test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl#customer_suppression_intents_event_unique"/>
+   <test id="Tests\Feature\CustomerSuppressionKeyAdmissionTest::test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl#customer_suppression_intents_target_index"/>
+   <test id="Tests\Feature\CustomerSuppressionKeyAdmissionTest::test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl#customer_suppression_intents_consent_event_id_fk"/>
+   <test id="Tests\Feature\CustomerSuppressionKeyAdmissionTest::test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl#customer_suppression_intents_target_id_fk"/>
+   <test id="Tests\Feature\CustomerSuppressionKeyAdmissionTest::test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl#customer_suppression_attempts_public_unique"/>
+   <test id="Tests\Feature\CustomerSuppressionKeyAdmissionTest::test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl#customer_suppression_attempts_target_unique"/>
+   <test id="Tests\Feature\CustomerSuppressionKeyAdmissionTest::test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl#customer_suppression_attempts_target_id_fk"/>
+   <test id="Tests\Feature\CustomerSuppressionKeyAdmissionTest::test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl#customer_suppression_confirmations_attempt_unique"/>
+   <test id="Tests\Feature\CustomerSuppressionKeyAdmissionTest::test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl#customer_suppression_confirmations_attempt_id_fk"/>
+   <test id="Tests\Feature\CustomerSuppressionKeyAdmissionTest::test_foreign_reserved_native_foreign_key_refuses_before_owned_ddl"/>
+   <test id="Tests\Feature\CustomerSuppressionKeyAdmissionTest::test_native_dictionary_collation_alias_of_reserved_constraint_refuses_before_ddl"/>
+   <test id="Tests\Feature\CustomerSuppressionKeyAdmissionTest::test_reserved_key_used_by_another_object_kind_refuses_before_ddl"/>
+   <test id="Tests\Feature\CustomerSuppressionKeyAdmissionTest::test_temporary_reserved_key_refuses_before_ddl"/>
+   <test id="Tests\Feature\CustomerSuppressionKeyAdmissionTest::test_final_ddl_callback_cannot_record_a_late_foreign_reserved_index"/>
+   <test id="Tests\Feature\FreeGrantSchemaRecoveryTest::test_every_sqlite_statement_and_selected_native_create_fk_index_guard_boundaries_retry_exactly"/>
+   <test id="Tests\Feature\FreeGrantSchemaRecoveryTest::test_completed_installation_with_retained_rows_survives_log_uncertainty_idempotently_and_refuses_down"/>
+   <test id="Tests\Feature\FreeGrantSchemaRecoveryTest::test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write#0"/>
+   <test id="Tests\Feature\FreeGrantSchemaRecoveryTest::test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write#1"/>
+   <test id="Tests\Feature\FreeGrantSchemaRecoveryTest::test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write#2"/>
+   <test id="Tests\Feature\FreeGrantSchemaRecoveryTest::test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write#3"/>
+   <test id="Tests\Feature\FreeGrantSchemaRecoveryTest::test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write#4"/>
+   <test id="Tests\Feature\FreeGrantSchemaRecoveryTest::test_sqlite_composite_dependency_primary_key_is_not_a_unique_id_target"/>
+   <test id="Tests\Feature\ProductDraftMigrationTest::test_populated_down_preserves_all_evidence_and_unjournaled_retry_refuses_before_ddl"/>
+   <test id="Tests\Feature\ProductDraftMigrationTest::test_interrupted_prefix_is_preserved_for_explicit_recovery"/>
+   <test id="Tests\Feature\ProductDraftMigrationTest::test_foreign_view_identity_is_preserved"/>
+   <test id="Tests\Feature\ProductDraftMigrationTest::test_temporary_shadow_prevents_any_permanent_creation"/>
+   <test id="Tests\Feature\ProductDraftMigrationTest::test_foreign_trigger_identity_is_preserved"/>
+   <test id="Tests\Feature\ProductMemberRefreshConcurrencyTest::test_native_draft_wait_allows_one_refresh_or_preserves_the_winning_edit#duplicate refresh"/>
+   <test id="Tests\Feature\ProductMemberRefreshConcurrencyTest::test_native_draft_wait_allows_one_refresh_or_preserves_the_winning_edit#edit before refresh"/>
+   <test id="Tests\Feature\ProductMemberRefreshConcurrencyTest::test_native_draft_wait_allows_one_refresh_or_preserves_the_winning_edit#refresh before edit"/>
+   <test id="Tests\Feature\ProductMemberRefreshConcurrencyTest::test_native_source_wait_rejects_a_review_changed_by_the_committing_source_writer#root transaction"/>
+   <test id="Tests\Feature\ProductMemberRefreshConcurrencyTest::test_native_source_wait_rejects_a_review_changed_by_the_committing_source_writer#old repeatable-read snapshot"/>
+   <test id="Tests\Feature\ProductMemberRefreshConcurrencyTest::test_native_actor_wait_observes_authority_withdrawal_despite_an_older_snapshot#review / role"/>
+   <test id="Tests\Feature\ProductMemberRefreshConcurrencyTest::test_native_actor_wait_observes_authority_withdrawal_despite_an_older_snapshot#refresh / role"/>
+   <test id="Tests\Feature\ProductMemberRefreshConcurrencyTest::test_native_actor_wait_observes_authority_withdrawal_despite_an_older_snapshot#review / MFA"/>
+   <test id="Tests\Feature\ProductMemberRefreshConcurrencyTest::test_native_actor_wait_observes_authority_withdrawal_despite_an_older_snapshot#refresh / MFA"/>
+   <test id="Tests\Feature\ProductionCheckoutNativeRaceTest::test_competing_assent_waits_on_exact_original_buyer_and_preserves_one_order#0"/>
+   <test id="Tests\Feature\ProductionCheckoutNativeRaceTest::test_competing_assent_waits_on_exact_original_buyer_and_preserves_one_order#1"/>
+   <test id="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_owned_retry_preserves_all_parent_originals_without_identity_child_dependencies"/>
+   <test id="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_contiguous_empty_tail_can_restart_but_an_earlier_guard_hole_is_not_owned"/>
+   <test id="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_data_bearing_unguarded_prefix_cannot_be_adopted_or_deleted"/>
+   <test id="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_reserved_guard_table_collision_retains_foreign_marker_on_both_drivers"/>
+   <test id="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_profiles_definitions_cannot_adopt_an_old_family_or_rewrite_original_terms"/>
+   <test id="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_pending_original_requires_bounded_contiguous_artifacts_before_structural_activation"/>
+   <test id="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_down_refuses_before_mutating_originals_or_parent_history"/>
+   <test id="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_native_global_check_reservation_is_inspected_before_the_first_owned_ddl"/>
+   <test id="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_original_cannot_bind_the_same_redemption_to_a_different_current_account"/>
+   <test id="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_original_cannot_bind_a_redemption_to_another_source_invoice"/>
+   <test id="Tests\Feature\StemsRecordingConcurrencyTest::test_conflicting_associations_wait_on_the_track_and_preserve_the_winning_attestation#conflicting / root transaction"/>
+   <test id="Tests\Feature\StemsRecordingConcurrencyTest::test_conflicting_associations_wait_on_the_track_and_preserve_the_winning_attestation#identical / root transaction"/>
+   <test id="Tests\Feature\StemsRecordingConcurrencyTest::test_conflicting_associations_wait_on_the_track_and_preserve_the_winning_attestation#conflicting / old caller snapshot"/>
+   <test id="Tests\Feature\StemsRecordingConcurrencyTest::test_conflicting_associations_wait_on_the_track_and_preserve_the_winning_attestation#identical / old caller snapshot"/>
+   <test id="Tests\Feature\TestPaymentEvidenceMigrationTest::test_empty_payment_migration_roundtrip_preserves_existing_private_evidence_and_pending_resources"/>
+   <test id="Tests\Feature\TestPaymentEvidenceMigrationTest::test_work_state_is_mutable_while_receipt_identity_and_evidence_remain_unchanged"/>
+   <test id="Tests\Feature\TestPaymentEvidenceMigrationTest::test_invalid_work_claims_are_rejected_by_models_and_direct_sql#unknown state"/>
+   <test id="Tests\Feature\TestPaymentEvidenceMigrationTest::test_invalid_work_claims_are_rejected_by_models_and_direct_sql#uppercase state"/>
+   <test id="Tests\Feature\TestPaymentEvidenceMigrationTest::test_invalid_work_claims_are_rejected_by_models_and_direct_sql#processing without claim"/>
+   <test id="Tests\Feature\TestPaymentEvidenceMigrationTest::test_invalid_work_claims_are_rejected_by_models_and_direct_sql#processing without lease"/>
+   <test id="Tests\Feature\TestPaymentEvidenceMigrationTest::test_invalid_work_claims_are_rejected_by_models_and_direct_sql#processing without token"/>
+   <test id="Tests\Feature\TestPaymentEvidenceMigrationTest::test_invalid_work_claims_are_rejected_by_models_and_direct_sql#short token"/>
+   <test id="Tests\Feature\TestPaymentEvidenceMigrationTest::test_invalid_work_claims_are_rejected_by_models_and_direct_sql#nonprocessing token"/>
+   <test id="Tests\Feature\TestPaymentEvidenceMigrationTest::test_invalid_work_claims_are_rejected_by_models_and_direct_sql#nonprocessing lease"/>
+   <test id="Tests\Feature\TestPaymentEvidenceMigrationTest::test_invalid_work_claims_are_rejected_by_models_and_direct_sql#negative attempts"/>
+   <test id="Tests\Feature\TestPaymentEvidenceMigrationTest::test_invalid_work_claims_are_rejected_by_models_and_direct_sql#unbounded outcome"/>
+   <test id="Tests\Feature\TestPaymentEvidenceMigrationTest::test_payment_evidence_and_receipt_work_identity_reject_model_and_bulk_mutation#0"/>
+   <test id="Tests\Feature\TestPaymentEvidenceMigrationTest::test_payment_evidence_and_receipt_work_identity_reject_model_and_bulk_mutation#1"/>
+   <test id="Tests\Feature\TestPaymentEvidenceMigrationTest::test_payment_evidence_and_receipt_work_identity_reject_model_and_bulk_mutation#2"/>
+   <test id="Tests\Feature\TestPaymentEvidenceMigrationTest::test_payment_evidence_and_receipt_work_identity_reject_model_and_bulk_mutation#3"/>
+   <test id="Tests\Feature\TestPaymentEvidenceMigrationTest::test_append_only_observations_retain_private_evidence_and_model_relationships"/>
+   <test id="Tests\Feature\TestPaymentEvidenceMigrationTest::test_unique_confirmation_bindings_and_case_sensitive_provider_scopes_are_retained"/>
+   <test id="Tests\Feature\TestPaymentEvidenceMigrationTest::test_sql_rejects_incoherent_bindings_unsupported_states_and_non_test_payment_evidence"/>
+   <test id="Tests\Feature\TestPaymentEvidenceMigrationTest::test_sql_rejects_orphan_records_and_foreign_keys_restrict_evidence_deletion"/>
+   <test id="Tests\Feature\TrackMetadataPresetsConcurrencyTest::test_overlapping_edits_wait_on_the_exact_preset_row_and_only_one_revision_is_saved"/>
+   <test id="Tests\Feature\TrackMetadataPresetsConcurrencyTest::test_snapshot_and_archive_serialize_on_the_exact_preset_row#snapshot locks first"/>
+   <test id="Tests\Feature\TrackMetadataPresetsConcurrencyTest::test_snapshot_and_archive_serialize_on_the_exact_preset_row#archive locks first"/>
+   <test id="Tests\Feature\TrackMetadataPresetsConcurrencyTest::test_every_domain_operation_rejects_revocation_hidden_by_an_old_repeatable_read_snapshot#staff role"/>
+   <test id="Tests\Feature\TrackMetadataPresetsConcurrencyTest::test_every_domain_operation_rejects_revocation_hidden_by_an_old_repeatable_read_snapshot#verified email"/>
+   <test id="Tests\Feature\TrackMetadataPresetsConcurrencyTest::test_every_domain_operation_rejects_revocation_hidden_by_an_old_repeatable_read_snapshot#MFA enrollment"/>
+  </group>
+ </groups>
+</testSuite>

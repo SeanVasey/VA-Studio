@@ -79,25 +79,33 @@ async function activate(page: Page, label: string, action: 'Publish release' | '
     });
 }
 
+// Filament 5's searchable select renders its trigger as a plain button named by the field label ("Track"); the combobox is the
+// search input inside the open dropdown (support/resources/js/utilities/select.js, v5.11.1).
+function trackSelects(group: Locator): Locator {
+  return group.getByRole('button', { name: 'Track', exact: true });
+}
+
 async function addTrack(group: Locator, track: Track) {
-  const before = await group.getByRole('combobox').count();
+  const before = await trackSelects(group).count();
   await group.getByRole('button', { name: 'Add to related tracks', exact: true }).click();
-  await expect(group.getByRole('combobox')).toHaveCount(before + 1);
-  const select = group.getByRole('combobox').last();
+  await expect(trackSelects(group)).toHaveCount(before + 1);
+  const select = trackSelects(group).last();
   await select.focus();
   await select.press('Enter');
-  await group.getByRole('textbox', { name: 'Search', exact: true }).fill(track.title.slice(0, 80));
-  await group.getByRole('option', { name: `${track.title} · ${track.artist}`, exact: true }).click();
+  const search = group.page().getByRole('combobox', { expanded: true });
+  await expect(search).toHaveCount(1);
+  await search.fill(track.title.slice(0, 80));
+  await group.page().getByRole('option', { name: `${track.title} · ${track.artist}`, exact: true }).click();
   await expect(select).toContainText(track.title);
 }
 
 async function clearTracks(group: Locator) {
-  let remaining = await group.getByRole('combobox').count();
+  let remaining = await trackSelects(group).count();
   while (remaining > 0) {
     await group.getByRole('button', { name: 'Delete', exact: true }).last().click();
-    await expect(group.getByRole('combobox')).toHaveCount(--remaining);
+    await expect(trackSelects(group)).toHaveCount(--remaining);
   }
-  await expect(group.getByRole('combobox')).toHaveCount(0);
+  await expect(trackSelects(group)).toHaveCount(0);
 }
 
 async function reviewVerifiedPrivateTrack(page: Page, visitor: APIRequestContext, testInfo: TestInfo, manifest: Manifest, track: Track, browserName: string) {
@@ -323,8 +331,8 @@ async function reviewedPublication(page: Page, browser: Browser, visitor: APIReq
   expect(proof).toMatchObject({ verified: true, project: testInfo.project.name, state: 'publication-ready', evidenceHash: manifest.evidenceHash });
   await page.goto('/admin/tracks');
   await searchTracks(page, track.title);
-  await row(page, track.title).getByRole('button', { name: 'Unpublish', exact: true }).click();
-  const withdrawal = page.getByRole('alertdialog', { name: 'Unpublish', exact: true });
+  await row(page, track.title).getByRole('button', { name: 'Return to draft', exact: true }).click();
+  const withdrawal = page.getByRole('alertdialog', { name: 'Return to draft', exact: true });
   const [withdrawn] = await Promise.all([actionResponse(page, 'callMountedAction'), withdrawal.getByRole('button', { name: 'Confirm', exact: true }).click()]);
   expect(withdrawn.status()).toBe(200);
   expect(await withdrawn.finished()).toBeNull();
@@ -414,7 +422,7 @@ async function reviewedPublication(page: Page, browser: Browser, visitor: APIReq
     await expect(publication.dialog.getByRole('heading')).toBeHidden();
     await expect(row(page, track.title).getByText('published', { exact: true })).toBeVisible();
     await page.reload();
-    await expect(row(page, track.title).getByRole('button', { name: 'Unpublish', exact: true })).toBeVisible();
+    await expect(row(page, track.title).getByRole('button', { name: 'Return to draft', exact: true })).toBeVisible();
     expect((await visitor.get(track.href)).status()).toBe(200);
     await row(page, track.title).getByRole('button', { name: 'Edit', exact: true }).click();
     const retained = page.getByRole('dialog');
@@ -503,7 +511,7 @@ test('ordinary editorial associations and reviewed publication preserve current 
     const move = groups.nth(0).getByRole('button', { name: 'Move up', exact: true }).nth(1);
     await move.focus();
     await move.press('Enter');
-    await expect(groups.nth(0).getByRole('combobox').first()).toContainText(second.title);
+    await expect(trackSelects(groups.nth(0)).first()).toContainText(second.title);
     await addTrack(groups.nth(1), first);
     await dialog.getByRole('button', { name: 'Save private draft', exact: true }).click();
     await expect(releaseRow(page, firstLabel).getByText('Private draft', { exact: true })).toBeVisible();
@@ -541,8 +549,8 @@ test('ordinary editorial associations and reviewed publication preserve current 
 
     await page.goto('/admin/tracks');
     const trackRow = page.getByRole('row').filter({ has: page.getByText(first.title, { exact: true }) });
-    await trackRow.getByRole('button', { name: 'Unpublish', exact: true }).click();
-    const withdrawal = page.getByRole('alertdialog', { name: 'Unpublish', exact: true });
+    await trackRow.getByRole('button', { name: 'Return to draft', exact: true }).click();
+    const withdrawal = page.getByRole('alertdialog', { name: 'Return to draft', exact: true });
     await withdrawal.getByRole('button', { name: 'Confirm', exact: true }).click();
     await expect(trackRow.getByRole('button', { name: 'Publish', exact: true })).toBeVisible();
     await persisted(testInfo, manifest, 'withdrawn', 'ordinary-withdrawal-evidence');
@@ -558,8 +566,8 @@ test('ordinary editorial associations and reviewed publication preserve current 
     await page.goto('/admin/site-releases');
     await (await releaseMenuAction(page, firstLabel, 'Edit as new draft')).click();
     dialog = page.getByRole('dialog');
-    await expect(dialog.getByRole('group', { name: 'Related tracks', exact: true }).first().getByRole('combobox').first()).toContainText(second.title);
-    await expect(dialog.getByRole('group', { name: 'Related tracks', exact: true }).first().getByRole('combobox').nth(1)).toContainText(`${first.title} · ${first.artist} (not currently available)`);
+    await expect(trackSelects(dialog.getByRole('group', { name: 'Related tracks', exact: true }).first()).first()).toContainText(second.title);
+    await expect(trackSelects(dialog.getByRole('group', { name: 'Related tracks', exact: true }).first()).nth(1)).toContainText(`${first.title} · ${first.artist} (not currently available)`);
     await dialog.getByLabel('Release label', { exact: false }).fill(copiedLabel);
     await dialog.getByLabel('Article paragraph', { exact: false }).and(dialog.locator('textarea')).fill(copiedParagraph);
     await dialog.getByRole('button', { name: 'Save private draft', exact: true }).click();

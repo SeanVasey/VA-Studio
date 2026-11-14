@@ -1,0 +1,60 @@
+{
+  "scope": "synthetic configuration-only proof",
+  "same_probe_and_runner": true,
+  "execution_count_per_source": 1,
+  "no_application_bootstrap_or_database": true,
+  "phases": {
+    "red": {
+      "source": "0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371",
+      "policy_sha256": "4977404fa5b6c0fe303db535a2662bc0c1aa7aff7295c50d8ab2f17ec9b662c3",
+      "tracked_file_count": 10632,
+      "programs": {
+        "MemberGrantMixedProvenanceRegressionTest.php": "50c610a082d5767b09ca6fb86b477861b86e308ae1b2646301f42cb254fd2f25",
+        "run.sh": "443d9a9e93326990567435a04bed818da8ae4c56952398498a7f39df355662f4"
+      },
+      "verification": {
+        "expected": "fail",
+        "expected_behavior_observed": true,
+        "tests": 1,
+        "assertions": 10,
+        "failures": 1,
+        "errors": 0,
+        "skips": 0,
+        "exit": 1,
+        "xml_duration_seconds": "0.006061",
+        "observed": {
+          "decision": "admitted",
+          "factory_calls": [
+            "App\\Domain\\Grants\\Member\\MemberGrantFactsAuthority",
+            "App\\Domain\\Grants\\Member\\MemberOriginalArtifactAuthority",
+            "App\\Domain\\Memberships\\Production\\MembershipReservationAuthority"
+          ]
+        }
+      }
+    },
+    "green": {
+      "source": "a4e37cdc222ccea13ae65fb983c6d5fd89a25e29",
+      "policy_sha256": "2bd12e40b89802d7a64deac15cbe640f80846fe87eb0839127fd26fd51663875",
+      "tracked_file_count": 10633,
+      "programs": {
+        "MemberGrantMixedProvenanceRegressionTest.php": "50c610a082d5767b09ca6fb86b477861b86e308ae1b2646301f42cb254fd2f25",
+        "run.sh": "443d9a9e93326990567435a04bed818da8ae4c56952398498a7f39df355662f4"
+      },
+      "verification": {
+        "expected": "pass",
+        "expected_behavior_observed": true,
+        "tests": 1,
+        "assertions": 10,
+        "failures": 0,
+        "errors": 0,
+        "skips": 0,
+        "exit": 0,
+        "xml_duration_seconds": "0.005285",
+        "observed": {
+          "decision": "provenance_driver",
+          "factory_calls": []
+        }
+      }
+    }
+  }
+}

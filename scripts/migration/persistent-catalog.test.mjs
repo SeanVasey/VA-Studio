@@ -16,8 +16,9 @@ let base;
 let release;
 
 function git(checkout, args) {
-  const result = spawnSync('git', args, { cwd: checkout, encoding: 'utf8' });
-  assert.equal(result.status, 0, result.stderr);
+  // `git ls-files` outgrew spawnSync's default 1 MiB buffer (ENOBUFS, status null); see persistent-content-upgrade.test.mjs.
+  const result = spawnSync('git', args, { cwd: checkout, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+  assert.equal(result.status, 0, result.error ? String(result.error) : result.stderr);
   return result.stdout.trim();
 }
 

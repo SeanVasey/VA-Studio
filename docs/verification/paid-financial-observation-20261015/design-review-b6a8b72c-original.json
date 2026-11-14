@@ -1,0 +1,89 @@
+{
+  "DECISION": "APPROVE DESIGN WITH CONDITIONS",
+  "created_utc": "2026-10-15T12:48:47.404123+00:00",
+  "design_sha256": "b7878ce1ae6c87609033fa7ce141eaa55b3da3dcdc944c2a9d58284b217231d3",
+  "implementation_conditions": [
+    "Iterate the actual complete held-source lineCount1..10 and all1-based lines under original before/after proofs, with exact common financial/source identity and distinct V1/Tax gross fields.",
+    "Source expectation contains no original Charge ID. Relate before/after Charge.id to the same supplied PaymentIntent.latest_charge and retained original PI/account/mode/currency/gross, without inventing a source field or authenticated provider provenance.",
+    "Admission must remain raw/callback-free on malformed maps/env/repository/leaf inputs; the normal Laravel unresolved literal-env descriptor must have a meaningful positive. Recheck the same new policy after callback-capable source proof/extraction before returning a value.",
+    "All summaries remain explicitly unattested; unequal succeeded-sum/Charge aggregate is only the comparison boolean, never settled amount, refund completion or disposition authority. Preserve original gross and each non-succeeded status sum/count; require supported64-bit runtime and overflow-safe bounded arithmetic.",
+    "No new frame/clock/receipt/positive commit/cleanup/SQL/DML/schema/provider binding/I/O or business effect; failing factory cleanup belongs to original caller/source owners."
+  ],
+  "implementation_or_execution_approval": false,
+  "planning_boundaries": [
+    "No implementation/test/provider/financial execution pass is established by design approval.",
+    "Sean eligibility/window/tax allocation/dispute-access/rights/exclusive policies stay unknown; no rules or credentials are invented.",
+    "No live merchant/provider/payment/account/host/refund/settlement/payout/rights/download/inventory/UI/schema/durable effect; defaultfalse and frozen original source/profile/SDK/API/shared-P2 limits remain.",
+    "Documentation retrieval failures are declared preparation failures only, not provider/account interoperability. Their original logs were not independently assessed in this bounded design recheck; preserve them for final evidence."
+  ],
+  "prior_REVISE_sha": "ef74c3cbd4104fbee8449efc36161860ae068b30",
+  "prior_originals": [
+    {
+      "path": "/workspace/runtime/paid-financial-observation-design-review-ef74c3cb-20261015.md",
+      "sha256": "738915dbe92ca5e12b7e631796a5b1d301dc8773278978323a80f3bd79ed8a63",
+      "unchanged": true
+    },
+    {
+      "path": "/workspace/runtime/paid-financial-observation-design-review-ef74c3cb-20261015.json",
+      "sha256": "bc8ae9e56cb9b381519c8d943a263a83d6ee6d90821b264e727d3c413d7676a9",
+      "unchanged": true
+    }
+  ],
+  "prior_requirements": [
+    {
+      "basis": "FinancialCandidate explicitly declares consistent_candidate/providerAuthenticated=false/unattested_input, no observed/verified/clear/refund authority; later durable layer requires authenticated retrieval and original source/positive commit gates.",
+      "id": "A5-D1",
+      "result": "satisfied"
+    },
+    {
+      "basis": "Exact summary/status maps, USD original gross, integer bounded amounts and admitted64-bit sums; failed/canceled/pending histories remain separate from succeeded and provider Charge aggregate. Comparison boolean is reported without requiring an atomic/settled relationship. Exact dispute statuses/current bit/history remain nonauthoritative.",
+      "id": "A5-D2",
+      "result": "satisfied"
+    },
+    {
+      "basis": "Both factories and normalizer gate exact literal configuration/environment before callbacks/offsets, recheck captured policy after proofs/extraction, refuse reconstruction/serialization/cloning, and add no source/receipt/frame/clock/SQL/DML/cleanup authority. Existing source SQL/marker proofs remain caller-owned.",
+      "id": "A5-D3",
+      "result": "satisfied"
+    }
+  ],
+  "read_commands": [
+    "Read-only exact HEAD/status and ef74..b6 design-only delta",
+    "Read-only immutable unchanged public SourceV1/V2 line sections to confirm no Charge identifier export",
+    "Hash unchanged ef74 original runtime MD/JSON"
+  ],
+  "remaining_required_design_repairs": [],
+  "required_execution_review_gates": [
+    "Actual synthetic V1/Tax held-source factory positive and full multiline/Tax gross/wrong-reader/frame/late withdrawal controls; no reflected sources.",
+    "Genuine original Crypt proof callback can withdraw the new policy, followed by disabled factory refusal while caller-owned frame remains held; assess actual source implementation/evidence rather than presuming this seam passes.",
+    "Focused primitive/object/cycle/depth/node/byte/serialization/status/list/money/account/currency/mode/Charge controls and policy defaultfalse/nonboolean/production/no transport resolution.",
+    "Record frozen source, exact commands/counts/skips/errors/PHP/recorder/OS and original failures; meaningful focused affected compatibility, Pint/cheap safeguards.",
+    "Independent actual source and sealed evidence decisions, exact-head cheap preflight and expected-SHA merge. No new native run for unchanged source SQL primitives unless actual source changes warrant it."
+  ],
+  "review_kind": "Independent non-author bounded amended planning gate only",
+  "reviewed_commit_delta": [
+    "docs/verification/paid-financial-observation-20261015/design.md"
+  ],
+  "reviewed_sha": "b6a8b72cac8af133e003f8daa48a04b97c99d09c",
+  "reviewer_actions": {
+    "code_test_DB_network_CI_hosted_operations": 0,
+    "shared_or_tracked_edits": 0,
+    "writes": "Only new original runtime design MD/JSON"
+  },
+  "reviewer_preparation_errors": [],
+  "source_API_constraints": [
+    {
+      "exports_original_Charge_ID": false,
+      "path": "app/Domain/Commerce/ProductionCheckout/ProductionPaidOrderSourceV1.php",
+      "same_as_prior": true,
+      "sha256": "ca7ce0c8f6fd1d90b6ec299770947fe9117a30d268457db706adfae3eeff2983"
+    },
+    {
+      "exports_original_Charge_ID": false,
+      "path": "app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxPaidOrderSourceV2.php",
+      "same_as_prior": true,
+      "sha256": "42ee6d412217a8e72938f4af70a16e0bac38fb7f237b3ef1a95237a132211052"
+    }
+  ],
+  "worktree_status_at_completion": "?? docs/verification/paid-financial-observation-20261015/design-review-ef74c3cb-original.json\n?? docs/verification/paid-financial-observation-20261015/design-review-ef74c3cb-original.md\n?? docs/verification/paid-financial-observation-20261015/documentation-preparation/\n",
+  "worktree_status_limit": "Root-owned untracked copies of unchanged original reviewer documentation may exist; no tracked/app/config/test change or reviewer mutation. Reviewed contract is the immutable Git design at b6a8."
+}

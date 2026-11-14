@@ -1,0 +1,181 @@
+<?xml version="1.0"?>
+<testSuite xmlns="https://xml.phpunit.de/testSuite">
+ <tests>
+  <testClass name="Tests\Feature\CustomerConsentMigrationTest" file="/workspace/VA-Studio-member-originals/tests/Feature/CustomerConsentMigrationTest.php">
+   <testMethod id="Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history#after DDL step 1" name="test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history"/>
+   <testMethod id="Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history#after DDL step 2" name="test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history"/>
+   <testMethod id="Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history#after DDL step 3" name="test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history"/>
+   <testMethod id="Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history#after DDL step 4" name="test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history"/>
+   <testMethod id="Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history#after DDL step 5" name="test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history"/>
+   <testMethod id="Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history#after DDL step 6" name="test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history"/>
+   <testMethod id="Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history#after DDL step 7" name="test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history"/>
+   <testMethod id="Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history#after DDL step 8" name="test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history"/>
+   <testMethod id="Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history#after DDL step 9" name="test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history"/>
+   <testMethod id="Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history#after DDL step 10" name="test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history"/>
+   <testMethod id="Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history#after DDL step 11" name="test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history"/>
+   <testMethod id="Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history#after DDL step 12" name="test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history"/>
+   <testMethod id="Tests\Feature\CustomerConsentMigrationTest::test_operational_rollback_refuses_before_queries_and_keeps_policy_choice_history_and_repository_record" name="test_operational_rollback_refuses_before_queries_and_keeps_policy_choice_history_and_repository_record"/>
+   <testMethod id="Tests\Feature\CustomerConsentMigrationTest::test_foreign_or_drifted_storage_refuses_without_adopting_or_dropping_any_object#extra index" name="test_foreign_or_drifted_storage_refuses_without_adopting_or_dropping_any_object"/>
+   <testMethod id="Tests\Feature\CustomerConsentMigrationTest::test_foreign_or_drifted_storage_refuses_without_adopting_or_dropping_any_object#extra column" name="test_foreign_or_drifted_storage_refuses_without_adopting_or_dropping_any_object"/>
+   <testMethod id="Tests\Feature\CustomerConsentMigrationTest::test_foreign_or_drifted_storage_refuses_without_adopting_or_dropping_any_object#unexpected trigger" name="test_foreign_or_drifted_storage_refuses_without_adopting_or_dropping_any_object"/>
+   <testMethod id="Tests\Feature\CustomerConsentMigrationTest::test_foreign_or_drifted_storage_refuses_without_adopting_or_dropping_any_object#missing prefix trigger" name="test_foreign_or_drifted_storage_refuses_without_adopting_or_dropping_any_object"/>
+   <testMethod id="Tests\Feature\CustomerConsentMigrationTest::test_foreign_or_drifted_storage_refuses_without_adopting_or_dropping_any_object#missing final recorded trigger" name="test_foreign_or_drifted_storage_refuses_without_adopting_or_dropping_any_object"/>
+   <testMethod id="Tests\Feature\CustomerConsentMigrationTest::test_foreign_or_drifted_storage_refuses_without_adopting_or_dropping_any_object#temporary shadow" name="test_foreign_or_drifted_storage_refuses_without_adopting_or_dropping_any_object"/>
+   <testMethod id="Tests\Feature\CustomerConsentMigrationTest::test_direct_sql_cannot_rewrite_delete_replace_or_rebind_retained_graph" name="test_direct_sql_cannot_rewrite_delete_replace_or_rebind_retained_graph"/>
+  </testClass>
+  <testClass name="Tests\Feature\HostedCheckoutMigrationTest" file="/workspace/VA-Studio-member-originals/tests/Feature/HostedCheckoutMigrationTest.php">
+   <testMethod id="Tests\Feature\HostedCheckoutMigrationTest::test_empty_checkout_tables_roundtrip_without_rewriting_existing_prepared_order_evidence" name="test_empty_checkout_tables_roundtrip_without_rewriting_existing_prepared_order_evidence"/>
+   <testMethod id="Tests\Feature\HostedCheckoutMigrationTest::test_checkout_evidence_rejects_model_and_bulk_mutation#0" name="test_checkout_evidence_rejects_model_and_bulk_mutation"/>
+   <testMethod id="Tests\Feature\HostedCheckoutMigrationTest::test_checkout_evidence_rejects_model_and_bulk_mutation#1" name="test_checkout_evidence_rejects_model_and_bulk_mutation"/>
+   <testMethod id="Tests\Feature\HostedCheckoutMigrationTest::test_checkout_evidence_rejects_model_and_bulk_mutation#2" name="test_checkout_evidence_rejects_model_and_bulk_mutation"/>
+   <testMethod id="Tests\Feature\HostedCheckoutMigrationTest::test_checkout_evidence_rejects_model_and_bulk_mutation#3" name="test_checkout_evidence_rejects_model_and_bulk_mutation"/>
+   <testMethod id="Tests\Feature\HostedCheckoutMigrationTest::test_unique_bindings_and_case_sensitive_account_scopes_prevent_ambiguous_session_identity" name="test_unique_bindings_and_case_sensitive_account_scopes_prevent_ambiguous_session_identity"/>
+   <testMethod id="Tests\Feature\HostedCheckoutMigrationTest::test_foreign_keys_reject_orphan_records_and_retain_all_referenced_evidence" name="test_foreign_keys_reject_orphan_records_and_retain_all_referenced_evidence"/>
+   <testMethod id="Tests\Feature\HostedCheckoutMigrationTest::test_observations_append_and_private_ciphertext_is_hidden_by_every_model" name="test_observations_append_and_private_ciphertext_is_hidden_by_every_model"/>
+  </testClass>
+  <testClass name="Tests\Feature\MediaWorkerIdentityTest" file="/workspace/VA-Studio-member-originals/tests/Feature/MediaWorkerIdentityTest.php">
+   <testMethod id="Tests\Feature\MediaWorkerIdentityTest::test_locked_completion_refuses_changed_retained_identity_without_redirecting_attribution#requester" name="test_locked_completion_refuses_changed_retained_identity_without_redirecting_attribution"/>
+   <testMethod id="Tests\Feature\MediaWorkerIdentityTest::test_locked_completion_refuses_changed_retained_identity_without_redirecting_attribution#source" name="test_locked_completion_refuses_changed_retained_identity_without_redirecting_attribution"/>
+   <testMethod id="Tests\Feature\MediaWorkerIdentityTest::test_locked_completion_refuses_changed_retained_identity_without_redirecting_attribution#source track" name="test_locked_completion_refuses_changed_retained_identity_without_redirecting_attribution"/>
+  </testClass>
+  <testClass name="Tests\Feature\ProductionCheckoutMigrationTest" file="/workspace/VA-Studio-member-originals/tests/Feature/ProductionCheckoutMigrationTest.php">
+   <testMethod id="Tests\Feature\ProductionCheckoutMigrationTest::test_exact_installed_graph_repeats_without_writes_and_preserves_records" name="test_exact_installed_graph_repeats_without_writes_and_preserves_records"/>
+   <testMethod id="Tests\Feature\ProductionCheckoutMigrationTest::test_exact_empty_prefix_resumes_only_missing_objects#0" name="test_exact_empty_prefix_resumes_only_missing_objects"/>
+   <testMethod id="Tests\Feature\ProductionCheckoutMigrationTest::test_exact_empty_prefix_resumes_only_missing_objects#1" name="test_exact_empty_prefix_resumes_only_missing_objects"/>
+   <testMethod id="Tests\Feature\ProductionCheckoutMigrationTest::test_exact_empty_prefix_resumes_only_missing_objects#2" name="test_exact_empty_prefix_resumes_only_missing_objects"/>
+   <testMethod id="Tests\Feature\ProductionCheckoutMigrationTest::test_exact_empty_prefix_resumes_only_missing_objects#3" name="test_exact_empty_prefix_resumes_only_missing_objects"/>
+   <testMethod id="Tests\Feature\ProductionCheckoutMigrationTest::test_exact_empty_prefix_resumes_only_missing_objects#4" name="test_exact_empty_prefix_resumes_only_missing_objects"/>
+   <testMethod id="Tests\Feature\ProductionCheckoutMigrationTest::test_exact_empty_prefix_resumes_only_missing_objects#5" name="test_exact_empty_prefix_resumes_only_missing_objects"/>
+   <testMethod id="Tests\Feature\ProductionCheckoutMigrationTest::test_foreign_reserved_namespace_refuses_before_writes" name="test_foreign_reserved_namespace_refuses_before_writes"/>
+   <testMethod id="Tests\Feature\ProductionCheckoutMigrationTest::test_before_and_after_creation_failures_resume_exact_prefixes_without_changing_parent_rows_or_guards" name="test_before_and_after_creation_failures_resume_exact_prefixes_without_changing_parent_rows_or_guards"/>
+   <testMethod id="Tests\Feature\ProductionCheckoutMigrationTest::test_populated_partial_installation_preserves_all_records_and_surviving_guards_before_refusal" name="test_populated_partial_installation_preserves_all_records_and_surviving_guards_before_refusal"/>
+   <testMethod id="Tests\Feature\ProductionCheckoutMigrationTest::test_interior_guard_gap_is_not_adopted_as_a_prefix" name="test_interior_guard_gap_is_not_adopted_as_a_prefix"/>
+   <testMethod id="Tests\Feature\ProductionCheckoutMigrationTest::test_sqlite_duplicate_table_and_trigger_namespace_cannot_hide_a_foreign_marker" name="test_sqlite_duplicate_table_and_trigger_namespace_cannot_hide_a_foreign_marker"/>
+   <testMethod id="Tests\Feature\ProductionCheckoutMigrationTest::test_native_dictionary_accent_alias_is_rejected_before_creating_the_first_owned_table" name="test_native_dictionary_accent_alias_is_rejected_before_creating_the_first_owned_table"/>
+   <testMethod id="Tests\Feature\ProductionCheckoutMigrationTest::test_native_foreign_constraint_dictionary_identity_refuses_before_any_owned_ddl#0" name="test_native_foreign_constraint_dictionary_identity_refuses_before_any_owned_ddl"/>
+   <testMethod id="Tests\Feature\ProductionCheckoutMigrationTest::test_native_foreign_constraint_dictionary_identity_refuses_before_any_owned_ddl#1" name="test_native_foreign_constraint_dictionary_identity_refuses_before_any_owned_ddl"/>
+   <testMethod id="Tests\Feature\ProductionCheckoutMigrationTest::test_native_foreign_constraint_dictionary_identity_refuses_before_any_owned_ddl#2" name="test_native_foreign_constraint_dictionary_identity_refuses_before_any_owned_ddl"/>
+   <testMethod id="Tests\Feature\ProductionCheckoutMigrationTest::test_native_unowned_stored_routine_reference_refuses_before_any_owned_ddl" name="test_native_unowned_stored_routine_reference_refuses_before_any_owned_ddl"/>
+   <testMethod id="Tests\Feature\ProductionCheckoutMigrationTest::test_final_assertion_interruption_and_repository_log_uncertainty_retry_without_duplicate_bookkeeping" name="test_final_assertion_interruption_and_repository_log_uncertainty_retry_without_duplicate_bookkeeping"/>
+  </testClass>
+  <testClass name="Tests\Feature\ProductionMembershipBilling\BillingIssuedRetrievalTest" file="/workspace/VA-Studio-member-originals/tests/Feature/ProductionMembershipBilling/BillingIssuedRetrievalTest.php">
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingIssuedRetrievalTest::test_values_copies_and_another_issuer_cannot_adopt_a_start_or_interval" name="test_values_copies_and_another_issuer_cannot_adopt_a_start_or_interval"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingIssuedRetrievalTest::test_simulated_allocation_replacement_at_the_same_numeric_id_cannot_be_adopted#start before end" name="test_simulated_allocation_replacement_at_the_same_numeric_id_cannot_be_adopted"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingIssuedRetrievalTest::test_simulated_allocation_replacement_at_the_same_numeric_id_cannot_be_adopted#start before append" name="test_simulated_allocation_replacement_at_the_same_numeric_id_cannot_be_adopted"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingIssuedRetrievalTest::test_simulated_allocation_replacement_at_the_same_numeric_id_cannot_be_adopted#end before append" name="test_simulated_allocation_replacement_at_the_same_numeric_id_cannot_be_adopted"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingIssuedRetrievalTest::test_simulated_allocation_replacement_at_the_same_numeric_id_cannot_be_adopted#end before attempt" name="test_simulated_allocation_replacement_at_the_same_numeric_id_cannot_be_adopted"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingIssuedRetrievalTest::test_replaced_endpoint_after_end_cannot_claim_the_first_invoice_identity" name="test_replaced_endpoint_after_end_cannot_claim_the_first_invoice_identity"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingIssuedRetrievalTest::test_database_end_follows_provider_reads_and_worker_time_cannot_change_paid_time_or_freshness" name="test_database_end_follows_provider_reads_and_worker_time_cannot_change_paid_time_or_freshness"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingIssuedRetrievalTest::test_a_newer_reversal_on_a_clock_behind_worker_is_admitted_after_an_ahead_worker" name="test_a_newer_reversal_on_a_clock_behind_worker_is_admitted_after_an_ahead_worker"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingIssuedRetrievalTest::test_native_duplicate_first_identity_uses_a_current_read_after_its_earlier_snapshot" name="test_native_duplicate_first_identity_uses_a_current_read_after_its_earlier_snapshot"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingIssuedRetrievalTest::test_failed_first_retrieval_retains_a_database_interval_without_claiming_invoice_ownership" name="test_failed_first_retrieval_retains_a_database_interval_without_claiming_invoice_ownership"/>
+  </testClass>
+  <testClass name="Tests\Feature\ProductionMembershipBilling\MembershipReservationClockClosureTest" file="/workspace/VA-Studio-member-originals/tests/Feature/ProductionMembershipBilling/MembershipReservationClockClosureTest.php">
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\MembershipReservationClockClosureTest::test_terminal_clock_callback_cannot_withdraw_identity_after_the_last_precommit_owner_check" name="test_terminal_clock_callback_cannot_withdraw_identity_after_the_last_precommit_owner_check"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\MembershipReservationClockClosureTest::test_native_committed_clock_callback_owner_withdrawal_refuses_receipt_without_undoing_reservation" name="test_native_committed_clock_callback_owner_withdrawal_refuses_receipt_without_undoing_reservation"/>
+  </testClass>
+  <testClass name="Tests\Feature\SupportAttachmentNativeConcurrencyTest" file="/workspace/VA-Studio-member-originals/tests/Feature/SupportAttachmentNativeConcurrencyTest.php">
+   <testMethod id="Tests\Feature\SupportAttachmentNativeConcurrencyTest::test_native_last_file_reservation_serializes_real_contenders_and_retains_exact_originals" name="test_native_last_file_reservation_serializes_real_contenders_and_retains_exact_originals"/>
+  </testClass>
+  <testClass name="Tests\Feature\TestOrderFinalizationConcurrencyTest" file="/workspace/VA-Studio-member-originals/tests/Feature/TestOrderFinalizationConcurrencyTest.php">
+   <testMethod id="Tests\Feature\TestOrderFinalizationConcurrencyTest::test_competing_finalizers_share_one_terminal_graph_and_one_resource_effect" name="test_competing_finalizers_share_one_terminal_graph_and_one_resource_effect"/>
+   <testMethod id="Tests\Feature\TestOrderFinalizationConcurrencyTest::test_block_that_wins_scope_mutex_forces_exception_without_grants" name="test_block_that_wins_scope_mutex_forces_exception_without_grants"/>
+   <testMethod id="Tests\Feature\TestOrderFinalizationConcurrencyTest::test_finalization_that_wins_scope_mutex_retains_grant_when_admin_blocks_afterward" name="test_finalization_that_wins_scope_mutex_retains_grant_when_admin_blocks_afterward"/>
+   <testMethod id="Tests\Feature\TestOrderFinalizationConcurrencyTest::test_own_reservation_retry_waiting_on_scope_observes_committed_exclusive_sale" name="test_own_reservation_retry_waiting_on_scope_observes_committed_exclusive_sale"/>
+  </testClass>
+  <testClass name="Tests\Feature\UuidByteGuardMigrationTest" file="/workspace/VA-Studio-member-originals/tests/Feature/UuidByteGuardMigrationTest.php">
+   <testMethod id="Tests\Feature\UuidByteGuardMigrationTest::test_uuid_predicates_count_stored_bytes_and_preserve_existing_format_policies" name="test_uuid_predicates_count_stored_bytes_and_preserve_existing_format_policies"/>
+   <testMethod id="Tests\Feature\UuidByteGuardMigrationTest::test_request_and_render_claim_writes_reject_nul_tails_and_blob_values_while_nullable_states_remain_valid" name="test_request_and_render_claim_writes_reject_nul_tails_and_blob_values_while_nullable_states_remain_valid"/>
+   <testMethod id="Tests\Feature\UuidByteGuardMigrationTest::test_receipt_claims_keep_nullable_states_length_only_policy_and_mysql_character_coercion" name="test_receipt_claims_keep_nullable_states_length_only_policy_and_mysql_character_coercion"/>
+   <testMethod id="Tests\Feature\UuidByteGuardMigrationTest::test_populated_upgrade_retains_originals_and_canonical_identifiers_without_weakening_lifecycle_guards" name="test_populated_upgrade_retains_originals_and_canonical_identifiers_without_weakening_lifecycle_guards"/>
+   <testMethod id="Tests\Feature\UuidByteGuardMigrationTest::test_preflight_reports_a_retained_request_uuid_with_no_rewrite_or_partial_installation" name="test_preflight_reports_a_retained_request_uuid_with_no_rewrite_or_partial_installation"/>
+   <testMethod id="Tests\Feature\UuidByteGuardMigrationTest::test_preflight_reports_a_retained_nullable_claim_with_no_rewrite" name="test_preflight_reports_a_retained_nullable_claim_with_no_rewrite"/>
+   <testMethod id="Tests\Feature\UuidByteGuardMigrationTest::test_partial_installation_retries_verify_the_expected_trigger_set_and_down_preserves_original_guards" name="test_partial_installation_retries_verify_the_expected_trigger_set_and_down_preserves_original_guards"/>
+   <testMethod id="Tests\Feature\UuidByteGuardMigrationTest::test_retry_refuses_a_same_named_unrelated_trigger_without_replacing_it" name="test_retry_refuses_a_same_named_unrelated_trigger_without_replacing_it"/>
+   <testMethod id="Tests\Feature\UuidByteGuardMigrationTest::test_rollback_preflights_late_guard_drift_before_any_drop_and_preserves_all_retained_rows" name="test_rollback_preflights_late_guard_drift_before_any_drop_and_preserves_all_retained_rows"/>
+   <testMethod id="Tests\Feature\UuidByteGuardMigrationTest::test_rollback_refuses_a_late_differently_cased_guard_without_adopting_or_dropping_it" name="test_rollback_refuses_a_late_differently_cased_guard_without_adopting_or_dropping_it"/>
+   <testMethod id="Tests\Feature\UuidByteGuardMigrationTest::test_rollback_retries_missing_guards_without_dropping_original_or_temporary_guards" name="test_rollback_retries_missing_guards_without_dropping_original_or_temporary_guards"/>
+  </testClass>
+ </tests>
+ <groups>
+  <group name="default">
+   <test id="Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history#after DDL step 1"/>
+   <test id="Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history#after DDL step 2"/>
+   <test id="Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history#after DDL step 3"/>
+   <test id="Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history#after DDL step 4"/>
+   <test id="Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history#after DDL step 5"/>
+   <test id="Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history#after DDL step 6"/>
+   <test id="Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history#after DDL step 7"/>
+   <test id="Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history#after DDL step 8"/>
+   <test id="Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history#after DDL step 9"/>
+   <test id="Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history#after DDL step 10"/>
+   <test id="Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history#after DDL step 11"/>
+   <test id="Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history#after DDL step 12"/>
+   <test id="Tests\Feature\CustomerConsentMigrationTest::test_operational_rollback_refuses_before_queries_and_keeps_policy_choice_history_and_repository_record"/>
+   <test id="Tests\Feature\CustomerConsentMigrationTest::test_foreign_or_drifted_storage_refuses_without_adopting_or_dropping_any_object#extra index"/>
+   <test id="Tests\Feature\CustomerConsentMigrationTest::test_foreign_or_drifted_storage_refuses_without_adopting_or_dropping_any_object#extra column"/>
+   <test id="Tests\Feature\CustomerConsentMigrationTest::test_foreign_or_drifted_storage_refuses_without_adopting_or_dropping_any_object#unexpected trigger"/>
+   <test id="Tests\Feature\CustomerConsentMigrationTest::test_foreign_or_drifted_storage_refuses_without_adopting_or_dropping_any_object#missing prefix trigger"/>
+   <test id="Tests\Feature\CustomerConsentMigrationTest::test_foreign_or_drifted_storage_refuses_without_adopting_or_dropping_any_object#missing final recorded trigger"/>
+   <test id="Tests\Feature\CustomerConsentMigrationTest::test_foreign_or_drifted_storage_refuses_without_adopting_or_dropping_any_object#temporary shadow"/>
+   <test id="Tests\Feature\CustomerConsentMigrationTest::test_direct_sql_cannot_rewrite_delete_replace_or_rebind_retained_graph"/>
+   <test id="Tests\Feature\HostedCheckoutMigrationTest::test_empty_checkout_tables_roundtrip_without_rewriting_existing_prepared_order_evidence"/>
+   <test id="Tests\Feature\HostedCheckoutMigrationTest::test_checkout_evidence_rejects_model_and_bulk_mutation#0"/>
+   <test id="Tests\Feature\HostedCheckoutMigrationTest::test_checkout_evidence_rejects_model_and_bulk_mutation#1"/>
+   <test id="Tests\Feature\HostedCheckoutMigrationTest::test_checkout_evidence_rejects_model_and_bulk_mutation#2"/>
+   <test id="Tests\Feature\HostedCheckoutMigrationTest::test_checkout_evidence_rejects_model_and_bulk_mutation#3"/>
+   <test id="Tests\Feature\HostedCheckoutMigrationTest::test_unique_bindings_and_case_sensitive_account_scopes_prevent_ambiguous_session_identity"/>
+   <test id="Tests\Feature\HostedCheckoutMigrationTest::test_foreign_keys_reject_orphan_records_and_retain_all_referenced_evidence"/>
+   <test id="Tests\Feature\HostedCheckoutMigrationTest::test_observations_append_and_private_ciphertext_is_hidden_by_every_model"/>
+   <test id="Tests\Feature\MediaWorkerIdentityTest::test_locked_completion_refuses_changed_retained_identity_without_redirecting_attribution#requester"/>
+   <test id="Tests\Feature\MediaWorkerIdentityTest::test_locked_completion_refuses_changed_retained_identity_without_redirecting_attribution#source"/>
+   <test id="Tests\Feature\MediaWorkerIdentityTest::test_locked_completion_refuses_changed_retained_identity_without_redirecting_attribution#source track"/>
+   <test id="Tests\Feature\ProductionCheckoutMigrationTest::test_exact_installed_graph_repeats_without_writes_and_preserves_records"/>
+   <test id="Tests\Feature\ProductionCheckoutMigrationTest::test_exact_empty_prefix_resumes_only_missing_objects#0"/>
+   <test id="Tests\Feature\ProductionCheckoutMigrationTest::test_exact_empty_prefix_resumes_only_missing_objects#1"/>
+   <test id="Tests\Feature\ProductionCheckoutMigrationTest::test_exact_empty_prefix_resumes_only_missing_objects#2"/>
+   <test id="Tests\Feature\ProductionCheckoutMigrationTest::test_exact_empty_prefix_resumes_only_missing_objects#3"/>
+   <test id="Tests\Feature\ProductionCheckoutMigrationTest::test_exact_empty_prefix_resumes_only_missing_objects#4"/>
+   <test id="Tests\Feature\ProductionCheckoutMigrationTest::test_exact_empty_prefix_resumes_only_missing_objects#5"/>
+   <test id="Tests\Feature\ProductionCheckoutMigrationTest::test_foreign_reserved_namespace_refuses_before_writes"/>
+   <test id="Tests\Feature\ProductionCheckoutMigrationTest::test_before_and_after_creation_failures_resume_exact_prefixes_without_changing_parent_rows_or_guards"/>
+   <test id="Tests\Feature\ProductionCheckoutMigrationTest::test_populated_partial_installation_preserves_all_records_and_surviving_guards_before_refusal"/>
+   <test id="Tests\Feature\ProductionCheckoutMigrationTest::test_interior_guard_gap_is_not_adopted_as_a_prefix"/>
+   <test id="Tests\Feature\ProductionCheckoutMigrationTest::test_sqlite_duplicate_table_and_trigger_namespace_cannot_hide_a_foreign_marker"/>
+   <test id="Tests\Feature\ProductionCheckoutMigrationTest::test_native_dictionary_accent_alias_is_rejected_before_creating_the_first_owned_table"/>
+   <test id="Tests\Feature\ProductionCheckoutMigrationTest::test_native_foreign_constraint_dictionary_identity_refuses_before_any_owned_ddl#0"/>
+   <test id="Tests\Feature\ProductionCheckoutMigrationTest::test_native_foreign_constraint_dictionary_identity_refuses_before_any_owned_ddl#1"/>
+   <test id="Tests\Feature\ProductionCheckoutMigrationTest::test_native_foreign_constraint_dictionary_identity_refuses_before_any_owned_ddl#2"/>
+   <test id="Tests\Feature\ProductionCheckoutMigrationTest::test_native_unowned_stored_routine_reference_refuses_before_any_owned_ddl"/>
+   <test id="Tests\Feature\ProductionCheckoutMigrationTest::test_final_assertion_interruption_and_repository_log_uncertainty_retry_without_duplicate_bookkeeping"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingIssuedRetrievalTest::test_values_copies_and_another_issuer_cannot_adopt_a_start_or_interval"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingIssuedRetrievalTest::test_simulated_allocation_replacement_at_the_same_numeric_id_cannot_be_adopted#start before end"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingIssuedRetrievalTest::test_simulated_allocation_replacement_at_the_same_numeric_id_cannot_be_adopted#start before append"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingIssuedRetrievalTest::test_simulated_allocation_replacement_at_the_same_numeric_id_cannot_be_adopted#end before append"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingIssuedRetrievalTest::test_simulated_allocation_replacement_at_the_same_numeric_id_cannot_be_adopted#end before attempt"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingIssuedRetrievalTest::test_replaced_endpoint_after_end_cannot_claim_the_first_invoice_identity"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingIssuedRetrievalTest::test_database_end_follows_provider_reads_and_worker_time_cannot_change_paid_time_or_freshness"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingIssuedRetrievalTest::test_a_newer_reversal_on_a_clock_behind_worker_is_admitted_after_an_ahead_worker"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingIssuedRetrievalTest::test_native_duplicate_first_identity_uses_a_current_read_after_its_earlier_snapshot"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingIssuedRetrievalTest::test_failed_first_retrieval_retains_a_database_interval_without_claiming_invoice_ownership"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\MembershipReservationClockClosureTest::test_terminal_clock_callback_cannot_withdraw_identity_after_the_last_precommit_owner_check"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\MembershipReservationClockClosureTest::test_native_committed_clock_callback_owner_withdrawal_refuses_receipt_without_undoing_reservation"/>
+   <test id="Tests\Feature\SupportAttachmentNativeConcurrencyTest::test_native_last_file_reservation_serializes_real_contenders_and_retains_exact_originals"/>
+   <test id="Tests\Feature\TestOrderFinalizationConcurrencyTest::test_competing_finalizers_share_one_terminal_graph_and_one_resource_effect"/>
+   <test id="Tests\Feature\TestOrderFinalizationConcurrencyTest::test_block_that_wins_scope_mutex_forces_exception_without_grants"/>
+   <test id="Tests\Feature\TestOrderFinalizationConcurrencyTest::test_finalization_that_wins_scope_mutex_retains_grant_when_admin_blocks_afterward"/>
+   <test id="Tests\Feature\TestOrderFinalizationConcurrencyTest::test_own_reservation_retry_waiting_on_scope_observes_committed_exclusive_sale"/>
+   <test id="Tests\Feature\UuidByteGuardMigrationTest::test_uuid_predicates_count_stored_bytes_and_preserve_existing_format_policies"/>
+   <test id="Tests\Feature\UuidByteGuardMigrationTest::test_request_and_render_claim_writes_reject_nul_tails_and_blob_values_while_nullable_states_remain_valid"/>
+   <test id="Tests\Feature\UuidByteGuardMigrationTest::test_receipt_claims_keep_nullable_states_length_only_policy_and_mysql_character_coercion"/>
+   <test id="Tests\Feature\UuidByteGuardMigrationTest::test_populated_upgrade_retains_originals_and_canonical_identifiers_without_weakening_lifecycle_guards"/>
+   <test id="Tests\Feature\UuidByteGuardMigrationTest::test_preflight_reports_a_retained_request_uuid_with_no_rewrite_or_partial_installation"/>
+   <test id="Tests\Feature\UuidByteGuardMigrationTest::test_preflight_reports_a_retained_nullable_claim_with_no_rewrite"/>
+   <test id="Tests\Feature\UuidByteGuardMigrationTest::test_partial_installation_retries_verify_the_expected_trigger_set_and_down_preserves_original_guards"/>
+   <test id="Tests\Feature\UuidByteGuardMigrationTest::test_retry_refuses_a_same_named_unrelated_trigger_without_replacing_it"/>
+   <test id="Tests\Feature\UuidByteGuardMigrationTest::test_rollback_preflights_late_guard_drift_before_any_drop_and_preserves_all_retained_rows"/>
+   <test id="Tests\Feature\UuidByteGuardMigrationTest::test_rollback_refuses_a_late_differently_cased_guard_without_adopting_or_dropping_it"/>
+   <test id="Tests\Feature\UuidByteGuardMigrationTest::test_rollback_retries_missing_guards_without_dropping_original_or_temporary_guards"/>
+  </group>
+ </groups>
+</testSuite>

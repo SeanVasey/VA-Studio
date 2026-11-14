@@ -1,0 +1,193 @@
+<?xml version="1.0"?>
+<testSuite xmlns="https://xml.phpunit.de/testSuite">
+ <tests>
+  <testClass name="Tests\Feature\CustomerListeningMigrationTest" file="/workspace/VA-Studio-member-originals/tests/Feature/CustomerListeningMigrationTest.php">
+   <testMethod id="Tests\Feature\CustomerListeningMigrationTest::test_repeated_complete_owned_install_preserves_customer_preferences_and_real_credit_history" name="test_repeated_complete_owned_install_preserves_customer_preferences_and_real_credit_history"/>
+   <testMethod id="Tests\Feature\CustomerListeningMigrationTest::test_rollback_always_refuses_before_query_and_retains_schema_history_and_repository_record#empty" name="test_rollback_always_refuses_before_query_and_retains_schema_history_and_repository_record"/>
+   <testMethod id="Tests\Feature\CustomerListeningMigrationTest::test_rollback_always_refuses_before_query_and_retains_schema_history_and_repository_record#populated" name="test_rollback_always_refuses_before_query_and_retains_schema_history_and_repository_record"/>
+   <testMethod id="Tests\Feature\CustomerListeningMigrationTest::test_foreign_or_drifted_objects_are_never_adopted_or_dropped#index" name="test_foreign_or_drifted_objects_are_never_adopted_or_dropped"/>
+   <testMethod id="Tests\Feature\CustomerListeningMigrationTest::test_foreign_or_drifted_objects_are_never_adopted_or_dropped#column" name="test_foreign_or_drifted_objects_are_never_adopted_or_dropped"/>
+   <testMethod id="Tests\Feature\CustomerListeningMigrationTest::test_foreign_or_drifted_objects_are_never_adopted_or_dropped#trigger" name="test_foreign_or_drifted_objects_are_never_adopted_or_dropped"/>
+   <testMethod id="Tests\Feature\CustomerListeningMigrationTest::test_temporary_shadow_is_never_adopted_or_dropped" name="test_temporary_shadow_is_never_adopted_or_dropped"/>
+   <testMethod id="Tests\Feature\CustomerListeningMigrationTest::test_real_migrator_restarts_an_exact_complete_unrecorded_install#after complete up" name="test_real_migrator_restarts_an_exact_complete_unrecorded_install"/>
+   <testMethod id="Tests\Feature\CustomerListeningMigrationTest::test_real_migrator_restarts_an_exact_complete_unrecorded_install#after atomic CREATE event" name="test_real_migrator_restarts_an_exact_complete_unrecorded_install"/>
+  </testClass>
+  <testClass name="Tests\Feature\ExclusiveActivationMigrationTest" file="/workspace/VA-Studio-member-originals/tests/Feature/ExclusiveActivationMigrationTest.php">
+   <testMethod id="Tests\Feature\ExclusiveActivationMigrationTest::test_disposable_empty_activation_migration_retains_prior_quotes_and_links" name="test_disposable_empty_activation_migration_retains_prior_quotes_and_links"/>
+  </testClass>
+  <testClass name="Tests\Feature\HostedCheckoutTest" file="/workspace/VA-Studio-member-originals/tests/Feature/HostedCheckoutTest.php">
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_hosted_test_session_uses_frozen_discounted_lines_and_changes_no_payment_or_order_evidence#0" name="test_hosted_test_session_uses_frozen_discounted_lines_and_changes_no_payment_or_order_evidence"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_hosted_test_session_uses_frozen_discounted_lines_and_changes_no_payment_or_order_evidence#1" name="test_hosted_test_session_uses_frozen_discounted_lines_and_changes_no_payment_or_order_evidence"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_hosted_test_session_uses_frozen_discounted_lines_and_changes_no_payment_or_order_evidence#2" name="test_hosted_test_session_uses_frozen_discounted_lines_and_changes_no_payment_or_order_evidence"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_hosted_test_session_uses_frozen_discounted_lines_and_changes_no_payment_or_order_evidence#3" name="test_hosted_test_session_uses_frozen_discounted_lines_and_changes_no_payment_or_order_evidence"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_provider_create_observes_a_committed_intent_from_an_independent_mysql_connection" name="test_provider_create_observes_a_committed_intent_from_an_independent_mysql_connection"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_timeout_retains_one_intent_and_retries_exactly_after_original_inventory_deadline" name="test_timeout_retains_one_intent_and_retries_exactly_after_original_inventory_deadline"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_unknown_provider_outcome_past_retry_window_requires_reconciliation_without_new_session" name="test_unknown_provider_outcome_past_retry_window_requires_reconciliation_without_new_session"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_reconciliation_of_known_session_works_after_policy_withdrawal_and_never_finalizes_paid_evidence" name="test_reconciliation_of_known_session_works_after_policy_withdrawal_and_never_finalizes_paid_evidence"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_explicit_operator_locator_recovers_a_lost_session_after_retry_window_without_recreating_it" name="test_explicit_operator_locator_recovers_a_lost_session_after_retry_window_without_recreating_it"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_default_recovery_scan_skips_aged_unknown_intents_before_applying_its_limit" name="test_default_recovery_scan_skips_aged_unknown_intents_before_applying_its_limit"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_operator_recovery_command_never_prints_provider_errors_private_urls_or_buyer_details" name="test_operator_recovery_command_never_prints_provider_errors_private_urls_or_buyer_details"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_provider_private_fields_are_omitted_from_retained_decrypted_observations_and_http_projection" name="test_provider_private_fields_are_omitted_from_retained_decrypted_observations_and_http_projection"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources#0" name="test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources#1" name="test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources#2" name="test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources#3" name="test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources#4" name="test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources#5" name="test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources#6" name="test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources#7" name="test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources#8" name="test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources#9" name="test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources#10" name="test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources#11" name="test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources#12" name="test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources#13" name="test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources#14" name="test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources#15" name="test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources#16" name="test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources#17" name="test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources#18" name="test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_new_checkout_requires_explicit_configuration_test_scope_and_matching_account#0" name="test_new_checkout_requires_explicit_configuration_test_scope_and_matching_account"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_new_checkout_requires_explicit_configuration_test_scope_and_matching_account#1" name="test_new_checkout_requires_explicit_configuration_test_scope_and_matching_account"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_new_checkout_requires_explicit_configuration_test_scope_and_matching_account#2" name="test_new_checkout_requires_explicit_configuration_test_scope_and_matching_account"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_new_checkout_requires_explicit_configuration_test_scope_and_matching_account#3" name="test_new_checkout_requires_explicit_configuration_test_scope_and_matching_account"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_new_checkout_requires_explicit_configuration_test_scope_and_matching_account#4" name="test_new_checkout_requires_explicit_configuration_test_scope_and_matching_account"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_nonzero_test_tax_and_expired_first_attempt_cannot_initiate_a_provider_session" name="test_nonzero_test_tax_and_expired_first_attempt_cannot_initiate_a_provider_session"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_provider_amount_bounds_are_enforced_before_any_create_call#0" name="test_provider_amount_bounds_are_enforced_before_any_create_call"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_provider_amount_bounds_are_enforced_before_any_create_call#1" name="test_provider_amount_bounds_are_enforced_before_any_create_call"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_provider_amount_bounds_are_enforced_before_any_create_call#2" name="test_provider_amount_bounds_are_enforced_before_any_create_call"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_provider_amount_bounds_are_enforced_before_any_create_call#3" name="test_provider_amount_bounds_are_enforced_before_any_create_call"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_database_failure_never_duplicates_provider_identity_or_partly_binds_a_session#0" name="test_database_failure_never_duplicates_provider_identity_or_partly_binds_a_session"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_database_failure_never_duplicates_provider_identity_or_partly_binds_a_session#1" name="test_database_failure_never_duplicates_provider_identity_or_partly_binds_a_session"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_database_failure_never_duplicates_provider_identity_or_partly_binds_a_session#2" name="test_database_failure_never_duplicates_provider_identity_or_partly_binds_a_session"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_foreign_owner_and_unknown_order_are_indistinguishable_before_provider_io" name="test_foreign_owner_and_unknown_order_are_indistinguishable_before_provider_io"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_http_checkout_is_owned_private_and_browser_success_return_only_reads_unverified_status" name="test_http_checkout_is_owned_private_and_browser_success_return_only_reads_unverified_status"/>
+   <testMethod id="Tests\Feature\HostedCheckoutTest::test_real_csrf_exact_empty_json_and_unexpected_errors_preserve_private_boundaries" name="test_real_csrf_exact_empty_json_and_unexpected_errors_preserve_private_boundaries"/>
+  </testClass>
+  <testClass name="Tests\Feature\OrderInquiryConcurrencyTest" file="/workspace/VA-Studio-member-originals/tests/Feature/OrderInquiryConcurrencyTest.php">
+   <testMethod id="Tests\Feature\OrderInquiryConcurrencyTest::test_current_publication_operator_and_customer_fences_serialize_both_commit_orders#exact duplicate" name="test_current_publication_operator_and_customer_fences_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\OrderInquiryConcurrencyTest::test_current_publication_operator_and_customer_fences_serialize_both_commit_orders#publication admission first" name="test_current_publication_operator_and_customer_fences_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\OrderInquiryConcurrencyTest::test_current_publication_operator_and_customer_fences_serialize_both_commit_orders#publication withdrawal first" name="test_current_publication_operator_and_customer_fences_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\OrderInquiryConcurrencyTest::test_current_publication_operator_and_customer_fences_serialize_both_commit_orders#role admission first" name="test_current_publication_operator_and_customer_fences_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\OrderInquiryConcurrencyTest::test_current_publication_operator_and_customer_fences_serialize_both_commit_orders#role withdrawal first" name="test_current_publication_operator_and_customer_fences_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\OrderInquiryConcurrencyTest::test_current_publication_operator_and_customer_fences_serialize_both_commit_orders#mfa admission first" name="test_current_publication_operator_and_customer_fences_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\OrderInquiryConcurrencyTest::test_current_publication_operator_and_customer_fences_serialize_both_commit_orders#mfa withdrawal first" name="test_current_publication_operator_and_customer_fences_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\OrderInquiryConcurrencyTest::test_current_publication_operator_and_customer_fences_serialize_both_commit_orders#credential admission first" name="test_current_publication_operator_and_customer_fences_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\OrderInquiryConcurrencyTest::test_current_publication_operator_and_customer_fences_serialize_both_commit_orders#credential withdrawal first" name="test_current_publication_operator_and_customer_fences_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\OrderInquiryConcurrencyTest::test_current_publication_operator_and_customer_fences_serialize_both_commit_orders#account admission first" name="test_current_publication_operator_and_customer_fences_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\OrderInquiryConcurrencyTest::test_current_publication_operator_and_customer_fences_serialize_both_commit_orders#account withdrawal first" name="test_current_publication_operator_and_customer_fences_serialize_both_commit_orders"/>
+  </testClass>
+  <testClass name="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest" file="/workspace/VA-Studio-member-originals/tests/Feature/ProductionMemberOriginals/MemberOriginalSchemaPreparationTest.php">
+   <testMethod id="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_owned_retry_preserves_all_parent_originals_without_identity_child_dependencies" name="test_owned_retry_preserves_all_parent_originals_without_identity_child_dependencies"/>
+   <testMethod id="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_contiguous_empty_tail_can_restart_but_an_earlier_guard_hole_is_not_owned" name="test_contiguous_empty_tail_can_restart_but_an_earlier_guard_hole_is_not_owned"/>
+   <testMethod id="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_data_bearing_unguarded_prefix_cannot_be_adopted_or_deleted" name="test_data_bearing_unguarded_prefix_cannot_be_adopted_or_deleted"/>
+   <testMethod id="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_reserved_guard_table_collision_retains_foreign_marker_on_both_drivers" name="test_reserved_guard_table_collision_retains_foreign_marker_on_both_drivers"/>
+   <testMethod id="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_profiles_definitions_cannot_adopt_an_old_family_or_rewrite_original_terms" name="test_profiles_definitions_cannot_adopt_an_old_family_or_rewrite_original_terms"/>
+   <testMethod id="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_pending_original_requires_bounded_contiguous_artifacts_before_structural_activation" name="test_pending_original_requires_bounded_contiguous_artifacts_before_structural_activation"/>
+   <testMethod id="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_down_refuses_before_mutating_originals_or_parent_history" name="test_down_refuses_before_mutating_originals_or_parent_history"/>
+   <testMethod id="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_native_global_check_reservation_is_inspected_before_the_first_owned_ddl" name="test_native_global_check_reservation_is_inspected_before_the_first_owned_ddl"/>
+   <testMethod id="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_original_cannot_bind_the_same_redemption_to_a_different_current_account" name="test_original_cannot_bind_the_same_redemption_to_a_different_current_account"/>
+   <testMethod id="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_original_cannot_bind_a_redemption_to_another_source_invoice" name="test_original_cannot_bind_a_redemption_to_another_source_invoice"/>
+  </testClass>
+  <testClass name="Tests\Feature\SiteContentConcurrencyTest" file="/workspace/VA-Studio-member-originals/tests/Feature/SiteContentConcurrencyTest.php">
+   <testMethod id="Tests\Feature\SiteContentConcurrencyTest::test_competing_first_publications_create_only_one_history_and_audit_winner" name="test_competing_first_publications_create_only_one_history_and_audit_winner"/>
+   <testMethod id="Tests\Feature\SiteContentConcurrencyTest::test_publish_and_rollback_share_the_same_versioned_mutex_and_reject_aba_stale_editors" name="test_publish_and_rollback_share_the_same_versioned_mutex_and_reject_aba_stale_editors"/>
+   <testMethod id="Tests\Feature\SiteContentConcurrencyTest::test_v4_publish_and_rollback_preserve_exact_winner_and_retained_loser_in_both_lock_orders#publish first" name="test_v4_publish_and_rollback_preserve_exact_winner_and_retained_loser_in_both_lock_orders"/>
+   <testMethod id="Tests\Feature\SiteContentConcurrencyTest::test_v4_publish_and_rollback_preserve_exact_winner_and_retained_loser_in_both_lock_orders#rollback first" name="test_v4_publish_and_rollback_preserve_exact_winner_and_retained_loser_in_both_lock_orders"/>
+  </testClass>
+  <testClass name="Tests\Feature\TestOwnerDeliveryConcurrencyTest" file="/workspace/VA-Studio-member-originals/tests/Feature/TestOwnerDeliveryConcurrencyTest.php">
+   <testMethod id="Tests\Feature\TestOwnerDeliveryConcurrencyTest::test_two_independent_issuers_that_both_verify_bytes_compete_for_one_remaining_rolling_budget_slot" name="test_two_independent_issuers_that_both_verify_bytes_compete_for_one_remaining_rolling_budget_slot"/>
+   <testMethod id="Tests\Feature\TestOwnerDeliveryConcurrencyTest::test_two_independent_redeemers_that_hold_verified_snapshots_commit_only_one_stream_attempt" name="test_two_independent_redeemers_that_hold_verified_snapshots_commit_only_one_stream_attempt"/>
+   <testMethod id="Tests\Feature\TestOwnerDeliveryConcurrencyTest::test_independent_block_commits_while_redemption_holds_its_verified_snapshot_and_prevents_consumption" name="test_independent_block_commits_while_redemption_holds_its_verified_snapshot_and_prevents_consumption"/>
+  </testClass>
+ </tests>
+ <groups>
+  <group name="default">
+   <test id="Tests\Feature\CustomerListeningMigrationTest::test_repeated_complete_owned_install_preserves_customer_preferences_and_real_credit_history"/>
+   <test id="Tests\Feature\CustomerListeningMigrationTest::test_rollback_always_refuses_before_query_and_retains_schema_history_and_repository_record#empty"/>
+   <test id="Tests\Feature\CustomerListeningMigrationTest::test_rollback_always_refuses_before_query_and_retains_schema_history_and_repository_record#populated"/>
+   <test id="Tests\Feature\CustomerListeningMigrationTest::test_foreign_or_drifted_objects_are_never_adopted_or_dropped#index"/>
+   <test id="Tests\Feature\CustomerListeningMigrationTest::test_foreign_or_drifted_objects_are_never_adopted_or_dropped#column"/>
+   <test id="Tests\Feature\CustomerListeningMigrationTest::test_foreign_or_drifted_objects_are_never_adopted_or_dropped#trigger"/>
+   <test id="Tests\Feature\CustomerListeningMigrationTest::test_temporary_shadow_is_never_adopted_or_dropped"/>
+   <test id="Tests\Feature\CustomerListeningMigrationTest::test_real_migrator_restarts_an_exact_complete_unrecorded_install#after complete up"/>
+   <test id="Tests\Feature\CustomerListeningMigrationTest::test_real_migrator_restarts_an_exact_complete_unrecorded_install#after atomic CREATE event"/>
+   <test id="Tests\Feature\ExclusiveActivationMigrationTest::test_disposable_empty_activation_migration_retains_prior_quotes_and_links"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_hosted_test_session_uses_frozen_discounted_lines_and_changes_no_payment_or_order_evidence#0"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_hosted_test_session_uses_frozen_discounted_lines_and_changes_no_payment_or_order_evidence#1"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_hosted_test_session_uses_frozen_discounted_lines_and_changes_no_payment_or_order_evidence#2"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_hosted_test_session_uses_frozen_discounted_lines_and_changes_no_payment_or_order_evidence#3"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_provider_create_observes_a_committed_intent_from_an_independent_mysql_connection"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_timeout_retains_one_intent_and_retries_exactly_after_original_inventory_deadline"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_unknown_provider_outcome_past_retry_window_requires_reconciliation_without_new_session"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_reconciliation_of_known_session_works_after_policy_withdrawal_and_never_finalizes_paid_evidence"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_explicit_operator_locator_recovers_a_lost_session_after_retry_window_without_recreating_it"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_default_recovery_scan_skips_aged_unknown_intents_before_applying_its_limit"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_operator_recovery_command_never_prints_provider_errors_private_urls_or_buyer_details"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_provider_private_fields_are_omitted_from_retained_decrypted_observations_and_http_projection"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources#0"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources#1"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources#2"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources#3"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources#4"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources#5"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources#6"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources#7"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources#8"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources#9"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources#10"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources#11"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources#12"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources#13"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources#14"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources#15"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources#16"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources#17"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_mismatched_provider_response_never_binds_or_leaks_and_keeps_pending_resources#18"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_new_checkout_requires_explicit_configuration_test_scope_and_matching_account#0"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_new_checkout_requires_explicit_configuration_test_scope_and_matching_account#1"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_new_checkout_requires_explicit_configuration_test_scope_and_matching_account#2"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_new_checkout_requires_explicit_configuration_test_scope_and_matching_account#3"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_new_checkout_requires_explicit_configuration_test_scope_and_matching_account#4"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_nonzero_test_tax_and_expired_first_attempt_cannot_initiate_a_provider_session"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_provider_amount_bounds_are_enforced_before_any_create_call#0"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_provider_amount_bounds_are_enforced_before_any_create_call#1"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_provider_amount_bounds_are_enforced_before_any_create_call#2"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_provider_amount_bounds_are_enforced_before_any_create_call#3"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_database_failure_never_duplicates_provider_identity_or_partly_binds_a_session#0"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_database_failure_never_duplicates_provider_identity_or_partly_binds_a_session#1"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_database_failure_never_duplicates_provider_identity_or_partly_binds_a_session#2"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_foreign_owner_and_unknown_order_are_indistinguishable_before_provider_io"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_http_checkout_is_owned_private_and_browser_success_return_only_reads_unverified_status"/>
+   <test id="Tests\Feature\HostedCheckoutTest::test_real_csrf_exact_empty_json_and_unexpected_errors_preserve_private_boundaries"/>
+   <test id="Tests\Feature\OrderInquiryConcurrencyTest::test_current_publication_operator_and_customer_fences_serialize_both_commit_orders#exact duplicate"/>
+   <test id="Tests\Feature\OrderInquiryConcurrencyTest::test_current_publication_operator_and_customer_fences_serialize_both_commit_orders#publication admission first"/>
+   <test id="Tests\Feature\OrderInquiryConcurrencyTest::test_current_publication_operator_and_customer_fences_serialize_both_commit_orders#publication withdrawal first"/>
+   <test id="Tests\Feature\OrderInquiryConcurrencyTest::test_current_publication_operator_and_customer_fences_serialize_both_commit_orders#role admission first"/>
+   <test id="Tests\Feature\OrderInquiryConcurrencyTest::test_current_publication_operator_and_customer_fences_serialize_both_commit_orders#role withdrawal first"/>
+   <test id="Tests\Feature\OrderInquiryConcurrencyTest::test_current_publication_operator_and_customer_fences_serialize_both_commit_orders#mfa admission first"/>
+   <test id="Tests\Feature\OrderInquiryConcurrencyTest::test_current_publication_operator_and_customer_fences_serialize_both_commit_orders#mfa withdrawal first"/>
+   <test id="Tests\Feature\OrderInquiryConcurrencyTest::test_current_publication_operator_and_customer_fences_serialize_both_commit_orders#credential admission first"/>
+   <test id="Tests\Feature\OrderInquiryConcurrencyTest::test_current_publication_operator_and_customer_fences_serialize_both_commit_orders#credential withdrawal first"/>
+   <test id="Tests\Feature\OrderInquiryConcurrencyTest::test_current_publication_operator_and_customer_fences_serialize_both_commit_orders#account admission first"/>
+   <test id="Tests\Feature\OrderInquiryConcurrencyTest::test_current_publication_operator_and_customer_fences_serialize_both_commit_orders#account withdrawal first"/>
+   <test id="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_owned_retry_preserves_all_parent_originals_without_identity_child_dependencies"/>
+   <test id="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_contiguous_empty_tail_can_restart_but_an_earlier_guard_hole_is_not_owned"/>
+   <test id="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_data_bearing_unguarded_prefix_cannot_be_adopted_or_deleted"/>
+   <test id="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_reserved_guard_table_collision_retains_foreign_marker_on_both_drivers"/>
+   <test id="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_profiles_definitions_cannot_adopt_an_old_family_or_rewrite_original_terms"/>
+   <test id="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_pending_original_requires_bounded_contiguous_artifacts_before_structural_activation"/>
+   <test id="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_down_refuses_before_mutating_originals_or_parent_history"/>
+   <test id="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_native_global_check_reservation_is_inspected_before_the_first_owned_ddl"/>
+   <test id="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_original_cannot_bind_the_same_redemption_to_a_different_current_account"/>
+   <test id="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_original_cannot_bind_a_redemption_to_another_source_invoice"/>
+   <test id="Tests\Feature\SiteContentConcurrencyTest::test_competing_first_publications_create_only_one_history_and_audit_winner"/>
+   <test id="Tests\Feature\SiteContentConcurrencyTest::test_publish_and_rollback_share_the_same_versioned_mutex_and_reject_aba_stale_editors"/>
+   <test id="Tests\Feature\SiteContentConcurrencyTest::test_v4_publish_and_rollback_preserve_exact_winner_and_retained_loser_in_both_lock_orders#publish first"/>
+   <test id="Tests\Feature\SiteContentConcurrencyTest::test_v4_publish_and_rollback_preserve_exact_winner_and_retained_loser_in_both_lock_orders#rollback first"/>
+   <test id="Tests\Feature\TestOwnerDeliveryConcurrencyTest::test_two_independent_issuers_that_both_verify_bytes_compete_for_one_remaining_rolling_budget_slot"/>
+   <test id="Tests\Feature\TestOwnerDeliveryConcurrencyTest::test_two_independent_redeemers_that_hold_verified_snapshots_commit_only_one_stream_attempt"/>
+   <test id="Tests\Feature\TestOwnerDeliveryConcurrencyTest::test_independent_block_commits_while_redemption_holds_its_verified_snapshot_and_prevents_consumption"/>
+  </group>
+ </groups>
+</testSuite>

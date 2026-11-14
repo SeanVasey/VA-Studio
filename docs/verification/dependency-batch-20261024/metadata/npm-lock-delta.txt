@@ -1,0 +1,7 @@
+lockfileVersion 3 | records 164 -> 164
+CHANGED (root manifest) None -> None dev=False
+CHANGED node_modules/@asamuzakjp/dom-selector 9.2.4 -> 10.0.5 dev=True
+CHANGED node_modules/@vitest/mocker 5.0.4 -> 5.0.5 dev=True
+CHANGED node_modules/@vitest/spy 5.0.4 -> 5.0.5 dev=True
+CHANGED node_modules/jsdom 30.1.2 -> 30.1.3 dev=True
+CHANGED node_modules/vitest 5.0.4 -> 5.0.5 dev=True

@@ -23,7 +23,7 @@ final class ProductionAccountFeaturesDefaultConfigurationTest extends TestCase
     use ProductionFeatureFixtures;
 
     private const SHIPPED = [
-        'production-account-features' => ['enabled' => false, 'provenance' => null, 'versions' => [
+        'production-account-features' => ['enabled' => false, 'http_mounted' => false, 'provenance' => null, 'versions' => [
             'listening_library' => 'production-listening-library-identity-v1',
             'consent_preferences' => 'production-consent-preferences-identity-v1',
         ]],

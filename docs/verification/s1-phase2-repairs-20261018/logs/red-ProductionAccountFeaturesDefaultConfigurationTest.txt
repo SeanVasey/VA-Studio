@@ -1,0 +1,29 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/f4/phpunit.xml
+
+F..                                                                 3 / 3 (100%)
+
+Time: 00:25.197, Memory: 90.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionAccountFeatures\ProductionAccountFeaturesDefaultConfigurationTest::test_booted_parents_are_the_exact_closed_default_off_plain_arrays
+production-account-features file must ship exactly this closed default.
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+     'enabled' => false,
++    'http_mounted' => false,
+     'provenance' => null,
+     'versions' => Array &1 [
+         'listening_library' => 'production-listening-library-identity-v1',
+
+/home/user/wt/f4/tests/Feature/ProductionAccountFeatures/ProductionAccountFeaturesDefaultConfigurationTest.php:38
+/home/user/wt/t1/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 3, Assertions: 24, Failures: 1.

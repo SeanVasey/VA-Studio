@@ -1,0 +1,12 @@
+diff --git a/tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsTest.php b/tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsTest.php
+index 73333c9b..9113646a 100644
+--- a/tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsTest.php
++++ b/tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsTest.php
+@@ -8,7 +8,6 @@ use App\Domain\Memberships\Billing\BillingLedger;
+ use App\Domain\Memberships\Billing\BillingPolicy;
+ use App\Domain\Memberships\Billing\BillingReconciliation;
+ use App\Domain\Memberships\Billing\BillingRetrievalAttempts;
+-use App\Domain\Memberships\Billing\BillingSchema;
+ use App\Domain\Memberships\Billing\BillingValues;
+ use Carbon\CarbonImmutable;
+ use Illuminate\Support\Facades\DB;

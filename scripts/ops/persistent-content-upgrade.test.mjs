@@ -20,8 +20,11 @@ let removedCheckRelease;
 let changedStorageRelease;
 const available = spawnSync('php', ['-r', 'exit(PHP_MAJOR_VERSION===8 && PHP_MINOR_VERSION>=4 && extension_loaded("pdo_sqlite") && function_exists("posix_geteuid") ? 0 : 1);']).status === 0 && existsSync(join(root, 'vendor/autoload.php')) && existsSync(join(root, 'public/build/manifest.json'));
 
+// `git ls-files` over the repository printed 1.31 MB on 2026-11-12, past spawnSync's default 1 MiB maxBuffer: the call failed with
+// ENOBUFS (status null, empty stderr) and every case failed in setup. The buffer leaves room to grow, and a spawn error now says so.
 function git(checkout, args) {
-  const result = spawnSync('git', args, { cwd: checkout, encoding: 'utf8' }); assert.equal(result.status, 0, result.stderr); return result.stdout.trim();
+  const result = spawnSync('git', args, { cwd: checkout, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+  assert.equal(result.status, 0, result.error ? String(result.error) : result.stderr); return result.stdout.trim();
 }
 
 function release(parent, name, migration) {

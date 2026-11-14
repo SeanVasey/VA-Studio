@@ -1,0 +1,3 @@
+SYNTHETIC CONTRACT ORIGINAL 1002-1
+This is a labelled synthetic test file, not a real agreement, order or license.
+It exists only to exercise byte-exact archive preservation.

@@ -1,0 +1,1 @@
+{"tool":"pint","result":"fixed","files":[{"path":"tests\/Feature\/ProductionMemberOriginals\/MemberOriginalPreparationTest.php","fixers":["class_definition","braces_position","ordered_imports"]},{"path":"tests\/Feature\/ProductionMemberOriginals\/MemberGrantSourceAdmissionTest.php","fixers":["fully_qualified_strict_types","ordered_imports"]}]}

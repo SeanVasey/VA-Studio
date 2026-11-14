@@ -1,0 +1,6 @@
+PHP 8.4.26
+SQLite 3.46.1
+App\Domain\Memberships\Billing\BillingLedger /workspace/VA-Studio-billing-c3-baseline/app/Domain/Memberships/Billing/BillingLedger.php
+App\Domain\Memberships\Billing\BillingReconciliation /workspace/VA-Studio-billing-c3-baseline/app/Domain/Memberships/Billing/BillingReconciliation.php
+Tests\Support\BillingStripeFixtures /workspace/VA-Studio-billing-c3-baseline/tests/Support/BillingStripeFixtures.php
+Tests\Support\FinalizationDatabaseMigrations /workspace/VA-Studio-billing-c3-baseline/tests/Support/FinalizationDatabaseMigrations.php

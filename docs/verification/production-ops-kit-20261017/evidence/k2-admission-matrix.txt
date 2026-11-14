@@ -1,0 +1,65 @@
+K2 evidence: which environments admit each capability flag, read from the real policy classes
+Run 2026-10-18 on source 057e8039 (K1) plus the K2 working tree, PHP 8.4. Script: evidence/k2-admission-matrix.php (boots the real application
+with one flag set true and asks the real policy class; no database, network or host). Values: ADMITTED = the policy would act, refused = it would not.
+
+Matrix 1. One flag true, each of three environments. 'alone' = the flag only. 'complete' = also the policy JSON (the class's own CONTRACT constant)
+or companion settings that policy needs, so the environment gate is the only variable.
+
+flag                                                stagi/alone  stagi/compl  local/alone  local/compl  produ/alone  produ/compl
+VASEY_TEST_SERVICE_PROJECTS_ENABLED                 ADMITTED     ADMITTED     ADMITTED     ADMITTED     refused      refused    
+VASEY_TEST_FREE_GRANTS_ENABLED                      ADMITTED     ADMITTED     ADMITTED     ADMITTED     refused      refused    
+VASEY_TEST_CUSTOMER_CONSENT_ENABLED                 ADMITTED     ADMITTED     ADMITTED     ADMITTED     refused      refused    
+VASEY_TEST_UNPAID_RELEASE_ENABLED                   refused      ADMITTED     refused      ADMITTED     refused      refused    
+VASEY_TEST_REFUND_RESOLUTION_ENABLED                refused      ADMITTED     refused      ADMITTED     refused      refused    
+VASEY_TEST_TRANSACTIONAL_NOTIFICATIONS_ENABLED      refused      ADMITTED     refused      ADMITTED     refused      refused    
+CONTACT_TEST_ORDER_INQUIRIES_ENABLED                ADMITTED     ADMITTED     ADMITTED     ADMITTED     refused      refused    
+CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED      refused      refused      refused      refused      refused      refused    
+VASEY_OPERATIVE_FREE_GRANTS_ENABLED                 refused      refused      refused      refused      refused      refused    
+VASEY_SUPPORT_ATTACHMENTS_FIXTURE_ENABLED           refused      refused      ADMITTED     ADMITTED     refused      refused    
+
+Matrix 2. The two flags no environment gate protects: with a stand-in adapter bound (what a reviewed adapter would do), they admit
+in every environment, staging and production included. Only the flag and the adapter binding stand between them and a live path.
+
+  staging    VASEY_OPERATIVE_FREE_GRANTS_ENABLED                ADMITTED
+  staging    CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED     ADMITTED
+  local      VASEY_OPERATIVE_FREE_GRANTS_ENABLED                ADMITTED
+  local      CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED     ADMITTED
+  production VASEY_OPERATIVE_FREE_GRANTS_ENABLED                ADMITTED
+  production CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED     ADMITTED
+
+Reading the two matrices with the code (file:line at this commit):
+  admitted on staging when true; off in the profile because the guest-purchase rehearsal does not use them:
+    VASEY_TEST_SERVICE_PROJECTS_ENABLED   config/services-projects.php:5     ServiceProjectPolicy.php:11   admitsTestCommerce() && flag
+    VASEY_TEST_FREE_GRANTS_ENABLED        config/free-grants.php:4           FreeGrantPolicy.php:11        admitsTestCommerce() && flag (renders a PDF in the web request)
+    VASEY_TEST_CUSTOMER_CONSENT_ENABLED   config/customer-preferences.php:5  LocalConsentRuntime.php:11    admitsTestCommerce() && flag
+    VASEY_TEST_UNPAID_RELEASE_ENABLED     config/unpaid-release.php:4        UnpaidReleasePolicy.php:22,35 admitsTestCommerce(), STRIPE_MODE=test, acct_ id; flag; exact JSON policy (CONTRACT)
+    VASEY_TEST_REFUND_RESOLUTION_ENABLED  config/refund-resolution.php:4     RefundResolutionPolicy.php:21,29  account() delegates to UnpaidReleasePolicy; flag; exact JSON policy
+    VASEY_TEST_TRANSACTIONAL_NOTIFICATIONS_ENABLED config/transactional-notifications.php:5  TransactionalNotificationPolicy.php:23-24  admitsTestCommerce(), test accounts on, flag, transport private_capture, policy version
+    CONTACT_TEST_ORDER_INQUIRIES_ENABLED  config/inquiries.php:6             OrderInquiry.php:122,197      flag, and readable() = admitsTestCommerce(); also needs the public inquiry setup (CONTACT_INQUIRIES_* owner-approved)
+  not admitted on staging:
+    VASEY_SUPPORT_ATTACHMENTS_FIXTURE_ENABLED  config/support-attachments.php:5  FixtureAttachmentPolicy.php:20, SupportAttachmentUi.php:10  environment is local or testing; staging refuses it even when true
+  not environment-gated (must be false on staging, stated explicitly):
+    VASEY_OPERATIVE_FREE_GRANTS_ENABLED   config/free-grants.php:6           FreeGrantPolicy.php:12,36     flag && a bound FreeGrantIdentity; no environment test. Only TestFreeGrantIdentity exists in app/ and nothing binds it
+    CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED config/inquiries.php:11   InquiryNotificationWork.php:53  flag && a bound InquiryAlertTransport; no environment test; no implementation ships in app/
+  beyond the ten, stated false so the key is never left to a default:
+    DISCOVERY_SITEMAP_ENABLED             config/discovery-sitemap.php:5     SitemapConfiguration::assertEnabled() gates the build and store chain in any environment; only the production index serves it (PublicDiscoveryController.php:16)
+    VASEY_LISTENING_V2_PROMOTION_ENABLED  config/customer-listening.php:6    ListeningRollout::capture(): needs a review reference too; the config comment says a retained V2 row cannot be rolled back by turning it off
+
+The production lanes (Paid252 = config/paid-grants.php; Tax255 = config/paid-tax-grants.php and config/production-tax-checkout.php; production customer
+identity; production free grants; and the other production-* files) hold literal false/true values with no env() call (tests/ops/test_staging_capability_profile.py
+asserts the five named files contain no env()). No profile line can open one; the validator's new boundary.production_lanes_closed check fails if a code
+change ever does, which is what the mutation run below shows.
+
+Validator mutation run (scripts/ops/validate-test-commerce-profile.php --template on the overlay; each config file changed for one run, then restored and
+compared; `git diff -- config` empty afterwards):
+  config/paid-grants.php             'http_mounted' => true          FAIL boundary.production_lanes_closed - Production lane flags that are true: paid-grants.http_mounted.
+  config/paid-tax-grants.php         'operative_enabled' => true     FAIL boundary.production_lanes_closed - ... paid-tax-grants.operative_enabled.
+  config/production-tax-checkout.php 'enabled' => true               FAIL boundary.production_lanes_closed - ... production-tax-checkout.enabled. (also trips the older out-of-profile check: 2 of 38 failed)
+  config/production-customer-identity.php 'notifications_enabled' => true  FAIL boundary.production_lanes_closed - ... production-customer-identity.notifications_enabled.
+  config/production-free-grants.php  'enabled' => true               FAIL boundary.production_lanes_closed - ... production-free-grants.enabled.
+  config/production-free-grants.php  renamed away                    FAIL boundary.production_lanes_closed - Production lane configuration not found (renamed? update the validator): production-free-grants.
+  and with the check's own condition disabled (mutation of the validator), the paid-grants flip above was reported PASS: the check is what catches it.
+
+Limits of this run: the CONTACT_TEST_ORDER_INQUIRIES_ENABLED probe is the two conditions the code tests (admitsTestCommerce() and the flag), not a full
+order-inquiry intake, which also needs the owner-approved public inquiry setup. The "complete" column adds companions only so the environment gate is visible;
+no Stripe request, database write or mail was made. The stand-in adapters in matrix 2 are not shipped code; they show what binding one would do to the gate.

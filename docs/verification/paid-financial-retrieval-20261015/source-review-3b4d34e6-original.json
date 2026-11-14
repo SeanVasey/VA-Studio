@@ -1,0 +1,130 @@
+{
+  "reviewed_sha": "3b4d34e6203e4aa745792cea5c82c89caf53da20",
+  "decision": "REVISE BEFORE SOURCE APPROVAL",
+  "independent_non_author": true,
+  "source_review_only": true,
+  "approved_design_sha": "fd06135d0fb7510aad27d3450ff2bbd458a7071e",
+  "exact_immutable_git_source_sha256": {
+    "app/Domain/Commerce/ProductionFinancialRetrieval/FinancialReadPlan.php": "a894defcd1a07437f5d30d4b11213779cb61ebdb090f48c0f1400fcc6e4678f7",
+    "app/Domain/Commerce/ProductionFinancialRetrieval/FinancialRetrievalException.php": "d44cbf7dce685ea3842a669fb7c0f88256701ab58d8382a35d4aa9914f12fca2",
+    "app/Domain/Commerce/ProductionFinancialRetrieval/GuardedSdkTransport.php": "e2e8b0c1ca5da78eacf7c0a4a5e2e963b8f0f8503605957bfc4db426a38248e0",
+    "app/Domain/Commerce/ProductionFinancialRetrieval/ReadOwnership.php": "a51b3ea71ab1f530f4619c925e12ddc4a69b843333a38ed0479c12789fe1fc8c",
+    "app/Domain/Commerce/ProductionFinancialRetrieval/RetrievalPolicy.php": "0fb7a54600fadd9565107ae224f68b86a916b1560fa4acae59831b624757d6e2",
+    "config/production-financial-retrieval.php": "ae604b26203e8f492544e99ddb0947a37a8a25a198d699d0ae6b6c7e885e9efa",
+    "tests/Feature/ProductionFinancialRetrieval/FinancialReadPlanTest.php": "a8de2a318c6108bff4b358034c592fc6e1c87654a17add38b5e9779e61a8df3c"
+  },
+  "head_clean_at_initial_read": true,
+  "author_ownership": "Root may batch repairs in working tree after the closed run; this review stays bound to immutable3b4 Git bytes, not mutable successors.",
+  "open_p0": 0,
+  "open_p1": 1,
+  "open_material_p2": 3,
+  "findings": [
+    {
+      "id": "R1",
+      "severity": "P1",
+      "path": "app/Domain/Commerce/ProductionFinancialRetrieval/GuardedSdkTransport.php",
+      "line": 68,
+      "title": "Static getRawValue(null) prevents every SDK request",
+      "finding": "ReflectionProperty::getRawValue requires an object in the actual PHP8.4 API; the null static read throws TypeError before the delegate call. The gateway redacts it and neither positive SDK case can complete.",
+      "evidence": "All initial SDK cases have zero delegate calls. Root separately confirmed native reflection-only TypeError and unhooked static property; this reviewer did not execute PHP/app diagnostics.",
+      "repair": "Use supported hook-free read of the pinned unhooked static (getValue() for _httpClient), retaining exact slot identity checks. Current happy path and notice/reopen/SDK-error cases must actually reach expected request counts."
+    },
+    {
+      "id": "R2",
+      "severity": "P2",
+      "path": "app/Domain/Commerce/ProductionFinancialRetrieval/RetrievalPolicy.php",
+      "line": 63,
+      "title": "Current map scan loses original connection custody and accepts callback PDO subclasses",
+      "finding": "requireOutsideTransactions follows the current instances db manager/map and calls inTransaction on arbitrary PDO subclasses. A callback can replace/remove the manager/map entry, hide a reopened original native transaction, or trigger a subclass method before refusal. Original receipts only detect stale context at terminal proof, after additional GETs could already occur.",
+      "repair": "Capture the exact original DatabaseManager, source connection/native PDO and loaded cohort while held; require manager/map/native identities and original primary continuity every request. Admit internal PDO/Pdo driver class plus default PDOStatement before methods; check framework/native zero state. Map changes/new unsupported peers must refuse before the next GET, preserving creator-owned transaction cleanup.",
+      "controls": "Independent manager replacement/map omission/native PDO substitution and subclass method counter; genuinely reopened original/peer transaction remains active until its creator cleans it."
+    },
+    {
+      "id": "R3",
+      "severity": "P2",
+      "path": "app/Domain/Commerce/ProductionFinancialRetrieval/RetrievalPolicy.php",
+      "line": 97,
+      "title": "Reached frozen metadata surfaces are not admitted by the new wrapper",
+      "finding": "Current policy admits Container/config fields but not the Facade raw cache/application or standard Connection raw config/database/prefix before frozen source/receipt and gateway entries. These reached paths can perform ArrayAccess offsets or method/string work from late noncanonical metadata.",
+      "call_paths": [
+        "receipt proveClosed -> IdentityHistoricalCommittedReceipt::proveClosed -> IdentityOriginalCommitWitness::context indexes Facade resolvedInstance[db]",
+        "V1 receipt -> OriginalCommitDispatcher::requireClosed -> CommittedReadContext::prove -> Connection getDriverName/getConfig(driver), getDatabaseName/getTablePrefix",
+        "Identity witness context additionally uses Connection getName/config(name); SDK withClient uses DB::getConnections"
+      ],
+      "repair": "Within the new wrapper require raw Facade resolvedInstance actual array, Facade app captured Application, resolved db consistent captured manager; Connection raw config actual array with driver/name strings, database/tablePrefix strings, transactions int and admitted native/default-statement PDO before reached methods. Bracket source/receipt/gateway calls and refuse later changes. Do not edit shared/frozen helpers or claim their analogous P2s solved.",
+      "controls": "Actual ArrayAccess/Connection metadata sentinels reached from the new wrapper, with callback count zero and no subsequent GET; captured core-class positive must remain supported."
+    },
+    {
+      "id": "R4",
+      "severity": "P2",
+      "path": "app/Domain/Commerce/ProductionFinancialRetrieval/GuardedSdkTransport.php",
+      "line": 90,
+      "title": "100-item dense-list cap is deferred until after SDK conversion and later requests",
+      "finding": "nodes() bounds4096 nodes but never restricts dense lists to100. A101-entry refunds/disputes list below byte/node caps reaches SDK conversion and can permit following GETs before FinancialCandidate rejects it.",
+      "repair": "Admit dense native lists <=100 before handing each response to SDK; retain depth12/node4096/cumulative1MiB. Exercise101-item list with later request count fixed at the invalid response, not only an eventual candidate refusal."
+    }
+  ],
+  "working_mechanics_by_inspection": [
+    "Literal defaultfalse policy; source-kind typed private plan factory; existing FinancialExpectation preserves original gross/capture identity and output stays unattested.",
+    "Early pre-existing peer-cohort refusal before extraction/mint; exact own receipt/observer/source/reader/effective deadline/raw cohort comparison.",
+    "Thirty-second plan cap is shortened by authentic observer deadline; no source-clock renewal.",
+    "One-shot claim, attempted-before-proof, refused-context own poison/invalidate and finally drain; clone copy detached, unowned reconstruction and nonthrowing original observation cleanup without physical commit/rollback/abort.",
+    "Exact six GET URL/params/version/authorization scope, no file/retry/Connect/context; PI latest_charge binding, case-insensitive Stripe-Notice refusal, primitive response/header and cumulative body limits."
+  ],
+  "actual_initial_evidence": {
+    "head": "3b4d34e6203e4aa745792cea5c82c89caf53da20",
+    "counts": {
+      "tests": 22,
+      "assertions": 144,
+      "failures": 9,
+      "errors": 2,
+      "skipped": 0
+    },
+    "php_exit": 2,
+    "recorder_exit": 1,
+    "observed_os_exit": 1,
+    "observed_pid": 222659,
+    "start_ticks": "9496237",
+    "uid": 1000,
+    "os_state": "Z",
+    "source_input_count": 2437,
+    "source_runner_loader_head_status_stable": true,
+    "run_scope": "whole new file; original failed, not a passing SDK-path/native acceptance",
+    "sdk_controls": "Zero-delegate SDK branches do not prove notice, transport displacement, SDK exception, reopen or terminal response behavior."
+  },
+  "receipt_hashes": {
+    "command.json": "beeced41a0116f73f8562a4d708264544e0d7ea994171caa5dbe24e8283a9114",
+    "result.json": "d00f424e4e224e261740f9e048442e6515c9918699e198e7d59f9ec77f07884f",
+    "log.txt": "3bc3fed77a8f67c9376430bcf782c8ad37d16f6b98d2ecf60be5fa325d0efee2",
+    "junit.xml": "2d7942ad4674bec1f761a2ebf544389d189426cf8137dac69896437b64f18c2a",
+    "process.exit": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+    "supervisor-os-exit.json": "4952c70a634b1cc1e9ecc4a7bc3cc2999c1327517af78a8e2a13852ee0873728"
+  },
+  "needed_acceptance_controls": [
+    "Whole repaired new file including genuine positive V1 and TaxV2 six-request outcomes; meaningful raw failure controls must assert request count and no later request.",
+    "Effective older source cap vs later caller bound; genuine elapsed-time caller/source control distinguished from synthetic/reflected clock control; source/receipt not renewed.",
+    "No dispatch before positive original commit: rollback, direct PDO commit/reopen, ended/wrong frames, actual afterCommit/committing refusal and caller-owned cleanup/fresh retry.",
+    "Partial second mint with late retained Crypt callback withdrawal, original partial observation tracking, source-kind observer disposition, peer/mixed-cohort preservation.",
+    "Held read-before-commit refusal, destructor-only unused plan, repeated close, reentry and safe clone/deserialize; thrown/durable original afterCommit preserves truthful no-retry/no-compensation state.",
+    "Separate policy flag/key/account/mode/TLS/transport/manager/primary/peer mutation controls; supported standard offsetSet env binding and local/testing vs staging/production/default/nonboolean/raw-parent refusal.",
+    "Per-response shape/status/header/body/depth/nodes/101-list and cumulative body boundaries, malformed PI/charge binding and incomplete lists; no body/credential trace/chaining retention.",
+    "Owned private MySQL focused original commit/two-receipt/callback/source-age/native cleanup controls with original launch/OS/source/runtime witnesses; no native proof currently exists."
+  ],
+  "reviewer_execution_limits": {
+    "app_tests": false,
+    "PHP_diagnostics": false,
+    "database": false,
+    "network_provider": false,
+    "hosted_ci": false,
+    "shared_edits": false
+  },
+  "future_limits": "No source/evidence/development merge approval. Frozen source/helper P2s remain outside module repair; authenticated provider/host/account, durable ledger/financial write/MFA/idempotency, rights/refund/access policy and full release gates remain open.",
+  "read_command_summary": [
+    "git exactHEAD/status/diff; rg --files new module/test and runtime evidence",
+    "cat all five new classes, config and whole new focused test",
+    "nl new policy/guard; rg original FinancialObservation capture APIs and reached SDK/Connection helpers",
+    "read original closed result/log/JUnit/command/runtime/OS receipts",
+    "Python parse original JUnit/counts/exit/stability, hash immutable Git source and runtime originals; write reviewer artifacts only"
+  ],
+  "reviewer_prep_failures": []
+}

@@ -1,0 +1,9 @@
+{
+  "exit": 0,
+  "duration_seconds": 0.52,
+  "completed_utc": "2026-10-13T09:01:16.952849+00:00",
+  "source_count": 2254,
+  "source_unchanged": true,
+  "head_after": "78ef16be7626c81de49d103d581551b707201eda",
+  "selftest_count": 52
+}

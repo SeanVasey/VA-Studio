@@ -1,0 +1,11 @@
+{
+  "status": "superseded-source-changed-during-discovery",
+  "reason": "Deadline test cleanup amended by its owner after the first application run; all three method names unchanged. No application tests executed by census. Final discovery will be repeated against frozen final bytes.",
+  "discovery_exit": 0,
+  "selected_cases": 1930,
+  "selected_files": 180,
+  "all_cases": 7900,
+  "all_files": 577,
+  "initial_test_sha256": "3ab6124ef2b1b3200733967ca9d8c0b43ec67c600a41db74ed30b78ed7dce7ec",
+  "final_test_sha256": "e8df808fa1b4a5a3767cc4f8554127e10102a3f4a859504a87af04a754dfdb5b"
+}

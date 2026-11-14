@@ -1,0 +1,6 @@
+cd /workspace/VA-Studio-membership-ledger
+git switch --detach 45d1299406821627f4ba02af186e324a70c6ade0
+git status --short
+git rev-parse HEAD
+bash /workspace/runtime/membership-reservation-selection-evidence/final-45d12994/discovery.sh
+python3 /workspace/runtime/membership-reservation-selection-evidence/final-45d12994/finalize.py > /workspace/runtime/membership-reservation-selection-evidence/final-45d12994/finalize.txt 2>&1

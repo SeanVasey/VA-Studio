@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\MembershipNativeCatalogCurrentnessTest" file="/workspace/VA-Studio-member-catalog-currentness/tests/Feature/ProductionMembershipBilling/MembershipNativeCatalogCurrentnessTest.php" tests="1" assertions="12" errors="1" failures="0" skipped="0" time="78.980270">
+    <testcase name="test_unrelated_auto_allocated_insert_preserves_original_proof_but_selected_row_change_refuses" file="/workspace/VA-Studio-member-catalog-currentness/tests/Feature/ProductionMembershipBilling/MembershipNativeCatalogCurrentnessTest.php" line="52" class="Tests\Feature\ProductionMembershipBilling\MembershipNativeCatalogCurrentnessTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipNativeCatalogCurrentnessTest" assertions="12" time="78.980270">
+      <error type="App\Domain\Memberships\Production\MembershipException">Tests\Feature\ProductionMembershipBilling\MembershipNativeCatalogCurrentnessTest::test_unrelated_auto_allocated_insert_preserves_original_proof_but_selected_row_change_refuses
+App\Domain\Memberships\Production\MembershipException: Production membership preparation unavailable.
+
+/workspace/VA-Studio-member-catalog-currentness/app/Domain/Memberships/Production/MembershipException.php:16
+/workspace/runtime/membership-catalog-currentness-evidence/native-red-planned-source/app/Domain/Memberships/Production/MembershipCatalogEvidence.php:87
+/workspace/VA-Studio-member-catalog-currentness/tests/Feature/ProductionMembershipBilling/MembershipNativeCatalogCurrentnessTest.php:103
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+  </testsuite>
+</testsuites>

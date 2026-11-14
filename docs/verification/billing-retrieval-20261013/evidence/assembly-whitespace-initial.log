@@ -1,0 +1,142 @@
+docs/verification/billing-retrieval-20261013/evidence/consumer/terminal-omission.overlay.patch:11: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/consumer/terminal-omission.overlay.patch:23: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/consumer/unit.overlay.patch:14: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/consumer/unit.overlay.patch:16: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/consumer/unit.overlay.patch:20: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/consumer/unit.overlay.patch:54: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/consumer/unit.overlay.patch:62: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/consumer/unit.overlay.patch:83: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/consumer/unit.overlay.patch:87: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/consumer/unit.overlay.patch:98: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/consumer/unit.overlay.patch:101: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/consumer/unit.overlay.patch:109: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/consumer/unit.overlay.patch:112: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/consumer/unit.overlay.patch:125: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/consumer/unit.overlay.patch:128: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/consumer/unit.overlay.patch:137: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/consumer/unit.overlay.patch:242: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/consumer/unit.overlay.patch:246: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/consumer/unit.overlay.patch:265: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/consumer/unit.overlay.patch:269: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/consumer/unit.overlay.patch:273: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/consumer/unit.overlay.patch:292: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/consumer/unit.overlay.patch:294: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/consumer/unit.overlay.patch:298: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/consumer/unit.overlay.patch:332: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/consumer/unit.overlay.patch:340: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/consumer/unit.overlay.patch:347: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/consumer/unit.overlay.patch:358: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/consumer/unit.overlay.patch:375: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/consumer/unit.overlay.patch:403: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/fixture/cursor.patch:6: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/fixture/cursor.patch:8: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/fixture/cursor.patch:37: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/fixture/cursor.patch:41: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/fixture/cursor.patch:43: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/fixture/cursor.patch:59: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/fixture/cursor.patch:89: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/fixture/cursor.patch:104: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/fixture/cursor.patch:119: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/fixture/cursor.patch:122: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/fixture/cursor.patch:144: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/fixture/cursor.patch:164: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/fixture/cursor.patch:170: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/fixture/cursor.patch:205: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/fixture/cursor.patch:210: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/fixture/schema-preparation.patch:8: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/fixture/schema-preparation.patch:23: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/fixture/schema-preparation.patch:32: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/fixture/schema-preparation.patch:56: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/fixture/schema-preparation.patch:71: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/fixture/schema-preparation.patch:135: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/fixture/static-v2.patch:12: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/fixture/static-v2.patch:39: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/fixture/static-v2.patch:56: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/fixture/static-v2.patch:61: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/fixture/static-v2.patch:68: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/fixture/static-v2.patch:90: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/fixture/static-v2.patch:95: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/fixture/static.patch:12: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/fixture/static.patch:39: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/fixture/static.patch:56: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/fixture/static.patch:61: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/fixture/static.patch:68: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/fixture/static.patch:90: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/evidence/fixture/static.patch:95: trailing whitespace.
++ 
+docs/verification/billing-retrieval-20261013/source-map.md:67: trailing whitespace.
++- `records/issuer-final`: `Tests\Feature\ProductionMembershipBilling\BillingIssuedRetrievalTest::test_native_duplicate_first_identity_uses_a_current_read_after_its_earlier_snapshot` — 
+docs/verification/billing-retrieval-20261013/source-map.md:68: trailing whitespace.
++- `schema/sqlite-identity-initial`: `Tests\Feature\ProductionMembershipBilling\BillingRetrievalIdentitySchemaTest::test_native_database_utc_is_independent_of_session_timezone` — 
+docs/verification/billing-retrieval-20261013/source-map.md:69: trailing whitespace.
++- `schema/sqlite-final`: `Tests\Feature\ProductionMembershipBilling\BillingRetrievalIdentitySchemaTest::test_native_database_utc_is_independent_of_session_timezone` — 
+docs/verification/billing-retrieval-20261013/source-map.md:70: trailing whitespace.
++- `schema/sqlite-final`: `Tests\Feature\ProductionMembershipBilling\BillingRetrievalIdentitySchemaTest::test_native_old_snapshot_cannot_hide_a_competing_committed_interval_claim` — 
+docs/verification/billing-retrieval-20261013/source-map.md:71: trailing whitespace.
++- `schema/sqlite-final`: `Tests\Feature\ProductionMembershipBilling\BillingRetrievalIdentitySchemaTest::test_native_endpoint_lookup_uses_current_allocation_after_an_older_snapshot` — 
+docs/verification/billing-retrieval-20261013/source-map.md:72: trailing whitespace.
++- `root/sqlite-membership-admission-integration`: `Tests\Feature\ProductionMembershipBilling\MembershipReservationClockClosureTest::test_native_committed_clock_callback_owner_withdrawal_refuses_receipt_without_undoing_reservation` — 

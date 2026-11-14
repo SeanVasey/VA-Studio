@@ -1,0 +1,19 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/g1/phpunit.xml
+
+...F.                                                               5 / 5 (100%)
+
+Time: 19:33.793, Memory: 95.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionMembershipBilling\MembershipSchemaProofFrameTest::test_definitions_proven_in_the_frame_cannot_change_under_it
+DDL passed a held frame: ALTER TABLE quote_owners COMMENT='synthetic'
+
+/home/user/wt/g1/tests/Feature/ProductionMembershipBilling/MembershipSchemaProofFrameTest.php:160
+/home/user/wt/g1/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 5, Assertions: 31, Failures: 1.

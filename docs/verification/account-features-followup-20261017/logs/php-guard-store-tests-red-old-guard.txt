@@ -1,0 +1,28 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/b4f/phpunit.xml
+
+.F..                                                                4 / 4 (100%)
+
+Time: 00:18.288, Memory: 24.50 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionFeatures\ProductionAccountFeaturesHttpTest::test_request_guard_admits_exactly_the_two_framework_session_store_classes@EncryptedStore with data ('encrypted', 'Illuminate\Session\EncryptedStore', true)
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException at /home/user/wt/b4f/app/Http/AccountFeatures/AccountFeatureRequestGuard.php:51
+Failed asserting that App\Domain\Customers\ProductionFeatures\ProductionFeatureException Object #3266 (
+    'message' => 'Reload your account before trying again.',
+    'string' => '',
+    'code' => 0,
+    'file' => '/home/user/wt/b4f/app/Http/AccountFeatures/AccountFeatureRequestGuard.php',
+    'line' => 51,
+    'previous' => null,
+    'status' => 503,
+) is null.
+
+/home/user/wt/b4f/tests/Feature/ProductionFeatures/ProductionAccountFeaturesHttpTest.php:189
+
+FAILURES!
+Tests: 4, Assertions: 57, Failures: 1.
+exit=1

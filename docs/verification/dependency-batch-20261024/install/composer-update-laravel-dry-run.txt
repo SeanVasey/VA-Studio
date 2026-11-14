@@ -1,0 +1,8 @@
+Loading composer repositories with package information
+Updating dependencies
+Lock file operations: 0 installs, 1 update, 0 removals
+  - Upgrading laravel/framework (v13.37.0 => v13.38.0)
+112 packages you are using are looking for funding.
+Use the `composer fund` command to find out more!
+Found 1 security vulnerability advisory affecting 1 package.
+Run "composer audit" for a full list of advisories.

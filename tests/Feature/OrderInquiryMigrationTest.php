@@ -56,6 +56,16 @@ class OrderInquiryMigrationTest extends TestCase
                         unset($guard['CREATED']);
                     }
                 }
+            } else {
+                // SQLite hands a recreated object whichever free page its freelist offers, so `rootpage` is storage, not
+                // structure, and moves with unrelated earlier migrations. Only this migration's own rows drop it;
+                // every unrelated row, rootpage included, must still be identical.
+                foreach ($schema as &$row) {
+                    if ($row['tbl_name'] === 'inquiry_order_contexts') {
+                        unset($row['rootpage']);
+                    }
+                }
+                unset($row);
             }
 
             return $schema;

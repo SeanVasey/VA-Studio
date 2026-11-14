@@ -1,0 +1,28 @@
+ops/production/nginx/vasey-production.conf with the placeholders filled (host shop.example.invalid, a throwaway self-signed certificate, a
+temporary prefix, empty forge-conf directories).
+
+$ nginx -t -p <prefix> -c <conf>                              (the file as written)
+nginx: the configuration file .../nginx.conf syntax is ok
+nginx: [emerg] socket() [::]:443 failed (97: Address family not supported by protocol)      <- this container has no IPv6
+nginx: configuration file .../nginx.conf test failed
+
+$ nginx -t ...                                                 (only the two `listen [::]` lines removed)
+nginx: the configuration file .../nginx.conf syntax is ok
+nginx: configuration file .../nginx.conf test is successful
+
+Live run (nginx in the foreground, curl --noproxy '*' --resolve to 127.0.0.1; PHP-FPM absent, so every request answers 502):
+response headers of GET /:
+  strict-transport-security: max-age=31536000
+  x-content-type-options: nosniff
+  referrer-policy: strict-origin-when-cross-origin
+  x-frame-options: SAMEORIGIN
+  permissions-policy: camera=(), microphone=(), geolocation=(), usb=(), interest-cohort=()
+  (no x-robots-tag, no www-authenticate)
+access log (log_format vasey_production):
+  127.0.0.1 [..] "GET /paid-grants/authorizations/:uuid/redeem" 502 150 rt=0.000 "curl/8.5.0"
+  127.0.0.1 [..] "GET /paid-grants/origins/:uuid/document" 502 150 rt=0.000 "curl/8.5.0"        (request was ...document?x=1: the query is dropped)
+  127.0.0.1 [..] "GET /paid-grants/authorizations/0123abcd-.../other" 502 ...                    (not one of the two routes: not masked)
+  127.0.0.1 [..] "GET /tracks/some-track" 502 ..., "GET /embed/abc" 502 ..., "GET /" 502 ...
+error_log stderr (redirected to a file): lines such as
+  [crit] ... connect() to unix:/run/php/vasey-paid-delivery.sock failed (2: No such file or directory) ... request: "GET /paid-grants/authorizations/0123abcd-4567-89ab-cdef-0123456789ab/redeem HTTP/2.0"
+  -> the error log quotes the raw request line when an upstream fails. Only the access log masks the identifier.

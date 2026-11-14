@@ -1,0 +1,41 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/g1/phpunit.xml
+
+FFFF                                                                4 / 4 (100%)
+
+Time: 01:08.427, Memory: 104.00 MB
+
+There were 4 failures:
+
+1) Tests\Feature\ProductionMemberGrants\MemberObserverTerminalProofTest::test_the_authoring_terminal_phase_proves_in_full_after_remembered_proofs
+Failed asserting that false is true.
+
+/home/user/wt/g1/tests/Feature/ProductionMemberGrants/MemberObserverTerminalProofTest.php:142
+/home/user/wt/g1/tests/Feature/ProductionMemberGrants/MemberObserverTerminalProofTest.php:60
+/home/user/wt/g1/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMemberGrants\MemberObserverTerminalProofTest::test_the_original_terminal_phase_proves_in_full_after_remembered_proofs
+Failed asserting that false is true.
+
+/home/user/wt/g1/tests/Feature/ProductionMemberGrants/MemberObserverTerminalProofTest.php:142
+/home/user/wt/g1/tests/Feature/ProductionMemberGrants/MemberObserverTerminalProofTest.php:71
+/home/user/wt/g1/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionMemberGrants\MemberObserverTerminalProofTest::test_the_activation_terminal_phase_proves_in_full_after_remembered_proofs
+Failed asserting that false is true.
+
+/home/user/wt/g1/tests/Feature/ProductionMemberGrants/MemberObserverTerminalProofTest.php:142
+/home/user/wt/g1/tests/Feature/ProductionMemberGrants/MemberObserverTerminalProofTest.php:81
+/home/user/wt/g1/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\ProductionMemberGrants\MemberObserverTerminalProofTest::test_the_activation_read_terminal_phase_proves_in_full_after_remembered_proofs
+Failed asserting that false is true.
+
+/home/user/wt/g1/tests/Feature/ProductionMemberGrants/MemberObserverTerminalProofTest.php:142
+/home/user/wt/g1/tests/Feature/ProductionMemberGrants/MemberObserverTerminalProofTest.php:92
+/home/user/wt/g1/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 4, Assertions: 72, Failures: 4.

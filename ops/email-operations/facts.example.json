@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "candidate_sha": null,
+  "public_origin": null,
+  "disabled_baseline": {
+    "identity_enabled": false,
+    "notifications_enabled": false,
+    "smtp_settings_bound": false,
+    "suppression_enabled": false,
+    "suppression_provider_bound": false,
+    "general_mailer": "log"
+  },
+  "planned_identity_smtp": {
+    "provider_reference": null,
+    "account_scope_reference": null,
+    "host": null,
+    "port": null,
+    "security": null,
+    "sender": null,
+    "hello_domain": null,
+    "revision": null,
+    "host_secret_reference": null,
+    "sender_review_reference": null
+  },
+  "planned_suppression": {
+    "provider_reference": null,
+    "account_scope_reference": null,
+    "adapter_revision": null,
+    "review_reference": null,
+    "regrant_policy_reference": null,
+    "unknown_outcome_runbook_reference": null
+  },
+  "operations": {
+    "queue_connection": "database",
+    "worker_timeout_seconds": 120,
+    "queue_retry_after_seconds": 1200,
+    "worker_tries": 1,
+    "identity_recovery_limit": 50,
+    "worker_supervision_reference": null,
+    "identity_recovery_schedule_reference": null,
+    "scheduler_observation_reference": null
+  },
+  "retention": {
+    "policy_reference": null,
+    "log_policy_reference": null,
+    "identity_evidence_append_only": true,
+    "suppression_evidence_append_only": true,
+    "purge_enabled": false
+  }
+}

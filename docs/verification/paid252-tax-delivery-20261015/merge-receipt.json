@@ -1,0 +1,17 @@
+{
+  "actual_merge": "d95e4a74606ee257a2cda06d0793c1cedf165137",
+  "expected_head": "1d24fde494997f936a4d1a9236ac981f2994af60",
+  "expected_head_tree": "a278c4b51bda20706483b16269f1b07fbd82999e",
+  "final_reviews": 0,
+  "final_threads": 0,
+  "independent_actual_publication_decision": "independent-actual-publication-DECISION.md",
+  "merge_tree": "a278c4b51bda20706483b16269f1b07fbd82999e",
+  "merged_at": "2026-10-15T10:59:56Z",
+  "pr": 123,
+  "preflight_conclusion": "success",
+  "preflight_run": 38723605510,
+  "publication_archive_sha256": "4f142e6d74ccf8c8bf4f82f048cbfed359c27fbde7d9951cd4fd5986219dde67",
+  "review_inventory_complete": true,
+  "scope": "Focused reviewed default-off development merge; no full/host/provider/live/Foundation/GitLab/activation acceptance.",
+  "url": "https://github.com/SeanVasey/VA-Studio/pull/123"
+}

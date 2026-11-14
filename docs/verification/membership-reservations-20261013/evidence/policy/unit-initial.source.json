@@ -1,0 +1,16 @@
+{
+  "head": "670f9caa158e436746ed9aed85667c10b9905f35",
+  "command": [
+    "php",
+    "vendor/bin/phpunit",
+    "tests/Unit/MembershipRedemptionPolicyTest.php",
+    "--log-junit",
+    "/workspace/runtime/membership-reservation-policy-evidence/unit-initial.xml"
+  ],
+  "sha256": {
+    "app/Domain/Memberships/Production/MembershipPolicyDocument.php": "1545367e9c167458e401ba90950c286e8fadb7aa9918360de9170328e613092e",
+    "app/Domain/Memberships/Production/MembershipPolicyBinding.php": "96b62f5f6b3fc4603fd9df5f1a4c0c5f6060e20e54c3e8249ce04e0d999c8e86",
+    "app/Domain/Memberships/Production/MembershipRedemptionTerms.php": "2efe4b182a46549b7beff5b620473a36ac154ff9174ba11b311edd7c444abeea",
+    "tests/Unit/MembershipRedemptionPolicyTest.php": "1f878d5d26fa8588918ae3a1771d8649fd2fb289a978046e8e388b977a3d7547"
+  }
+}

@@ -9,6 +9,7 @@ use App\Support\PhpCliBinaryUnavailable;
 use Dotenv\Dotenv;
 use Dotenv\Parser\Parser;
 use Illuminate\Contracts\Console\Kernel;
+use Vasey\Ops\CapabilityBoundary;
 
 ini_set('display_errors', '0');
 ini_set('log_errors', '0');
@@ -26,10 +27,23 @@ $check = static function (string $id, bool $ok) use (&$failures): void {
 $scratch = null;
 try {
     require dirname(__DIR__, 2).'/vendor/autoload.php';
+    // The capability profile's boundary, shared with scripts/ops/validate-test-commerce-profile.php. A missing file is a refusal
+    // (runtime.unavailable), never a silent skip: this gate is the only guard some of these flags have.
+    $boundary = dirname(__DIR__, 2).'/scripts/ops/capability-boundary.php';
+    if (! is_file($boundary) || is_link($boundary)) {
+        throw new RuntimeException;
+    }
+    require_once $boundary;
     if (! is_file($file) || is_link($file) || ! is_readable($file) || filesize($file) > 262144) {
         throw new RuntimeException;
     }
     $raw = file_get_contents($file);
+    // A UTF-8 byte-order mark (an editor's gift) makes the raw parser below throw, which would otherwise surface only as the
+    // generic runtime.unavailable. Name it, then refuse: the file must be saved as plain UTF-8 without a mark.
+    if (str_starts_with($raw, "\xEF\xBB\xBF")) {
+        $failures[] = 'runtime.byte_order_mark';
+        throw new RuntimeException;
+    }
     $entries = (new Parser)->parse($raw);
     $names = array_map(static fn ($entry) => $entry->getName(), $entries);
     $check('runtime.unique_keys', count($names) === count(array_unique($names)));
@@ -72,11 +86,55 @@ try {
         $check('runtime.maintenance', config('app.maintenance.driver') === 'file');
         $check('runtime.stripe_mode', config('payments.stripe.mode') === 'test');
         foreach (['http_enabled', 'fresh_checkout_enabled', 'reconciliation_enabled', 'provider_io_enabled',
-            'exemption_authoring_enabled', 'committed_read_receipts_enabled'] as $flag) {
+            'exemption_authoring_enabled', 'committed_read_receipts_enabled', 'operator_reconciliation_enabled'] as $flag) {
             $check('runtime.production_'.$flag, config('production_checkout.'.$flag) === false);
         }
         $check('runtime.production_credentials', in_array(config('production_checkout.secret_key'), [null, ''], true)
             && in_array(config('production_checkout.funds_mode'), [null, ''], true));
+        // Capability profile (docs/verification/production-ops-kit-20261017, batch K3). The eleven flags and the four stated beside them must
+        // be exactly false in the effective configuration: an absent line is fine (every config default is false), but true, "1", blank
+        // and "yes" are refused, and so is a config key that no longer exists (null). VASEY_OPERATIVE_FREE_GRANTS_ENABLED and
+        // CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED have no environment gate in their policy classes, so here and in the template
+        // are the only places that keep them off on staging. Applies to `local` and `staging` alike.
+        $notOff = CapabilityBoundary::flagsNotOff(static fn (string $key): mixed => config($key));
+        foreach (array_keys(CapabilityBoundary::stagedFlags()) as $flag) {
+            $check('runtime.flag_off_'.strtolower($flag), ! in_array($flag, $notOff, true));
+        }
+        // Optional staging capabilities (unpaid release, 2026-11-11; the test refund and dispute lifecycle and automatic test
+        // delivery enabling, 2026-11-12): exactly false, or exactly true with the real policy class accepting this configuration (test-commerce environment, Stripe test mode, `acct_`
+        // account, its exact policy) and, for refund and dispute, each of the four policy values equal to its DD-16 choice.
+        // Any other value, or true with a missing, partial or changed policy, is refused under the flag's own identifier.
+        $refused = CapabilityBoundary::optionalFlagsRefused(static fn (string $key): mixed => config($key), static function (string $policy): bool {
+            try {
+                app($policy)->current();
+
+                return true;
+            } catch (Throwable) {
+                return false;
+            }
+        });
+        foreach (array_keys(CapabilityBoundary::STAGING_OPTIONAL_FLAGS) as $flag) {
+            $check('runtime.optional_'.strtolower($flag), ! in_array($flag, $refused, true));
+        }
+        // Optional staging policies (the Exclusive selection policy, in use on the hosted rehearsal): blank is off; any other value
+        // passes only when the real policy class accepts it, so a malformed policy is refused here instead of at the first quote.
+        // The operator profile validator applies the same rule (scripts/ops/validate-test-commerce-profile.php).
+        $refusedPolicies = CapabilityBoundary::optionalPoliciesRefused(static fn (string $key): mixed => config($key), static function (string $policy): bool {
+            try {
+                app($policy)->current();
+
+                return true;
+            } catch (Throwable) {
+                return false;
+            }
+        });
+        foreach (array_keys(CapabilityBoundary::STAGING_OPTIONAL_POLICIES) as $policy) {
+            $check('runtime.optional_'.strtolower($policy), ! in_array($policy, $refusedPolicies, true));
+        }
+        // Paid252, Tax255, production customer identity, production free grants and the other production lanes: no enabled or mounted
+        // flag may be true, and the named lanes' configuration must still exist.
+        $lanes = CapabilityBoundary::productionLanes(dirname(__DIR__, 2).'/config', static fn (string $stem): array => (array) config($stem));
+        $check('runtime.production_lanes_closed', $lanes['open'] === [] && $lanes['missing'] === []);
         // Renderer children started inside FPM requests need a genuine CLI PHP of this exact version and build (M-16).
         // Validate the configured binary as the FPM pool will, with a real probe; the path itself is never printed.
         try {

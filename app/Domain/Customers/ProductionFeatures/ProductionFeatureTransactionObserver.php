@@ -2,6 +2,7 @@
 
 namespace App\Domain\Customers\ProductionFeatures;
 
+use App\Domain\Customers\ProductionIdentity\IdentityMetadataAdmission;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
 use Illuminate\Database\DatabaseTransactionsManager;
@@ -19,9 +20,16 @@ final class ProductionFeatureTransactionObserver implements Dispatcher
 
     private bool $proved = false;
 
+    private ?ProductionFeatureBookkeeping $bookkeeping = null;
+
+    public function hasOriginalFrame(): bool
+    {
+        return $this->frame !== null;
+    }
+
     public function __construct(private readonly Connection $connection, private readonly PDO $primary,
         private readonly ProductionFeatureConfiguration $configuration, private readonly ?Dispatcher $delegate,
-        private readonly DatabaseTransactionsManager $manager) {}
+        private readonly DatabaseTransactionsManager $manager, private readonly IdentityMetadataAdmission $metadata) {}
 
     public function frame(): ProductionFeatureTransaction
     {
@@ -54,19 +62,25 @@ final class ProductionFeatureTransactionObserver implements Dispatcher
 
     public function abort(): void
     {
-        if ($this->frame !== null) {
-            if ($this->frame->protectFailure()) {
-                // Ordinary Laravel rollback owns this physical source and its scoped callbacks.
-                $this->connection->rollBack();
+        try {
+            if ($this->frame !== null) {
+                $owned = (new ReflectionProperty(Connection::class, 'events'))->getRawValue($this->connection) === $this
+                    && (new ReflectionProperty(Connection::class, 'transactionsManager'))->getRawValue($this->connection) === $this->manager;
+                if ($this->frame->protectFailure($owned)) {
+                    // Ordinary Laravel rollback owns this physical source and its scoped callbacks.
+                    $this->connection->rollBack();
+                }
             }
-        } else {
-            // No marker existed: a pre-start callback may own this active PDO. Never roll it back.
-            $this->connection->setPdo($this->connection->getRawPdo());
+        } finally {
+            // This fresh scoped manager is ours even when the connection slot was replaced.
+            // Its unacknowledged callbacks must never leak into a later caller operation.
+            $this->bookkeeping?->discard();
         }
     }
 
     public function dispatch($event, $payload = [], $halt = false)
     {
+        $this->metadata->requireCurrent($this->primary);
         $outerBeginning = ! $this->proved && $event instanceof TransactionBeginning && $event->connection === $this->connection
             && $this->connection->transactionLevel() === 1;
         $outerCommitting = ! $this->proved && $event instanceof TransactionCommitting && $event->connection === $this->connection
@@ -75,6 +89,7 @@ final class ProductionFeatureTransactionObserver implements Dispatcher
         // They are not our original frame; the subsequent read-only proof assesses their effects.
         if ($outerBeginning) {
             $this->admitBinding();
+            $this->bookkeeping = ProductionFeatureBookkeeping::capture($this->manager, $this->connection->getName());
             if ($this->frame !== null || $this->connection->getRawPdo() !== $this->primary) {
                 throw new ProductionFeatureException;
             }
@@ -106,6 +121,7 @@ final class ProductionFeatureTransactionObserver implements Dispatcher
 
     private function admitBinding(): void
     {
+        $this->metadata->requireCurrent($this->primary);
         $this->configuration->admit();
         ProductionFeatureConfiguration::plainPrimary($this->primary);
         if ($this->connection->getRawPdo() !== $this->primary || $this->connection->getEventDispatcher() !== $this

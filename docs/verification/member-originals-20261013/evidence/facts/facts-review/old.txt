@@ -1,0 +1,49 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-member-original-facts/phpunit.xml
+
+FFFFFF                                                              6 / 6 (100%)
+
+Time: 00:24.219, Memory: 79.00 MB
+
+There were 6 failures:
+
+1) Tests\Feature\ProductionMemberOriginals\MemberGrantFactsCallbackClosureTest::test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs@current identity_configuration with data ('current', 'identity_configuration')
+Changed owner input was admitted after the record decrypt callback.
+Failed asserting that false is true.
+
+/workspace/runtime/member-original-facts-evidence/facts-review/MemberGrantFactsCallbackClosureTest.php:118
+
+2) Tests\Feature\ProductionMemberOriginals\MemberGrantFactsCallbackClosureTest::test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs@current actor_id_reference with data ('current', 'actor_id_reference')
+Changed owner input was admitted after the record decrypt callback.
+Failed asserting that false is true.
+
+/workspace/runtime/member-original-facts-evidence/facts-review/MemberGrantFactsCallbackClosureTest.php:118
+
+3) Tests\Feature\ProductionMemberOriginals\MemberGrantFactsCallbackClosureTest::test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs@current actor_exists with data ('current', 'actor_exists')
+Changed owner input was admitted after the record decrypt callback.
+Failed asserting that false is true.
+
+/workspace/runtime/member-original-facts-evidence/facts-review/MemberGrantFactsCallbackClosureTest.php:118
+
+4) Tests\Feature\ProductionMemberOriginals\MemberGrantFactsCallbackClosureTest::test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs@committed identity_configuration with data ('committed', 'identity_configuration')
+Changed owner input was admitted after the record decrypt callback.
+Failed asserting that false is true.
+
+/workspace/runtime/member-original-facts-evidence/facts-review/MemberGrantFactsCallbackClosureTest.php:118
+
+5) Tests\Feature\ProductionMemberOriginals\MemberGrantFactsCallbackClosureTest::test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs@committed actor_id_reference with data ('committed', 'actor_id_reference')
+Changed owner input was admitted after the record decrypt callback.
+Failed asserting that false is true.
+
+/workspace/runtime/member-original-facts-evidence/facts-review/MemberGrantFactsCallbackClosureTest.php:118
+
+6) Tests\Feature\ProductionMemberOriginals\MemberGrantFactsCallbackClosureTest::test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs@committed actor_exists with data ('committed', 'actor_exists')
+Changed owner input was admitted after the record decrypt callback.
+Failed asserting that false is true.
+
+/workspace/runtime/member-original-facts-evidence/facts-review/MemberGrantFactsCallbackClosureTest.php:118
+
+FAILURES!
+Tests: 6, Assertions: 18, Failures: 6.

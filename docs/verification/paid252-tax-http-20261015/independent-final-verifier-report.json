@@ -1,0 +1,3051 @@
+{
+  "Pint": {
+    "current_file_bytes_equal": true,
+    "exit": 0,
+    "files": 20,
+    "format": "native installed Pint agent JSON",
+    "head": "bb3d29983d6d225cfb62d9607beaa54874f3aa03"
+  },
+  "actual_invocations": [
+    {
+      "PHP_exit": 2,
+      "components": {
+        "Tests\\Feature\\PaidGrantRootRegistrationTest": {
+          "assertions": 77,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 7
+        },
+        "Tests\\Feature\\PaidTaxHttpJourneyTest": {
+          "assertions": 133,
+          "errors": 1,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 9
+        },
+        "Tests\\Feature\\PaidTaxRootHttpBoundaryTest": {
+          "assertions": 502,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 32
+        },
+        "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest": {
+          "assertions": 21,
+          "errors": 0,
+          "failures": 16,
+          "skipped": 0,
+          "tests": 17
+        }
+      },
+      "counts": {
+        "assertions": 733,
+        "errors": 1,
+        "failures": 16,
+        "skipped": 0,
+        "tests": 65
+      },
+      "name": "http-whole-after-class-repair",
+      "observed_recorder_OS_exit": 1,
+      "pass": false,
+      "recorder_exit": 1,
+      "source": "760c9388b8f07f250fc67d5489f93feb85420051"
+    },
+    {
+      "PHP_exit": 2,
+      "components": {
+        "Tests\\Feature\\PaidGrantHttpJourneyTest": {
+          "assertions": 648,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 19
+        },
+        "Tests\\Feature\\PaidTaxHttpJourneyTest": {
+          "assertions": 191,
+          "errors": 1,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 12
+        },
+        "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest": {
+          "assertions": 131,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 17
+        }
+      },
+      "counts": {
+        "assertions": 970,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 48
+      },
+      "name": "journey-producer-v1-affected",
+      "observed_recorder_OS_exit": 1,
+      "pass": false,
+      "recorder_exit": 1,
+      "source": "ae1cfe040f2ccfc8969ce80b58693c93482b2f97"
+    },
+    {
+      "PHP_exit": 2,
+      "components": {
+        "Tests\\Feature\\PaidTaxHttpJourneyTest": {
+          "assertions": 111,
+          "errors": 0,
+          "failures": 5,
+          "skipped": 0,
+          "tests": 10
+        },
+        "Tests\\Feature\\PaidTaxRootHttpBoundaryTest": {
+          "assertions": 509,
+          "errors": 2,
+          "failures": 1,
+          "skipped": 0,
+          "tests": 39
+        },
+        "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest": {
+          "assertions": 131,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 17
+        }
+      },
+      "counts": {
+        "assertions": 751,
+        "errors": 2,
+        "failures": 6,
+        "skipped": 0,
+        "tests": 66
+      },
+      "name": "metadata-root-and-producer-repair",
+      "observed_recorder_OS_exit": 1,
+      "pass": false,
+      "recorder_exit": 1,
+      "source": "e430832785ad8e3911240e350278f875e4aba82e"
+    },
+    {
+      "PHP_exit": 0,
+      "components": {
+        "Tests\\Feature\\PaidTaxRootHttpBoundaryTest": {
+          "assertions": 17,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 1
+        }
+      },
+      "counts": {
+        "assertions": 17,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      "name": "producer-csrf-original-red",
+      "observed_recorder_OS_exit": 0,
+      "pass": true,
+      "recorder_exit": 0,
+      "source": "bb3d29983d6d225cfb62d9607beaa54874f3aa03"
+    },
+    {
+      "PHP_exit": 0,
+      "components": {
+        "Tests\\Feature\\PaidTaxRootHttpBoundaryTest": {
+          "assertions": 580,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 44
+        }
+      },
+      "counts": {
+        "assertions": 580,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 44
+      },
+      "name": "root-armed-getter-final",
+      "observed_recorder_OS_exit": 0,
+      "pass": true,
+      "recorder_exit": 0,
+      "source": "e3f06b084538dac11665ff9be77c74228bdab64d"
+    },
+    {
+      "PHP_exit": 0,
+      "components": {
+        "Tests\\Feature\\PaidTaxRootHttpBoundaryTest": {
+          "assertions": 578,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 43
+        }
+      },
+      "counts": {
+        "assertions": 578,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 43
+      },
+      "name": "root-final-serverbag",
+      "observed_recorder_OS_exit": 0,
+      "pass": true,
+      "recorder_exit": 0,
+      "source": "ae1cfe040f2ccfc8969ce80b58693c93482b2f97"
+    },
+    {
+      "PHP_exit": 1,
+      "components": {
+        "Tests\\Feature\\PaidTaxRootHttpBoundaryTest": {
+          "assertions": 34,
+          "errors": 0,
+          "failures": 1,
+          "skipped": 0,
+          "tests": 1
+        }
+      },
+      "counts": {
+        "assertions": 34,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "tests": 1
+      },
+      "name": "root-initial-a565",
+      "observed_recorder_OS_exit": 1,
+      "pass": false,
+      "recorder_exit": 1,
+      "source": "a565e54a47fd46a3cf62eeab40826674f8c84988"
+    },
+    {
+      "PHP_exit": 2,
+      "components": {
+        "Tests\\Feature\\PaidTaxRootHttpBoundaryTest": {
+          "assertions": 578,
+          "errors": 1,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 44
+        }
+      },
+      "counts": {
+        "assertions": 578,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 44
+      },
+      "name": "root-raw-property-final",
+      "observed_recorder_OS_exit": 1,
+      "pass": false,
+      "recorder_exit": 1,
+      "source": "306b9fbb5918a58779194492a80f5141f191190f"
+    },
+    {
+      "PHP_exit": 2,
+      "components": {},
+      "counts": null,
+      "name": "root-whole-query-observation",
+      "observed_recorder_OS_exit": 1,
+      "pass": false,
+      "recorder_exit": 1,
+      "source": "dfb45468dc2b4520436ede024b2626f58a6c260d"
+    },
+    {
+      "PHP_exit": 0,
+      "components": {
+        "Tests\\Feature\\PaidTaxHttpJourneyTest": {
+          "assertions": 40,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 2
+        }
+      },
+      "counts": {
+        "assertions": 40,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 2
+      },
+      "name": "unfinished-two-line-and-current-timing",
+      "observed_recorder_OS_exit": 0,
+      "pass": true,
+      "recorder_exit": 0,
+      "source": "e3f06b084538dac11665ff9be77c74228bdab64d"
+    },
+    {
+      "PHP_exit": 0,
+      "components": {
+        "Tests\\Feature\\PaidTaxRootHttpBoundaryTest": {
+          "assertions": 597,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 45
+        }
+      },
+      "counts": {
+        "assertions": 597,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 45
+      },
+      "name": "whole-root-with-real-producer-csrf",
+      "observed_recorder_OS_exit": 0,
+      "pass": true,
+      "recorder_exit": 0,
+      "source": "bb3d29983d6d225cfb62d9607beaa54874f3aa03"
+    }
+  ],
+  "actual_nonzero_count": 6,
+  "actual_pass_count": 5,
+  "app_source_sha": "bb3d29983d6d225cfb62d9607beaa54874f3aa03",
+  "archive": {
+    "all_indexed_digests_valid": true,
+    "bytes": 8323164,
+    "exact_safe_regular_member_set": true,
+    "members": 2546,
+    "sha256": "e72a5383d387a23048fc350bbfdc824b426e42380f362050d374956d49327c87"
+  },
+  "base_actual_merge_sha": "d95e4a74606ee257a2cda06d0793c1cedf165137",
+  "case_coverage": {
+    "http-whole-after-class-repair": [
+      {
+        "assertions": 34,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_cold_refusal_never_registers_or_resolves_private_services with data set #0"
+      },
+      {
+        "assertions": 34,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_cold_refusal_never_registers_or_resolves_private_services with data set #1"
+      },
+      {
+        "assertions": 34,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_cold_refusal_never_registers_or_resolves_private_services with data set #2"
+      },
+      {
+        "assertions": 34,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_cold_refusal_never_registers_or_resolves_private_services with data set #3"
+      },
+      {
+        "assertions": 34,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_cold_refusal_never_registers_or_resolves_private_services with data set #4"
+      },
+      {
+        "assertions": 34,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_cold_refusal_never_registers_or_resolves_private_services with data set #5"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_runtime_withdrawal_refuses_previously_registered_routes with data set #0"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_runtime_withdrawal_refuses_previously_registered_routes with data set #1"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_runtime_withdrawal_refuses_previously_registered_routes with data set #2"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_runtime_withdrawal_refuses_previously_registered_routes with data set #3"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_runtime_withdrawal_refuses_previously_registered_routes with data set #4"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_runtime_withdrawal_refuses_previously_registered_routes with data set #5"
+      },
+      {
+        "assertions": 5,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_mount_alone_registers_only_unbound_transport_and_keeps_commerce_policies_off"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #0"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #1"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #2"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #3"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #4"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #5"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #6"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #7"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #8"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #9"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #10"
+      },
+      {
+        "assertions": 18,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #0"
+      },
+      {
+        "assertions": 18,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #1"
+      },
+      {
+        "assertions": 17,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #2"
+      },
+      {
+        "assertions": 18,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #3"
+      },
+      {
+        "assertions": 18,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #4"
+      },
+      {
+        "assertions": 17,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #5"
+      },
+      {
+        "assertions": 5,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_original_request_context_cannot_be_replaced_renewed_or_claimed_for_another_request"
+      },
+      {
+        "assertions": 3,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_encoding_failure_and_actual_never_started_response_disposal_close_original_owner"
+      },
+      {
+        "assertions": 41,
+        "class": "Tests\\Feature\\PaidTaxHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_actual_root_tax_checkout_then_paid_pdf_and_native_original_delivery"
+      },
+      {
+        "assertions": 15,
+        "class": "Tests\\Feature\\PaidTaxHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_real_csrf_comparison_and_rotation_protect_json_and_native_forms_without_spending"
+      },
+      {
+        "assertions": 14,
+        "class": "Tests\\Feature\\PaidTaxHttpJourneyTest",
+        "error": true,
+        "failure": false,
+        "name": "test_never_started_projection_and_transfer_responses_release_the_actual_original_observer"
+      },
+      {
+        "assertions": 11,
+        "class": "Tests\\Feature\\PaidTaxHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_late_withdrawal_suppresses_original_projection_bytes_and_releases_observer with data set #0"
+      },
+      {
+        "assertions": 11,
+        "class": "Tests\\Feature\\PaidTaxHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_late_withdrawal_suppresses_original_projection_bytes_and_releases_observer with data set #1"
+      },
+      {
+        "assertions": 11,
+        "class": "Tests\\Feature\\PaidTaxHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_late_withdrawal_suppresses_original_projection_bytes_and_releases_observer with data set #2"
+      },
+      {
+        "assertions": 8,
+        "class": "Tests\\Feature\\PaidTaxHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_identity_delay_cannot_replace_the_original_request_budget_and_expiry_prevents_attempt"
+      },
+      {
+        "assertions": 12,
+        "class": "Tests\\Feature\\PaidTaxHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_wrong_batch_wrong_owner_staff_and_current_credential_withdrawal_never_spend"
+      },
+      {
+        "assertions": 10,
+        "class": "Tests\\Feature\\PaidTaxHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_two_line_physical_failure_retains_first_original_then_retries_whole_order"
+      },
+      {
+        "assertions": 4,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_nothing_is_registered_or_mounted_by_default"
+      },
+      {
+        "assertions": 1,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": true,
+        "name": "test_default_off_never_queries_private_data_and_never_resolves_identity"
+      },
+      {
+        "assertions": 1,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": true,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #0"
+      },
+      {
+        "assertions": 1,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": true,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #1"
+      },
+      {
+        "assertions": 1,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": true,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #2"
+      },
+      {
+        "assertions": 1,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": true,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #3"
+      },
+      {
+        "assertions": 1,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": true,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #4"
+      },
+      {
+        "assertions": 1,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": true,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #5"
+      },
+      {
+        "assertions": 1,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": true,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #6"
+      },
+      {
+        "assertions": 1,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": true,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #7"
+      },
+      {
+        "assertions": 1,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": true,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #8"
+      },
+      {
+        "assertions": 1,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": true,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #9"
+      },
+      {
+        "assertions": 1,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": true,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #10"
+      },
+      {
+        "assertions": 1,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": true,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #11"
+      },
+      {
+        "assertions": 1,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": true,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #12"
+      },
+      {
+        "assertions": 1,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": true,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #13"
+      },
+      {
+        "assertions": 2,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": true,
+        "name": "test_session_floor_principal_is_required_and_no_request_field_can_carry_an_amount"
+      },
+      {
+        "assertions": 10,
+        "class": "Tests\\Feature\\PaidGrantRootRegistrationTest",
+        "error": false,
+        "failure": false,
+        "name": "test_only_an_explicit_boolean_mount_registers_paid_routes with data set #0"
+      },
+      {
+        "assertions": 10,
+        "class": "Tests\\Feature\\PaidGrantRootRegistrationTest",
+        "error": false,
+        "failure": false,
+        "name": "test_only_an_explicit_boolean_mount_registers_paid_routes with data set #1"
+      },
+      {
+        "assertions": 10,
+        "class": "Tests\\Feature\\PaidGrantRootRegistrationTest",
+        "error": false,
+        "failure": false,
+        "name": "test_only_an_explicit_boolean_mount_registers_paid_routes with data set #2"
+      },
+      {
+        "assertions": 10,
+        "class": "Tests\\Feature\\PaidGrantRootRegistrationTest",
+        "error": false,
+        "failure": false,
+        "name": "test_only_an_explicit_boolean_mount_registers_paid_routes with data set #3"
+      },
+      {
+        "assertions": 7,
+        "class": "Tests\\Feature\\PaidGrantRootRegistrationTest",
+        "error": false,
+        "failure": false,
+        "name": "test_the_explicit_mount_uses_root_privacy_before_any_paid_controller"
+      },
+      {
+        "assertions": 15,
+        "class": "Tests\\Feature\\PaidGrantRootRegistrationTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_handlers_sanitize_errors_thrown_before_paid_privacy_or_controller with data set #0"
+      },
+      {
+        "assertions": 15,
+        "class": "Tests\\Feature\\PaidGrantRootRegistrationTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_handlers_sanitize_errors_thrown_before_paid_privacy_or_controller with data set #1"
+      }
+    ],
+    "journey-producer-v1-affected": [
+      {
+        "assertions": 41,
+        "class": "Tests\\Feature\\PaidTaxHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_actual_root_tax_checkout_then_paid_pdf_and_native_original_delivery"
+      },
+      {
+        "assertions": 15,
+        "class": "Tests\\Feature\\PaidTaxHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_real_csrf_comparison_and_rotation_protect_json_and_native_forms_without_spending"
+      },
+      {
+        "assertions": 18,
+        "class": "Tests\\Feature\\PaidTaxHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_never_started_projection_and_transfer_responses_release_the_actual_original_observer"
+      },
+      {
+        "assertions": 20,
+        "class": "Tests\\Feature\\PaidTaxHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_actual_captured_read_encoding_construction_and_clone_failures_preserve_cleanup_and_original_error"
+      },
+      {
+        "assertions": 11,
+        "class": "Tests\\Feature\\PaidTaxHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_late_withdrawal_suppresses_original_projection_bytes_and_releases_observer with data set #0"
+      },
+      {
+        "assertions": 11,
+        "class": "Tests\\Feature\\PaidTaxHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_late_withdrawal_suppresses_original_projection_bytes_and_releases_observer with data set #1"
+      },
+      {
+        "assertions": 11,
+        "class": "Tests\\Feature\\PaidTaxHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_late_withdrawal_suppresses_original_projection_bytes_and_releases_observer with data set #2"
+      },
+      {
+        "assertions": 9,
+        "class": "Tests\\Feature\\PaidTaxHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_identity_delay_cannot_replace_the_original_request_budget_and_expiry_prevents_attempt"
+      },
+      {
+        "assertions": 12,
+        "class": "Tests\\Feature\\PaidTaxHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_wrong_batch_wrong_owner_staff_and_current_credential_withdrawal_never_spend"
+      },
+      {
+        "assertions": 10,
+        "class": "Tests\\Feature\\PaidTaxHttpJourneyTest",
+        "error": true,
+        "failure": false,
+        "name": "test_two_line_physical_failure_retains_first_original_then_retries_whole_order"
+      },
+      {
+        "assertions": 18,
+        "class": "Tests\\Feature\\PaidTaxHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_throwing_after_commit_preserves_one_spent_attempt_and_a_new_http_authorization_can_retry"
+      },
+      {
+        "assertions": 15,
+        "class": "Tests\\Feature\\PaidTaxHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_late_transfer_withdrawal_emits_no_attachment_error_bytes_and_retains_the_attempt"
+      },
+      {
+        "assertions": 4,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_nothing_is_registered_or_mounted_by_default"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_default_off_never_queries_private_data_and_never_resolves_identity"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #0"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #1"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #2"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #3"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #4"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #5"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #6"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #7"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #8"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #9"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #10"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #11"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #12"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #13"
+      },
+      {
+        "assertions": 30,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_session_floor_principal_is_required_and_no_request_field_can_carry_an_amount"
+      },
+      {
+        "assertions": 99,
+        "class": "Tests\\Feature\\PaidGrantHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_actual_typed_buyer_http_finalization_paid_pdf_and_native_file_delivery_preserve_originals"
+      },
+      {
+        "assertions": 24,
+        "class": "Tests\\Feature\\PaidGrantHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_unknown_controller_failure_reaches_fixed_sanitized_reporter_without_request_or_exception_text"
+      },
+      {
+        "assertions": 112,
+        "class": "Tests\\Feature\\PaidGrantHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_two_line_http_order_retains_its_first_original_across_second_line_failure_and_retry"
+      },
+      {
+        "assertions": 29,
+        "class": "Tests\\Feature\\PaidGrantHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_actual_private_json_body_seal_closes_withdrawal_after_response_and_before_first_original_byte with data set #0"
+      },
+      {
+        "assertions": 29,
+        "class": "Tests\\Feature\\PaidGrantHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_actual_private_json_body_seal_closes_withdrawal_after_response_and_before_first_original_byte with data set #1"
+      },
+      {
+        "assertions": 30,
+        "class": "Tests\\Feature\\PaidGrantHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_actual_private_json_body_seal_closes_withdrawal_after_response_and_before_first_original_byte with data set #2"
+      },
+      {
+        "assertions": 25,
+        "class": "Tests\\Feature\\PaidGrantHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_intake_and_original_typed_session_refuse_before_paid_origin_or_private_projection with data set #0"
+      },
+      {
+        "assertions": 25,
+        "class": "Tests\\Feature\\PaidGrantHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_intake_and_original_typed_session_refuse_before_paid_origin_or_private_projection with data set #1"
+      },
+      {
+        "assertions": 25,
+        "class": "Tests\\Feature\\PaidGrantHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_intake_and_original_typed_session_refuse_before_paid_origin_or_private_projection with data set #2"
+      },
+      {
+        "assertions": 25,
+        "class": "Tests\\Feature\\PaidGrantHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_intake_and_original_typed_session_refuse_before_paid_origin_or_private_projection with data set #3"
+      },
+      {
+        "assertions": 25,
+        "class": "Tests\\Feature\\PaidGrantHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_intake_and_original_typed_session_refuse_before_paid_origin_or_private_projection with data set #4"
+      },
+      {
+        "assertions": 25,
+        "class": "Tests\\Feature\\PaidGrantHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_intake_and_original_typed_session_refuse_before_paid_origin_or_private_projection with data set #5"
+      },
+      {
+        "assertions": 25,
+        "class": "Tests\\Feature\\PaidGrantHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_intake_and_original_typed_session_refuse_before_paid_origin_or_private_projection with data set #6"
+      },
+      {
+        "assertions": 25,
+        "class": "Tests\\Feature\\PaidGrantHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_intake_and_original_typed_session_refuse_before_paid_origin_or_private_projection with data set #7"
+      },
+      {
+        "assertions": 25,
+        "class": "Tests\\Feature\\PaidGrantHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_intake_and_original_typed_session_refuse_before_paid_origin_or_private_projection with data set #8"
+      },
+      {
+        "assertions": 25,
+        "class": "Tests\\Feature\\PaidGrantHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_intake_and_original_typed_session_refuse_before_paid_origin_or_private_projection with data set #9"
+      },
+      {
+        "assertions": 25,
+        "class": "Tests\\Feature\\PaidGrantHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_intake_and_original_typed_session_refuse_before_paid_origin_or_private_projection with data set #10"
+      },
+      {
+        "assertions": 25,
+        "class": "Tests\\Feature\\PaidGrantHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_intake_and_original_typed_session_refuse_before_paid_origin_or_private_projection with data set #11"
+      },
+      {
+        "assertions": 25,
+        "class": "Tests\\Feature\\PaidGrantHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_intake_and_original_typed_session_refuse_before_paid_origin_or_private_projection with data set #12"
+      }
+    ],
+    "metadata-root-and-producer-repair": [
+      {
+        "assertions": 34,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_cold_refusal_never_registers_or_resolves_private_services with data set #0"
+      },
+      {
+        "assertions": 34,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_cold_refusal_never_registers_or_resolves_private_services with data set #1"
+      },
+      {
+        "assertions": 34,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_cold_refusal_never_registers_or_resolves_private_services with data set #2"
+      },
+      {
+        "assertions": 34,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_cold_refusal_never_registers_or_resolves_private_services with data set #3"
+      },
+      {
+        "assertions": 34,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_cold_refusal_never_registers_or_resolves_private_services with data set #4"
+      },
+      {
+        "assertions": 34,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_cold_refusal_never_registers_or_resolves_private_services with data set #5"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_runtime_withdrawal_refuses_previously_registered_routes with data set #0"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_runtime_withdrawal_refuses_previously_registered_routes with data set #1"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_runtime_withdrawal_refuses_previously_registered_routes with data set #2"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_runtime_withdrawal_refuses_previously_registered_routes with data set #3"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_runtime_withdrawal_refuses_previously_registered_routes with data set #4"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_runtime_withdrawal_refuses_previously_registered_routes with data set #5"
+      },
+      {
+        "assertions": 5,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_mount_alone_registers_only_unbound_transport_and_keeps_commerce_policies_off"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #0"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #1"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #2"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #3"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #4"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #5"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #6"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #7"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #8"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #9"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #10"
+      },
+      {
+        "assertions": 18,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #0"
+      },
+      {
+        "assertions": 18,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #1"
+      },
+      {
+        "assertions": 17,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #2"
+      },
+      {
+        "assertions": 18,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #3"
+      },
+      {
+        "assertions": 18,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #4"
+      },
+      {
+        "assertions": 17,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #5"
+      },
+      {
+        "assertions": 0,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": true,
+        "failure": false,
+        "name": "test_original_request_context_cannot_be_replaced_renewed_or_claimed_for_another_request"
+      },
+      {
+        "assertions": 3,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_encoding_failure_and_actual_never_started_response_disposal_close_original_owner"
+      },
+      {
+        "assertions": 2,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_mount_admission_rejects_nonliteral_metadata_without_invoking_callbacks with data set #0"
+      },
+      {
+        "assertions": 2,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_mount_admission_rejects_nonliteral_metadata_without_invoking_callbacks with data set #1"
+      },
+      {
+        "assertions": 2,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_mount_admission_rejects_nonliteral_metadata_without_invoking_callbacks with data set #2"
+      },
+      {
+        "assertions": 2,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_mount_admission_rejects_nonliteral_metadata_without_invoking_callbacks with data set #3"
+      },
+      {
+        "assertions": 2,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_standard_literal_environment_binding_mounts_without_resolving_its_factory"
+      },
+      {
+        "assertions": 0,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": true,
+        "failure": false,
+        "name": "test_request_start_descriptor_refuses_callback_bag_and_keeps_a_failed_capture_tombstone"
+      },
+      {
+        "assertions": 2,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": true,
+        "name": "test_producer_root_reads_the_actual_raw_stream_once_and_preserves_its_duplicate_parser"
+      },
+      {
+        "assertions": 15,
+        "class": "Tests\\Feature\\PaidTaxHttpJourneyTest",
+        "error": false,
+        "failure": true,
+        "name": "test_actual_root_tax_checkout_then_paid_pdf_and_native_original_delivery"
+      },
+      {
+        "assertions": 7,
+        "class": "Tests\\Feature\\PaidTaxHttpJourneyTest",
+        "error": false,
+        "failure": true,
+        "name": "test_real_csrf_comparison_and_rotation_protect_json_and_native_forms_without_spending"
+      },
+      {
+        "assertions": 12,
+        "class": "Tests\\Feature\\PaidTaxHttpJourneyTest",
+        "error": false,
+        "failure": true,
+        "name": "test_never_started_projection_and_transfer_responses_release_the_actual_original_observer"
+      },
+      {
+        "assertions": 20,
+        "class": "Tests\\Feature\\PaidTaxHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_actual_captured_read_encoding_construction_and_clone_failures_preserve_cleanup_and_original_error"
+      },
+      {
+        "assertions": 11,
+        "class": "Tests\\Feature\\PaidTaxHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_late_withdrawal_suppresses_original_projection_bytes_and_releases_observer with data set #0"
+      },
+      {
+        "assertions": 11,
+        "class": "Tests\\Feature\\PaidTaxHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_late_withdrawal_suppresses_original_projection_bytes_and_releases_observer with data set #1"
+      },
+      {
+        "assertions": 11,
+        "class": "Tests\\Feature\\PaidTaxHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_late_withdrawal_suppresses_original_projection_bytes_and_releases_observer with data set #2"
+      },
+      {
+        "assertions": 7,
+        "class": "Tests\\Feature\\PaidTaxHttpJourneyTest",
+        "error": false,
+        "failure": true,
+        "name": "test_identity_delay_cannot_replace_the_original_request_budget_and_expiry_prevents_attempt"
+      },
+      {
+        "assertions": 7,
+        "class": "Tests\\Feature\\PaidTaxHttpJourneyTest",
+        "error": false,
+        "failure": true,
+        "name": "test_wrong_batch_wrong_owner_staff_and_current_credential_withdrawal_never_spend"
+      },
+      {
+        "assertions": 10,
+        "class": "Tests\\Feature\\PaidTaxHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_two_line_physical_failure_retains_first_original_then_retries_whole_order"
+      },
+      {
+        "assertions": 4,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_nothing_is_registered_or_mounted_by_default"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_default_off_never_queries_private_data_and_never_resolves_identity"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #0"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #1"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #2"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #3"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #4"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #5"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #6"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #7"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #8"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #9"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #10"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #11"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #12"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #13"
+      },
+      {
+        "assertions": 30,
+        "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_session_floor_principal_is_required_and_no_request_field_can_carry_an_amount"
+      }
+    ],
+    "producer-csrf-original-red": [
+      {
+        "assertions": 17,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_real_producer_csrf_equality_and_rotation_return_private_419_without_input_flash"
+      }
+    ],
+    "root-armed-getter-final": [
+      {
+        "assertions": 34,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_cold_refusal_never_registers_or_resolves_private_services with data set #0"
+      },
+      {
+        "assertions": 34,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_cold_refusal_never_registers_or_resolves_private_services with data set #1"
+      },
+      {
+        "assertions": 34,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_cold_refusal_never_registers_or_resolves_private_services with data set #2"
+      },
+      {
+        "assertions": 34,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_cold_refusal_never_registers_or_resolves_private_services with data set #3"
+      },
+      {
+        "assertions": 34,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_cold_refusal_never_registers_or_resolves_private_services with data set #4"
+      },
+      {
+        "assertions": 34,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_cold_refusal_never_registers_or_resolves_private_services with data set #5"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_runtime_withdrawal_refuses_previously_registered_routes with data set #0"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_runtime_withdrawal_refuses_previously_registered_routes with data set #1"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_runtime_withdrawal_refuses_previously_registered_routes with data set #2"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_runtime_withdrawal_refuses_previously_registered_routes with data set #3"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_runtime_withdrawal_refuses_previously_registered_routes with data set #4"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_runtime_withdrawal_refuses_previously_registered_routes with data set #5"
+      },
+      {
+        "assertions": 5,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_mount_alone_registers_only_unbound_transport_and_keeps_commerce_policies_off"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #0"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #1"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #2"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #3"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #4"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #5"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #6"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #7"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #8"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #9"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #10"
+      },
+      {
+        "assertions": 18,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #0"
+      },
+      {
+        "assertions": 18,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #1"
+      },
+      {
+        "assertions": 17,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #2"
+      },
+      {
+        "assertions": 17,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #3"
+      },
+      {
+        "assertions": 18,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #4"
+      },
+      {
+        "assertions": 18,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #5"
+      },
+      {
+        "assertions": 17,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #6"
+      },
+      {
+        "assertions": 17,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #7"
+      },
+      {
+        "assertions": 5,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_original_request_context_cannot_be_replaced_renewed_or_claimed_for_another_request"
+      },
+      {
+        "assertions": 3,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_encoding_failure_and_actual_never_started_response_disposal_close_original_owner"
+      },
+      {
+        "assertions": 2,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_mount_admission_rejects_nonliteral_metadata_without_invoking_callbacks with data set #0"
+      },
+      {
+        "assertions": 2,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_mount_admission_rejects_nonliteral_metadata_without_invoking_callbacks with data set #1"
+      },
+      {
+        "assertions": 2,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_mount_admission_rejects_nonliteral_metadata_without_invoking_callbacks with data set #2"
+      },
+      {
+        "assertions": 2,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_mount_admission_rejects_nonliteral_metadata_without_invoking_callbacks with data set #3"
+      },
+      {
+        "assertions": 2,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_standard_literal_environment_binding_mounts_without_resolving_its_factory"
+      },
+      {
+        "assertions": 3,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_request_start_descriptor_refuses_callback_bag_and_keeps_a_failed_capture_tombstone"
+      },
+      {
+        "assertions": 4,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_producer_root_reads_the_actual_raw_stream_once_and_preserves_its_duplicate_parser"
+      },
+      {
+        "assertions": 18,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_exception_headers_are_bounded_allowlisted_and_never_copy_private_metadata"
+      },
+      {
+        "assertions": 7,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_get_query_body_wrong_method_and_native_aliases_refuse_before_identity"
+      },
+      {
+        "assertions": 2,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_original_start_capture_reads_backing_storage_without_a_request_property_getter_hook"
+      }
+    ],
+    "root-final-serverbag": [
+      {
+        "assertions": 34,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_cold_refusal_never_registers_or_resolves_private_services with data set #0"
+      },
+      {
+        "assertions": 34,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_cold_refusal_never_registers_or_resolves_private_services with data set #1"
+      },
+      {
+        "assertions": 34,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_cold_refusal_never_registers_or_resolves_private_services with data set #2"
+      },
+      {
+        "assertions": 34,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_cold_refusal_never_registers_or_resolves_private_services with data set #3"
+      },
+      {
+        "assertions": 34,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_cold_refusal_never_registers_or_resolves_private_services with data set #4"
+      },
+      {
+        "assertions": 34,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_cold_refusal_never_registers_or_resolves_private_services with data set #5"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_runtime_withdrawal_refuses_previously_registered_routes with data set #0"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_runtime_withdrawal_refuses_previously_registered_routes with data set #1"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_runtime_withdrawal_refuses_previously_registered_routes with data set #2"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_runtime_withdrawal_refuses_previously_registered_routes with data set #3"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_runtime_withdrawal_refuses_previously_registered_routes with data set #4"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_runtime_withdrawal_refuses_previously_registered_routes with data set #5"
+      },
+      {
+        "assertions": 5,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_mount_alone_registers_only_unbound_transport_and_keeps_commerce_policies_off"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #0"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #1"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #2"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #3"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #4"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #5"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #6"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #7"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #8"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #9"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #10"
+      },
+      {
+        "assertions": 18,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #0"
+      },
+      {
+        "assertions": 18,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #1"
+      },
+      {
+        "assertions": 17,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #2"
+      },
+      {
+        "assertions": 17,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #3"
+      },
+      {
+        "assertions": 18,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #4"
+      },
+      {
+        "assertions": 18,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #5"
+      },
+      {
+        "assertions": 17,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #6"
+      },
+      {
+        "assertions": 17,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #7"
+      },
+      {
+        "assertions": 5,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_original_request_context_cannot_be_replaced_renewed_or_claimed_for_another_request"
+      },
+      {
+        "assertions": 3,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_encoding_failure_and_actual_never_started_response_disposal_close_original_owner"
+      },
+      {
+        "assertions": 2,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_mount_admission_rejects_nonliteral_metadata_without_invoking_callbacks with data set #0"
+      },
+      {
+        "assertions": 2,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_mount_admission_rejects_nonliteral_metadata_without_invoking_callbacks with data set #1"
+      },
+      {
+        "assertions": 2,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_mount_admission_rejects_nonliteral_metadata_without_invoking_callbacks with data set #2"
+      },
+      {
+        "assertions": 2,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_mount_admission_rejects_nonliteral_metadata_without_invoking_callbacks with data set #3"
+      },
+      {
+        "assertions": 2,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_standard_literal_environment_binding_mounts_without_resolving_its_factory"
+      },
+      {
+        "assertions": 3,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_request_start_descriptor_refuses_callback_bag_and_keeps_a_failed_capture_tombstone"
+      },
+      {
+        "assertions": 4,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_producer_root_reads_the_actual_raw_stream_once_and_preserves_its_duplicate_parser"
+      },
+      {
+        "assertions": 18,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_exception_headers_are_bounded_allowlisted_and_never_copy_private_metadata"
+      },
+      {
+        "assertions": 7,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_get_query_body_wrong_method_and_native_aliases_refuse_before_identity"
+      }
+    ],
+    "root-initial-a565": [
+      {
+        "assertions": 34,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": true,
+        "name": "test_cold_refusal_never_registers_or_resolves_private_services with data set #0"
+      }
+    ],
+    "root-raw-property-final": [
+      {
+        "assertions": 34,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_cold_refusal_never_registers_or_resolves_private_services with data set #0"
+      },
+      {
+        "assertions": 34,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_cold_refusal_never_registers_or_resolves_private_services with data set #1"
+      },
+      {
+        "assertions": 34,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_cold_refusal_never_registers_or_resolves_private_services with data set #2"
+      },
+      {
+        "assertions": 34,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_cold_refusal_never_registers_or_resolves_private_services with data set #3"
+      },
+      {
+        "assertions": 34,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_cold_refusal_never_registers_or_resolves_private_services with data set #4"
+      },
+      {
+        "assertions": 34,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_cold_refusal_never_registers_or_resolves_private_services with data set #5"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_runtime_withdrawal_refuses_previously_registered_routes with data set #0"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_runtime_withdrawal_refuses_previously_registered_routes with data set #1"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_runtime_withdrawal_refuses_previously_registered_routes with data set #2"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_runtime_withdrawal_refuses_previously_registered_routes with data set #3"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_runtime_withdrawal_refuses_previously_registered_routes with data set #4"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_runtime_withdrawal_refuses_previously_registered_routes with data set #5"
+      },
+      {
+        "assertions": 5,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_mount_alone_registers_only_unbound_transport_and_keeps_commerce_policies_off"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #0"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #1"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #2"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #3"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #4"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #5"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #6"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #7"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #8"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #9"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #10"
+      },
+      {
+        "assertions": 18,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #0"
+      },
+      {
+        "assertions": 18,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #1"
+      },
+      {
+        "assertions": 17,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #2"
+      },
+      {
+        "assertions": 17,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #3"
+      },
+      {
+        "assertions": 18,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #4"
+      },
+      {
+        "assertions": 18,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #5"
+      },
+      {
+        "assertions": 17,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #6"
+      },
+      {
+        "assertions": 17,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #7"
+      },
+      {
+        "assertions": 5,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_original_request_context_cannot_be_replaced_renewed_or_claimed_for_another_request"
+      },
+      {
+        "assertions": 3,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_encoding_failure_and_actual_never_started_response_disposal_close_original_owner"
+      },
+      {
+        "assertions": 2,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_mount_admission_rejects_nonliteral_metadata_without_invoking_callbacks with data set #0"
+      },
+      {
+        "assertions": 2,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_mount_admission_rejects_nonliteral_metadata_without_invoking_callbacks with data set #1"
+      },
+      {
+        "assertions": 2,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_mount_admission_rejects_nonliteral_metadata_without_invoking_callbacks with data set #2"
+      },
+      {
+        "assertions": 2,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_mount_admission_rejects_nonliteral_metadata_without_invoking_callbacks with data set #3"
+      },
+      {
+        "assertions": 2,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_standard_literal_environment_binding_mounts_without_resolving_its_factory"
+      },
+      {
+        "assertions": 3,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_request_start_descriptor_refuses_callback_bag_and_keeps_a_failed_capture_tombstone"
+      },
+      {
+        "assertions": 4,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_producer_root_reads_the_actual_raw_stream_once_and_preserves_its_duplicate_parser"
+      },
+      {
+        "assertions": 18,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_exception_headers_are_bounded_allowlisted_and_never_copy_private_metadata"
+      },
+      {
+        "assertions": 7,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_get_query_body_wrong_method_and_native_aliases_refuse_before_identity"
+      },
+      {
+        "assertions": 0,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": true,
+        "failure": false,
+        "name": "test_original_start_capture_reads_backing_storage_without_a_request_property_getter_hook"
+      }
+    ],
+    "root-whole-query-observation": [],
+    "unfinished-two-line-and-current-timing": [
+      {
+        "assertions": 9,
+        "class": "Tests\\Feature\\PaidTaxHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_identity_delay_cannot_replace_the_original_request_budget_and_expiry_prevents_attempt"
+      },
+      {
+        "assertions": 31,
+        "class": "Tests\\Feature\\PaidTaxHttpJourneyTest",
+        "error": false,
+        "failure": false,
+        "name": "test_two_line_physical_failure_retains_first_original_then_retries_whole_order"
+      }
+    ],
+    "whole-root-with-real-producer-csrf": [
+      {
+        "assertions": 34,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_cold_refusal_never_registers_or_resolves_private_services with data set #0"
+      },
+      {
+        "assertions": 34,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_cold_refusal_never_registers_or_resolves_private_services with data set #1"
+      },
+      {
+        "assertions": 34,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_cold_refusal_never_registers_or_resolves_private_services with data set #2"
+      },
+      {
+        "assertions": 34,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_cold_refusal_never_registers_or_resolves_private_services with data set #3"
+      },
+      {
+        "assertions": 34,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_cold_refusal_never_registers_or_resolves_private_services with data set #4"
+      },
+      {
+        "assertions": 34,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_cold_refusal_never_registers_or_resolves_private_services with data set #5"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_runtime_withdrawal_refuses_previously_registered_routes with data set #0"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_runtime_withdrawal_refuses_previously_registered_routes with data set #1"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_runtime_withdrawal_refuses_previously_registered_routes with data set #2"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_runtime_withdrawal_refuses_previously_registered_routes with data set #3"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_runtime_withdrawal_refuses_previously_registered_routes with data set #4"
+      },
+      {
+        "assertions": 6,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_runtime_withdrawal_refuses_previously_registered_routes with data set #5"
+      },
+      {
+        "assertions": 5,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_mount_alone_registers_only_unbound_transport_and_keeps_commerce_policies_off"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #0"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #1"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #2"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #3"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #4"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #5"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #6"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #7"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #8"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #9"
+      },
+      {
+        "assertions": 13,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_raw_intake_refuses_before_customer_identity with data set #10"
+      },
+      {
+        "assertions": 18,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #0"
+      },
+      {
+        "assertions": 18,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #1"
+      },
+      {
+        "assertions": 17,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #2"
+      },
+      {
+        "assertions": 17,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #3"
+      },
+      {
+        "assertions": 18,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #4"
+      },
+      {
+        "assertions": 18,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #5"
+      },
+      {
+        "assertions": 17,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #6"
+      },
+      {
+        "assertions": 17,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_errors_before_privacy_force_json_without_redirect_flash_or_exception_text with data set #7"
+      },
+      {
+        "assertions": 5,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_original_request_context_cannot_be_replaced_renewed_or_claimed_for_another_request"
+      },
+      {
+        "assertions": 3,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_encoding_failure_and_actual_never_started_response_disposal_close_original_owner"
+      },
+      {
+        "assertions": 2,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_mount_admission_rejects_nonliteral_metadata_without_invoking_callbacks with data set #0"
+      },
+      {
+        "assertions": 2,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_mount_admission_rejects_nonliteral_metadata_without_invoking_callbacks with data set #1"
+      },
+      {
+        "assertions": 2,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_mount_admission_rejects_nonliteral_metadata_without_invoking_callbacks with data set #2"
+      },
+      {
+        "assertions": 2,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_mount_admission_rejects_nonliteral_metadata_without_invoking_callbacks with data set #3"
+      },
+      {
+        "assertions": 2,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_standard_literal_environment_binding_mounts_without_resolving_its_factory"
+      },
+      {
+        "assertions": 3,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_request_start_descriptor_refuses_callback_bag_and_keeps_a_failed_capture_tombstone"
+      },
+      {
+        "assertions": 4,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_producer_root_reads_the_actual_raw_stream_once_and_preserves_its_duplicate_parser"
+      },
+      {
+        "assertions": 18,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_root_exception_headers_are_bounded_allowlisted_and_never_copy_private_metadata"
+      },
+      {
+        "assertions": 7,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_get_query_body_wrong_method_and_native_aliases_refuse_before_identity"
+      },
+      {
+        "assertions": 2,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_original_start_capture_reads_backing_storage_without_a_request_property_getter_hook"
+      },
+      {
+        "assertions": 17,
+        "class": "Tests\\Feature\\PaidTaxRootHttpBoundaryTest",
+        "error": false,
+        "failure": false,
+        "name": "test_real_producer_csrf_equality_and_rotation_return_private_419_without_input_flash"
+      }
+    ]
+  },
+  "cheap_263": [
+    {
+      "argv": [
+        "python3",
+        "scripts/dev/test-bootstrap-macos.py"
+      ],
+      "count": 13,
+      "exit": 0,
+      "member": "cheap/test-bootstrap-macos.json"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/ci/test-ci-scope.py"
+      ],
+      "count": 27,
+      "exit": 0,
+      "member": "cheap/test-ci-scope.json"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/ci/test-database-receipts.py"
+      ],
+      "count": 61,
+      "exit": 0,
+      "member": "cheap/test-database-receipts.json"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/ci/test-focused-tests.py"
+      ],
+      "count": 50,
+      "exit": 0,
+      "member": "cheap/test-focused-tests.json"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/ci/test-gitlab-database-receipts.py"
+      ],
+      "count": 32,
+      "exit": 0,
+      "member": "cheap/test-gitlab-database-receipts.json"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/ci/test-gitlab-writer-feedback.py"
+      ],
+      "count": 7,
+      "exit": 0,
+      "member": "cheap/test-gitlab-writer-feedback.json"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/ci/test-php-test-runtime.py"
+      ],
+      "count": 5,
+      "exit": 0,
+      "member": "cheap/test-php-test-runtime.json"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/ci/test-phpunit-shards.py"
+      ],
+      "count": 52,
+      "exit": 0,
+      "member": "cheap/test-phpunit-shards.json"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/test-publish-github.py"
+      ],
+      "count": 2,
+      "exit": 0,
+      "member": "cheap/test-publish-github.json"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/ci/test-workflow-cadence.py"
+      ],
+      "count": 14,
+      "exit": 0,
+      "member": "cheap/test-workflow-cadence.json"
+    }
+  ],
+  "cheap_carry_scope": [
+    "scripts/",
+    ".github/",
+    "composer.json",
+    "composer.lock",
+    "phpunit.xml"
+  ],
+  "created_utc": "2026-10-15T12:02:26.464334+00:00",
+  "empty_JUnit_original": "root-whole-query-observation; partial counts remain null",
+  "limits": [
+    "Prior-source narrow case/component carry, not a passing current whole Tax12/selection48 invocation.",
+    "No new native execution/census/SQL/concurrency claim.",
+    "No host cache rebuild/session/distributed/FPM/provider/live/full-suite or activation claim."
+  ],
+  "original_independent_imports": [
+    {
+      "path": "independent-design-original-REVISE.md",
+      "sha256": "1c6067418ae0c5325b646a53129292a85b01a84f0a05252f77a3e8a9c3dc806e"
+    },
+    {
+      "path": "independent-design-original-REVISE.json",
+      "sha256": "6e966805b93588ce6879b1bec415b7ee8a3b13a5b70bc7f1f7ede0636f75f72b"
+    },
+    {
+      "path": "independent-design-DECISION.md",
+      "sha256": "e792e95cf472aba1871ca5e19ac92244b2eed3ac535f56a1a9144f4c4479240e"
+    },
+    {
+      "path": "independent-design-DECISION.json",
+      "sha256": "5bed6b7d1ba16e8ddffdf2e3b5c51f328a1a241bce8af2be0a591bc9b1dc2d93"
+    },
+    {
+      "path": "independent-source-original-REVISE.md",
+      "sha256": "c4f0dd6a21aecdf4dc60ac31d56a6e28f908d97e8c58dd89e431b0ad79e0afd5"
+    },
+    {
+      "path": "independent-source-original-REVISE.json",
+      "sha256": "c59eece664c070848b13991048bb7761435e086d2dc6e03f0e258d32bc7bfc66"
+    },
+    {
+      "path": "independent-source-ae1-residual-REVISE.md",
+      "sha256": "581da13f104a488d1c376b5620ef20fb7ce66402fe059a7eb1a11517460cbcf8"
+    },
+    {
+      "path": "independent-source-ae1-residual-REVISE.json",
+      "sha256": "9a3b1a0d6ab3273da7b56f7b88d0e17b7ebe5a5a111a00fb8369fe05a438cc8b"
+    },
+    {
+      "path": "independent-source-e3-DECISION.md",
+      "sha256": "b54c3132d76e23069e7432e7f6ce4b266ceec1f72b1287a3c85464ea34ac0ba5"
+    },
+    {
+      "path": "independent-source-e3-report.json",
+      "sha256": "a8d2131ec43d67a9c83c482ded1472fa3f1cb13d51a636a570ec0bb53611dbf5"
+    },
+    {
+      "path": "independent-source-DECISION.md",
+      "sha256": "b00fb3f2b35bae1cc20bdc954f28512d50fc11d3450ee85aa844a30842e59f18"
+    },
+    {
+      "path": "independent-source-report.json",
+      "sha256": "e52af518219bd0409a0775e1763cf6aadf508a0a358aa1a1b1e8abc5e8dfe0ea"
+    }
+  ],
+  "reviewed_sha": "2a382a505c3145f709cede4110dbcd0b57196a3c",
+  "reviewer_execution_boundary": {
+    "app_tests_DB_network_hosted_operations": 0,
+    "tracked_edits": 0
+  },
+  "source": {
+    "actual_current_inputs_equal_to_APP": 2423,
+    "actual_route_inputs": 17,
+    "current_and_recorded_loaders": 13,
+    "distinct_archive_source_blobs": 2383,
+    "final_doc_delta": [
+      "docs/ops/paid-tax-http-runtime.md",
+      "docs/verification/paid252-tax-http-20261015/README.md",
+      "docs/verification/paid252-tax-http-20261015/final-recorded-evidence-index.json",
+      "docs/verification/paid252-tax-http-20261015/final-recorded-evidence.tar.gz",
+      "docs/verification/paid252-tax-http-20261015/independent-source-DECISION.md",
+      "docs/verification/paid252-tax-http-20261015/independent-source-e3-DECISION.md",
+      "docs/verification/paid252-tax-http-20261015/independent-source-e3-report.json",
+      "docs/verification/paid252-tax-http-20261015/independent-source-report.json"
+    ],
+    "heads": [
+      "306b9fbb5918a58779194492a80f5141f191190f",
+      "760c9388b8f07f250fc67d5489f93feb85420051",
+      "a565e54a47fd46a3cf62eeab40826674f8c84988",
+      "ae1cfe040f2ccfc8969ce80b58693c93482b2f97",
+      "bb3d29983d6d225cfb62d9607beaa54874f3aa03",
+      "dfb45468dc2b4520436ede024b2626f58a6c260d",
+      "e3f06b084538dac11665ff9be77c74228bdab64d",
+      "e430832785ad8e3911240e350278f875e4aba82e"
+    ],
+    "inputs_each": 2423,
+    "inventories": 8,
+    "protected_actual_base_Git_and_current_bytes_equal": true,
+    "protected_original_files": 239,
+    "reachable_Git_objects_verified": 2383,
+    "total_path_bindings": 19384
+  },
+  "verification": "PASS"
+}

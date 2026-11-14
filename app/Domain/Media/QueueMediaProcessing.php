@@ -2,6 +2,7 @@
 
 namespace App\Domain\Media;
 
+use App\Domain\Catalog\TrackVisibility;
 use App\Domain\Media\Models\MediaAsset;
 use App\Domain\Media\Models\MediaProcessingRun;
 use App\Jobs\ProcessMedia;
@@ -18,7 +19,7 @@ class QueueMediaProcessing
             $actor = app(MediaWriterActor::class)->authorize($actor);
             $source = MediaAsset::query()->lockForUpdate()->findOrFail($source->id);
             $track = $source->track()->lockForUpdate()->firstOrFail();
-            if ($track->status === 'published') {
+            if (TrackVisibility::isLive($track->status)) {
                 throw ValidationException::withMessages(['media' => 'Unpublish the track before processing a replacement media revision.']);
             }
             if ($source->disk !== 'local' || ! str_starts_with($source->storage_path, 'quarantine/') || $source->processing_run_id || ! in_array($source->role, ['master_wav', 'artwork', 'stems_zip'], true)) {
@@ -32,7 +33,7 @@ class QueueMediaProcessing
             } catch (MediaFailure $failure) {
                 throw ValidationException::withMessages(['media' => $failure->getMessage()]);
             }
-            $maxBytes = (int) config($source->role === 'artwork' ? 'media.max_artwork_bytes' : 'media.max_source_bytes');
+            $maxBytes = (int) config(MediaProcessor::sourceLimitKey($source->role));
             if (filesize($path) < 12 || filesize($path) > $maxBytes) {
                 throw ValidationException::withMessages(['media' => 'The upload is empty or exceeds the role size limit.']);
             }
@@ -52,7 +53,8 @@ class QueueMediaProcessing
             if (! $run) {
                 $run = MediaProcessingRun::create(['source_asset_id' => $source->id, 'requested_by' => $actor->id, 'profile_version' => $profile['version'], 'profile_fingerprint' => $fingerprint, 'input_sha256' => $hash, 'profile' => $profile]);
             } else {
-                $run->update(['status' => 'queued', 'claim_token' => null, 'failure_code' => null, 'failure_message' => null, 'failed_at' => null]);
+                // updated_at is forced: re-queuing an already queued run changes nothing else, and callers read it as the dispatch time.
+                $run->forceFill(['status' => 'queued', 'claim_token' => null, 'failure_code' => null, 'failure_message' => null, 'failed_at' => null, 'updated_at' => now()])->save();
             }
             AuditEvent::record('media.processing.queued', $run, ['source_asset_id' => $source->id, 'profile_version' => $profile['version']], $actor->id);
             ProcessMedia::dispatch($run->id)->onQueue(config('media.queue'))->afterCommit();

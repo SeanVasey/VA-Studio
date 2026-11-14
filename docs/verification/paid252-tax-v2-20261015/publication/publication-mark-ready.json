@@ -1,0 +1,15 @@
+{
+  "recorded_utc": "2026-10-15T07:58:07.057438+00:00",
+  "argv": [
+    "gh",
+    "pr",
+    "ready",
+    "122",
+    "--repo",
+    "SeanVasey/VA-Studio"
+  ],
+  "head": "3dc5a5af043a1e254fab895541d93d25223a8a0e",
+  "process_exit": 0,
+  "stdout": "",
+  "stderr": "\u2713 Pull request SeanVasey/VA-Studio#122 is marked as \"ready for review\"\n"
+}

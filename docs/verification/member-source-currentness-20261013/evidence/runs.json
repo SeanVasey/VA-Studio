@@ -1,0 +1,482 @@
+{
+  "scope": "Completed source-specific component and frozen-root receipts. Overlapping counts are not a whole integrated suite or cross-driver unique-test total.",
+  "final_source": "0095e46aefa85463268027d89c829a4886537ad6",
+  "pending": [
+    "final independent review and exact-head preflight"
+  ],
+  "runs": [
+    {
+      "id": "r4/configuration",
+      "driver": "sqlite",
+      "expected": {
+        "tests": 22,
+        "assertions": 56,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "xml": "r4/configuration.xml",
+      "exit": "r4/configuration.exit",
+      "source": "r4/configuration-source.json",
+      "scope": "Configuration only, no Laravel migration/Rows/database body."
+    },
+    {
+      "id": "r4/staging-configuration",
+      "driver": "sqlite",
+      "expected": {
+        "tests": 1,
+        "assertions": 4,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "xml": "r4/staging-configuration.xml",
+      "exit": "r4/staging-configuration.exit",
+      "source": "r4/configuration-source.json",
+      "scope": "Migration-backed forced SQLite in-memory; overlaps C3 native phase2.931s; not configuration-only."
+    },
+    {
+      "id": "r4/frame-initial",
+      "driver": "sqlite",
+      "expected": {
+        "tests": 12,
+        "assertions": 51,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 1,
+        "exit": 2
+      },
+      "xml": "r4/frame-initial.xml",
+      "exit": "r4/frame-initial.exit",
+      "source": "r4/frame-initial-source.json.gz",
+      "scope": "Original real frame invocation; one teardown error from retained Rows fixture pin, one native skip."
+    },
+    {
+      "id": "r4/sqlite-final",
+      "driver": "sqlite",
+      "expected": {
+        "tests": 50,
+        "assertions": 322,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 1,
+        "exit": 0
+      },
+      "xml": "r4/sqlite-final.xml",
+      "exit": "r4/sqlite-final.exit",
+      "source": "r4/sqlite-final-source.json.gz",
+      "scope": "Whole new frame and affected preparation/policy/staging files; one native-only skip."
+    },
+    {
+      "id": "r4/baseline-fail",
+      "driver": "none",
+      "expected": {
+        "tests": 1,
+        "assertions": 10,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "exit": 1
+      },
+      "xml": "r4/baseline/fail-0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371/phpunit.xml",
+      "exit": "r4/baseline/fail-0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371/phpunit.exit",
+      "source": "r4/baseline/fail-0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371/source-before.json.gz",
+      "scope": "Same pure external existing-current API probe; no app bootstrap or database. Corrected component sourcea4 is not final R4 source."
+    },
+    {
+      "id": "r4/baseline-pass",
+      "driver": "none",
+      "expected": {
+        "tests": 1,
+        "assertions": 10,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "xml": "r4/baseline/pass-a4e37cdc222ccea13ae65fb983c6d5fd89a25e29/phpunit.xml",
+      "exit": "r4/baseline/pass-a4e37cdc222ccea13ae65fb983c6d5fd89a25e29/phpunit.exit",
+      "source": "r4/baseline/pass-a4e37cdc222ccea13ae65fb983c6d5fd89a25e29/source-before.json.gz",
+      "scope": "Same pure external existing-current API probe; no app bootstrap or database. Corrected component sourcea4 is not final R4 source."
+    },
+    {
+      "id": "catalog/pure-initial",
+      "driver": "none",
+      "expected": {
+        "tests": 60,
+        "assertions": 70,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "xml": "catalog/pure-initial.xml",
+      "exit": "catalog/pure-initial.exit",
+      "source": "catalog/pure-initial.source.json",
+      "scope": "Pure PHPUnit parser corpus; no Laravel application/database. Filename is not a result claim."
+    },
+    {
+      "id": "catalog/pure-quote-boundary",
+      "driver": "none",
+      "expected": {
+        "tests": 61,
+        "assertions": 71,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "xml": "catalog/pure-quote-boundary.xml",
+      "exit": "catalog/pure-quote-boundary.exit",
+      "source": "catalog/pure-quote-boundary.source.json",
+      "scope": "Pure PHPUnit parser corpus; no Laravel application/database. Filename is not a result claim."
+    },
+    {
+      "id": "catalog/pure-engine-boundary-red",
+      "driver": "none",
+      "expected": {
+        "tests": 62,
+        "assertions": 72,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "exit": 1
+      },
+      "xml": "catalog/pure-engine-boundary-red.xml",
+      "exit": "catalog/pure-engine-boundary-red.exit",
+      "source": "catalog/pure-engine-boundary-red.source.json",
+      "scope": "Pure PHPUnit parser corpus; no Laravel application/database. Filename is not a result claim."
+    },
+    {
+      "id": "catalog/pure-engine-boundary-green",
+      "driver": "none",
+      "expected": {
+        "tests": 62,
+        "assertions": 71,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 2
+      },
+      "xml": "catalog/pure-engine-boundary-green.xml",
+      "exit": "catalog/pure-engine-boundary-green.exit",
+      "source": "catalog/pure-engine-boundary-green.source.json",
+      "scope": "Pure PHPUnit parser corpus; no Laravel application/database. Filename is not a result claim."
+    },
+    {
+      "id": "catalog/pure-final",
+      "driver": "none",
+      "expected": {
+        "tests": 63,
+        "assertions": 73,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "xml": "catalog/pure-final.xml",
+      "exit": "catalog/pure-final.exit",
+      "source": "catalog/pure-final.source.json",
+      "scope": "Pure PHPUnit parser corpus; no Laravel application/database. Filename is not a result claim."
+    },
+    {
+      "id": "catalog/native-old-source-red",
+      "driver": "mysql",
+      "expected": {
+        "tests": 1,
+        "assertions": 4,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 2
+      },
+      "xml": "catalog/native-old-source-red.xml",
+      "exit": "catalog/native-old-source-red.exit",
+      "source": "catalog/native-old-source-red.source.json.gz",
+      "scope": "Initial native1205 setup error, counter mutation/reproof not reached; not intended P2red."
+    },
+    {
+      "id": "r4/native-four",
+      "driver": "mysql",
+      "expected": {
+        "tests": 4,
+        "assertions": 14,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "xml": "r4/native-four.xml",
+      "exit": "r4/native-four.exit",
+      "source": "r4/native-four.source.json.gz",
+      "scope": "Four selected real MySQL8.4.11 policy/frame cases at15a65e07; eight unselected frame methods not native-executed in this batch."
+    },
+    {
+      "id": "catalog/native-old-source-red-v2",
+      "driver": "mysql",
+      "expected": {
+        "tests": 1,
+        "assertions": 12,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 2
+      },
+      "xml": "catalog/native-old-source-red-v2.xml",
+      "exit": "catalog/native-old-source-red-v2.exit",
+      "source": "catalog/native-old-source-red-v2.source.json.gz",
+      "scope": "Intended old-Evidence currentness refusal reached after independent committed counter2\u21923 with same selected plans; uncaught changed_catalog_source is JUnit error, not assertion failure. Single old class overlay on candidate982."
+    },
+    {
+      "id": "catalog/native-fixed-five",
+      "driver": "mysql",
+      "expected": {
+        "tests": 5,
+        "assertions": 46,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "xml": "catalog/native-fixed-five.xml",
+      "exit": "catalog/native-fixed-five.exit",
+      "source": "catalog/native-fixed-five.source.json.gz",
+      "scope": "Five focused MySQL8.4.11 cases at982: current counter/real definition/identical shadow plus existing file/deadline and committed snapshot cases. Corrected-red captured inputs identical; original class preload removed."
+    },
+    {
+      "id": "catalog/sqlite-eligibility-whole",
+      "driver": "sqlite",
+      "expected": {
+        "tests": 16,
+        "assertions": 123,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "xml": "catalog/sqlite-eligibility-whole.xml",
+      "exit": "catalog/sqlite-eligibility-whole.exit",
+      "source": "catalog/sqlite-eligibility-whole.source.json.gz",
+      "scope": "Whole existing eligibility file at982; revision/rights/private bytes/callback/current-frame cases. SQLite does not prove native counter/DDL behavior."
+    },
+    {
+      "id": "root/native-reservation-integration",
+      "driver": "mysql",
+      "expected": {
+        "tests": 1,
+        "assertions": 21,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "xml": "root/native-reservation-integration.xml",
+      "exit": "root/native-reservation-integration.exit",
+      "source": "root/native-reservation-integration.source.json.gz",
+      "scope": "Actual frozen0095 root: real sources reserve once, exact retry and original award replay retain identity. One native integration case, not a full suite or operative258 grant."
+    }
+  ],
+  "source_bindings": [
+    {
+      "id": "r4-configuration",
+      "source": "r4/configuration-source.json",
+      "key": "files",
+      "reference": "a4e37cdc222ccea13ae65fb983c6d5fd89a25e29",
+      "require_exact": false,
+      "overrides": {}
+    },
+    {
+      "id": "r4-frame-initial",
+      "source": "r4/frame-initial-source.json.gz",
+      "key": "files",
+      "reference": "3424190f7974b38048d65128c359570c2df45cf2",
+      "require_exact": true,
+      "overrides": {}
+    },
+    {
+      "id": "r4-sqlite-final",
+      "source": "r4/sqlite-final-source.json.gz",
+      "key": "files",
+      "reference": "15a65e0761382a9ad50c4b279605a644a4eeb285",
+      "require_exact": true,
+      "overrides": {}
+    },
+    {
+      "id": "r4-fail-before",
+      "source": "r4/baseline/fail-0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371/source-before.json.gz",
+      "key": "files",
+      "reference": "0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371",
+      "require_exact": true,
+      "overrides": {}
+    },
+    {
+      "id": "r4-fail-after",
+      "source": "r4/baseline/fail-0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371/source-after.json.gz",
+      "key": "files",
+      "reference": "0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371",
+      "require_exact": true,
+      "overrides": {}
+    },
+    {
+      "id": "r4-pass-before",
+      "source": "r4/baseline/pass-a4e37cdc222ccea13ae65fb983c6d5fd89a25e29/source-before.json.gz",
+      "key": "files",
+      "reference": "a4e37cdc222ccea13ae65fb983c6d5fd89a25e29",
+      "require_exact": true,
+      "overrides": {}
+    },
+    {
+      "id": "r4-pass-after",
+      "source": "r4/baseline/pass-a4e37cdc222ccea13ae65fb983c6d5fd89a25e29/source-after.json.gz",
+      "key": "files",
+      "reference": "a4e37cdc222ccea13ae65fb983c6d5fd89a25e29",
+      "require_exact": true,
+      "overrides": {}
+    },
+    {
+      "id": "catalog-pure-initial",
+      "source": "catalog/pure-initial.source.json",
+      "key": "source",
+      "reference": "a58d53ef0a8303e59b984e5c5a4a0222f815a66b",
+      "require_exact": false,
+      "overrides": {}
+    },
+    {
+      "id": "catalog-pure-quote-boundary",
+      "source": "catalog/pure-quote-boundary.source.json",
+      "key": "source",
+      "reference": "a58d53ef0a8303e59b984e5c5a4a0222f815a66b",
+      "require_exact": false,
+      "overrides": {}
+    },
+    {
+      "id": "catalog-pure-engine-boundary-red",
+      "source": "catalog/pure-engine-boundary-red.source.json",
+      "key": "source",
+      "reference": "a58d53ef0a8303e59b984e5c5a4a0222f815a66b",
+      "require_exact": true,
+      "overrides": {
+        "composer.lock": "catalog/pure-engine-boundary-red-source/composer.lock",
+        "phpunit.xml": "catalog/pure-engine-boundary-red-source/phpunit.xml",
+        "tests/Unit/MembershipCatalogDefinitionTest.php": "catalog/pure-engine-boundary-red-source/tests/Unit/MembershipCatalogDefinitionTest.php",
+        "app/Domain/Memberships/Production/MembershipCatalogEvidence.php": "catalog/pure-engine-boundary-red-source/app/Domain/Memberships/Production/MembershipCatalogEvidence.php",
+        "app/Domain/Memberships/Production/MembershipCatalogDefinition.php": "catalog/pure-engine-boundary-red-source/app/Domain/Memberships/Production/MembershipCatalogDefinition.php"
+      }
+    },
+    {
+      "id": "catalog-pure-engine-boundary-green",
+      "source": "catalog/pure-engine-boundary-green.source.json",
+      "key": "source",
+      "reference": "a58d53ef0a8303e59b984e5c5a4a0222f815a66b",
+      "require_exact": true,
+      "overrides": {
+        "composer.lock": "catalog/pure-engine-boundary-green-source/composer.lock",
+        "phpunit.xml": "catalog/pure-engine-boundary-green-source/phpunit.xml",
+        "tests/Unit/MembershipCatalogDefinitionTest.php": "catalog/pure-engine-boundary-green-source/tests/Unit/MembershipCatalogDefinitionTest.php",
+        "app/Domain/Memberships/Production/MembershipCatalogEvidence.php": "catalog/pure-engine-boundary-green-source/app/Domain/Memberships/Production/MembershipCatalogEvidence.php",
+        "app/Domain/Memberships/Production/MembershipCatalogDefinition.php": "catalog/pure-engine-boundary-green-source/app/Domain/Memberships/Production/MembershipCatalogDefinition.php"
+      }
+    },
+    {
+      "id": "catalog-pure-final",
+      "source": "catalog/pure-final.source.json",
+      "key": "source",
+      "reference": "a58d53ef0a8303e59b984e5c5a4a0222f815a66b",
+      "require_exact": true,
+      "overrides": {}
+    },
+    {
+      "id": "catalog-native-initial",
+      "source": "catalog/native-old-source-red.source.json.gz",
+      "key": "source",
+      "reference": "822a848138d5a209ff293e7fc8886680e361a4c0",
+      "require_exact": true,
+      "overrides": {}
+    },
+    {
+      "id": "r4-native-four",
+      "source": "r4/native-four.source.json.gz",
+      "key": "files",
+      "reference": "15a65e0761382a9ad50c4b279605a644a4eeb285",
+      "require_exact": true,
+      "overrides": {}
+    },
+    {
+      "id": "catalog-native-corrected-red",
+      "source": "catalog/native-old-source-red-v2.source.json.gz",
+      "key": "source",
+      "reference": "982f4ea69ed8d2191345cd8c752377da19780a89",
+      "require_exact": true,
+      "overrides": {}
+    },
+    {
+      "id": "quality-before",
+      "source": "quality/sources-before.json.gz",
+      "key": null,
+      "reference": "cc612650217830d2972efeafa12d4d9652c48524",
+      "require_exact": true,
+      "overrides": {}
+    },
+    {
+      "id": "quality-after",
+      "source": "quality/sources-after.json.gz",
+      "key": null,
+      "reference": "cc612650217830d2972efeafa12d4d9652c48524",
+      "require_exact": true,
+      "overrides": {}
+    },
+    {
+      "id": "quality-policy-final-before",
+      "source": "quality/policy-final/sources-before.json.gz",
+      "key": null,
+      "reference": "ca0fe30b6614d64a8b9050a39d6944256f170d69",
+      "require_exact": true,
+      "overrides": {}
+    },
+    {
+      "id": "quality-policy-final-after",
+      "source": "quality/policy-final/sources-after.json.gz",
+      "key": null,
+      "reference": "ca0fe30b6614d64a8b9050a39d6944256f170d69",
+      "require_exact": true,
+      "overrides": {}
+    },
+    {
+      "id": "selection-discovery",
+      "source": "selection/discovery.sources.json.gz",
+      "key": null,
+      "reference": "ca0fe30b6614d64a8b9050a39d6944256f170d69",
+      "require_exact": true,
+      "overrides": {}
+    },
+    {
+      "id": "catalog-native-fixed",
+      "source": "catalog/native-fixed-five.source.json.gz",
+      "key": "source",
+      "reference": "982f4ea69ed8d2191345cd8c752377da19780a89",
+      "require_exact": true,
+      "overrides": {}
+    },
+    {
+      "id": "catalog-sqlite-eligibility",
+      "source": "catalog/sqlite-eligibility-whole.source.json.gz",
+      "key": "source",
+      "reference": "982f4ea69ed8d2191345cd8c752377da19780a89",
+      "require_exact": true,
+      "overrides": {}
+    },
+    {
+      "id": "root-native-reservation",
+      "source": "root/native-reservation-integration.source.json.gz",
+      "key": "files",
+      "reference": "0095e46aefa85463268027d89c829a4886537ad6",
+      "require_exact": true,
+      "overrides": {}
+    }
+  ],
+  "integration_reference": "0095e46aefa85463268027d89c829a4886537ad6",
+  "integration_reference_scope": "Frozen root source; native reservation canary complete. Independent decision/preflight remain separate root gates.",
+  "c3_merge": "7b467c3824e2da81174a5445b6ee639cf0a59d93"
+}

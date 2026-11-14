@@ -1,0 +1,42 @@
+{
+  "cwd": "/workspace/VA-Studio-member-original-facts",
+  "argv": [
+    "php",
+    "-r",
+    "require \"vendor/autoload.php\"; exit((new PHPUnit\\TextUI\\Application)->run(array_merge([\"phpunit\"], array_slice($argv, 1))));",
+    "--",
+    "--do-not-cache-result",
+    "--colors=never",
+    "--log-junit",
+    "/workspace/runtime/member-original-facts-evidence/schema/native/native-fixed-01/phpunit.xml",
+    "/workspace/runtime/member-original-facts-evidence/schema/native/MemberGrantNativeCurrentSchemaTest.php"
+  ],
+  "runner_argv": [
+    "/workspace/runtime/member-original-facts-evidence/schema/native/run.py",
+    "--phase",
+    "fixed",
+    "--root",
+    "/workspace/VA-Studio-member-original-facts",
+    "--sha",
+    "bd3661ec02e3004fef3ae3d8a990e44ef5c6ce08",
+    "--label",
+    "native-fixed-01"
+  ],
+  "environment": {
+    "APP_BASE_PATH": "/workspace/VA-Studio-member-original-facts",
+    "APP_ENV": "testing",
+    "APP_DEBUG": "false",
+    "DB_CONNECTION": "mysql",
+    "DB_HOST": "127.0.0.1",
+    "DB_PORT": "33413",
+    "DB_DATABASE": "vaseyaudio_member_original_facts",
+    "DB_SOCKET": "/workspace/runtime/mysql-policy-run/mysql.sock",
+    "CACHE_STORE": "array",
+    "SESSION_DRIVER": "array",
+    "QUEUE_CONNECTION": "sync",
+    "MAIL_MAILER": "array",
+    "BROADCAST_CONNECTION": "null",
+    "XDEBUG_MODE": "off",
+    "MEMBER_SCHEMA_BASELINE": "0"
+  }
+}

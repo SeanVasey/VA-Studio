@@ -1,0 +1,1 @@
+880d9ca5ec095a57370170647fdccae355aac362f0dbf56f034ebf65e961563f  /workspace/runtime/membership-award-evidence/MembershipAwardNativeDiagnosticTest.php

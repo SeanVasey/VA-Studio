@@ -204,7 +204,8 @@ final class CurrentEligibleTrackSnapshot
             $paths = [];
             foreach ($tracks as $track) {
                 // Keep shared eligibility semantics, including every active offer's evidence.
-                if (app(PublicationReadiness::class)->blockers($track, $at) !== []) {
+                // Listing evidence, as the catalog: private deliverables are not hashed inside this bounded capture.
+                if (app(PublicationReadiness::class)->listingBlockers($track, $at) !== []) {
                     continue;
                 }
                 $available = $track->offers->contains(fn ($offer): bool => app(SelectionInventory::class)->available($offer->current_revision_id, null, $at));

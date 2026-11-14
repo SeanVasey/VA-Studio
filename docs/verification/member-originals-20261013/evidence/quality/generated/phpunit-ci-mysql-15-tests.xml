@@ -1,0 +1,239 @@
+<?xml version="1.0"?>
+<testSuite xmlns="https://xml.phpunit.de/testSuite">
+ <tests>
+  <testClass name="Tests\Feature\CommerceAuditActorConcurrencyTest" file="/workspace/VA-Studio-member-originals/tests/Feature/CommerceAuditActorConcurrencyTest.php">
+   <testMethod id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders#create / commerce first" name="test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders"/>
+   <testMethod id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders#create / manifest first" name="test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders"/>
+   <testMethod id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders#price / commerce first" name="test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders"/>
+   <testMethod id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders#price / manifest first" name="test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders"/>
+   <testMethod id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders#promoted-price / commerce first" name="test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders"/>
+   <testMethod id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders#promoted-price / manifest first" name="test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders"/>
+   <testMethod id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders#inventory-hold / commerce first" name="test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders"/>
+   <testMethod id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders#inventory-hold / manifest first" name="test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders"/>
+   <testMethod id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders#reserve-hold / commerce first" name="test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders"/>
+   <testMethod id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders#reserve-hold / manifest first" name="test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders"/>
+   <testMethod id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders#inventory-attempt / commerce first" name="test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders"/>
+   <testMethod id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders#inventory-attempt / manifest first" name="test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders"/>
+   <testMethod id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders#reserve-attempt / commerce first" name="test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders"/>
+   <testMethod id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders#reserve-attempt / manifest first" name="test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders"/>
+   <testMethod id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders#promotion-attempt / commerce first" name="test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders"/>
+   <testMethod id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders#promotion-attempt / manifest first" name="test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders"/>
+   <testMethod id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders#prepare / commerce first" name="test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders"/>
+   <testMethod id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders#prepare / manifest first" name="test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders"/>
+   <testMethod id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders#review / commerce first" name="test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders"/>
+   <testMethod id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders#review / manifest first" name="test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders"/>
+   <testMethod id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_existing_order_replay_and_checkout_fence_actor_before_order_in_both_orders#prepare first" name="test_existing_order_replay_and_checkout_fence_actor_before_order_in_both_orders"/>
+   <testMethod id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_existing_order_replay_and_checkout_fence_actor_before_order_in_both_orders#checkout first" name="test_existing_order_replay_and_checkout_fence_actor_before_order_in_both_orders"/>
+   <testMethod id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_explicit_guest_commits_while_ambient_customer_row_remains_locked" name="test_explicit_guest_commits_while_ambient_customer_row_remains_locked"/>
+  </testClass>
+  <testClass name="Tests\Feature\CustomerInquiryConcurrencyTest" file="/workspace/VA-Studio-member-originals/tests/Feature/CustomerInquiryConcurrencyTest.php">
+   <testMethod id="Tests\Feature\CustomerInquiryConcurrencyTest::test_competing_owners_with_one_global_request_key_save_exactly_one_inquiry_and_receipt_audit" name="test_competing_owners_with_one_global_request_key_save_exactly_one_inquiry_and_receipt_audit"/>
+   <testMethod id="Tests\Feature\CustomerInquiryConcurrencyTest::test_publication_withdrawal_and_admission_share_one_mutex_without_stale_admission#admission takes the lock first" name="test_publication_withdrawal_and_admission_share_one_mutex_without_stale_admission"/>
+   <testMethod id="Tests\Feature\CustomerInquiryConcurrencyTest::test_publication_withdrawal_and_admission_share_one_mutex_without_stale_admission#withdrawal takes the lock first" name="test_publication_withdrawal_and_admission_share_one_mutex_without_stale_admission"/>
+   <testMethod id="Tests\Feature\CustomerInquiryConcurrencyTest::test_successor_publication_and_first_notice_admission_serialize_without_stale_context#admission takes the lock first" name="test_successor_publication_and_first_notice_admission_serialize_without_stale_context"/>
+   <testMethod id="Tests\Feature\CustomerInquiryConcurrencyTest::test_successor_publication_and_first_notice_admission_serialize_without_stale_context#withdrawal takes the lock first" name="test_successor_publication_and_first_notice_admission_serialize_without_stale_context"/>
+   <testMethod id="Tests\Feature\CustomerInquiryConcurrencyTest::test_operator_authority_revocation_and_admission_share_the_current_user_lock#admin admission first" name="test_operator_authority_revocation_and_admission_share_the_current_user_lock"/>
+   <testMethod id="Tests\Feature\CustomerInquiryConcurrencyTest::test_operator_authority_revocation_and_admission_share_the_current_user_lock#admin revocation first" name="test_operator_authority_revocation_and_admission_share_the_current_user_lock"/>
+   <testMethod id="Tests\Feature\CustomerInquiryConcurrencyTest::test_operator_authority_revocation_and_admission_share_the_current_user_lock#verified email admission first" name="test_operator_authority_revocation_and_admission_share_the_current_user_lock"/>
+   <testMethod id="Tests\Feature\CustomerInquiryConcurrencyTest::test_operator_authority_revocation_and_admission_share_the_current_user_lock#verified email revocation first" name="test_operator_authority_revocation_and_admission_share_the_current_user_lock"/>
+   <testMethod id="Tests\Feature\CustomerInquiryConcurrencyTest::test_operator_authority_revocation_and_admission_share_the_current_user_lock#MFA enrollment admission first" name="test_operator_authority_revocation_and_admission_share_the_current_user_lock"/>
+   <testMethod id="Tests\Feature\CustomerInquiryConcurrencyTest::test_operator_authority_revocation_and_admission_share_the_current_user_lock#MFA enrollment revocation first" name="test_operator_authority_revocation_and_admission_share_the_current_user_lock"/>
+  </testClass>
+  <testClass name="Tests\Feature\LicenseTemplateAuthoringTest" file="/workspace/VA-Studio-member-originals/tests/Feature/LicenseTemplateAuthoringTest.php">
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringTest::test_identity_create_edit_and_no_op_use_exact_actor_and_minimized_atomic_audits" name="test_identity_create_edit_and_no_op_use_exact_actor_and_minimized_atomic_audits"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringTest::test_unknown_or_invalid_identity_input_cannot_create_or_edit#missing name" name="test_unknown_or_invalid_identity_input_cannot_create_or_edit"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringTest::test_unknown_or_invalid_identity_input_cannot_create_or_edit#blank name" name="test_unknown_or_invalid_identity_input_cannot_create_or_edit"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringTest::test_unknown_or_invalid_identity_input_cannot_create_or_edit#long name" name="test_unknown_or_invalid_identity_input_cannot_create_or_edit"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringTest::test_unknown_or_invalid_identity_input_cannot_create_or_edit#bad slug" name="test_unknown_or_invalid_identity_input_cannot_create_or_edit"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringTest::test_unknown_or_invalid_identity_input_cannot_create_or_edit#trailing newline slug" name="test_unknown_or_invalid_identity_input_cannot_create_or_edit"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringTest::test_unknown_or_invalid_identity_input_cannot_create_or_edit#long slug" name="test_unknown_or_invalid_identity_input_cannot_create_or_edit"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringTest::test_unknown_or_invalid_identity_input_cannot_create_or_edit#unknown type" name="test_unknown_or_invalid_identity_input_cannot_create_or_edit"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringTest::test_unknown_or_invalid_identity_input_cannot_create_or_edit#terms" name="test_unknown_or_invalid_identity_input_cannot_create_or_edit"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringTest::test_unknown_or_invalid_identity_input_cannot_create_or_edit#publication" name="test_unknown_or_invalid_identity_input_cannot_create_or_edit"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringTest::test_unknown_or_invalid_identity_input_cannot_create_or_edit#identity" name="test_unknown_or_invalid_identity_input_cannot_create_or_edit"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringTest::test_unknown_or_invalid_identity_input_cannot_create_or_edit#price" name="test_unknown_or_invalid_identity_input_cannot_create_or_edit"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringTest::test_unknown_or_invalid_identity_input_cannot_create_or_edit#baseline in data" name="test_unknown_or_invalid_identity_input_cannot_create_or_edit"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringTest::test_duplicate_slug_and_forged_or_wrong_actor_baselines_preserve_all_evidence" name="test_duplicate_slug_and_forged_or_wrong_actor_baselines_preserve_all_evidence"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringTest::test_current_persisted_authority_and_required_mfa_guard_every_command#create / role" name="test_current_persisted_authority_and_required_mfa_guard_every_command"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringTest::test_current_persisted_authority_and_required_mfa_guard_every_command#create / email" name="test_current_persisted_authority_and_required_mfa_guard_every_command"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringTest::test_current_persisted_authority_and_required_mfa_guard_every_command#create / deleted" name="test_current_persisted_authority_and_required_mfa_guard_every_command"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringTest::test_current_persisted_authority_and_required_mfa_guard_every_command#create / unsaved" name="test_current_persisted_authority_and_required_mfa_guard_every_command"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringTest::test_current_persisted_authority_and_required_mfa_guard_every_command#create / customer" name="test_current_persisted_authority_and_required_mfa_guard_every_command"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringTest::test_current_persisted_authority_and_required_mfa_guard_every_command#create / mfa" name="test_current_persisted_authority_and_required_mfa_guard_every_command"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringTest::test_current_persisted_authority_and_required_mfa_guard_every_command#review / role" name="test_current_persisted_authority_and_required_mfa_guard_every_command"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringTest::test_current_persisted_authority_and_required_mfa_guard_every_command#review / email" name="test_current_persisted_authority_and_required_mfa_guard_every_command"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringTest::test_current_persisted_authority_and_required_mfa_guard_every_command#review / deleted" name="test_current_persisted_authority_and_required_mfa_guard_every_command"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringTest::test_current_persisted_authority_and_required_mfa_guard_every_command#review / unsaved" name="test_current_persisted_authority_and_required_mfa_guard_every_command"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringTest::test_current_persisted_authority_and_required_mfa_guard_every_command#review / customer" name="test_current_persisted_authority_and_required_mfa_guard_every_command"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringTest::test_current_persisted_authority_and_required_mfa_guard_every_command#review / mfa" name="test_current_persisted_authority_and_required_mfa_guard_every_command"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringTest::test_current_persisted_authority_and_required_mfa_guard_every_command#edit / role" name="test_current_persisted_authority_and_required_mfa_guard_every_command"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringTest::test_current_persisted_authority_and_required_mfa_guard_every_command#edit / email" name="test_current_persisted_authority_and_required_mfa_guard_every_command"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringTest::test_current_persisted_authority_and_required_mfa_guard_every_command#edit / deleted" name="test_current_persisted_authority_and_required_mfa_guard_every_command"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringTest::test_current_persisted_authority_and_required_mfa_guard_every_command#edit / unsaved" name="test_current_persisted_authority_and_required_mfa_guard_every_command"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringTest::test_current_persisted_authority_and_required_mfa_guard_every_command#edit / customer" name="test_current_persisted_authority_and_required_mfa_guard_every_command"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringTest::test_current_persisted_authority_and_required_mfa_guard_every_command#edit / mfa" name="test_current_persisted_authority_and_required_mfa_guard_every_command"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringTest::test_same_second_aba_and_stale_edits_are_rejected_without_an_extra_audit" name="test_same_second_aba_and_stale_edits_are_rejected_without_an_extra_audit"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringTest::test_every_reviewed_state_refuses_identity_changes_and_preserves_original_license_graph#submitted" name="test_every_reviewed_state_refuses_identity_changes_and_preserves_original_license_graph"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringTest::test_every_reviewed_state_refuses_identity_changes_and_preserves_original_license_graph#approved" name="test_every_reviewed_state_refuses_identity_changes_and_preserves_original_license_graph"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringTest::test_every_reviewed_state_refuses_identity_changes_and_preserves_original_license_graph#published" name="test_every_reviewed_state_refuses_identity_changes_and_preserves_original_license_graph"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringTest::test_audit_failure_rolls_back_identity_mutation#create" name="test_audit_failure_rolls_back_identity_mutation"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringTest::test_audit_failure_rolls_back_identity_mutation#edit" name="test_audit_failure_rolls_back_identity_mutation"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringTest::test_baseline_capture_has_no_earlier_consistent_database_read_and_rejects_ambient_transactions" name="test_baseline_capture_has_no_earlier_consistent_database_read_and_rejects_ambient_transactions"/>
+  </testClass>
+  <testClass name="Tests\Feature\ProductionCheckoutNativeRaceTest" file="/workspace/VA-Studio-member-originals/tests/Feature/ProductionCheckoutNativeRaceTest.php">
+   <testMethod id="Tests\Feature\ProductionCheckoutNativeRaceTest::test_competing_assent_waits_on_exact_original_buyer_and_preserves_one_order#0" name="test_competing_assent_waits_on_exact_original_buyer_and_preserves_one_order"/>
+   <testMethod id="Tests\Feature\ProductionCheckoutNativeRaceTest::test_competing_assent_waits_on_exact_original_buyer_and_preserves_one_order#1" name="test_competing_assent_waits_on_exact_original_buyer_and_preserves_one_order"/>
+  </testClass>
+  <testClass name="Tests\Feature\ReviewedLicenseDraftConcurrencyTest" file="/workspace/VA-Studio-member-originals/tests/Feature/ReviewedLicenseDraftConcurrencyTest.php">
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftConcurrencyTest::test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders#edit / worker 0 first" name="test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftConcurrencyTest::test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders#edit / worker 1 first" name="test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftConcurrencyTest::test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders#legacy / worker 0 first" name="test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftConcurrencyTest::test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders#legacy / worker 1 first" name="test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftConcurrencyTest::test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders#submit / worker 0 first" name="test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftConcurrencyTest::test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders#submit / worker 1 first" name="test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftConcurrencyTest::test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders#template / worker 0 first" name="test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftConcurrencyTest::test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders#template / worker 1 first" name="test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftConcurrencyTest::test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders#role / worker 0 first" name="test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftConcurrencyTest::test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders#role / worker 1 first" name="test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftConcurrencyTest::test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders#mfa / worker 0 first" name="test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\ReviewedLicenseDraftConcurrencyTest::test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders#mfa / worker 1 first" name="test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders"/>
+  </testClass>
+  <testClass name="Tests\Feature\ServiceProjectCommittedSchemaIndependentTest" file="/workspace/VA-Studio-member-originals/tests/Feature/ServiceProjectCommittedSchemaIndependentTest.php">
+   <testMethod id="Tests\Feature\ServiceProjectCommittedSchemaIndependentTest::test_permanent_view_cannot_replace_the_captured_source_event_table_after_commit" name="test_permanent_view_cannot_replace_the_captured_source_event_table_after_commit"/>
+  </testClass>
+  <testClass name="Tests\Feature\SharedInventoryConcurrencyTest" file="/workspace/VA-Studio-member-originals/tests/Feature/SharedInventoryConcurrencyTest.php">
+   <testMethod id="Tests\Feature\SharedInventoryConcurrencyTest::test_independent_connections_serialize_shared_inventory#0" name="test_independent_connections_serialize_shared_inventory"/>
+   <testMethod id="Tests\Feature\SharedInventoryConcurrencyTest::test_independent_connections_serialize_shared_inventory#1" name="test_independent_connections_serialize_shared_inventory"/>
+   <testMethod id="Tests\Feature\SharedInventoryConcurrencyTest::test_independent_connections_serialize_shared_inventory#2" name="test_independent_connections_serialize_shared_inventory"/>
+   <testMethod id="Tests\Feature\SharedInventoryConcurrencyTest::test_independent_connections_serialize_shared_inventory#3" name="test_independent_connections_serialize_shared_inventory"/>
+   <testMethod id="Tests\Feature\SharedInventoryConcurrencyTest::test_independent_connections_serialize_shared_inventory#4" name="test_independent_connections_serialize_shared_inventory"/>
+   <testMethod id="Tests\Feature\SharedInventoryConcurrencyTest::test_independent_connections_serialize_shared_inventory#5" name="test_independent_connections_serialize_shared_inventory"/>
+   <testMethod id="Tests\Feature\SharedInventoryConcurrencyTest::test_independent_connections_serialize_shared_inventory#6" name="test_independent_connections_serialize_shared_inventory"/>
+   <testMethod id="Tests\Feature\SharedInventoryConcurrencyTest::test_independent_connections_serialize_shared_inventory#7" name="test_independent_connections_serialize_shared_inventory"/>
+   <testMethod id="Tests\Feature\SharedInventoryConcurrencyTest::test_independent_connections_serialize_shared_inventory#8" name="test_independent_connections_serialize_shared_inventory"/>
+  </testClass>
+  <testClass name="Tests\Feature\StemsRecordingPreviewConcurrencyTest" file="/workspace/VA-Studio-member-originals/tests/Feature/StemsRecordingPreviewConcurrencyTest.php">
+   <testMethod id="Tests\Feature\StemsRecordingPreviewConcurrencyTest::test_processor_completion_rejects_an_obsolete_preview_after_the_track_wait#root transaction" name="test_processor_completion_rejects_an_obsolete_preview_after_the_track_wait"/>
+   <testMethod id="Tests\Feature\StemsRecordingPreviewConcurrencyTest::test_processor_completion_rejects_an_obsolete_preview_after_the_track_wait#old caller snapshot" name="test_processor_completion_rejects_an_obsolete_preview_after_the_track_wait"/>
+   <testMethod id="Tests\Feature\StemsRecordingPreviewConcurrencyTest::test_preview_fence_does_not_lock_a_quarantined_processing_source#source submitted as stems" name="test_preview_fence_does_not_lock_a_quarantined_processing_source"/>
+   <testMethod id="Tests\Feature\StemsRecordingPreviewConcurrencyTest::test_preview_fence_does_not_lock_a_quarantined_processing_source#source submitted as master" name="test_preview_fence_does_not_lock_a_quarantined_processing_source"/>
+  </testClass>
+  <testClass name="Tests\Feature\TestPaymentConcurrencyTest" file="/workspace/VA-Studio-member-originals/tests/Feature/TestPaymentConcurrencyTest.php">
+   <testMethod id="Tests\Feature\TestPaymentConcurrencyTest::test_two_workers_for_one_receipt_share_one_claim_and_one_confirmation" name="test_two_workers_for_one_receipt_share_one_claim_and_one_confirmation"/>
+   <testMethod id="Tests\Feature\TestPaymentConcurrencyTest::test_distinct_receipts_racing_for_one_payment_cannot_duplicate_confirmation" name="test_distinct_receipts_racing_for_one_payment_cannot_duplicate_confirmation"/>
+   <testMethod id="Tests\Feature\TestPaymentConcurrencyTest::test_worker_whose_lease_was_reclaimed_cannot_commit_stale_payment_evidence" name="test_worker_whose_lease_was_reclaimed_cannot_commit_stale_payment_evidence"/>
+   <testMethod id="Tests\Feature\TestPaymentConcurrencyTest::test_old_provider_failure_cannot_overwrite_success_after_lease_takeover" name="test_old_provider_failure_cannot_overwrite_success_after_lease_takeover"/>
+   <testMethod id="Tests\Feature\TestPaymentConcurrencyTest::test_late_pending_observation_cannot_regress_a_concurrently_confirmed_payment" name="test_late_pending_observation_cannot_regress_a_concurrently_confirmed_payment"/>
+  </testClass>
+ </tests>
+ <groups>
+  <group name="default">
+   <test id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders#create / commerce first"/>
+   <test id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders#create / manifest first"/>
+   <test id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders#price / commerce first"/>
+   <test id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders#price / manifest first"/>
+   <test id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders#promoted-price / commerce first"/>
+   <test id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders#promoted-price / manifest first"/>
+   <test id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders#inventory-hold / commerce first"/>
+   <test id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders#inventory-hold / manifest first"/>
+   <test id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders#reserve-hold / commerce first"/>
+   <test id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders#reserve-hold / manifest first"/>
+   <test id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders#inventory-attempt / commerce first"/>
+   <test id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders#inventory-attempt / manifest first"/>
+   <test id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders#reserve-attempt / commerce first"/>
+   <test id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders#reserve-attempt / manifest first"/>
+   <test id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders#promotion-attempt / commerce first"/>
+   <test id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders#promotion-attempt / manifest first"/>
+   <test id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders#prepare / commerce first"/>
+   <test id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders#prepare / manifest first"/>
+   <test id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders#review / commerce first"/>
+   <test id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders#review / manifest first"/>
+   <test id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_existing_order_replay_and_checkout_fence_actor_before_order_in_both_orders#prepare first"/>
+   <test id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_existing_order_replay_and_checkout_fence_actor_before_order_in_both_orders#checkout first"/>
+   <test id="Tests\Feature\CommerceAuditActorConcurrencyTest::test_explicit_guest_commits_while_ambient_customer_row_remains_locked"/>
+   <test id="Tests\Feature\CustomerInquiryConcurrencyTest::test_competing_owners_with_one_global_request_key_save_exactly_one_inquiry_and_receipt_audit"/>
+   <test id="Tests\Feature\CustomerInquiryConcurrencyTest::test_publication_withdrawal_and_admission_share_one_mutex_without_stale_admission#admission takes the lock first"/>
+   <test id="Tests\Feature\CustomerInquiryConcurrencyTest::test_publication_withdrawal_and_admission_share_one_mutex_without_stale_admission#withdrawal takes the lock first"/>
+   <test id="Tests\Feature\CustomerInquiryConcurrencyTest::test_successor_publication_and_first_notice_admission_serialize_without_stale_context#admission takes the lock first"/>
+   <test id="Tests\Feature\CustomerInquiryConcurrencyTest::test_successor_publication_and_first_notice_admission_serialize_without_stale_context#withdrawal takes the lock first"/>
+   <test id="Tests\Feature\CustomerInquiryConcurrencyTest::test_operator_authority_revocation_and_admission_share_the_current_user_lock#admin admission first"/>
+   <test id="Tests\Feature\CustomerInquiryConcurrencyTest::test_operator_authority_revocation_and_admission_share_the_current_user_lock#admin revocation first"/>
+   <test id="Tests\Feature\CustomerInquiryConcurrencyTest::test_operator_authority_revocation_and_admission_share_the_current_user_lock#verified email admission first"/>
+   <test id="Tests\Feature\CustomerInquiryConcurrencyTest::test_operator_authority_revocation_and_admission_share_the_current_user_lock#verified email revocation first"/>
+   <test id="Tests\Feature\CustomerInquiryConcurrencyTest::test_operator_authority_revocation_and_admission_share_the_current_user_lock#MFA enrollment admission first"/>
+   <test id="Tests\Feature\CustomerInquiryConcurrencyTest::test_operator_authority_revocation_and_admission_share_the_current_user_lock#MFA enrollment revocation first"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringTest::test_identity_create_edit_and_no_op_use_exact_actor_and_minimized_atomic_audits"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringTest::test_unknown_or_invalid_identity_input_cannot_create_or_edit#missing name"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringTest::test_unknown_or_invalid_identity_input_cannot_create_or_edit#blank name"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringTest::test_unknown_or_invalid_identity_input_cannot_create_or_edit#long name"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringTest::test_unknown_or_invalid_identity_input_cannot_create_or_edit#bad slug"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringTest::test_unknown_or_invalid_identity_input_cannot_create_or_edit#trailing newline slug"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringTest::test_unknown_or_invalid_identity_input_cannot_create_or_edit#long slug"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringTest::test_unknown_or_invalid_identity_input_cannot_create_or_edit#unknown type"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringTest::test_unknown_or_invalid_identity_input_cannot_create_or_edit#terms"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringTest::test_unknown_or_invalid_identity_input_cannot_create_or_edit#publication"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringTest::test_unknown_or_invalid_identity_input_cannot_create_or_edit#identity"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringTest::test_unknown_or_invalid_identity_input_cannot_create_or_edit#price"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringTest::test_unknown_or_invalid_identity_input_cannot_create_or_edit#baseline in data"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringTest::test_duplicate_slug_and_forged_or_wrong_actor_baselines_preserve_all_evidence"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringTest::test_current_persisted_authority_and_required_mfa_guard_every_command#create / role"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringTest::test_current_persisted_authority_and_required_mfa_guard_every_command#create / email"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringTest::test_current_persisted_authority_and_required_mfa_guard_every_command#create / deleted"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringTest::test_current_persisted_authority_and_required_mfa_guard_every_command#create / unsaved"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringTest::test_current_persisted_authority_and_required_mfa_guard_every_command#create / customer"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringTest::test_current_persisted_authority_and_required_mfa_guard_every_command#create / mfa"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringTest::test_current_persisted_authority_and_required_mfa_guard_every_command#review / role"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringTest::test_current_persisted_authority_and_required_mfa_guard_every_command#review / email"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringTest::test_current_persisted_authority_and_required_mfa_guard_every_command#review / deleted"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringTest::test_current_persisted_authority_and_required_mfa_guard_every_command#review / unsaved"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringTest::test_current_persisted_authority_and_required_mfa_guard_every_command#review / customer"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringTest::test_current_persisted_authority_and_required_mfa_guard_every_command#review / mfa"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringTest::test_current_persisted_authority_and_required_mfa_guard_every_command#edit / role"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringTest::test_current_persisted_authority_and_required_mfa_guard_every_command#edit / email"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringTest::test_current_persisted_authority_and_required_mfa_guard_every_command#edit / deleted"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringTest::test_current_persisted_authority_and_required_mfa_guard_every_command#edit / unsaved"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringTest::test_current_persisted_authority_and_required_mfa_guard_every_command#edit / customer"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringTest::test_current_persisted_authority_and_required_mfa_guard_every_command#edit / mfa"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringTest::test_same_second_aba_and_stale_edits_are_rejected_without_an_extra_audit"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringTest::test_every_reviewed_state_refuses_identity_changes_and_preserves_original_license_graph#submitted"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringTest::test_every_reviewed_state_refuses_identity_changes_and_preserves_original_license_graph#approved"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringTest::test_every_reviewed_state_refuses_identity_changes_and_preserves_original_license_graph#published"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringTest::test_audit_failure_rolls_back_identity_mutation#create"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringTest::test_audit_failure_rolls_back_identity_mutation#edit"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringTest::test_baseline_capture_has_no_earlier_consistent_database_read_and_rejects_ambient_transactions"/>
+   <test id="Tests\Feature\ProductionCheckoutNativeRaceTest::test_competing_assent_waits_on_exact_original_buyer_and_preserves_one_order#0"/>
+   <test id="Tests\Feature\ProductionCheckoutNativeRaceTest::test_competing_assent_waits_on_exact_original_buyer_and_preserves_one_order#1"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftConcurrencyTest::test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders#edit / worker 0 first"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftConcurrencyTest::test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders#edit / worker 1 first"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftConcurrencyTest::test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders#legacy / worker 0 first"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftConcurrencyTest::test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders#legacy / worker 1 first"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftConcurrencyTest::test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders#submit / worker 0 first"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftConcurrencyTest::test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders#submit / worker 1 first"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftConcurrencyTest::test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders#template / worker 0 first"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftConcurrencyTest::test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders#template / worker 1 first"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftConcurrencyTest::test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders#role / worker 0 first"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftConcurrencyTest::test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders#role / worker 1 first"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftConcurrencyTest::test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders#mfa / worker 0 first"/>
+   <test id="Tests\Feature\ReviewedLicenseDraftConcurrencyTest::test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders#mfa / worker 1 first"/>
+   <test id="Tests\Feature\ServiceProjectCommittedSchemaIndependentTest::test_permanent_view_cannot_replace_the_captured_source_event_table_after_commit"/>
+   <test id="Tests\Feature\SharedInventoryConcurrencyTest::test_independent_connections_serialize_shared_inventory#0"/>
+   <test id="Tests\Feature\SharedInventoryConcurrencyTest::test_independent_connections_serialize_shared_inventory#1"/>
+   <test id="Tests\Feature\SharedInventoryConcurrencyTest::test_independent_connections_serialize_shared_inventory#2"/>
+   <test id="Tests\Feature\SharedInventoryConcurrencyTest::test_independent_connections_serialize_shared_inventory#3"/>
+   <test id="Tests\Feature\SharedInventoryConcurrencyTest::test_independent_connections_serialize_shared_inventory#4"/>
+   <test id="Tests\Feature\SharedInventoryConcurrencyTest::test_independent_connections_serialize_shared_inventory#5"/>
+   <test id="Tests\Feature\SharedInventoryConcurrencyTest::test_independent_connections_serialize_shared_inventory#6"/>
+   <test id="Tests\Feature\SharedInventoryConcurrencyTest::test_independent_connections_serialize_shared_inventory#7"/>
+   <test id="Tests\Feature\SharedInventoryConcurrencyTest::test_independent_connections_serialize_shared_inventory#8"/>
+   <test id="Tests\Feature\StemsRecordingPreviewConcurrencyTest::test_processor_completion_rejects_an_obsolete_preview_after_the_track_wait#root transaction"/>
+   <test id="Tests\Feature\StemsRecordingPreviewConcurrencyTest::test_processor_completion_rejects_an_obsolete_preview_after_the_track_wait#old caller snapshot"/>
+   <test id="Tests\Feature\StemsRecordingPreviewConcurrencyTest::test_preview_fence_does_not_lock_a_quarantined_processing_source#source submitted as stems"/>
+   <test id="Tests\Feature\StemsRecordingPreviewConcurrencyTest::test_preview_fence_does_not_lock_a_quarantined_processing_source#source submitted as master"/>
+   <test id="Tests\Feature\TestPaymentConcurrencyTest::test_two_workers_for_one_receipt_share_one_claim_and_one_confirmation"/>
+   <test id="Tests\Feature\TestPaymentConcurrencyTest::test_distinct_receipts_racing_for_one_payment_cannot_duplicate_confirmation"/>
+   <test id="Tests\Feature\TestPaymentConcurrencyTest::test_worker_whose_lease_was_reclaimed_cannot_commit_stale_payment_evidence"/>
+   <test id="Tests\Feature\TestPaymentConcurrencyTest::test_old_provider_failure_cannot_overwrite_success_after_lease_takeover"/>
+   <test id="Tests\Feature\TestPaymentConcurrencyTest::test_late_pending_observation_cannot_regress_a_concurrently_confirmed_payment"/>
+  </group>
+ </groups>
+</testSuite>

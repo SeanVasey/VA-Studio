@@ -1,0 +1,432 @@
+{
+  "scope": "Before/after map comparisons and retained runner stability results are distinguished. A missing stability receipt is not inferred from a passing test.",
+  "unavailable": [
+    "records/helpers-initial: single source map and passing receipt retained; no separately retained after-map or stability sidecar."
+  ],
+  "runs": [
+    {
+      "id": "records/helpers-final",
+      "receipt": "records/helpers-final-source-check.json",
+      "keys": [
+        "changed"
+      ],
+      "expected": [],
+      "method": "retained runner stability result; raw after-map not separately retained",
+      "unchanged": true
+    },
+    {
+      "id": "records/issuer-canary",
+      "receipt": "records/issuer-canary-source-check.json",
+      "keys": [
+        "unchanged"
+      ],
+      "expected": true,
+      "method": "retained runner stability result; raw after-map not separately retained",
+      "unchanged": true
+    },
+    {
+      "id": "records/issuer-full",
+      "receipt": "records/issuer-full-source-check.json",
+      "keys": [
+        "unchanged"
+      ],
+      "expected": true,
+      "method": "retained runner stability result; raw after-map not separately retained",
+      "unchanged": true
+    },
+    {
+      "id": "records/issuer-final",
+      "receipt": "records/issuer-final-source-check.json",
+      "keys": [
+        "unchanged"
+      ],
+      "expected": true,
+      "method": "retained runner stability result; raw after-map not separately retained",
+      "unchanged": true
+    },
+    {
+      "id": "records/legacy-transition",
+      "receipt": "records/legacy-transition-source-check.json",
+      "keys": [
+        "unchanged"
+      ],
+      "expected": true,
+      "method": "retained runner stability result; raw after-map not separately retained",
+      "unchanged": true
+    },
+    {
+      "id": "records/native-producer-canary",
+      "receipt": "records/native-producer-canary.source-check.json",
+      "keys": [
+        "changed"
+      ],
+      "expected": [],
+      "method": "retained runner stability result; raw after-map not separately retained",
+      "unchanged": true
+    },
+    {
+      "id": "records/baseline",
+      "before": {
+        "receipt": "records/baseline/source-before.json",
+        "keys": [
+          "files"
+        ]
+      },
+      "after": {
+        "receipt": "records/baseline/source-after.json",
+        "keys": [
+          "files"
+        ]
+      },
+      "method": "independent comparison of archived before/after source maps",
+      "captured_files": 10288,
+      "unchanged": true
+    },
+    {
+      "id": "records/award-upgrade-old",
+      "before": {
+        "receipt": "records/award-upgrade/old-source-before.json",
+        "keys": [
+          "files"
+        ]
+      },
+      "after": {
+        "receipt": "records/award-upgrade/old-source-after.json",
+        "keys": [
+          "files"
+        ]
+      },
+      "method": "independent comparison of archived before/after source maps",
+      "captured_files": 10288,
+      "unchanged": true
+    },
+    {
+      "id": "records/award-upgrade-new",
+      "before": {
+        "receipt": "records/award-upgrade/new-source-before.json",
+        "keys": [
+          "files"
+        ]
+      },
+      "after": {
+        "receipt": "records/award-upgrade/new-source-after.json",
+        "keys": [
+          "files"
+        ]
+      },
+      "method": "independent comparison of archived before/after source maps",
+      "captured_files": 10631,
+      "unchanged": true
+    },
+    {
+      "id": "schema/sqlite-upgrade-initial",
+      "receipt": "schema/sqlite-upgrade-initial.unchanged.json",
+      "keys": [
+        "changed"
+      ],
+      "expected": [],
+      "method": "retained runner stability result; raw after-map not separately retained",
+      "unchanged": true
+    },
+    {
+      "id": "schema/sqlite-identity-initial",
+      "receipt": "schema/sqlite-identity-initial.unchanged.json",
+      "keys": [
+        "changed"
+      ],
+      "expected": [],
+      "method": "retained runner stability result; raw after-map not separately retained",
+      "unchanged": true
+    },
+    {
+      "id": "schema/mysql-canary",
+      "receipt": "schema/mysql-canary.unchanged.json",
+      "keys": [
+        "changed"
+      ],
+      "expected": [],
+      "method": "retained runner stability result; raw after-map not separately retained",
+      "unchanged": true
+    },
+    {
+      "id": "schema/mysql-canary-diagnostic",
+      "receipt": "schema/mysql-canary-diagnostic.unchanged.json",
+      "keys": [
+        "changed"
+      ],
+      "expected": [],
+      "method": "retained runner stability result; raw after-map not separately retained",
+      "unchanged": true
+    },
+    {
+      "id": "schema/mysql-canary-fixed",
+      "receipt": "schema/mysql-canary-fixed.unchanged.json",
+      "keys": [
+        "changed"
+      ],
+      "expected": [],
+      "method": "retained runner stability result; raw after-map not separately retained",
+      "unchanged": true
+    },
+    {
+      "id": "schema/sqlite-final",
+      "receipt": "schema/sqlite-final.unchanged.json",
+      "keys": [
+        "changed"
+      ],
+      "expected": [],
+      "method": "retained runner stability result; raw after-map not separately retained",
+      "unchanged": true
+    },
+    {
+      "id": "schema/mysql-identity-final",
+      "receipt": "schema/mysql-identity-final.unchanged.json",
+      "keys": [
+        "changed"
+      ],
+      "expected": [],
+      "method": "retained runner stability result; raw after-map not separately retained",
+      "unchanged": true
+    },
+    {
+      "id": "fixture/sqlite-fixtures-initial",
+      "receipt": "fixture/sqlite-fixtures-initial.result.json",
+      "keys": [
+        "changed_sources"
+      ],
+      "expected": [],
+      "method": "retained runner stability result; raw after-map not separately retained",
+      "unchanged": true
+    },
+    {
+      "id": "fixture/sqlite-schema-preparation",
+      "receipt": "fixture/sqlite-schema-preparation.result.json",
+      "keys": [
+        "changed_sources"
+      ],
+      "expected": [],
+      "method": "retained runner stability result; raw after-map not separately retained",
+      "unchanged": true
+    },
+    {
+      "id": "fixture/sqlite-cursor",
+      "receipt": "fixture/sqlite-cursor.result.json",
+      "keys": [
+        "changed_sources"
+      ],
+      "expected": [],
+      "method": "retained runner stability result; raw after-map not separately retained",
+      "unchanged": true
+    },
+    {
+      "id": "root/sqlite-historical-migrations",
+      "receipt": "root/sqlite-historical-migrations.result.json",
+      "keys": [
+        "changed_sources"
+      ],
+      "expected": [],
+      "method": "retained runner stability result; raw after-map not separately retained",
+      "unchanged": true
+    },
+    {
+      "id": "root/sqlite-award-proof-integration",
+      "receipt": "root/sqlite-award-proof-integration.result.json",
+      "keys": [
+        "changed_sources"
+      ],
+      "expected": [],
+      "method": "retained runner stability result; raw after-map not separately retained",
+      "unchanged": true
+    },
+    {
+      "id": "root/sqlite-billing-api-integration",
+      "receipt": "root/sqlite-billing-api-integration.result.json",
+      "keys": [
+        "changed_sources"
+      ],
+      "expected": [],
+      "method": "retained runner stability result; raw after-map not separately retained",
+      "unchanged": true
+    },
+    {
+      "id": "root/sqlite-hint-job-integration",
+      "receipt": "root/sqlite-hint-job-integration.result.json",
+      "keys": [
+        "changed_sources"
+      ],
+      "expected": [],
+      "method": "retained runner stability result; raw after-map not separately retained",
+      "unchanged": true
+    },
+    {
+      "id": "root/sqlite-membership-admission-integration",
+      "receipt": "root/sqlite-membership-admission-integration.result.json",
+      "keys": [
+        "changed_sources"
+      ],
+      "expected": [],
+      "method": "retained runner stability result; raw after-map not separately retained",
+      "unchanged": true
+    },
+    {
+      "id": "consumer/unit",
+      "before": {
+        "receipt": "consumer/unit.before.sha256"
+      },
+      "after": {
+        "receipt": "consumer/unit.after.sha256"
+      },
+      "method": "independent comparison of archived before/after source maps",
+      "captured_files": 11,
+      "unchanged": true
+    },
+    {
+      "id": "consumer/terminal-omission-red",
+      "before": {
+        "receipt": "consumer/terminal-omission-red.before.sha256"
+      },
+      "after": {
+        "receipt": "consumer/terminal-omission-red.after.sha256"
+      },
+      "method": "independent comparison of archived before/after source maps",
+      "captured_files": 1243,
+      "unchanged": true
+    },
+    {
+      "id": "consumer/terminal-restored-green",
+      "before": {
+        "receipt": "consumer/terminal-restored-green.before.sha256"
+      },
+      "after": {
+        "receipt": "consumer/terminal-restored-green.after.sha256"
+      },
+      "method": "independent comparison of archived before/after source maps",
+      "captured_files": 1243,
+      "unchanged": true
+    },
+    {
+      "id": "root/ci-policy-initial",
+      "receipt": "root/ci-policy-initial.unchanged.json",
+      "keys": [
+        "changed"
+      ],
+      "expected": [],
+      "method": "retained runner stability result; raw after-map not separately retained",
+      "unchanged": true
+    },
+    {
+      "id": "records/native-producer-remainder",
+      "receipt": "records/native-producer-remainder.source-check.json",
+      "keys": [
+        "changed"
+      ],
+      "expected": [],
+      "method": "retained runner stability result; raw after-map not separately retained",
+      "unchanged": true
+    },
+    {
+      "id": "schema/mysql-currentness-red",
+      "receipt": "schema/mysql-currentness-red.unchanged.json",
+      "keys": [
+        "changed"
+      ],
+      "expected": [],
+      "method": "retained runner stability result; raw after-map not separately retained",
+      "unchanged": true
+    },
+    {
+      "id": "schema/mysql-currentness-fixed",
+      "receipt": "schema/mysql-currentness-fixed.unchanged.json",
+      "keys": [
+        "changed"
+      ],
+      "expected": [],
+      "method": "retained runner stability result; raw after-map not separately retained",
+      "unchanged": true
+    },
+    {
+      "id": "schema/sqlite-currentness-final",
+      "receipt": "schema/sqlite-currentness-final.unchanged.json",
+      "keys": [
+        "changed"
+      ],
+      "expected": [],
+      "method": "retained runner stability result; raw after-map not separately retained",
+      "unchanged": true
+    },
+    {
+      "id": "selection/discovery-initial",
+      "receipt": "selection/discovery-source-check.json",
+      "keys": [
+        "changed"
+      ],
+      "expected": [],
+      "method": "retained runner stability result; raw after-map not separately retained",
+      "unchanged": true
+    },
+    {
+      "id": "selection/discovery-final",
+      "receipt": "selection/final-67d85d6e/discovery-source-check.json",
+      "keys": [
+        "changed"
+      ],
+      "expected": [],
+      "method": "retained runner stability result; raw after-map not separately retained",
+      "unchanged": true
+    },
+    {
+      "id": "quality/initial",
+      "before": {
+        "receipt": "quality/sources-before.json"
+      },
+      "after": {
+        "receipt": "quality/sources-after.json"
+      },
+      "method": "independent comparison of archived before/after source maps",
+      "captured_files": 2283,
+      "unchanged": true
+    },
+    {
+      "id": "quality/pint-v2",
+      "before": {
+        "receipt": "quality/pint-v2/sources-before.json"
+      },
+      "after": {
+        "receipt": "quality/pint-v2/sources-after.json"
+      },
+      "method": "independent comparison of archived before/after source maps",
+      "captured_files": 2283,
+      "unchanged": true
+    },
+    {
+      "id": "schema/mysql-upgrade-final",
+      "receipt": "schema/mysql-upgrade-final.unchanged.json",
+      "keys": [
+        "changed"
+      ],
+      "expected": [],
+      "method": "retained runner stability result; raw after-map not separately retained",
+      "unchanged": true
+    },
+    {
+      "id": "root/native-canaries-final",
+      "receipt": "root/native-canaries-final.result.json",
+      "keys": [
+        "changed_sources"
+      ],
+      "expected": [],
+      "method": "retained runner stability result; raw after-map not separately retained",
+      "unchanged": true
+    },
+    {
+      "id": "root/native-races-final",
+      "receipt": "root/native-races-final.result.json",
+      "keys": [
+        "changed_sources"
+      ],
+      "expected": [],
+      "method": "retained runner stability result; raw after-map not separately retained",
+      "unchanged": true
+    }
+  ]
+}

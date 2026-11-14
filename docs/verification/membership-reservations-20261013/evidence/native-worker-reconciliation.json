@@ -1,0 +1,528 @@
+{
+  "scope": "Completed archived worker receipts, mapped explicitly to their invocation. Null optional fields mean no structured fresh-retry summary was retained; they do not replace the testcase's own audit assertions or imply success. Monotonic intervals overlap and cannot be summed as independent work.",
+  "receipts": [
+    {
+      "run": "integration-and-adapters/native-reservation-races",
+      "receipt": "integration-and-adapters/native-race-workers/test_different_request_keys_cannot_spend_the_same_last_credit-7fab95bf-646d-45a7-b7ab-ab1363c6cba7.json",
+      "case": "test_different_request_keys_cannot_spend_the_same_last_credit",
+      "workers": [
+        {
+          "pid": 147746,
+          "exit": 0,
+          "stopped_by_teardown": false,
+          "reason": null,
+          "status": "reserved",
+          "elapsed_ns": 51166898795,
+          "transaction_level": 0,
+          "pdo_transaction": false
+        },
+        {
+          "pid": 147747,
+          "exit": 0,
+          "stopped_by_teardown": false,
+          "reason": "insufficient_credit",
+          "status": null,
+          "elapsed_ns": 64665400044,
+          "transaction_level": 0,
+          "pdo_transaction": false
+        }
+      ],
+      "observed_barriers": [
+        {
+          "requester": 80,
+          "blocker": 79,
+          "table": "production_membership_billing_award_fence",
+          "primary_key": 1,
+          "observed_ns": 47450483828662
+        },
+        {
+          "requester": 81,
+          "blocker": 80,
+          "table": "users",
+          "primary_key": 4,
+          "observed_ns": 47452020296900
+        }
+      ],
+      "concurrent_retry": null,
+      "fresh_retry": null,
+      "before_fresh_retry": null,
+      "after_fresh_retry": null,
+      "audited_summaries_equal": null
+    },
+    {
+      "run": "integration-and-adapters/native-reservation-races",
+      "receipt": "integration-and-adapters/native-race-workers/test_same_key_and_intent_return_the_same_retained_reservation_and_event-2a2c8fcc-1583-4557-8bae-a9de74b2617e.json",
+      "case": "test_same_key_and_intent_return_the_same_retained_reservation_and_event",
+      "workers": [
+        {
+          "pid": 149483,
+          "exit": 0,
+          "stopped_by_teardown": false,
+          "reason": null,
+          "status": "reserved",
+          "elapsed_ns": 54943302333,
+          "transaction_level": 0,
+          "pdo_transaction": false
+        },
+        {
+          "pid": 149484,
+          "exit": 0,
+          "stopped_by_teardown": false,
+          "reason": "operation_deadline",
+          "status": null,
+          "elapsed_ns": 66748257435,
+          "transaction_level": 0,
+          "pdo_transaction": false
+        }
+      ],
+      "observed_barriers": [
+        {
+          "requester": 85,
+          "blocker": 83,
+          "table": "production_membership_billing_award_fence",
+          "primary_key": 1,
+          "observed_ns": 47663219524305
+        },
+        {
+          "requester": 86,
+          "blocker": 85,
+          "table": "users",
+          "primary_key": 4,
+          "observed_ns": 47664623270571
+        }
+      ],
+      "concurrent_retry": null,
+      "fresh_retry": null,
+      "before_fresh_retry": null,
+      "after_fresh_retry": null,
+      "audited_summaries_equal": null
+    },
+    {
+      "run": "integration-and-adapters/native-reservation-races-isolated",
+      "receipt": "integration-and-adapters/native-race-workers/test_same_key_and_intent_return_the_same_retained_reservation_and_event-08b39674-93e3-4926-9612-115027583ef7.json",
+      "case": "test_same_key_and_intent_return_the_same_retained_reservation_and_event",
+      "workers": [
+        {
+          "pid": 152941,
+          "exit": 0,
+          "stopped_by_teardown": false,
+          "reason": null,
+          "status": "reserved",
+          "elapsed_ns": 45284010462,
+          "transaction_level": 0,
+          "pdo_transaction": false
+        },
+        {
+          "pid": 152942,
+          "exit": 0,
+          "stopped_by_teardown": false,
+          "reason": "operation_deadline",
+          "status": null,
+          "elapsed_ns": 63448939786,
+          "transaction_level": 0,
+          "pdo_transaction": false
+        }
+      ],
+      "observed_barriers": [
+        {
+          "requester": 94,
+          "blocker": 92,
+          "table": "production_membership_billing_award_fence",
+          "primary_key": 1,
+          "observed_ns": 48170519573487
+        },
+        {
+          "requester": 95,
+          "blocker": 94,
+          "table": "users",
+          "primary_key": 4,
+          "observed_ns": 48171874732461
+        }
+      ],
+      "concurrent_retry": null,
+      "fresh_retry": null,
+      "before_fresh_retry": null,
+      "after_fresh_retry": null,
+      "audited_summaries_equal": null
+    },
+    {
+      "run": "integration-and-adapters/native-reservation-races-contract",
+      "receipt": "integration-and-adapters/native-race-workers/test_available_expiry_and_reserve_at_synthetic_equality_conserve_the_allowance-71ac82d9-b0c8-4779-9281-c837ca7862fd.json",
+      "case": "test_available_expiry_and_reserve_at_synthetic_equality_conserve_the_allowance",
+      "workers": [
+        {
+          "pid": 160205,
+          "exit": 0,
+          "stopped_by_teardown": false,
+          "reason": null,
+          "status": "available_credit_expired",
+          "elapsed_ns": 34099476415,
+          "transaction_level": 0,
+          "pdo_transaction": false
+        },
+        {
+          "pid": 160206,
+          "exit": 0,
+          "stopped_by_teardown": false,
+          "reason": "credit_expired",
+          "status": null,
+          "elapsed_ns": 44198059498,
+          "transaction_level": 0,
+          "pdo_transaction": false
+        }
+      ],
+      "observed_barriers": [
+        {
+          "requester": 108,
+          "blocker": 107,
+          "table": "production_membership_billing_award_fence",
+          "primary_key": 1,
+          "observed_ns": 49656624960317
+        },
+        {
+          "requester": 109,
+          "blocker": 108,
+          "table": "users",
+          "primary_key": 4,
+          "observed_ns": 49657957354710
+        }
+      ],
+      "concurrent_retry": null,
+      "fresh_retry": null,
+      "before_fresh_retry": null,
+      "after_fresh_retry": null,
+      "audited_summaries_equal": null
+    },
+    {
+      "run": "integration-and-adapters/native-reservation-races-contract",
+      "receipt": "integration-and-adapters/native-race-workers/test_duplicate_release_at_honor_equality_creates_one_terminal_without_inflation-c01ef043-e094-41f2-af3a-c2b3e7abd58f.json",
+      "case": "test_duplicate_release_at_honor_equality_creates_one_terminal_without_inflation",
+      "workers": [
+        {
+          "pid": 157614,
+          "exit": 0,
+          "stopped_by_teardown": false,
+          "reason": null,
+          "status": "released",
+          "elapsed_ns": 34971491268,
+          "transaction_level": 0,
+          "pdo_transaction": false
+        },
+        {
+          "pid": 157615,
+          "exit": 0,
+          "stopped_by_teardown": false,
+          "reason": null,
+          "status": "released",
+          "elapsed_ns": 56353296540,
+          "transaction_level": 0,
+          "pdo_transaction": false
+        }
+      ],
+      "observed_barriers": [
+        {
+          "requester": 102,
+          "blocker": 101,
+          "table": "production_membership_billing_award_fence",
+          "primary_key": 1,
+          "observed_ns": 49043835076504
+        },
+        {
+          "requester": 103,
+          "blocker": 102,
+          "table": "users",
+          "primary_key": 4,
+          "observed_ns": 49045273786579
+        }
+      ],
+      "concurrent_retry": {
+        "outcome": "same_receipt",
+        "elapsed_ns": 56353296540,
+        "original_admission_budget_ns": 60000000000
+      },
+      "fresh_retry": {
+        "scope": "Separate explicitly invoked parent operation after workers and full audit; no automatic operation retry.",
+        "operation": "release",
+        "entered_ns": 49109354666038,
+        "receipt": {
+          "period_id": "c6e1d5a4-ece2-4f8a-968c-5db55efeaba5",
+          "redemption_id": "c8e94971-b7d7-49cd-bdfe-db42dbefaf4e",
+          "reservation_event_id": "521168e5-944f-4bf8-8b48-fb413dd79177",
+          "release_event_id": "69858ede-f96e-4733-8fbb-3d47382197ad",
+          "status": "released",
+          "balances": {
+            "available": 1,
+            "reserved": 0,
+            "consumed": 0,
+            "expired": 0
+          }
+        },
+        "finished_ns": 49135880113435,
+        "transaction_level": 0,
+        "pdo_transaction": false
+      },
+      "before_fresh_retry": {
+        "period_id": "c6e1d5a4-ece2-4f8a-968c-5db55efeaba5",
+        "tail_event_id": "69858ede-f96e-4733-8fbb-3d47382197ad",
+        "balances": {
+          "available": 1,
+          "reserved": 0,
+          "consumed": 0,
+          "expired": 0
+        },
+        "redemption_ids": [
+          "c8e94971-b7d7-49cd-bdfe-db42dbefaf4e"
+        ],
+        "row_counts": {
+          "production_membership_paid_periods": 1,
+          "production_membership_credit_events": 3,
+          "production_membership_redemptions": 1
+        },
+        "audit_sha256": "2f981a1e54d7000ac87973cec0d626f4a14208c46fdab859650a41ffa84fd55b",
+        "retained_rows_sha256": "d4468746b4cec2d373b850fb1a27ff6c42f18e925d0bfeb434196c8adb34f7f1"
+      },
+      "after_fresh_retry": {
+        "period_id": "c6e1d5a4-ece2-4f8a-968c-5db55efeaba5",
+        "tail_event_id": "69858ede-f96e-4733-8fbb-3d47382197ad",
+        "balances": {
+          "available": 1,
+          "reserved": 0,
+          "consumed": 0,
+          "expired": 0
+        },
+        "redemption_ids": [
+          "c8e94971-b7d7-49cd-bdfe-db42dbefaf4e"
+        ],
+        "row_counts": {
+          "production_membership_paid_periods": 1,
+          "production_membership_credit_events": 3,
+          "production_membership_redemptions": 1
+        },
+        "audit_sha256": "2f981a1e54d7000ac87973cec0d626f4a14208c46fdab859650a41ffa84fd55b",
+        "retained_rows_sha256": "d4468746b4cec2d373b850fb1a27ff6c42f18e925d0bfeb434196c8adb34f7f1"
+      },
+      "audited_summaries_equal": true
+    },
+    {
+      "run": "integration-and-adapters/native-reservation-races-contract",
+      "receipt": "integration-and-adapters/native-race-workers/test_release_after_period_expiry_moves_credit_to_expired_and_cannot_resurrect_it-cb3a3fed-9db6-4b0f-95c9-845e7545eb92.json",
+      "case": "test_release_after_period_expiry_moves_credit_to_expired_and_cannot_resurrect_it",
+      "workers": [
+        {
+          "pid": 158691,
+          "exit": 0,
+          "stopped_by_teardown": false,
+          "reason": null,
+          "status": "released",
+          "elapsed_ns": 33502653581,
+          "transaction_level": 0,
+          "pdo_transaction": false
+        },
+        {
+          "pid": 158692,
+          "exit": 0,
+          "stopped_by_teardown": false,
+          "reason": null,
+          "status": "released",
+          "elapsed_ns": 54227772811,
+          "transaction_level": 0,
+          "pdo_transaction": false
+        }
+      ],
+      "observed_barriers": [
+        {
+          "requester": 105,
+          "blocker": 104,
+          "table": "production_membership_billing_award_fence",
+          "primary_key": 1,
+          "observed_ns": 49398671414941
+        },
+        {
+          "requester": 106,
+          "blocker": 105,
+          "table": "users",
+          "primary_key": 4,
+          "observed_ns": 49400028469467
+        }
+      ],
+      "concurrent_retry": {
+        "outcome": "same_receipt",
+        "elapsed_ns": 54227772811,
+        "original_admission_budget_ns": 60000000000
+      },
+      "fresh_retry": {
+        "scope": "Separate explicitly invoked parent operation after workers and full audit; no automatic operation retry.",
+        "operation": "release",
+        "entered_ns": 49461783818215,
+        "receipt": {
+          "period_id": "2503922f-8a73-47a0-b0a1-084b0c774b44",
+          "redemption_id": "bda6ef2f-e32c-43f3-8d64-1aad22428747",
+          "reservation_event_id": "4e2fff92-5928-4d40-91f5-aacc00305a38",
+          "release_event_id": "fbf560de-e109-4554-9d45-1bdabacacf5e",
+          "status": "released",
+          "balances": {
+            "available": 0,
+            "reserved": 0,
+            "consumed": 0,
+            "expired": 1
+          }
+        },
+        "finished_ns": 49488249698029,
+        "transaction_level": 0,
+        "pdo_transaction": false
+      },
+      "before_fresh_retry": {
+        "period_id": "2503922f-8a73-47a0-b0a1-084b0c774b44",
+        "tail_event_id": "fbf560de-e109-4554-9d45-1bdabacacf5e",
+        "balances": {
+          "available": 0,
+          "reserved": 0,
+          "consumed": 0,
+          "expired": 1
+        },
+        "redemption_ids": [
+          "bda6ef2f-e32c-43f3-8d64-1aad22428747"
+        ],
+        "row_counts": {
+          "production_membership_paid_periods": 1,
+          "production_membership_credit_events": 3,
+          "production_membership_redemptions": 1
+        },
+        "audit_sha256": "caca18f8562c4fef0f7b7550629fffdbee59ca4cdd781d9cf48b3bd0295686ad",
+        "retained_rows_sha256": "41a29177ad1979560a03a3c4e15de6e078856dedfb8aed4fe180eaa3cf2b1330"
+      },
+      "after_fresh_retry": {
+        "period_id": "2503922f-8a73-47a0-b0a1-084b0c774b44",
+        "tail_event_id": "fbf560de-e109-4554-9d45-1bdabacacf5e",
+        "balances": {
+          "available": 0,
+          "reserved": 0,
+          "consumed": 0,
+          "expired": 1
+        },
+        "redemption_ids": [
+          "bda6ef2f-e32c-43f3-8d64-1aad22428747"
+        ],
+        "row_counts": {
+          "production_membership_paid_periods": 1,
+          "production_membership_credit_events": 3,
+          "production_membership_redemptions": 1
+        },
+        "audit_sha256": "caca18f8562c4fef0f7b7550629fffdbee59ca4cdd781d9cf48b3bd0295686ad",
+        "retained_rows_sha256": "41a29177ad1979560a03a3c4e15de6e078856dedfb8aed4fe180eaa3cf2b1330"
+      },
+      "audited_summaries_equal": true
+    },
+    {
+      "run": "integration-and-adapters/native-reservation-races-contract",
+      "receipt": "integration-and-adapters/native-race-workers/test_same_key_and_intent_return_the_same_retained_reservation_and_event-08adb5b6-7676-402e-930c-7ba2ddc64c9e.json",
+      "case": "test_same_key_and_intent_return_the_same_retained_reservation_and_event",
+      "workers": [
+        {
+          "pid": 156522,
+          "exit": 0,
+          "stopped_by_teardown": false,
+          "reason": null,
+          "status": "reserved",
+          "elapsed_ns": 50094567298,
+          "transaction_level": 0,
+          "pdo_transaction": false
+        },
+        {
+          "pid": 156523,
+          "exit": 0,
+          "stopped_by_teardown": false,
+          "reason": "operation_deadline",
+          "status": null,
+          "elapsed_ns": 60823447676,
+          "transaction_level": 0,
+          "pdo_transaction": false
+        }
+      ],
+      "observed_barriers": [
+        {
+          "requester": 99,
+          "blocker": 98,
+          "table": "production_membership_billing_award_fence",
+          "primary_key": 1,
+          "observed_ns": 48735787956879
+        },
+        {
+          "requester": 100,
+          "blocker": 99,
+          "table": "users",
+          "primary_key": 4,
+          "observed_ns": 48737270186545
+        }
+      ],
+      "concurrent_retry": {
+        "outcome": "operation_deadline",
+        "elapsed_ns": 60823447676,
+        "original_admission_budget_ns": 60000000000
+      },
+      "fresh_retry": {
+        "scope": "Separate explicitly invoked parent operation after workers and full audit; no automatic operation retry.",
+        "operation": "reserve",
+        "entered_ns": 48805256644362,
+        "receipt": {
+          "period_id": "7f9e2f3f-6fc7-47a9-85e6-08ef3d50594b",
+          "redemption_id": "8d06fc89-a7fd-4335-9812-2c5022e9b8f1",
+          "reservation_event_id": "c198be58-b871-4ade-9d6b-a19ec32b9f04",
+          "credit_amount": 1,
+          "honor_deadline": "2026-10-13 12:01:00",
+          "status": "reserved",
+          "balances": {
+            "available": 0,
+            "reserved": 1,
+            "consumed": 0,
+            "expired": 0
+          }
+        },
+        "finished_ns": 48842355556444,
+        "transaction_level": 0,
+        "pdo_transaction": false
+      },
+      "before_fresh_retry": {
+        "period_id": "7f9e2f3f-6fc7-47a9-85e6-08ef3d50594b",
+        "tail_event_id": "c198be58-b871-4ade-9d6b-a19ec32b9f04",
+        "balances": {
+          "available": 0,
+          "reserved": 1,
+          "consumed": 0,
+          "expired": 0
+        },
+        "redemption_ids": [
+          "8d06fc89-a7fd-4335-9812-2c5022e9b8f1"
+        ],
+        "row_counts": {
+          "production_membership_paid_periods": 1,
+          "production_membership_credit_events": 2,
+          "production_membership_redemptions": 1
+        },
+        "audit_sha256": "bbb8b701b756a2c85f5e9c42bc579cf1ce4296ac72a519359c1a26705b77937a",
+        "retained_rows_sha256": "f30d481f8f7c5efa0a9d8721abc4498ae5f466121b1a815606d54961d18af301"
+      },
+      "after_fresh_retry": {
+        "period_id": "7f9e2f3f-6fc7-47a9-85e6-08ef3d50594b",
+        "tail_event_id": "c198be58-b871-4ade-9d6b-a19ec32b9f04",
+        "balances": {
+          "available": 0,
+          "reserved": 1,
+          "consumed": 0,
+          "expired": 0
+        },
+        "redemption_ids": [
+          "8d06fc89-a7fd-4335-9812-2c5022e9b8f1"
+        ],
+        "row_counts": {
+          "production_membership_paid_periods": 1,
+          "production_membership_credit_events": 2,
+          "production_membership_redemptions": 1
+        },
+        "audit_sha256": "bbb8b701b756a2c85f5e9c42bc579cf1ce4296ac72a519359c1a26705b77937a",
+        "retained_rows_sha256": "f30d481f8f7c5efa0a9d8721abc4498ae5f466121b1a815606d54961d18af301"
+      },
+      "audited_summaries_equal": true
+    }
+  ]
+}

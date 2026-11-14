@@ -50,7 +50,10 @@ use App\Domain\Memberships\Production\MembershipPaidInvoiceAuthority;
 use App\Domain\Memberships\Production\MembershipPolicy as ProductionMembershipPolicy;
 use App\Domain\Memberships\Production\MembershipPolicyFactsAuthority;
 use App\Domain\Memberships\Production\MembershipReservationAuthority;
+use App\Domain\Merch\Fulfillment\MerchFulfillmentPolicy;
 use App\Domain\Notifications\TransactionalNotificationPolicy;
+use App\Domain\Services\Invoicing\ServiceInvoicePolicy;
+use App\Domain\Services\Invoicing\StripeSdkInvoiceGateway;
 use App\Domain\Services\Projects\ServiceProjectPolicy;
 use App\Domain\SupportAttachments\FixtureAttachmentPolicy;
 use App\Filament\Resources\TestPromotionResource;
@@ -116,12 +119,33 @@ class StagingEnvironmentAdmissionTest extends TestCase
         'app/Domain/Customers/Preferences/LocalConsentRuntime.php',
         'app/Domain/Notifications/TransactionalNotificationPolicy.php',
         'app/Domain/Inquiries/OrderInquiry.php',
+        // FP-013: the operator alert mail transport is admitted in local, testing and staging; production needs its code literal.
+        'app/Domain/Inquiries/Notifications/MailInquiryAlertTransport.php',
         'app/Domain/Services/Projects/ServiceProjectPolicy.php',
+        // BL-70: Stripe test-mode service invoicing (policy and gateway) is admitted wherever test commerce is; production holds its flag false.
+        'app/Domain/Services/Invoicing/ServiceInvoicePolicy.php',
+        'app/Domain/Services/Invoicing/StripeSdkInvoiceGateway.php',
+        // BL-63: Printful merch fulfillment is admitted in local, testing and staging behind its own default-off flag.
+        'app/Domain/Merch/Fulfillment/MerchFulfillmentPolicy.php',
         'app/Domain/Memberships/MembershipPolicy.php',
         'app/Domain/Grants/Free/FreeGrantPolicy.php',
         'app/Domain/Grants/Free/TestFreeGrantIdentity.php',
         'app/Domain/Grants/Free/FreeGrantDefinitions.php',
         'app/Http/Controllers/FreeGrantController.php',
+        // #266: the synthetic STAGING seller tag is admitted through the helper; production refuses it.
+        'app/Domain/Media/StagingSellerTag.php',
+        // BL-71: the BeatStars catalog import (drafts and media only) is admitted through the helper; production refuses it.
+        'app/Domain/Migration/BeatStarsImport/BeatStarsImportPolicy.php',
+    ];
+
+    /**
+     * Files that may spell 'staging' without being an environment gate. StagingSellerTag matches the word inside a
+     * configured tag path (a placeholder-file marker); its environment gate is TestEnvironment::admitsTestCommerce().
+     */
+    private const NAMES_STAGING_WITHOUT_GATING = [
+        'app/Domain/Media/StagingSellerTag.php' => '/stripos\(\$path, \'staging\'\)/',
+        // BL-49: the cutover check's marker word for staging stand-in file names (seller tag, specimen signature), one constant.
+        'app/Support/Diagnostics/CutoverMarkers.php' => '/public const STAGING_PATH_WORD = \'staging\';/',
     ];
 
     /** Development-only conveniences and production-lane rehearsals: these stay explicitly local/testing. */
@@ -143,6 +167,29 @@ class StagingEnvironmentAdmissionTest extends TestCase
         'app/Domain/Grants/Paid/PaidGrantPolicy.php',
         // Service project attachment sources stay local/testing only (synthetic attachment evidence).
         'app/Domain/Services/Projects/Attachments/ServiceProjectAttachmentSourceV1.php',
+        // #117: member activation reads admit rehearsal provenance only in local/testing and refuse verified
+        // production in staging, the same gate as MemberGrantPolicy and MembershipPolicy above.
+        'app/Domain/Grants/Member/MemberActivationReadConfiguration.php',
+        // #120-#125: Tax V2 checkout, paid-tax delivery and financial inspection rehearsals read the captured
+        // environment without resolving it and admit only local/testing; the Tax HTTP mount also needs literal true.
+        'app/Domain/Commerce/ProductionTaxCheckout/FreshTaxCheckoutPolicy.php',
+        // D-30 step 6: V1 contract identity capture has its own literal-false gate and admits only local/testing.
+        'app/Domain/Commerce/ProductionCheckout/ContractIdentityPolicy.php',
+        // D-30 (#245): v2 license issuance has its own literal-false gate (contracts.vasey_license_v2_issuance)
+        // and admits only local/testing; ops/production/validate-runtime.php holds it in production.
+        'app/Domain/Grants/VaseyLicenseIssuance.php',
+        'app/Domain/Grants/PaidTax/PaidTaxPolicy.php',
+        'app/Domain/Grants/PaidTax/PaidTaxRuntime.php',
+        'app/Domain/Grants/PaidTax/PaidTaxDeliveryPolicy.php',
+        'app/Http/Tax/TaxHttpMount.php',
+        'app/Domain/Commerce/ProductionFinancialInspection/FinancialInspectionPolicy.php',
+        // D1: the family 256 HTTP mount, like the Tax mount, needs the literal true and a local/testing cached environment.
+        'app/Http/ProductionFree/ProductionFreeHttpMount.php',
+        // C4e: the member HTTP mount, like the family 256 mount, needs the literal true and a local/testing cached environment.
+        'app/Http/Membership/MembershipHttpMount.php',
+        // CX: order-ready mail refuses in local/testing unless Mail is faked, so a development run can never send; it is a
+        // refusal, not an admission, and staging relies on its configured sender and pinned preflight receipt instead.
+        'app/Domain/Notifications/Mail/TransactionalMailPolicy.php',
     ];
 
     private const LOCAL_TESTING_GATE = '/environment\(\[?\'local\', \'testing\'\]?\)|in_array\(\$[a-zA-Z\[\]\']+, \[\'local\', \'testing\'\], true\)/';
@@ -154,11 +201,12 @@ class StagingEnvironmentAdmissionTest extends TestCase
         InventoryFixtures::configure();
         config([
             'customer.test_accounts_enabled' => true, 'free-grants.test_enabled' => true,
-            'customer-preferences.test_grants_enabled' => true, 'services-projects.test_enabled' => true,
+            'customer-preferences.test_grants_enabled' => true, 'services-projects.test_enabled' => true, 'services-invoicing.test_enabled' => true,
             'memberships.test_mode_enabled' => true, 'unpaid-release.enabled' => true,
             'transactional-notifications.test_enabled' => true, 'transactional-notifications.transport' => 'private_capture',
             'transactional-notifications.policy_version' => TransactionalNotificationPolicy::VERSION,
             'support-attachments.fixture_enabled' => true, 'commerce.test_promotions' => '[]',
+            'merch.printful_enabled' => true,
             // The real SDK gateway admits only an exact sk_test_ credential shape.
             'payments.stripe.secret_key' => 'sk_test_SYNTHETICONLY12345',
         ]);
@@ -265,6 +313,23 @@ class StagingEnvironmentAdmissionTest extends TestCase
                 }
             },
             'test service projects' => fn () => app(ServiceProjectPolicy::class)->enabled(),
+            'test service invoicing' => fn () => app(ServiceInvoicePolicy::class)->enabled(),
+            'service invoice gateway reaches the provider transport' => function (): bool {
+                $transport = new StagingAccountTransport;
+                $previous = ApiRequestor::httpClient();
+                try {
+                    (new StripeSdkInvoiceGateway($transport))->retrieve('in_StagingProbe');
+                } catch (RuntimeException $error) {
+                    self::assertSame('STRIPE_INVOICE_UNAVAILABLE', $error->getMessage());
+                } finally {
+                    ApiRequestor::setHttpClient($previous);
+                }
+
+                // The transport answers the account proof and nothing else, so an admitted gateway stops at the invoice read
+                // after sending at least the account request; a refused one sends nothing at all.
+                return $transport->requests !== [];
+            },
+            'merch printful fulfillment' => fn () => app(MerchFulfillmentPolicy::class)->enabled(),
             'synthetic memberships' => fn () => app(MembershipPolicy::class)->enabled(),
             'test free grants' => fn () => app(FreeGrantPolicy::class)->enabled(),
             'test free grant definitions' => fn () => self::completes(fn () => app(FreeGrantPolicy::class)
@@ -377,6 +442,7 @@ class StagingEnvironmentAdmissionTest extends TestCase
             'absent mode' => ['payments.stripe.mode' => null],
         ];
         $stripeGates = ['checkout account', 'payment processing', 'checkout gateway reaches the provider transport', 'stripe test webhook',
+            'test service invoicing', 'service invoice gateway reaches the provider transport',
             'finalization', 'contract issuance', 'fulfillment activation', 'owner delivery access', 'test unpaid release'];
         foreach ($live as $label => $settings) {
             config($settings);
@@ -388,6 +454,7 @@ class StagingEnvironmentAdmissionTest extends TestCase
         foreach (['sk_'.'live_SYNTHETICONLY12345', 'rk_'.'test_SYNTHETICONLY12345', 'rk_'.'live_SYNTHETICONLY12345', 'pk_'.'test_SYNTHETICONLY12345'] as $key) {
             config(['payments.stripe.secret_key' => $key]);
             $this->assertFalse($this->in('staging', self::gates()['checkout gateway reaches the provider transport']), 'gateway admitted '.substr($key, 0, 8));
+            $this->assertFalse($this->in('staging', self::gates()['service invoice gateway reaches the provider transport']), 'invoice gateway admitted '.substr($key, 0, 8));
         }
         config(['payments.stripe.secret_key' => 'sk_test_SYNTHETICONLY12345']);
 
@@ -472,9 +539,6 @@ class StagingEnvironmentAdmissionTest extends TestCase
                 return $error->reason;
             }
         };
-        $this->assertSame('admitted', $this->in('production', $memberGrant));
-        $this->assertSame('provenance', $this->in('staging', $memberGrant));
-
         config(['production-memberships.enabled' => true, 'production-memberships.version' => ProductionMembershipPolicy::VERSION,
             'production-memberships.provenance' => IdentityPolicy::PRODUCTION, 'production-memberships.approved_policy_hash' => str_repeat('a', 64)]);
         foreach ([MembershipPaidInvoiceAuthority::class, MembershipPolicyFactsAuthority::class, MembershipEligibleLicenseAuthority::class, MemberGrantAuthority::class] as $capability) {
@@ -489,10 +553,13 @@ class StagingEnvironmentAdmissionTest extends TestCase
                 return $error->reason;
             }
         };
-        // Verified production needs the native driver; only the configured driver name is read, never a connection.
+        // Both configuration-only gates require a MySQL label. No connection is opened here;
+        // actual native frame admission is covered separately by MemberGrantSourceAdmissionTest.
         $default = config('database.default');
         config(['database.connections.staging_probe_native' => ['driver' => 'mysql'], 'database.default' => 'staging_probe_native']);
         try {
+            $this->assertSame('admitted', $this->in('production', $memberGrant));
+            $this->assertSame('provenance', $this->in('staging', $memberGrant));
             $this->assertSame('admitted', $this->in('production', $membership));
             $this->assertSame('provenance', $this->in('staging', $membership));
         } finally {
@@ -555,7 +622,15 @@ class StagingEnvironmentAdmissionTest extends TestCase
                 $named[] = Str::after($path->getPathname(), base_path().'/');
             }
         }
-        $this->assertSame(['app/Support/Environment/TestEnvironment.php'], $named);
+        // A file allowed to spell the word must use it only in its recorded non-gate expression, never beside an
+        // environment read, so the exemption cannot hide a gate.
+        foreach (self::NAMES_STAGING_WITHOUT_GATING as $file => $use) {
+            $source = file_get_contents(base_path($file));
+            $this->assertMatchesRegularExpression($use, $source, $file);
+            $this->assertSame(1, preg_match_all('/[\'"]staging[\'"]/', $source), $file.' names staging outside its recorded use');
+            $this->assertDoesNotMatchRegularExpression('/environment\([^)]*[\'"]staging[\'"]|[\'"]staging[\'"]\s*===|===\s*[\'"]staging[\'"]/', $source, $file);
+        }
+        $this->assertSame(['app/Support/Environment/TestEnvironment.php'], array_values(array_diff($named, array_keys(self::NAMES_STAGING_WITHOUT_GATING))));
     }
 }
 

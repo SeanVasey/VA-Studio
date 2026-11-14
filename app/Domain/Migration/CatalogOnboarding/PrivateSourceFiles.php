@@ -19,12 +19,12 @@ final class PrivateSourceFiles
         }
     }
 
-    public function protectedFile(string $path, int $maximum = 33554432): array
+    public function protectedFile(string $path, int $maximum = 33554432, bool $allowEmpty = false): array
     {
         try {
             $parent = $this->directory(dirname($path));
 
-            return ['path' => $path, 'parent_identity' => $parent] + $this->read($path, $maximum, true);
+            return ['path' => $path, 'parent_identity' => $parent] + $this->read($path, $maximum, true, $allowEmpty);
         } catch (Throwable) {
             throw new InvalidArgumentException('catalog_source_files_invalid');
         }
@@ -142,12 +142,12 @@ final class PrivateSourceFiles
         $this->require(function_exists('posix_geteuid') && $stat['uid'] === posix_geteuid());
     }
 
-    private function read(string $path, int $maximum, bool $capture = false): array
+    private function read(string $path, int $maximum, bool $capture = false, bool $allowEmpty = false): array
     {
         $expected = $this->path($path);
         $this->owner($expected);
         $this->require(($expected['mode'] & 0170000) === 0100000 && ($expected['mode'] & 07777) === 0600
-            && $expected['nlink'] === 1 && $expected['size'] > 0 && $expected['size'] <= $maximum);
+            && $expected['nlink'] === 1 && ($allowEmpty || $expected['size'] > 0) && $expected['size'] <= $maximum);
         $handle = @fopen($path, 'rb');
         $this->require($handle !== false);
         try {

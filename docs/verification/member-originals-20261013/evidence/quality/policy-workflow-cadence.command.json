@@ -1,0 +1,24 @@
+{
+  "name": "policy-workflow-cadence",
+  "head": "78ef16be7626c81de49d103d581551b707201eda",
+  "cwd": "/workspace/VA-Studio-member-originals",
+  "argv": [
+    "python3",
+    "scripts/ci/test-workflow-cadence.py"
+  ],
+  "environment": {
+    "APP_ENV": "testing",
+    "APP_DEBUG": "false",
+    "DB_CONNECTION": "mysql",
+    "DB_HOST": "127.0.0.1",
+    "DB_PORT": "1",
+    "DB_SOCKET": "",
+    "DB_DATABASE": "vaseyaudio_discovery_only",
+    "CACHE_STORE": "array",
+    "SESSION_DRIVER": "array",
+    "QUEUE_CONNECTION": "sync"
+  },
+  "source_before_sha256": "e31e04b81fa2f05f028f04fe23934a79cfc1ec36b89ebf9248e2524665b3a47e",
+  "runner_sha256": "34aa172f612de71548070cb0b3fc36ec0f19965ef14936dae78c4b7108ffe8f6",
+  "started_utc": "2026-10-13T09:02:47.907623+00:00"
+}

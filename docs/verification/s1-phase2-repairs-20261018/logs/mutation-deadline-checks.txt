@@ -1,0 +1,28 @@
+-                            ProductionFreeGrantException::require(hrtime(true) < $deadline, 'expired');
++                            true;
+-                                ProductionFreeGrantException::require(hrtime(true) < $deadline, 'expired');
++                                true;
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/f4/phpunit.xml
+
+.F                                                                  2 / 2 (100%)
+
+Time: 00:09.803, Memory: 87.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantStalledSourceTest::test_the_deadline_is_checked_before_the_first_read
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'expired'
++'artifact_unavailable'
+
+/home/user/wt/f4/tests/Feature/ProductionFreeGrants/ProductionFreeGrantStalledSourceTest.php:153
+/home/user/wt/f4/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 2, Assertions: 9, Failures: 1.

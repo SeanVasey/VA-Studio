@@ -1,0 +1,40 @@
+{
+  "checks": [
+    {
+      "command": [
+        "docker",
+        "exec",
+        "--user",
+        "1000:1000",
+        "--workdir",
+        "/workspace/VA-Studio-account-guard-v2",
+        "va-pcc-runtime-20261101",
+        "php",
+        "-l",
+        "app/Domain/Customers/ProductionIdentity/CatalogGroupPlan.php"
+      ],
+      "exit": 0,
+      "stdout": "No syntax errors detected in app/Domain/Customers/ProductionIdentity/CatalogGroupPlan.php\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "--user",
+        "1000:1000",
+        "--workdir",
+        "/workspace/VA-Studio-account-guard-v2",
+        "va-pcc-runtime-20261101",
+        "php",
+        "/workspace/VA-Studio/vendor/laravel/pint/builds/pint",
+        "--test",
+        "app/Domain/Customers/ProductionIdentity/CatalogGroupPlan.php"
+      ],
+      "exit": 0,
+      "stdout": "\n  .\n\n  \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 Laravel  \n    PASS   ............................................................ 1 file  \n\n",
+      "stderr": ""
+    }
+  ],
+  "target_sha256": "0571b0a6d342c2773382e2225ff7cc7ebca76347542d7c24cb5a6efe10d84c74"
+}

@@ -1,0 +1,41 @@
+Working directory: /workspace/VA-Studio-membership-award
+Toolchain: source /workspace/.va-studio-toolchain/activate.sh
+Common test environment:
+TMPDIR=/tmp/va-studio-membership-policy-20261013 APP_ENV=testing APP_DEBUG=false DB_CONNECTION=sqlite DB_DATABASE=:memory: DB_URL= DB_SOCKET= CACHE_STORE=array SESSION_DRIVER=array QUEUE_CONNECTION=sync
+PHPUnit executable:
+php -d memory_limit=512M -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' --
+
+subscription-canary:
+--filter test_current_staff_approves_policy_derived_terms_and_original_buyer_without_awarding --log-junit /workspace/runtime/membership-award-evidence/subscription-canary.xml tests/Feature/ProductionMembershipBilling/BillingSubscriptionApprovalTest.php
+Observed exit 1: 1 test / 3 assertions / 1 failure / 0 errors/skips.
+Failure was test-only associative-key ordering: canonical encrypted JSON sorts keys, original T23 binding uses declaration order. Corrected assertion compares CanonicalJson::encode values preserving scalar types. No producer-source correction for this failure.
+
+subscription-sqlite-first:
+--log-junit /workspace/runtime/membership-award-evidence/subscription-sqlite-first.xml tests/Feature/ProductionMembershipBilling/BillingSubscriptionApprovalTest.php
+Observed exit 0: 10 tests / 66 assertions / 0 failures/errors/skips. Run occurred before final BillingSchema ownership reproof and 11th test were added; not final candidate evidence.
+
+subscription-compatibility:
+--log-junit /workspace/runtime/membership-award-evidence/subscription-compatibility.xml tests/Feature/ProductionMembershipBilling/BillingSubscriptionApprovalTest.php tests/Feature/ProductionMembershipBilling/BillingObservationLedgerTest.php
+Observed exit 2: 25 tests / 0 assertions / 25 errors / 0 failures/skips. All setup errors: concurrent BillingSchema edit referred to BillingAwardFence before that new class existed. No application assertions ran. Retry only after schema agent completes dependent files.
+
+subscription-pint:
+php vendor/bin/pint app/Domain/Memberships/Billing/BillingSubscriptionApprovals.php app/Domain/Memberships/Billing/BillingSubscriptionRecord.php tests/Feature/ProductionMembershipBilling/BillingSubscriptionApprovalTest.php
+Observed exit 0, passed.
+
+subscription-pint-final:
+php vendor/bin/pint --test app/Domain/Memberships/Billing/BillingSubscriptionApprovals.php app/Domain/Memberships/Billing/BillingSubscriptionRecord.php tests/Feature/ProductionMembershipBilling/BillingSubscriptionApprovalTest.php
+Observed exit 0, passed. Includes final billing schema reproof and captured staff ID terminal read.
+
+No MySQL run performed by subscription_approval agent. No claim of concurrency verification. No external provider I/O. SMTP fixture is isolated local synthetic identity proof only. No git commit made by this agent. Root owns final integrated source freeze, tests and independent review.
+
+subscription-final-canary (after fence dependencies became available):
+--stop-on-error --stop-on-failure --filter test_current_staff_approves_policy_derived_terms_and_original_buyer_without_awarding --log-junit /workspace/runtime/membership-award-evidence/subscription-final-canary.xml tests/Feature/ProductionMembershipBilling/BillingSubscriptionApprovalTest.php
+Observed exit 0: 1 test / 9 assertions / 0 errors/failures/skips.
+
+subscription-final (after final producer source correction):
+--stop-on-error --stop-on-failure --log-junit /workspace/runtime/membership-award-evidence/subscription-final.xml tests/Feature/ProductionMembershipBilling/BillingSubscriptionApprovalTest.php tests/Feature/ProductionMembershipBilling/BillingObservationLedgerTest.php
+Observed exit 1: fail-fast stopped after 10 tests / 64 assertions / 1 failure / 0 errors/skips, 26 selected. New schema-withdrawal test correctly refused before write, but expected reason "schema" instead of existing "schema_prefix". Corrected test-only expected reason; no production-source correction.
+
+subscription-final-v2:
+--stop-on-error --stop-on-failure --log-junit /workspace/runtime/membership-award-evidence/subscription-final-v2.xml tests/Feature/ProductionMembershipBilling/BillingSubscriptionApprovalTest.php tests/Feature/ProductionMembershipBilling/BillingObservationLedgerTest.php
+See adjacent .exit, .txt and .xml for completed result.

@@ -1,0 +1,26 @@
+[
+  {
+    "name": "",
+    "before": null,
+    "after": null,
+    "type": "updated"
+  },
+  {
+    "name": "node_modules/@inertiajs/core",
+    "before": "3.7.1",
+    "after": "3.8.0",
+    "type": "updated"
+  },
+  {
+    "name": "node_modules/@inertiajs/react",
+    "before": "3.7.1",
+    "after": "3.8.0",
+    "type": "updated"
+  },
+  {
+    "name": "node_modules/laravel-precognition",
+    "before": "2.0.0",
+    "after": "2.1.0",
+    "type": "updated"
+  }
+]

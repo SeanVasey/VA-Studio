@@ -11,6 +11,8 @@ use Illuminate\Support\Str;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\InventoryFixtures;
 use Tests\Support\OrderFixtures as F;
+use Tests\Support\RefundDisputeFixtures;
+use Tests\Support\TransactionalMailFixtures;
 use Tests\TestCase;
 
 class OrderPreparationMigrationTest extends TestCase
@@ -19,12 +21,17 @@ class OrderPreparationMigrationTest extends TestCase
 
     public function test_empty_order_tables_roundtrip_without_changing_existing_pending_inventory_and_pricing(): void
     {
-        $this->fakePrivateMediaStorage(); $this->travelTo(now()->startOfSecond()); F::configure();
-        $f = F::priced(false, true); $service = app(ReservePricedQuote::class);
+        $this->fakePrivateMediaStorage();
+        $this->travelTo(now()->startOfSecond());
+        F::configure();
+        $f = F::priced(false, true);
+        $service = app(ReservePricedQuote::class);
         $held = $service->hold($f['quote']->public_id, InventoryFixtures::OWNER, 'SYNTHETIC');
         $service->beginAttempt($f['quote']->public_id, InventoryFixtures::OWNER, (string) Str::uuid());
-        $quote = $f['quote']->refresh()->getAttributes(); $price = $f['pricing']->refresh()->getAttributes();
-        $reservation = $held['reservation']->refresh()->getAttributes(); $promotion = $held['promotion_use']->refresh()->getAttributes();
+        $quote = $f['quote']->refresh()->getAttributes();
+        $price = $f['pricing']->refresh()->getAttributes();
+        $reservation = $held['reservation']->refresh()->getAttributes();
+        $promotion = $held['promotion_use']->refresh()->getAttributes();
         $audits = DB::table('audit_events')->count();
         $migration = require database_path('migrations/2026_09_24_000017_order_preparation.php');
         $checkout = require database_path('migrations/2026_09_26_000018_hosted_test_checkout.php');
@@ -33,53 +40,107 @@ class OrderPreparationMigrationTest extends TestCase
         $contracts = require database_path('migrations/2026_09_26_000021_test_contract_issuance.php');
         $fulfillmentActivations = require database_path('migrations/2026_09_26_000022_test_fulfillment_activation.php');
         $delivery = require database_path('migrations/2026_09_26_000023_test_owner_delivery.php');
+        $deliveryResume = require database_path('migrations/2026_11_09_270300_test_delivery_resume_v2.php');
         $financialObservations = require database_path('migrations/2026_10_06_000039_test_payment_financial_observations.php');
         $unpaidRelease = require database_path('migrations/2026_10_06_000042_test_unpaid_releases.php');
         $purchaseClaims = require database_path('migrations/2026_10_06_000048_customer_purchase_claims.php');
         $refundResolution = require database_path('migrations/2026_10_06_000047_test_refund_resolutions.php');
         $orderInquiries = require database_path('migrations/2026_10_06_000049_inquiry_order_contexts.php');
         $orderInquiries->down();
+        // The empty merch fulfillment child holds foreign keys to orders and verified_payments; MySQL refuses to drop those
+        // parents while it exists (SQLite does not check), so it goes first and returns last.
+        $merchFulfillment = require database_path('migrations/2026_11_10_286300_merch_printful_fulfillment.php');
+        $this->assertDatabaseCount('merch_fulfillment_events', 0);
+        $this->assertDatabaseCount('merch_fulfillments', 0);
+        $merchFulfillment->down();
         // Remove the empty additive notification child before its retained parents.
         $notices = require database_path('migrations/2026_10_06_231000_test_transactional_notifications.php');
+        // Drop the empty, forward-only A5 refund/dispute child first; its guards name the order tables rebuilt below.
+        $refundDispute = require database_path('migrations/2026_10_24_264100_refund_dispute_lifecycle.php');
         $this->assertDatabaseCount('transactional_notices', 0);
         $this->assertDatabaseCount('transactional_notice_attempts', 0);
+        RefundDisputeFixtures::dropEmptyTables();
+        // The empty lane CX mail-delivery child names transactional_notices in its insert guard; dispose of it first.
+        TransactionalMailFixtures::dropEmptyDeliveries();
         $notices->down();
         $purchaseClaims->down();
+        // The empty buyer cancellation and never-sent release children replace the refund migration's resource guards; restore them first, newest first.
+        (require database_path('migrations/2026_11_12_001000_test_buyer_order_cancellations.php'))->down();
+        (require database_path('migrations/2026_11_11_001000_test_unsent_order_releases.php'))->down();
         $refundResolution->down();
         $unpaidRelease->down();
         $financialObservations->down();
         $exceptionOperations = require database_path('migrations/2026_10_02_000036_test_payment_exception_operations.php');
-        foreach (['test_payment_exception_events', 'test_payment_exception_work'] as $table) { $this->assertDatabaseCount($table, 0); }
-        foreach (['stripe_receipt_work', 'payment_observations', 'verified_payments'] as $table) { $this->assertDatabaseCount($table, 0); }
-        foreach (['checkout_intents', 'checkout_sessions', 'checkout_observations'] as $table) { $this->assertDatabaseCount($table, 0); }
-        $exceptionOperations->down(); $delivery->down(); $fulfillmentActivations->down(); $contracts->down(); $finalizations->down(); $payments->down(); $checkout->down();
-        foreach (['orders', 'order_lines', 'order_attempts'] as $table) { $this->assertDatabaseCount($table, 0); }
+        foreach (['test_payment_exception_events', 'test_payment_exception_work'] as $table) {
+            $this->assertDatabaseCount($table, 0);
+        }
+        foreach (['stripe_receipt_work', 'payment_observations', 'verified_payments'] as $table) {
+            $this->assertDatabaseCount($table, 0);
+        }
+        foreach (['checkout_intents', 'checkout_sessions', 'checkout_observations'] as $table) {
+            $this->assertDatabaseCount($table, 0);
+        }
+        // The empty v2 resume child (admissions and coverage, plus the v2 authorization guard) names test_delivery_redemptions
+        // in its triggers; SQLite revalidates them when a parent table is rebuilt, so it is removed before 000023 is.
+        $deliveryResume->down();
+        $exceptionOperations->down();
+        $delivery->down();
+        $fulfillmentActivations->down();
+        $contracts->down();
+        $finalizations->down();
+        $payments->down();
+        $checkout->down();
+        foreach (['orders', 'order_lines', 'order_attempts'] as $table) {
+            $this->assertDatabaseCount($table, 0);
+        }
         $migration->down();
-        foreach (['orders', 'order_lines', 'order_attempts'] as $table) { $this->assertFalse(Schema::hasTable($table)); }
+        foreach (['orders', 'order_lines', 'order_attempts'] as $table) {
+            $this->assertFalse(Schema::hasTable($table));
+        }
         $migration->up();
-        $checkout->up(); $payments->up(); $finalizations->up(); $contracts->up(); $fulfillmentActivations->up(); $delivery->up(); $exceptionOperations->up();
+        $checkout->up();
+        $payments->up();
+        $finalizations->up();
+        $contracts->up();
+        $fulfillmentActivations->up();
+        $delivery->up();
+        $deliveryResume->up();
+        $exceptionOperations->up();
         $financialObservations->up();
         $unpaidRelease->up();
         $refundResolution->up();
+        (require database_path('migrations/2026_11_11_001000_test_unsent_order_releases.php'))->up();
+        (require database_path('migrations/2026_11_12_001000_test_buyer_order_cancellations.php'))->up();
         $purchaseClaims->up();
         $notices->up();
+        TransactionalMailFixtures::restoreDeliveries();
+        $refundDispute->up();
         $orderInquiries->up();
-        foreach (['test_payment_exception_events', 'test_payment_exception_work'] as $table) { $this->assertDatabaseCount($table, 0); }
+        $merchFulfillment->up();
+        foreach (['test_payment_exception_events', 'test_payment_exception_work'] as $table) {
+            $this->assertDatabaseCount($table, 0);
+        }
         $this->assertSame($quote, $f['quote']->refresh()->getAttributes());
         $this->assertSame($price, $f['pricing']->refresh()->getAttributes());
         $this->assertSame($reservation, $held['reservation']->refresh()->getAttributes());
         $this->assertSame($promotion, $held['promotion_use']->refresh()->getAttributes());
         $this->assertSame($audits, DB::table('audit_events')->count());
-        foreach (['orders', 'order_lines', 'order_attempts'] as $table) { $this->assertDatabaseCount($table, 0); }
+        foreach (['orders', 'order_lines', 'order_attempts'] as $table) {
+            $this->assertDatabaseCount($table, 0);
+        }
         // Historical pending rows stay historical. A distinct fresh quote can use the new aggregate.
         $fresh = F::priced();
         app(PrepareOrder::class)->handle(InventoryFixtures::OWNER, (string) Str::uuid(), F::request($fresh['quote']));
-        $this->assertDatabaseCount('orders', 1); $this->assertDatabaseCount('order_lines', 1); $this->assertDatabaseCount('order_attempts', 1);
+        $this->assertDatabaseCount('orders', 1);
+        $this->assertDatabaseCount('order_lines', 1);
+        $this->assertDatabaseCount('order_attempts', 1);
     }
 
     public function test_new_foreign_keys_reject_orphan_evidence_with_enforcement_enabled(): void
     {
-        $this->fakePrivateMediaStorage(); F::configure(); $f = F::priced();
+        $this->fakePrivateMediaStorage();
+        F::configure();
+        $f = F::priced();
         $held = app(ReservePricedQuote::class)->hold($f['quote']->public_id, InventoryFixtures::OWNER);
         $rows = [
             'orders' => ['public_id' => (string) Str::uuid(), 'owner_key' => str_repeat('f', 64),
@@ -94,12 +155,18 @@ class OrderPreparationMigrationTest extends TestCase
                 'created_at' => now(), 'expires_at' => now()->addMinute()],
         ];
         foreach ($rows as $table => $row) {
-            try { DB::table($table)->insert($row); $this->fail('Orphan '.$table.' evidence was accepted.'); }
-            catch (QueryException $error) { $this->assertStringContainsString('foreign key', strtolower($error->getMessage())); }
+            try {
+                DB::table($table)->insert($row);
+                $this->fail('Orphan '.$table.' evidence was accepted.');
+            } catch (QueryException $error) {
+                $this->assertStringContainsString('foreign key', strtolower($error->getMessage()));
+            }
             $this->assertDatabaseCount($table, 0);
         }
         foreach (['orders', 'order_lines', 'order_attempts'] as $table) {
-            foreach (Schema::getForeignKeys($table) as $key) { $this->assertNotSame('cascade', strtolower($key['on_delete'])); }
+            foreach (Schema::getForeignKeys($table) as $key) {
+                $this->assertNotSame('cascade', strtolower($key['on_delete']));
+            }
         }
     }
 }

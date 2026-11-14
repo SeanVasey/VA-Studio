@@ -1,0 +1,432 @@
+{
+  "actions_performed": [
+    "Read-only boundedimmutableGit correction/source/control andoriginalCLI/packet/body/hash/count/carry reconciliation",
+    "Exclusive runtime original4635REVISE andfinalf1eaMD/JSON creation"
+  ],
+  "additional_inspected_requirement_source_sha256": {
+    "app/Domain/SiteBuilder/SiteImageProcessor.php": "32a907b9f6b9ec64e7db3b5b8b4383c31f7b796703d733edd90f2c6764745041",
+    "app/Domain/SoundKits/SoundKitProcessor.php": "55786cbeed5084f79661a8211661a7c35ea4f8e4e28475325972f0c469e7c1d3",
+    "config/queue.php": "ac9e8848df5b652431e71c31f243f70aa0d94ab0e722194993493b196f80c5e3"
+  },
+  "closed_source_finding": "B5-S1 canonical-origin consistency; hostname+bounded canonicaldecimalport reconstruction closesempty/paddedsyntax,malformedURL ValueError returnsfalse",
+  "current_wholeCLI": {
+    "assertion_count_not_reported": true,
+    "errors": 0,
+    "failures": 0,
+    "noJUnit_or_independentOSsupervisor_claim": true,
+    "process_exit": 0,
+    "skips": 0,
+    "source_unchanged": true,
+    "tests": 31
+  },
+  "decision": "APPROVE BOUNDED DEVELOPMENT SOURCE AND FINAL SEALED EVIDENCE",
+  "docs_only_delta": [
+    "docs/handoff/2026-10-07/CLAUDE-PLAN.md",
+    "docs/handoff/2026-10-07/codex-deferred-20261011.md",
+    "docs/verification/email-operations-20261015/README.md",
+    "docs/verification/email-operations-20261015/focused-fixed-evidence.zip",
+    "docs/verification/email-operations-20261015/focused-fixed-receipt.json"
+  ],
+  "engineering_quality_verdict": "PASS within reachedprotecteddescriptor/JSON/CLI/no-effects scope",
+  "findings": [],
+  "initial_archive": {
+    "bytes": 29156,
+    "member_hashes_verified": true,
+    "members": 19,
+    "sha256": "a3d9cf51a16b1a48553af9f2c26df0cd7648670b1a847105e36d9ba9047570f3",
+    "unchanged": true
+  },
+  "initial_source": "4635d182f6c6113b2c496ff45a924db91d47a503",
+  "new_preparation_errors": [],
+  "observed_status": "",
+  "old_control": "Testonly6166preserves4635checker exactly;1method/3subtests allfailoldpass,process1/stablesource. Old30/current31 overlap, never summed.",
+  "old_control_source": "6166ce0059ea4486b2bbb793c936f7e4e811846b",
+  "open_p0": 0,
+  "open_p1": 0,
+  "original_revise_sha256": {
+    ".json": "e2b15ee24f9a7ac8c440ae1c7773c35c900e959c1e4298bd3bf3d5f61b8478a6",
+    ".md": "c4145a25579a9982a3db165d9af1415329f378749f41e3cedc97d779a384ae06"
+  },
+  "prep_runtime_originals_sha256": {
+    "read-transport-disconnect-original.json": "d701c0be386b4125b05fa55addfe02bee88539b9cadc8f591e1a23b4050a3c82",
+    "runtime-02fd-original.json": "8c365aab22c3d5adfab41712830f63409bd1ddc583d58961bfa6dc48dac5ab70"
+  },
+  "primary_original_runs": [
+    {
+      "argv": [
+        "python3",
+        "scripts/ops/test-email-operations-preflight.py"
+      ],
+      "failed_subtests": 0,
+      "head": "4635d182f6c6113b2c496ff45a924db91d47a503",
+      "json_sha256": "006d5e6dfee3c71df4755d12d27be91837ca8d2ad24cedd10b34c573f98a8e1b",
+      "log_sha256": "4a617620bcaa62b11198745d75b6575aedfd95edc6892ce34d33910c4cd839f4",
+      "name": "cli-focused-4635-original",
+      "process_exit": 0,
+      "source_unchanged": true,
+      "tests": 30
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/ops/test-email-operations-preflight.py",
+        "EmailOperationsTests.test_origin_rejects_empty_and_noncanonical_explicit_ports"
+      ],
+      "failed_subtests": 3,
+      "head": "6166ce0059ea4486b2bbb793c936f7e4e811846b",
+      "json_sha256": "887bc1917a9e9babe2f17d59870738bb7b6f44b76cf2cec5fc86543c8e0bf609",
+      "log_sha256": "e38a3d49c2e630dc070c57bc0277c040dfba9fd04faab8791eddc895b9e39b38",
+      "name": "origin-ports-old-original",
+      "process_exit": 1,
+      "source_unchanged": true,
+      "tests": 1
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/ops/test-email-operations-preflight.py"
+      ],
+      "failed_subtests": 0,
+      "head": "f782a79a8cd16c996e9cf65ea89a64a630261bfd",
+      "json_sha256": "606b5ad4b58b529a52dc6ca0d767b71cc6e56b62043d35b0450275fd1bd272a7",
+      "log_sha256": "d91380b7160377d72cebd553446db904b5952296ce75e390a8023a8775a720a0",
+      "name": "cli-whole-fixed-original",
+      "process_exit": 0,
+      "source_unchanged": true,
+      "tests": 31
+    }
+  ],
+  "prior_preparation_failures": "Original4635reviewrecords pre-process exec-servertransportfailure/recovery, lateroverlybroadcurrentHEADassertion afterdocsadvance andnonexistentworker-invariants lookup; noapptestfailurereclassified",
+  "recorded_utc": "2026-10-15T20:38:24.327457+00:00",
+  "remaining_gates": [
+    "Byte-original finaldecision/report/original4635REVISE imports andcurrentpacket/bothledgercompletedreviewstatus",
+    "Independent explicitcarry onfinal documentation-onlypublicationhead",
+    "Cheap exactheadpreflight/currentcompleteinventory/protections/noopenP0/P1/expectedSHAdevelopmentmerge",
+    "Actualmerge receipt andbothledgers then nextdependencyreadydevelopment"
+  ],
+  "required_corrections": [],
+  "reviewed_head": "f1ea7991a0d7fe36ce141e1220b6281113000410",
+  "reviewer_app_checker_tests_db_network_ci_execution": false,
+  "reviewer_session": "/root/account_features_final_review",
+  "runner_sha256": "1daa5c8c4dfc0b62f3cf53ec652c3ee3e73a3878bed64eded5b4b8953857fb29",
+  "sealed_archive": {
+    "all_source_bodies_match_originalGitblob_andSHA": true,
+    "bytes": 91295,
+    "captured_heads": [
+      "4635d182f6c6113b2c496ff45a924db91d47a503",
+      "6166ce0059ea4486b2bbb793c936f7e4e811846b",
+      "f782a79a8cd16c996e9cf65ea89a64a630261bfd"
+    ],
+    "current16_sources_unchanged": true,
+    "git_sources": 48,
+    "member_hashes_and_sizes_verified": true,
+    "members": 57,
+    "sha256": "6f7ec89f2d02511ffae09f1355e853fd1711de5724033ea263f452396673c570",
+    "source_paths": 16
+  },
+  "shared_files_modified": false,
+  "source_binding": [
+    {
+      "blob": "6d37157cae6699e8e6f89980e566452dbc10db19",
+      "head": "4635d182f6c6113b2c496ff45a924db91d47a503",
+      "path": "scripts/ops/email-operations-preflight.py",
+      "sha256": "c4be1f03cf1d451328cf2d5f18a27b9403ed28f6c94ff67d48c417b7e294cc1c"
+    },
+    {
+      "blob": "6ce7e85ed883c200b2950b1090a9740154322445",
+      "head": "4635d182f6c6113b2c496ff45a924db91d47a503",
+      "path": "scripts/ops/test-email-operations-preflight.py",
+      "sha256": "cf97d22a914fd05de927e056dc6416a1ba9c36926e570f1a4549897ff3c4f0d8"
+    },
+    {
+      "blob": "019632254e3e6115fe86a703579b46beaf7e5951",
+      "head": "4635d182f6c6113b2c496ff45a924db91d47a503",
+      "path": "ops/email-operations/facts.example.json",
+      "sha256": "a09bb06a20bf4ee1e08ade92a6aeb284a2bcd6ef63b77fb440fc0b60136fd2a9"
+    },
+    {
+      "blob": "290c413e7ea9069a5992bcc1961c84b2be9e3c80",
+      "head": "4635d182f6c6113b2c496ff45a924db91d47a503",
+      "path": "docs/ops/email-operations-runtime.md",
+      "sha256": "6c48f8ebc909d74009daab67c434e0f2eea9fb93635ba839f010cdf009b797a4"
+    },
+    {
+      "blob": "b57f6eb902104974b858fc4f044988163ca8ef02",
+      "head": "4635d182f6c6113b2c496ff45a924db91d47a503",
+      "path": "app/Jobs/DeliverProductionIdentityNotice.php",
+      "sha256": "061de336297e398ded168dad925457b69dbf4c05242bde6f9591e7837280e539"
+    },
+    {
+      "blob": "a1edbed5480e85674ba96a1484aa25f36d0fb0ef",
+      "head": "4635d182f6c6113b2c496ff45a924db91d47a503",
+      "path": "app/Console/Commands/ProcessProductionIdentityNotices.php",
+      "sha256": "1d7cdcd3cd5facc769df0f69e0c87997cb7753f06cbe92837648e164da6dcdb7"
+    },
+    {
+      "blob": "95228799b3ac9b79336da991fdb7722bf727d38b",
+      "head": "4635d182f6c6113b2c496ff45a924db91d47a503",
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityPolicy.php",
+      "sha256": "8825d44b84067699e69236ee823748eba70967a2b1e5c90fb604265f59656775"
+    },
+    {
+      "blob": "df22135d2b81c53738c9129221089c5378dbd7a4",
+      "head": "4635d182f6c6113b2c496ff45a924db91d47a503",
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityRequests.php",
+      "sha256": "186f76459a29f999dcd2cf59c408b5230fd1d3b5f0005f256f75b91fe7f5efdc"
+    },
+    {
+      "blob": "ba5a110d474dc6a071c7b51bab5f653f5818801a",
+      "head": "4635d182f6c6113b2c496ff45a924db91d47a503",
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/WorkIdentityNotice.php",
+      "sha256": "37462eb8e71546483d61047b67db49ea5b091a529a82c3cd10e1760642775c8e"
+    },
+    {
+      "blob": "cbbf9ef252a293a0a0dea23f335caacf52925b6b",
+      "head": "4635d182f6c6113b2c496ff45a924db91d47a503",
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/SmtpIdentitySettings.php",
+      "sha256": "f3cdee9241b59020beb6f5b2d73f02a7e42f55b10e6b05f12064d8a3cf89f51f"
+    },
+    {
+      "blob": "735ef824544d7ce0fc85ab1339f22307db28124c",
+      "head": "4635d182f6c6113b2c496ff45a924db91d47a503",
+      "path": "app/Domain/Customers/ProductionFeatures/Suppression/ProductionSuppressionProvider.php",
+      "sha256": "71791e0b0d9f07c2373cfe871064dc2d12452dc5d8ef3a20bc96423ebb2303bd"
+    },
+    {
+      "blob": "5832ea430ca56a532abb5d1bae15a7c9df9078c4",
+      "head": "4635d182f6c6113b2c496ff45a924db91d47a503",
+      "path": "config/production-customer-identity.php",
+      "sha256": "5e4bf0c3b2505a735c833a195e441d67913e71a62438f083a30c353f73c34188"
+    },
+    {
+      "blob": "dc5838b87a3127d998ac8b972b666e723c9c991f",
+      "head": "4635d182f6c6113b2c496ff45a924db91d47a503",
+      "path": "config/production-identity-smtp.php",
+      "sha256": "75413404f81d57f54eb4c4d838c795c50a18a0b44cbb50e0d3363961df75b3f9"
+    },
+    {
+      "blob": "1243ecabc67573207be8b8f066ea5c586f681c53",
+      "head": "4635d182f6c6113b2c496ff45a924db91d47a503",
+      "path": "config/production-suppression.php",
+      "sha256": "84a6654f8917351ff5bcf2c28cf1e7041a272e655030c594f0825a6528fe9e49"
+    },
+    {
+      "blob": "e32e88da2cc82d4139c032c28b03005afc6008c6",
+      "head": "4635d182f6c6113b2c496ff45a924db91d47a503",
+      "path": "config/mail.php",
+      "sha256": "c43ff49a31c5f32ce21eb7159f2a4b3cd2f4074eaed5838d265646dbfedd3474"
+    },
+    {
+      "blob": "dac0e48095333f6da2d6d39843904c1de7ed957e",
+      "head": "4635d182f6c6113b2c496ff45a924db91d47a503",
+      "path": "routes/console.php",
+      "sha256": "a8f59fe29174f0ea5714cdc1ac1731af09e0d413825eb877a159d96bb157c2a3"
+    },
+    {
+      "blob": "6d37157cae6699e8e6f89980e566452dbc10db19",
+      "head": "6166ce0059ea4486b2bbb793c936f7e4e811846b",
+      "path": "scripts/ops/email-operations-preflight.py",
+      "sha256": "c4be1f03cf1d451328cf2d5f18a27b9403ed28f6c94ff67d48c417b7e294cc1c"
+    },
+    {
+      "blob": "e563d60c4e5b6ea84d7582fe7299d24548d5b03d",
+      "head": "6166ce0059ea4486b2bbb793c936f7e4e811846b",
+      "path": "scripts/ops/test-email-operations-preflight.py",
+      "sha256": "33497400d3d0211b085038487f30a3c05e2a85be932a8973846da4b2276f9656"
+    },
+    {
+      "blob": "019632254e3e6115fe86a703579b46beaf7e5951",
+      "head": "6166ce0059ea4486b2bbb793c936f7e4e811846b",
+      "path": "ops/email-operations/facts.example.json",
+      "sha256": "a09bb06a20bf4ee1e08ade92a6aeb284a2bcd6ef63b77fb440fc0b60136fd2a9"
+    },
+    {
+      "blob": "290c413e7ea9069a5992bcc1961c84b2be9e3c80",
+      "head": "6166ce0059ea4486b2bbb793c936f7e4e811846b",
+      "path": "docs/ops/email-operations-runtime.md",
+      "sha256": "6c48f8ebc909d74009daab67c434e0f2eea9fb93635ba839f010cdf009b797a4"
+    },
+    {
+      "blob": "b57f6eb902104974b858fc4f044988163ca8ef02",
+      "head": "6166ce0059ea4486b2bbb793c936f7e4e811846b",
+      "path": "app/Jobs/DeliverProductionIdentityNotice.php",
+      "sha256": "061de336297e398ded168dad925457b69dbf4c05242bde6f9591e7837280e539"
+    },
+    {
+      "blob": "a1edbed5480e85674ba96a1484aa25f36d0fb0ef",
+      "head": "6166ce0059ea4486b2bbb793c936f7e4e811846b",
+      "path": "app/Console/Commands/ProcessProductionIdentityNotices.php",
+      "sha256": "1d7cdcd3cd5facc769df0f69e0c87997cb7753f06cbe92837648e164da6dcdb7"
+    },
+    {
+      "blob": "95228799b3ac9b79336da991fdb7722bf727d38b",
+      "head": "6166ce0059ea4486b2bbb793c936f7e4e811846b",
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityPolicy.php",
+      "sha256": "8825d44b84067699e69236ee823748eba70967a2b1e5c90fb604265f59656775"
+    },
+    {
+      "blob": "df22135d2b81c53738c9129221089c5378dbd7a4",
+      "head": "6166ce0059ea4486b2bbb793c936f7e4e811846b",
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityRequests.php",
+      "sha256": "186f76459a29f999dcd2cf59c408b5230fd1d3b5f0005f256f75b91fe7f5efdc"
+    },
+    {
+      "blob": "ba5a110d474dc6a071c7b51bab5f653f5818801a",
+      "head": "6166ce0059ea4486b2bbb793c936f7e4e811846b",
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/WorkIdentityNotice.php",
+      "sha256": "37462eb8e71546483d61047b67db49ea5b091a529a82c3cd10e1760642775c8e"
+    },
+    {
+      "blob": "cbbf9ef252a293a0a0dea23f335caacf52925b6b",
+      "head": "6166ce0059ea4486b2bbb793c936f7e4e811846b",
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/SmtpIdentitySettings.php",
+      "sha256": "f3cdee9241b59020beb6f5b2d73f02a7e42f55b10e6b05f12064d8a3cf89f51f"
+    },
+    {
+      "blob": "735ef824544d7ce0fc85ab1339f22307db28124c",
+      "head": "6166ce0059ea4486b2bbb793c936f7e4e811846b",
+      "path": "app/Domain/Customers/ProductionFeatures/Suppression/ProductionSuppressionProvider.php",
+      "sha256": "71791e0b0d9f07c2373cfe871064dc2d12452dc5d8ef3a20bc96423ebb2303bd"
+    },
+    {
+      "blob": "5832ea430ca56a532abb5d1bae15a7c9df9078c4",
+      "head": "6166ce0059ea4486b2bbb793c936f7e4e811846b",
+      "path": "config/production-customer-identity.php",
+      "sha256": "5e4bf0c3b2505a735c833a195e441d67913e71a62438f083a30c353f73c34188"
+    },
+    {
+      "blob": "dc5838b87a3127d998ac8b972b666e723c9c991f",
+      "head": "6166ce0059ea4486b2bbb793c936f7e4e811846b",
+      "path": "config/production-identity-smtp.php",
+      "sha256": "75413404f81d57f54eb4c4d838c795c50a18a0b44cbb50e0d3363961df75b3f9"
+    },
+    {
+      "blob": "1243ecabc67573207be8b8f066ea5c586f681c53",
+      "head": "6166ce0059ea4486b2bbb793c936f7e4e811846b",
+      "path": "config/production-suppression.php",
+      "sha256": "84a6654f8917351ff5bcf2c28cf1e7041a272e655030c594f0825a6528fe9e49"
+    },
+    {
+      "blob": "e32e88da2cc82d4139c032c28b03005afc6008c6",
+      "head": "6166ce0059ea4486b2bbb793c936f7e4e811846b",
+      "path": "config/mail.php",
+      "sha256": "c43ff49a31c5f32ce21eb7159f2a4b3cd2f4074eaed5838d265646dbfedd3474"
+    },
+    {
+      "blob": "dac0e48095333f6da2d6d39843904c1de7ed957e",
+      "head": "6166ce0059ea4486b2bbb793c936f7e4e811846b",
+      "path": "routes/console.php",
+      "sha256": "a8f59fe29174f0ea5714cdc1ac1731af09e0d413825eb877a159d96bb157c2a3"
+    },
+    {
+      "blob": "94ffc677a512254a4cc9d499d8dfb8d9efed82cc",
+      "head": "f782a79a8cd16c996e9cf65ea89a64a630261bfd",
+      "path": "scripts/ops/email-operations-preflight.py",
+      "sha256": "4221c7220c7df052b6838acc54fd6b4d6d1f42cbb3ae34f3511fcf837f7c4e36"
+    },
+    {
+      "blob": "e563d60c4e5b6ea84d7582fe7299d24548d5b03d",
+      "head": "f782a79a8cd16c996e9cf65ea89a64a630261bfd",
+      "path": "scripts/ops/test-email-operations-preflight.py",
+      "sha256": "33497400d3d0211b085038487f30a3c05e2a85be932a8973846da4b2276f9656"
+    },
+    {
+      "blob": "019632254e3e6115fe86a703579b46beaf7e5951",
+      "head": "f782a79a8cd16c996e9cf65ea89a64a630261bfd",
+      "path": "ops/email-operations/facts.example.json",
+      "sha256": "a09bb06a20bf4ee1e08ade92a6aeb284a2bcd6ef63b77fb440fc0b60136fd2a9"
+    },
+    {
+      "blob": "290c413e7ea9069a5992bcc1961c84b2be9e3c80",
+      "head": "f782a79a8cd16c996e9cf65ea89a64a630261bfd",
+      "path": "docs/ops/email-operations-runtime.md",
+      "sha256": "6c48f8ebc909d74009daab67c434e0f2eea9fb93635ba839f010cdf009b797a4"
+    },
+    {
+      "blob": "b57f6eb902104974b858fc4f044988163ca8ef02",
+      "head": "f782a79a8cd16c996e9cf65ea89a64a630261bfd",
+      "path": "app/Jobs/DeliverProductionIdentityNotice.php",
+      "sha256": "061de336297e398ded168dad925457b69dbf4c05242bde6f9591e7837280e539"
+    },
+    {
+      "blob": "a1edbed5480e85674ba96a1484aa25f36d0fb0ef",
+      "head": "f782a79a8cd16c996e9cf65ea89a64a630261bfd",
+      "path": "app/Console/Commands/ProcessProductionIdentityNotices.php",
+      "sha256": "1d7cdcd3cd5facc769df0f69e0c87997cb7753f06cbe92837648e164da6dcdb7"
+    },
+    {
+      "blob": "95228799b3ac9b79336da991fdb7722bf727d38b",
+      "head": "f782a79a8cd16c996e9cf65ea89a64a630261bfd",
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityPolicy.php",
+      "sha256": "8825d44b84067699e69236ee823748eba70967a2b1e5c90fb604265f59656775"
+    },
+    {
+      "blob": "df22135d2b81c53738c9129221089c5378dbd7a4",
+      "head": "f782a79a8cd16c996e9cf65ea89a64a630261bfd",
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityRequests.php",
+      "sha256": "186f76459a29f999dcd2cf59c408b5230fd1d3b5f0005f256f75b91fe7f5efdc"
+    },
+    {
+      "blob": "ba5a110d474dc6a071c7b51bab5f653f5818801a",
+      "head": "f782a79a8cd16c996e9cf65ea89a64a630261bfd",
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/WorkIdentityNotice.php",
+      "sha256": "37462eb8e71546483d61047b67db49ea5b091a529a82c3cd10e1760642775c8e"
+    },
+    {
+      "blob": "cbbf9ef252a293a0a0dea23f335caacf52925b6b",
+      "head": "f782a79a8cd16c996e9cf65ea89a64a630261bfd",
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/SmtpIdentitySettings.php",
+      "sha256": "f3cdee9241b59020beb6f5b2d73f02a7e42f55b10e6b05f12064d8a3cf89f51f"
+    },
+    {
+      "blob": "735ef824544d7ce0fc85ab1339f22307db28124c",
+      "head": "f782a79a8cd16c996e9cf65ea89a64a630261bfd",
+      "path": "app/Domain/Customers/ProductionFeatures/Suppression/ProductionSuppressionProvider.php",
+      "sha256": "71791e0b0d9f07c2373cfe871064dc2d12452dc5d8ef3a20bc96423ebb2303bd"
+    },
+    {
+      "blob": "5832ea430ca56a532abb5d1bae15a7c9df9078c4",
+      "head": "f782a79a8cd16c996e9cf65ea89a64a630261bfd",
+      "path": "config/production-customer-identity.php",
+      "sha256": "5e4bf0c3b2505a735c833a195e441d67913e71a62438f083a30c353f73c34188"
+    },
+    {
+      "blob": "dc5838b87a3127d998ac8b972b666e723c9c991f",
+      "head": "f782a79a8cd16c996e9cf65ea89a64a630261bfd",
+      "path": "config/production-identity-smtp.php",
+      "sha256": "75413404f81d57f54eb4c4d838c795c50a18a0b44cbb50e0d3363961df75b3f9"
+    },
+    {
+      "blob": "1243ecabc67573207be8b8f066ea5c586f681c53",
+      "head": "f782a79a8cd16c996e9cf65ea89a64a630261bfd",
+      "path": "config/production-suppression.php",
+      "sha256": "84a6654f8917351ff5bcf2c28cf1e7041a272e655030c594f0825a6528fe9e49"
+    },
+    {
+      "blob": "e32e88da2cc82d4139c032c28b03005afc6008c6",
+      "head": "f782a79a8cd16c996e9cf65ea89a64a630261bfd",
+      "path": "config/mail.php",
+      "sha256": "c43ff49a31c5f32ce21eb7159f2a4b3cd2f4074eaed5838d265646dbfedd3474"
+    },
+    {
+      "blob": "dac0e48095333f6da2d6d39843904c1de7ed957e",
+      "head": "f782a79a8cd16c996e9cf65ea89a64a630261bfd",
+      "path": "routes/console.php",
+      "sha256": "a8f59fe29174f0ea5714cdc1ac1731af09e0d413825eb877a159d96bb157c2a3"
+    }
+  ],
+  "specification_verdict": "PASS within bounded pureoperator-declared facts scope",
+  "status_assessment": "RecordedREADME/ledger pendingindependentreview accurately describes status atf1ea; nextpublication headmustimportdecision andupdate completedreview versus remainingpublicationgates. No hostclaim; originaldesign/source/repro/prep errorsremain separate.",
+  "status_sha256": {
+    "docs/handoff/2026-10-07/CLAUDE-PLAN.md": "af815d39dbd0711aa4442ab11ff0820ece6c7f2caf53b13652c936c63df0571e",
+    "docs/handoff/2026-10-07/codex-deferred-20261011.md": "fb153e8657d10c2df33e0c35498a2441ddbada606bc0cab7785acc5091113c84",
+    "docs/verification/email-operations-20261015/README.md": "79620c3009edadd437bd4a625cd5bbd36d639f2af2f25bbfbc145554ec3d40f2"
+  },
+  "tested_fixed_source": "f782a79a8cd16c996e9cf65ea89a64a630261bfd",
+  "untested_or_unapproved": [
+    "No realsender/domain/provider/accountscope/approvedretention/operatorinputs supplied",
+    "No effectiveLaravel/web/worker/cache configuration orowner/group/ACL/parent trust/hostileparent atomicity verified",
+    "No DNS/SPF/DKIM/DMARC/SMTPcredentials/peerTLS/providerauthentication/submission/delivery/queue-supervision/scheduler/backlog/restore/unknowncompensation observations",
+    "No SQL/native/performance/wholeapplication/browser/Foundation/GitLab/host/deployment/activation/releaseacceptance; purechecker hasnoSQL"
+  ]
+}

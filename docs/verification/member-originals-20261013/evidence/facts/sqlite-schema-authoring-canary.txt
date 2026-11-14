@@ -1,0 +1,21 @@
+PHP 8.4.26
+App source /workspace/VA-Studio-member-original-facts/app/Domain/Grants/Member/MemberGrantDefinitions.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-member-original-facts/phpunit.xml
+
+......E                                                             7 / 7 (100%)
+
+Time: 00:18.765, Memory: 72.50 MB
+
+There was 1 error:
+
+1) Tests\Feature\ProductionMemberOriginals\MemberGrantDefinitionsTest::test_real_enrolled_staff_authors_and_deduplicates_without_customer_gate_or_grant_writes
+App\Domain\Grants\Member\MemberGrantException: Member original unavailable.
+
+/workspace/VA-Studio-member-original-facts/app/Domain/Grants/Member/MemberGrantDefinitions.php:152
+/workspace/VA-Studio-member-original-facts/tests/Feature/ProductionMemberOriginals/MemberGrantDefinitionsTest.php:41
+
+ERRORS!
+Tests: 7, Assertions: 17, Errors: 1.

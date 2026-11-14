@@ -1,0 +1,6 @@
+Customer ID,Email,Name,Marketing Opt-In
+synthetic-cust-001,buyer.one@example.invalid,SYNTHETIC Buyer One,yes
+synthetic-cust-002,buyer.two@example.invalid,SYNTHETIC Buyer Two,no
+synthetic-cust-003,shared.buyer@example.invalid,SYNTHETIC Buyer Three,
+synthetic-cust-004,Shared.Buyer@example.invalid,SYNTHETIC Buyer Four,yes
+synthetic-cust-005,buyer.five@example.invalid,SYNTHETIC Buyer Five,yes

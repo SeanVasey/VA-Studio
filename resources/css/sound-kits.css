@@ -1,0 +1,36 @@
+/* Sound-kit pages (BL-53). Theme tokens only (public/brand/theme.css); signage in Bebas, alternating surfaces, no motion. */
+.sound-kits-empty { max-width: 68ch; margin-top: 38px; padding: 28px; border: 1px solid var(--va-border); background: var(--va-surface); font-size: 16px; }
+.sound-kit-list { list-style: none; margin: 0; padding: 40px 0 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 24px; max-width: 1200px; }
+.sound-kit-card { display: flex; flex-direction: column; gap: 10px; min-width: 0; padding: 28px; border: 1px solid var(--va-border); background: var(--va-canvas); }
+.sound-kit-card:nth-child(even) { background: var(--va-surface); border-color: var(--va-rule); }
+.sound-kit-card h2 { font-family: var(--va-font-section); font-size: clamp(30px, 3vw, 40px); font-weight: 400; line-height: 1.1; letter-spacing: .04em; text-transform: uppercase; overflow-wrap: anywhere; }
+.sound-kit-card h2 a { display: inline-block; min-height: 44px; }
+.sound-kit-card .text-link { min-height: 44px; margin-top: auto; }
+.sound-kit-meta { font-family: var(--va-font-mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--va-text-muted); }
+.sound-kit-price { font-family: var(--va-font-mono); font-size: 18px; font-variant-numeric: tabular-nums; color: var(--va-text-strong); }
+.sound-kit-detail { max-width: 1200px; display: grid; gap: 40px; }
+.sound-kit-detail header .eyebrow { color: var(--va-action); }
+.sound-kit-detail h1 { font-size: clamp(44px, 6vw, 88px); line-height: .98; letter-spacing: -.03em; text-transform: uppercase; overflow-wrap: anywhere; margin: 16px 0 12px; }
+.sound-kit-summary { max-width: 68ch; margin-top: 20px; font-size: 16px; line-height: 1.8; white-space: pre-line; overflow-wrap: anywhere; }
+.sound-kit-facts { padding: 28px; background: var(--va-surface); display: grid; gap: 14px; }
+.sound-kit-facts h2 { font-family: var(--va-font-section); font-size: 32px; font-weight: 400; letter-spacing: .04em; text-transform: uppercase; }
+.sound-kit-facts dl { margin: 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 24px; }
+.sound-kit-facts dt { font-family: var(--va-font-mono); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--va-text-muted); }
+.sound-kit-facts dd { margin: 0; font-variant-numeric: tabular-nums; }
+.sound-kit-notice { max-width: 68ch; padding: 20px 24px; border: 1px solid var(--va-rule); background: var(--va-canvas); font-size: 15px; }
+
+.sound-kit-art { aspect-ratio: 1 / 1; max-width: 480px; background: var(--va-surface); border: 1px solid var(--va-rule); border-radius: var(--va-radius-panel); overflow: hidden; }
+.sound-kit-card .sound-kit-art { max-width: none; }
+.sound-kit-art .album-cover { display: block; width: 100%; height: 100%; object-fit: cover; }
+.sound-kit-demo { padding: 28px; background: var(--va-canvas); border: 1px solid var(--va-rule); display: grid; gap: 14px; max-width: 68ch; }
+.sound-kit-demo h2 { font-family: var(--va-font-section); font-size: 32px; font-weight: 400; letter-spacing: .04em; text-transform: uppercase; }
+.sound-kit-demo-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+
+/* Stripe-test kit purchase (BL-13). */
+.sound-kit-buy, .sound-kit-order { padding: 28px; background: var(--va-surface); border: 1px solid var(--va-rule); display: grid; gap: 14px; max-width: 68ch; }
+.sound-kit-buy h2, .sound-kit-order h2 { font-family: var(--va-font-section); font-size: 32px; font-weight: 400; letter-spacing: .04em; text-transform: uppercase; }
+.sound-kit-buy form { display: grid; gap: 10px; }
+.sound-kit-buy label { font-family: var(--va-font-mono); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--va-text-muted); }
+.sound-kit-buy input { min-height: 44px; padding: 8px 12px; border: 1px solid var(--va-border); background: var(--va-canvas); color: var(--va-text-strong); font: inherit; }
+.sound-kit-buy .button, .sound-kit-order .button { min-height: 44px; justify-self: start; }
+.sound-kit-order-actions { display: flex; flex-wrap: wrap; gap: 12px; }

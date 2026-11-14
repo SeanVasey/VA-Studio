@@ -1,0 +1,1977 @@
+{
+  "scope": "Captured paths compared to actual Git blob bytes or explicitly retained source overrides. A partial comparison remains partial. This does not attest unlisted source or execute a suite.",
+  "bindings": [
+    {
+      "id": "renderer-final",
+      "source": "renderer/inventory.json",
+      "key": [
+        "source_inventory"
+      ],
+      "path_key": "path",
+      "hash_key": "sha256",
+      "reference": "483793065c3f7a66057907a777f938f608bf7036",
+      "require_exact": true,
+      "scope": "32 changed source/dependency entries, complete baseline diff; owner final-head execution statement, not a full before/after runtime inventory.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 32,
+      "matched_paths": 32,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "renderer-E1-old",
+      "source": "renderer/inventory.json",
+      "key": [
+        "regression_capsules",
+        0,
+        "old"
+      ],
+      "path_key": "path",
+      "hash_key": "sha256",
+      "reference": "1d88e9f0b7c744af1008c8dc4b656c735d96dd2d",
+      "require_exact": true,
+      "scope": "Retrospective author mapping, not contemporaneous historical run-source capture. E6/E8 old-run test bytes are not established by corrective test capsule.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 1,
+      "matched_paths": 1,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "renderer-E1-fixed",
+      "source": "renderer/inventory.json",
+      "key": [
+        "regression_capsules",
+        0,
+        "fixed"
+      ],
+      "path_key": "path",
+      "hash_key": "sha256",
+      "reference": "2333b9dae2059e2d79c062f8f635332c67a83acf",
+      "require_exact": true,
+      "scope": "Retrospective author mapping, not contemporaneous historical run-source capture. E6/E8 old-run test bytes are not established by corrective test capsule.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 1,
+      "matched_paths": 1,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "renderer-E1-regression_test",
+      "source": "renderer/inventory.json",
+      "key": [
+        "regression_capsules",
+        0,
+        "regression_test"
+      ],
+      "path_key": "path",
+      "hash_key": "sha256",
+      "reference": "2333b9dae2059e2d79c062f8f635332c67a83acf",
+      "require_exact": true,
+      "scope": "Retrospective author mapping, not contemporaneous historical run-source capture. E6/E8 old-run test bytes are not established by corrective test capsule.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 1,
+      "matched_paths": 1,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "renderer-E6-E8-old",
+      "source": "renderer/inventory.json",
+      "key": [
+        "regression_capsules",
+        1,
+        "old"
+      ],
+      "path_key": "path",
+      "hash_key": "sha256",
+      "reference": "10b8cb250438a4f82b3e5657b2c915c4c13a687b",
+      "require_exact": true,
+      "scope": "Retrospective author mapping, not contemporaneous historical run-source capture. E6/E8 old-run test bytes are not established by corrective test capsule.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 2,
+      "matched_paths": 2,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "renderer-E6-E8-fixed",
+      "source": "renderer/inventory.json",
+      "key": [
+        "regression_capsules",
+        1,
+        "fixed"
+      ],
+      "path_key": "path",
+      "hash_key": "sha256",
+      "reference": "cd6aefe91c4272203774448c26f0b753106667fa",
+      "require_exact": true,
+      "scope": "Retrospective author mapping, not contemporaneous historical run-source capture. E6/E8 old-run test bytes are not established by corrective test capsule.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 3,
+      "matched_paths": 3,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "renderer-E6-E8-regression_test",
+      "source": "renderer/inventory.json",
+      "key": [
+        "regression_capsules",
+        1,
+        "regression_test"
+      ],
+      "path_key": "path",
+      "hash_key": "sha256",
+      "reference": "cd6aefe91c4272203774448c26f0b753106667fa",
+      "require_exact": true,
+      "scope": "Retrospective author mapping, not contemporaneous historical run-source capture. E6/E8 old-run test bytes are not established by corrective test capsule.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 1,
+      "matched_paths": 1,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "renderer-E7-old",
+      "source": "renderer/inventory.json",
+      "key": [
+        "regression_capsules",
+        2,
+        "old"
+      ],
+      "path_key": "path",
+      "hash_key": "sha256",
+      "reference": "cd6aefe91c4272203774448c26f0b753106667fa",
+      "require_exact": true,
+      "scope": "Retrospective author mapping, not contemporaneous historical run-source capture. E6/E8 old-run test bytes are not established by corrective test capsule.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 2,
+      "matched_paths": 2,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "renderer-E7-fixed",
+      "source": "renderer/inventory.json",
+      "key": [
+        "regression_capsules",
+        2,
+        "fixed"
+      ],
+      "path_key": "path",
+      "hash_key": "sha256",
+      "reference": "483793065c3f7a66057907a777f938f608bf7036",
+      "require_exact": true,
+      "scope": "Retrospective author mapping, not contemporaneous historical run-source capture. E6/E8 old-run test bytes are not established by corrective test capsule.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 2,
+      "matched_paths": 2,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "renderer-E7-regression_test",
+      "source": "renderer/inventory.json",
+      "key": [
+        "regression_capsules",
+        2,
+        "regression_test"
+      ],
+      "path_key": "path",
+      "hash_key": "sha256",
+      "reference": "483793065c3f7a66057907a777f938f608bf7036",
+      "require_exact": true,
+      "scope": "Retrospective author mapping, not contemporaneous historical run-source capture. E6/E8 old-run test bytes are not established by corrective test capsule.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 1,
+      "matched_paths": 1,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "facts-schema-source",
+      "source": "facts/schema/source.sha256",
+      "format": "sha256sum",
+      "reference": "6b76eea88c9be83889d0940bd77fa2c6ab70e2b1",
+      "require_exact": true,
+      "scope": "Eight recorded schema-owned implementation/test paths, not full running tree.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 8,
+      "matched_paths": 8,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "facts-schema-source-detach",
+      "source": "facts/schema/source-detach.sha256",
+      "format": "sha256sum",
+      "reference": "3561eee8351d83aec11af996687f4b2d63ea271c",
+      "require_exact": true,
+      "scope": "Eight recorded schema-owned implementation/test paths, not full running tree.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 8,
+      "matched_paths": 8,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "facts-bd3661ec-final",
+      "source": "facts/final-bd3661ec-source.json.gz",
+      "key": [
+        "sha256"
+      ],
+      "reference": "bd3661ec02e3004fef3ae3d8a990e44ef5c6ce08",
+      "require_exact": true,
+      "scope": "Complete 11,503 tracked-file owner inventory from historical facts final component; not current acceptance.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 11503,
+      "matched_paths": 11503,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "facts-canary-source-versus-bd3661ec",
+      "source": "facts/canary-source/source-sha256.json.gz",
+      "reference": "bd3661ec02e3004fef3ae3d8a990e44ef5c6ce08",
+      "require_exact": false,
+      "scope": "Historical captured working tree compared to later facts component. Differences include actual precommit implementation overlays and are not silently carried.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 11503,
+      "matched_paths": 11491,
+      "all_captured_paths_match": false,
+      "differences": [
+        {
+          "path": "app/Domain/Grants/Member/MemberGrantDefinitions.php",
+          "captured_sha256": "7d2096ff1fec7e80d6162e0b6ffd1ef2bce3e955eb8b3873ce9aea36765ca829",
+          "reference_sha256": "06044d9c2435c27188d3113c42b82027436a0076a18a8d8c6002c5437627ab78"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberGrantDocumentValues.php",
+          "captured_sha256": "1289cabe04f1ef0eae2db703824551589b3074b0d0940555ca2c529212a2b3e2",
+          "reference_sha256": "8da46f30b9bc511ec92728d717e1e255fd15445e9261999d789ac76ff7037179"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberGrantRenderProfileRegistry.php",
+          "captured_sha256": "094490362f34e3ebadcc916be143337e87518c42907a03c7de0663843e0b34ed",
+          "reference_sha256": "81c621c5467bc3debbfef7b24dc67b00593fac3b1dbf81d6723a2bcd506615eb"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalPdfRenderer.php",
+          "captured_sha256": "c48ad0a3e49eac2adc48f92a6351eec8e7808db94421fe4c361a2a7ac88481c6",
+          "reference_sha256": "f3acf36fcf4938b14a8efb742ad46a17dc7c3001a478833d36a48d09ce5c7ed2"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalRendererProcess.php",
+          "captured_sha256": "9a4cdf3f2397f5d2fc23bdb0f419b53d0ecc5d3cc41905360276507d589924ae",
+          "reference_sha256": "f0470e91b122b23588088a7361971b9e009f2098d86e9d1321a3cea47c610085"
+        },
+        {
+          "path": "app/Domain/Grants/Member/SealedMemberGrantFacts.php",
+          "captured_sha256": "999525d75fbba1866f7b76f8fecbf383d0bec69af9c74dfbb156aa449b4ada0c",
+          "reference_sha256": "a0e01850b81f291fa866d3dee02e11f0b7b1510ca08d0f92287cded946dce406"
+        },
+        {
+          "path": "resources/contracts/production-member-v1/profile-assets.json",
+          "captured_sha256": "10c7cfe4d0ca037f8f5fd1ea83d239361a4f4669e60d5b2e2db8091c9176b20c",
+          "reference_sha256": "caa3218c162ef3c9192785858e6cd9fad89ab828a345466652dda21e74a1c852"
+        },
+        {
+          "path": "scripts/render-member-original.php",
+          "captured_sha256": "31fc3adbc8065cf3718cd6ce31462081fc99c530c3c586f32a53db8e5734b348",
+          "reference_sha256": "880ec7590bba84b24c0944986b9c71e6484cd0b63f25b0e55add1b6a7f4be0c3"
+        },
+        {
+          "path": "tests/Feature/ProductionMemberOriginals/MemberGrantDefinitionsTest.php",
+          "captured_sha256": "41811f4e27a7cfdec19a3d01cab894aa5dd70c3cab6edf4e592d61e05ed258ce",
+          "reference_sha256": "819fae29de7880c819e9458b70f2135ef11a720e9dd6fd91fdb587bbcad01e34"
+        },
+        {
+          "path": "tests/Feature/ProductionMemberOriginals/MemberGrantFactsTest.php",
+          "captured_sha256": "8b7057aeaeb85229c9cbce0b43a9d14f28278f64775f30e1160111d8bc0990e6",
+          "reference_sha256": "5f0338c8315a4958be5ff843f38d196e87c347a2297c2f584e3e764711d0e4b8"
+        },
+        {
+          "path": "tests/Feature/ProductionMemberOriginals/MemberOriginalRendererTest.php",
+          "captured_sha256": "ec88bd16be9f625d68d66a02f3d2a382a813b1fe06fb3d0da928679cf118253f",
+          "reference_sha256": "6e3516b36231b9623867a0b12afb2394f770d7792d42cc399b6520cdc3a3388b"
+        },
+        {
+          "path": "tests/Unit/ProductionMemberOriginals/MemberGrantDocumentsTest.php",
+          "captured_sha256": "7a3ec26b7c82b7f9e533fde5a7dacb72fd69c624d2f07b39fe13db5d147f477c",
+          "reference_sha256": "85cfe24650ebc67bb8485a76475d3a4352f4453fdffde751ff1ccc7b7c55e842"
+        }
+      ]
+    },
+    {
+      "id": "facts-authoring-facts-first-source-versus-bd3661ec",
+      "source": "facts/authoring-facts-first-source/source-sha256.json.gz",
+      "reference": "bd3661ec02e3004fef3ae3d8a990e44ef5c6ce08",
+      "require_exact": false,
+      "scope": "Historical captured working tree compared to later facts component. Differences include actual precommit implementation overlays and are not silently carried.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 11503,
+      "matched_paths": 11499,
+      "all_captured_paths_match": false,
+      "differences": [
+        {
+          "path": "app/Domain/Grants/Member/MemberGrantDocumentValues.php",
+          "captured_sha256": "1289cabe04f1ef0eae2db703824551589b3074b0d0940555ca2c529212a2b3e2",
+          "reference_sha256": "8da46f30b9bc511ec92728d717e1e255fd15445e9261999d789ac76ff7037179"
+        },
+        {
+          "path": "app/Domain/Grants/Member/SealedMemberGrantFacts.php",
+          "captured_sha256": "999525d75fbba1866f7b76f8fecbf383d0bec69af9c74dfbb156aa449b4ada0c",
+          "reference_sha256": "a0e01850b81f291fa866d3dee02e11f0b7b1510ca08d0f92287cded946dce406"
+        },
+        {
+          "path": "tests/Feature/ProductionMemberOriginals/MemberGrantFactsTest.php",
+          "captured_sha256": "8b7057aeaeb85229c9cbce0b43a9d14f28278f64775f30e1160111d8bc0990e6",
+          "reference_sha256": "5f0338c8315a4958be5ff843f38d196e87c347a2297c2f584e3e764711d0e4b8"
+        },
+        {
+          "path": "tests/Unit/ProductionMemberOriginals/MemberGrantDocumentsTest.php",
+          "captured_sha256": "7a3ec26b7c82b7f9e533fde5a7dacb72fd69c624d2f07b39fe13db5d147f477c",
+          "reference_sha256": "85cfe24650ebc67bb8485a76475d3a4352f4453fdffde751ff1ccc7b7c55e842"
+        }
+      ]
+    },
+    {
+      "id": "facts-lifetime-correction",
+      "source": "facts/facts-lifetime-source/source-sha256.json",
+      "reference": "bd3661ec02e3004fef3ae3d8a990e44ef5c6ce08",
+      "require_exact": true,
+      "scope": "Two exact changed source/test inputs of the successful corrected SQLite facts run; other source from authoring-facts-first capture.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 2,
+      "matched_paths": 2,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "facts-native-old-before",
+      "source": "facts/schema/native/native-old-01/source-before.json.gz",
+      "key": [
+        "files"
+      ],
+      "reference": "15a65e0761382a9ad50c4b279605a644a4eeb285",
+      "require_exact": true,
+      "scope": "Full tracked Git inventory; external runner/test hashes are separate program inputs.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 10633,
+      "matched_paths": 10633,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "facts-native-old-after",
+      "source": "facts/schema/native/native-old-01/source-after.json.gz",
+      "key": [
+        "files"
+      ],
+      "reference": "15a65e0761382a9ad50c4b279605a644a4eeb285",
+      "require_exact": true,
+      "scope": "Full tracked Git inventory; external runner/test hashes are separate program inputs.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 10633,
+      "matched_paths": 10633,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "facts-native-fixed-before",
+      "source": "facts/schema/native/native-fixed-01/source-before.json.gz",
+      "key": [
+        "files"
+      ],
+      "reference": "bd3661ec02e3004fef3ae3d8a990e44ef5c6ce08",
+      "require_exact": true,
+      "scope": "Full tracked Git inventory; external runner/test hashes are separate program inputs.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 11503,
+      "matched_paths": 11503,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "facts-native-fixed-after",
+      "source": "facts/schema/native/native-fixed-01/source-after.json.gz",
+      "key": [
+        "files"
+      ],
+      "reference": "bd3661ec02e3004fef3ae3d8a990e44ef5c6ce08",
+      "require_exact": true,
+      "scope": "Full tracked Git inventory; external runner/test hashes are separate program inputs.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 11503,
+      "matched_paths": 11503,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/budget-io-final",
+      "source": "operation/budget-io-final.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "d3aafa1b1563353fe56a1eef54c4f477a50f0d61",
+      "require_exact": false,
+      "scope": "Full captured executable/dependency input comparison. Uncommitted unrelated composition drafts and intermediate test changes remain differences, not committed component claims.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 1956,
+      "matched_paths": 1945,
+      "all_captured_paths_match": false,
+      "differences": [
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalCandidate.php",
+          "captured_sha256": "42878e845587d6f550817ac4b26c38dd2110cc669c89bedfdee926b033b44e0c",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalCapturePermit.php",
+          "captured_sha256": "34ec6c03010ea047d94110af02c5dc23d38fa7011d7d3471ee5125449c42030f",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalConfiguration.php",
+          "captured_sha256": "ebddc4536218313c3cc79a819882ec0ea0eed169d4a6aee0c6b140972f97d155",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalMaterialization.php",
+          "captured_sha256": "bcc2d144323e6bd3d20f8be4654a90330e8cd5f9fb34ee503c5539ce80206ad1",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalReadyToken.php",
+          "captured_sha256": "299e16ea14d814cbd11ba778f074f6c3e9e41f0c44a661fb6b64e522ef208b2d",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalSource.php",
+          "captured_sha256": "8ec58199c0885c4784739261781892d5476b458d55cad01883ff381a93acb1d5",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalSourceClaim.php",
+          "captured_sha256": "cd05ec2586c707a54891a93b30b203855c604bb1e97e20452c7169c93a6464b6",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalSourceValues.php",
+          "captured_sha256": "3aaf06cf5d36fe419e300e4413933edb12ee3ecec705b6e71116c89284de7748",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipBillingEvidence.php",
+          "captured_sha256": "7ba5b6e56d2511cc1b4fd277b83204d33fbe01eea650b86be02af79fd763e189",
+          "reference_sha256": "aea9c888aee8a16d9731eec5c4c4ac4a7b37992136b9e85d8c0e669e68aef824"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipMemberCapture.php",
+          "captured_sha256": "e01c5d4c2f402dd32aff58c4cff27a6145204644e9cad7d00ad76c3d5b667d2a",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipReservationContext.php",
+          "captured_sha256": "76085a558b03e90e7f96adcb81833a498f0cd9035eb0849826cda2bcd15cc596",
+          "reference_sha256": "d2367d8166262a926e03cfd1e832c406dc1e0e621b0ff5df4c3db80203dfa9f6"
+        }
+      ]
+    },
+    {
+      "id": "operation/budget-io-initial",
+      "source": "operation/budget-io-initial.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "c7310cdad4154e662270736a4ecaeeef2e7cf64d",
+      "require_exact": true,
+      "scope": "Full captured executable/dependency input comparison. Uncommitted unrelated composition drafts and intermediate test changes remain differences, not committed component claims.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 1942,
+      "matched_paths": 1942,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/budget-io-reviewed",
+      "source": "operation/budget-io-reviewed.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "d3aafa1b1563353fe56a1eef54c4f477a50f0d61",
+      "require_exact": false,
+      "scope": "Full captured executable/dependency input comparison. Uncommitted unrelated composition drafts and intermediate test changes remain differences, not committed component claims.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 1956,
+      "matched_paths": 1941,
+      "all_captured_paths_match": false,
+      "differences": [
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalBudget.php",
+          "captured_sha256": "b783bf32f0a5f755aaa4ab309cf788032d73f9cc51ab0f6f503f40be0c7a5122",
+          "reference_sha256": "fc8d0306fdec3f0235e2b225ff6789f31301490cded976330cffb700036aff2a"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalCandidate.php",
+          "captured_sha256": "42878e845587d6f550817ac4b26c38dd2110cc669c89bedfdee926b033b44e0c",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalCapturePermit.php",
+          "captured_sha256": "34ec6c03010ea047d94110af02c5dc23d38fa7011d7d3471ee5125449c42030f",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalConfiguration.php",
+          "captured_sha256": "ebddc4536218313c3cc79a819882ec0ea0eed169d4a6aee0c6b140972f97d155",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalIoFrame.php",
+          "captured_sha256": "3bcb48fd0d0bb6d9bda716ef845a08f09451d31a2f7e0bb1a6242e17e28a8bbd",
+          "reference_sha256": "09f8eb47e127688e076f005226b9c23e631137dea9bb06b6d3deff69534cf561"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalMaterialization.php",
+          "captured_sha256": "bcc2d144323e6bd3d20f8be4654a90330e8cd5f9fb34ee503c5539ce80206ad1",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalReadyToken.php",
+          "captured_sha256": "299e16ea14d814cbd11ba778f074f6c3e9e41f0c44a661fb6b64e522ef208b2d",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalSource.php",
+          "captured_sha256": "8ec58199c0885c4784739261781892d5476b458d55cad01883ff381a93acb1d5",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalSourceClaim.php",
+          "captured_sha256": "cd05ec2586c707a54891a93b30b203855c604bb1e97e20452c7169c93a6464b6",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalSourceValues.php",
+          "captured_sha256": "3aaf06cf5d36fe419e300e4413933edb12ee3ecec705b6e71116c89284de7748",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipBillingEvidence.php",
+          "captured_sha256": "7ba5b6e56d2511cc1b4fd277b83204d33fbe01eea650b86be02af79fd763e189",
+          "reference_sha256": "aea9c888aee8a16d9731eec5c4c4ac4a7b37992136b9e85d8c0e669e68aef824"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipMemberCapture.php",
+          "captured_sha256": "e01c5d4c2f402dd32aff58c4cff27a6145204644e9cad7d00ad76c3d5b667d2a",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipReservationContext.php",
+          "captured_sha256": "76085a558b03e90e7f96adcb81833a498f0cd9035eb0849826cda2bcd15cc596",
+          "reference_sha256": "d2367d8166262a926e03cfd1e832c406dc1e0e621b0ff5df4c3db80203dfa9f6"
+        },
+        {
+          "path": "tests/Feature/ProductionMemberOriginals/MemberOriginalIoFrameTest.php",
+          "captured_sha256": "f8742de610ee8733c0dccb3808614ffbf4177050e32301a7e14b420a1fb6be93",
+          "reference_sha256": "11bd2c7d3e6c46f668d8e84c9203c6f67a46eab86d18c6cbd15bb3b88f0f702e"
+        },
+        {
+          "path": "tests/Unit/MemberOriginalBudgetTest.php",
+          "captured_sha256": "7733376c30056847ec9782bbfbe9d0e9aba0ea634e31a3ba52b54f4a4acec5af",
+          "reference_sha256": "341b1a0e457f7583839688d89f8ef4af2c8497b8d8a122eca829224fc43b4fa3"
+        }
+      ]
+    },
+    {
+      "id": "operation/composition-frame-issuer-5bbebd77",
+      "source": "operation/composition-frame-issuer-5bbebd77.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "5bbebd776ca6cce2be4fd0d427f3baa926c2676d",
+      "require_exact": true,
+      "scope": "Full captured executable/dependency input comparison. Uncommitted unrelated composition drafts and intermediate test changes remain differences, not committed component claims.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 2003,
+      "matched_paths": 2003,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/composition-frame-issuer-final",
+      "source": "operation/composition-frame-issuer-final.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "5bbebd776ca6cce2be4fd0d427f3baa926c2676d",
+      "require_exact": false,
+      "scope": "Full captured executable/dependency input comparison. Uncommitted unrelated composition drafts and intermediate test changes remain differences, not committed component claims.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 2002,
+      "matched_paths": 1997,
+      "all_captured_paths_match": false,
+      "differences": [
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalArtifacts.php",
+          "captured_sha256": "ac0f160ca1dc8850e76d5d2e541785474819b15ed73d5031bbd3bba878e42c39",
+          "reference_sha256": "73e586cd321da31a929fcd5a4bf96d9a4d86a415cfee889ecddbefebfc976451"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalCommittedProof.php",
+          "captured_sha256": "a6418d736308daa5afa89f96ad403b5537d11d1ae5e406d1d9191d37e3b066ad",
+          "reference_sha256": "2bf0e87a23d83c91c45f368b98f934072e01aac8ca412e0627a5b0986a81c0e0"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalConfiguration.php",
+          "captured_sha256": "6d4aa0214f8d0683aa453829666344383f5022e6282ec8622967353bf6bce996",
+          "reference_sha256": "0e13a611cffeee16d01dabee91935d1a8cbaab885a8e3eeaa8b55d1c8f7c9c9d"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalInspection.php",
+          "captured_sha256": "2dfe221c340735cf4f5064c64c97d2d9f1c2bd77c55cfafa7118dee0fb682a2a",
+          "reference_sha256": "9e3190d4f4c93e23d2995d4ad58ea4ecfaaffb8c5a2acd991fe9dda1a64ea89f"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalSourceCapture.php",
+          "captured_sha256": "d00f4bb87b43d018c6bd21e6322274a1253f58bdb05ccf4291f41f4d712d5ff4",
+          "reference_sha256": "28c2e28dffe2e4f01aa64f0f24416c62ee00390fad27d56b5cb4c56d01bcc5eb"
+        }
+      ]
+    },
+    {
+      "id": "operation/composition-issuer-fixed",
+      "source": "operation/composition-issuer-fixed.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "5bbebd776ca6cce2be4fd0d427f3baa926c2676d",
+      "require_exact": false,
+      "scope": "Full captured executable/dependency input comparison. Uncommitted unrelated composition drafts and intermediate test changes remain differences, not committed component claims.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 2002,
+      "matched_paths": 1996,
+      "all_captured_paths_match": false,
+      "differences": [
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalArtifacts.php",
+          "captured_sha256": "ac0f160ca1dc8850e76d5d2e541785474819b15ed73d5031bbd3bba878e42c39",
+          "reference_sha256": "73e586cd321da31a929fcd5a4bf96d9a4d86a415cfee889ecddbefebfc976451"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalCommittedProof.php",
+          "captured_sha256": "a6418d736308daa5afa89f96ad403b5537d11d1ae5e406d1d9191d37e3b066ad",
+          "reference_sha256": "2bf0e87a23d83c91c45f368b98f934072e01aac8ca412e0627a5b0986a81c0e0"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalConfiguration.php",
+          "captured_sha256": "6d4aa0214f8d0683aa453829666344383f5022e6282ec8622967353bf6bce996",
+          "reference_sha256": "0e13a611cffeee16d01dabee91935d1a8cbaab885a8e3eeaa8b55d1c8f7c9c9d"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalInspection.php",
+          "captured_sha256": "2dfe221c340735cf4f5064c64c97d2d9f1c2bd77c55cfafa7118dee0fb682a2a",
+          "reference_sha256": "9e3190d4f4c93e23d2995d4ad58ea4ecfaaffb8c5a2acd991fe9dda1a64ea89f"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalSourceCapture.php",
+          "captured_sha256": "d00f4bb87b43d018c6bd21e6322274a1253f58bdb05ccf4291f41f4d712d5ff4",
+          "reference_sha256": "28c2e28dffe2e4f01aa64f0f24416c62ee00390fad27d56b5cb4c56d01bcc5eb"
+        },
+        {
+          "path": "tests/Feature/ProductionMemberOriginals/MemberOriginalFinishBoundaryTest.php",
+          "captured_sha256": "a28f0de507fd93debe952739bfaef7638c17a1b8ff1b25f48473c853e3391a3a",
+          "reference_sha256": "e2b0c01c7b14f3c3008c80737a92ad29d0a824a79790b5687b52e4df0391f70c"
+        }
+      ]
+    },
+    {
+      "id": "operation/composition-issuer-initial",
+      "source": "operation/composition-issuer-initial.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "5bbebd776ca6cce2be4fd0d427f3baa926c2676d",
+      "require_exact": false,
+      "scope": "Full captured executable/dependency input comparison. Uncommitted unrelated composition drafts and intermediate test changes remain differences, not committed component claims.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 2002,
+      "matched_paths": 1995,
+      "all_captured_paths_match": false,
+      "differences": [
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalArtifacts.php",
+          "captured_sha256": "ac0f160ca1dc8850e76d5d2e541785474819b15ed73d5031bbd3bba878e42c39",
+          "reference_sha256": "73e586cd321da31a929fcd5a4bf96d9a4d86a415cfee889ecddbefebfc976451"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalCommittedProof.php",
+          "captured_sha256": "a6418d736308daa5afa89f96ad403b5537d11d1ae5e406d1d9191d37e3b066ad",
+          "reference_sha256": "2bf0e87a23d83c91c45f368b98f934072e01aac8ca412e0627a5b0986a81c0e0"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalConfiguration.php",
+          "captured_sha256": "6d4aa0214f8d0683aa453829666344383f5022e6282ec8622967353bf6bce996",
+          "reference_sha256": "0e13a611cffeee16d01dabee91935d1a8cbaab885a8e3eeaa8b55d1c8f7c9c9d"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalInspection.php",
+          "captured_sha256": "2dfe221c340735cf4f5064c64c97d2d9f1c2bd77c55cfafa7118dee0fb682a2a",
+          "reference_sha256": "9e3190d4f4c93e23d2995d4ad58ea4ecfaaffb8c5a2acd991fe9dda1a64ea89f"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalSourceCapture.php",
+          "captured_sha256": "d00f4bb87b43d018c6bd21e6322274a1253f58bdb05ccf4291f41f4d712d5ff4",
+          "reference_sha256": "28c2e28dffe2e4f01aa64f0f24416c62ee00390fad27d56b5cb4c56d01bcc5eb"
+        },
+        {
+          "path": "tests/Feature/ProductionMemberOriginals/MemberOriginalFinishBoundaryTest.php",
+          "captured_sha256": "a28f0de507fd93debe952739bfaef7638c17a1b8ff1b25f48473c853e3391a3a",
+          "reference_sha256": "e2b0c01c7b14f3c3008c80737a92ad29d0a824a79790b5687b52e4df0391f70c"
+        },
+        {
+          "path": "tests/Feature/ProductionMemberOriginals/MemberOriginalIssuerOwnershipTest.php",
+          "captured_sha256": "2c4057ab71e3b6adbb679090457f4e7e2f659110b587534a880f001bc07a8eac",
+          "reference_sha256": "394958bcd5699983eec8a96c36abc6bc825315fd9bf7241e320b49d9597897dc"
+        }
+      ]
+    },
+    {
+      "id": "operation/finish-boundary-final",
+      "source": "operation/finish-boundary-final.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "3cc2a0d39ad21a98ca238cffcb76ff7939f18b95",
+      "require_exact": false,
+      "scope": "Full captured executable/dependency input comparison. Uncommitted unrelated composition drafts and intermediate test changes remain differences, not committed component claims.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 1977,
+      "matched_paths": 1966,
+      "all_captured_paths_match": false,
+      "differences": [
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalCandidate.php",
+          "captured_sha256": "42878e845587d6f550817ac4b26c38dd2110cc669c89bedfdee926b033b44e0c",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalCapturePermit.php",
+          "captured_sha256": "34ec6c03010ea047d94110af02c5dc23d38fa7011d7d3471ee5125449c42030f",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalConfiguration.php",
+          "captured_sha256": "ebddc4536218313c3cc79a819882ec0ea0eed169d4a6aee0c6b140972f97d155",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalFinishBoundary.php",
+          "captured_sha256": "506cd94787a0b78dde1a14979bfc11e2a83e8db5a90153354e9d7d75a094db9c",
+          "reference_sha256": "9d6959216f08701de10454b6bcbf20dfd91262aff039d10e9bf36ee514ac43c6"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalMaterialization.php",
+          "captured_sha256": "bcc2d144323e6bd3d20f8be4654a90330e8cd5f9fb34ee503c5539ce80206ad1",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalReadyToken.php",
+          "captured_sha256": "299e16ea14d814cbd11ba778f074f6c3e9e41f0c44a661fb6b64e522ef208b2d",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalSource.php",
+          "captured_sha256": "8ec58199c0885c4784739261781892d5476b458d55cad01883ff381a93acb1d5",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalSourceClaim.php",
+          "captured_sha256": "cd05ec2586c707a54891a93b30b203855c604bb1e97e20452c7169c93a6464b6",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipBillingEvidence.php",
+          "captured_sha256": "7ba5b6e56d2511cc1b4fd277b83204d33fbe01eea650b86be02af79fd763e189",
+          "reference_sha256": "aea9c888aee8a16d9731eec5c4c4ac4a7b37992136b9e85d8c0e669e68aef824"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipMemberCapture.php",
+          "captured_sha256": "e01c5d4c2f402dd32aff58c4cff27a6145204644e9cad7d00ad76c3d5b667d2a",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipReservationContext.php",
+          "captured_sha256": "76085a558b03e90e7f96adcb81833a498f0cd9035eb0849826cda2bcd15cc596",
+          "reference_sha256": "d2367d8166262a926e03cfd1e832c406dc1e0e621b0ff5df4c3db80203dfa9f6"
+        }
+      ]
+    },
+    {
+      "id": "operation/finish-boundary-initial",
+      "source": "operation/finish-boundary-initial.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "3cc2a0d39ad21a98ca238cffcb76ff7939f18b95",
+      "require_exact": false,
+      "scope": "Full captured executable/dependency input comparison. Uncommitted unrelated composition drafts and intermediate test changes remain differences, not committed component claims.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 1977,
+      "matched_paths": 1965,
+      "all_captured_paths_match": false,
+      "differences": [
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalCandidate.php",
+          "captured_sha256": "42878e845587d6f550817ac4b26c38dd2110cc669c89bedfdee926b033b44e0c",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalCapturePermit.php",
+          "captured_sha256": "34ec6c03010ea047d94110af02c5dc23d38fa7011d7d3471ee5125449c42030f",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalConfiguration.php",
+          "captured_sha256": "ebddc4536218313c3cc79a819882ec0ea0eed169d4a6aee0c6b140972f97d155",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalFinishBoundary.php",
+          "captured_sha256": "506cd94787a0b78dde1a14979bfc11e2a83e8db5a90153354e9d7d75a094db9c",
+          "reference_sha256": "9d6959216f08701de10454b6bcbf20dfd91262aff039d10e9bf36ee514ac43c6"
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalMaterialization.php",
+          "captured_sha256": "bcc2d144323e6bd3d20f8be4654a90330e8cd5f9fb34ee503c5539ce80206ad1",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalReadyToken.php",
+          "captured_sha256": "299e16ea14d814cbd11ba778f074f6c3e9e41f0c44a661fb6b64e522ef208b2d",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalSource.php",
+          "captured_sha256": "8ec58199c0885c4784739261781892d5476b458d55cad01883ff381a93acb1d5",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalSourceClaim.php",
+          "captured_sha256": "cd05ec2586c707a54891a93b30b203855c604bb1e97e20452c7169c93a6464b6",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipBillingEvidence.php",
+          "captured_sha256": "7ba5b6e56d2511cc1b4fd277b83204d33fbe01eea650b86be02af79fd763e189",
+          "reference_sha256": "aea9c888aee8a16d9731eec5c4c4ac4a7b37992136b9e85d8c0e669e68aef824"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipMemberCapture.php",
+          "captured_sha256": "e01c5d4c2f402dd32aff58c4cff27a6145204644e9cad7d00ad76c3d5b667d2a",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipReservationContext.php",
+          "captured_sha256": "76085a558b03e90e7f96adcb81833a498f0cd9035eb0849826cda2bcd15cc596",
+          "reference_sha256": "d2367d8166262a926e03cfd1e832c406dc1e0e621b0ff5df4c3db80203dfa9f6"
+        },
+        {
+          "path": "tests/Feature/ProductionMemberOriginals/MemberOriginalFinishBoundaryTest.php",
+          "captured_sha256": "b73dc220328725151515ede2235f52f5f039de79252e2932452c64adbfc68e02",
+          "reference_sha256": "a28f0de507fd93debe952739bfaef7638c17a1b8ff1b25f48473c853e3391a3a"
+        }
+      ]
+    },
+    {
+      "id": "operation/finish-boundary-native-statements",
+      "source": "operation/finish-boundary-native-statements.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "3cc2a0d39ad21a98ca238cffcb76ff7939f18b95",
+      "require_exact": false,
+      "scope": "Full captured executable/dependency input comparison. Uncommitted unrelated composition drafts and intermediate test changes remain differences, not committed component claims.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 1977,
+      "matched_paths": 1967,
+      "all_captured_paths_match": false,
+      "differences": [
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalCandidate.php",
+          "captured_sha256": "42878e845587d6f550817ac4b26c38dd2110cc669c89bedfdee926b033b44e0c",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalCapturePermit.php",
+          "captured_sha256": "34ec6c03010ea047d94110af02c5dc23d38fa7011d7d3471ee5125449c42030f",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalConfiguration.php",
+          "captured_sha256": "ebddc4536218313c3cc79a819882ec0ea0eed169d4a6aee0c6b140972f97d155",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalMaterialization.php",
+          "captured_sha256": "bcc2d144323e6bd3d20f8be4654a90330e8cd5f9fb34ee503c5539ce80206ad1",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalReadyToken.php",
+          "captured_sha256": "299e16ea14d814cbd11ba778f074f6c3e9e41f0c44a661fb6b64e522ef208b2d",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalSource.php",
+          "captured_sha256": "8ec58199c0885c4784739261781892d5476b458d55cad01883ff381a93acb1d5",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalSourceClaim.php",
+          "captured_sha256": "cd05ec2586c707a54891a93b30b203855c604bb1e97e20452c7169c93a6464b6",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipBillingEvidence.php",
+          "captured_sha256": "7ba5b6e56d2511cc1b4fd277b83204d33fbe01eea650b86be02af79fd763e189",
+          "reference_sha256": "aea9c888aee8a16d9731eec5c4c4ac4a7b37992136b9e85d8c0e669e68aef824"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipMemberCapture.php",
+          "captured_sha256": "e01c5d4c2f402dd32aff58c4cff27a6145204644e9cad7d00ad76c3d5b667d2a",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipReservationContext.php",
+          "captured_sha256": "76085a558b03e90e7f96adcb81833a498f0cd9035eb0849826cda2bcd15cc596",
+          "reference_sha256": "d2367d8166262a926e03cfd1e832c406dc1e0e621b0ff5df4c3db80203dfa9f6"
+        }
+      ]
+    },
+    {
+      "id": "operation/io-review-red",
+      "source": "operation/io-review-red.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "c7310cdad4154e662270736a4ecaeeef2e7cf64d",
+      "require_exact": false,
+      "scope": "Full captured executable/dependency input comparison. Uncommitted unrelated composition drafts and intermediate test changes remain differences, not committed component claims.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 1956,
+      "matched_paths": 1939,
+      "all_captured_paths_match": false,
+      "differences": [
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalCandidate.php",
+          "captured_sha256": "42878e845587d6f550817ac4b26c38dd2110cc669c89bedfdee926b033b44e0c",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalCapturePermit.php",
+          "captured_sha256": "34ec6c03010ea047d94110af02c5dc23d38fa7011d7d3471ee5125449c42030f",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalConfiguration.php",
+          "captured_sha256": "5caf400b26b4b4e3bbdf2807635e75145f47955305a943672d8177ffd851f278",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalMaterialization.php",
+          "captured_sha256": "bcc2d144323e6bd3d20f8be4654a90330e8cd5f9fb34ee503c5539ce80206ad1",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalReadyToken.php",
+          "captured_sha256": "299e16ea14d814cbd11ba778f074f6c3e9e41f0c44a661fb6b64e522ef208b2d",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalRenderInput.php",
+          "captured_sha256": "9da97ef10c5d62ffc78a123b18f5658d13f3cecca1cf9a3261e0fe99850d6ec0",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalSource.php",
+          "captured_sha256": "8ec58199c0885c4784739261781892d5476b458d55cad01883ff381a93acb1d5",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalSourceClaim.php",
+          "captured_sha256": "cd05ec2586c707a54891a93b30b203855c604bb1e97e20452c7169c93a6464b6",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalSourceValues.php",
+          "captured_sha256": "3aaf06cf5d36fe419e300e4413933edb12ee3ecec705b6e71116c89284de7748",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalText.php",
+          "captured_sha256": "959d90054dfb6513dff278359d4d27709da4b0131faef674e2cdd6a6689902da",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipBillingEvidence.php",
+          "captured_sha256": "7ba5b6e56d2511cc1b4fd277b83204d33fbe01eea650b86be02af79fd763e189",
+          "reference_sha256": "aea9c888aee8a16d9731eec5c4c4ac4a7b37992136b9e85d8c0e669e68aef824"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipMemberCapture.php",
+          "captured_sha256": "e01c5d4c2f402dd32aff58c4cff27a6145204644e9cad7d00ad76c3d5b667d2a",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipReservationContext.php",
+          "captured_sha256": "76085a558b03e90e7f96adcb81833a498f0cd9035eb0849826cda2bcd15cc596",
+          "reference_sha256": "d2367d8166262a926e03cfd1e832c406dc1e0e621b0ff5df4c3db80203dfa9f6"
+        },
+        {
+          "path": "tests/Feature/ProductionMemberOriginals/MemberOriginalIoFrameTest.php",
+          "captured_sha256": "f8742de610ee8733c0dccb3808614ffbf4177050e32301a7e14b420a1fb6be93",
+          "reference_sha256": "4d8f6970ac0d270a4d1fe2823027fdf738153c6d9882ade5e4eb4e411b25bd83"
+        },
+        {
+          "path": "tests/Support/MemberOriginalRendererFixtures.php",
+          "captured_sha256": "9ee5ce469a11c312cc8ed8e8b6ecfc14987a754fad2b0531fdf92b2a453f08d7",
+          "reference_sha256": null
+        },
+        {
+          "path": "tests/Unit/MemberOriginalRenderInputTest.php",
+          "captured_sha256": "fa75a512f6dddca0f75096f5393e9839bd3a29dba2e4134d590a2a516ddf888d",
+          "reference_sha256": null
+        },
+        {
+          "path": "tests/Unit/MemberOriginalTextTest.php",
+          "captured_sha256": "e555004f15db72e44d220d88cd26aabf9e97e161e32d40a7df14a6c60acf3001",
+          "reference_sha256": null
+        }
+      ]
+    },
+    {
+      "id": "operation/native-io-final",
+      "source": "operation/native-io-final.source.json.gz",
+      "key": [
+        "files"
+      ],
+      "reference": "98ca4f0a64e82ee49a7d4b310d60a5095214c3c9",
+      "require_exact": false,
+      "scope": "Full captured executable/dependency input comparison. Uncommitted unrelated composition drafts and intermediate test changes remain differences, not committed component claims.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 1297,
+      "matched_paths": 1286,
+      "all_captured_paths_match": false,
+      "differences": [
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalCandidate.php",
+          "captured_sha256": "42878e845587d6f550817ac4b26c38dd2110cc669c89bedfdee926b033b44e0c",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalCapturePermit.php",
+          "captured_sha256": "34ec6c03010ea047d94110af02c5dc23d38fa7011d7d3471ee5125449c42030f",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalConfiguration.php",
+          "captured_sha256": "ebddc4536218313c3cc79a819882ec0ea0eed169d4a6aee0c6b140972f97d155",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalMaterialization.php",
+          "captured_sha256": "bcc2d144323e6bd3d20f8be4654a90330e8cd5f9fb34ee503c5539ce80206ad1",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalReadyToken.php",
+          "captured_sha256": "299e16ea14d814cbd11ba778f074f6c3e9e41f0c44a661fb6b64e522ef208b2d",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalSource.php",
+          "captured_sha256": "8ec58199c0885c4784739261781892d5476b458d55cad01883ff381a93acb1d5",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalSourceClaim.php",
+          "captured_sha256": "cd05ec2586c707a54891a93b30b203855c604bb1e97e20452c7169c93a6464b6",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalSourceValues.php",
+          "captured_sha256": "3aaf06cf5d36fe419e300e4413933edb12ee3ecec705b6e71116c89284de7748",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipBillingEvidence.php",
+          "captured_sha256": "7ba5b6e56d2511cc1b4fd277b83204d33fbe01eea650b86be02af79fd763e189",
+          "reference_sha256": "aea9c888aee8a16d9731eec5c4c4ac4a7b37992136b9e85d8c0e669e68aef824"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipMemberCapture.php",
+          "captured_sha256": "e01c5d4c2f402dd32aff58c4cff27a6145204644e9cad7d00ad76c3d5b667d2a",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipReservationContext.php",
+          "captured_sha256": "76085a558b03e90e7f96adcb81833a498f0cd9035eb0849826cda2bcd15cc596",
+          "reference_sha256": "d2367d8166262a926e03cfd1e832c406dc1e0e621b0ff5df4c3db80203dfa9f6"
+        }
+      ]
+    },
+    {
+      "id": "operation/source-values-final",
+      "source": "operation/source-values-final.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "cff76302f11661c44a4583d2f20d5e368b0b6aa1",
+      "require_exact": false,
+      "scope": "Full captured executable/dependency input comparison. Uncommitted unrelated composition drafts and intermediate test changes remain differences, not committed component claims.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 1975,
+      "matched_paths": 1965,
+      "all_captured_paths_match": false,
+      "differences": [
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalCandidate.php",
+          "captured_sha256": "42878e845587d6f550817ac4b26c38dd2110cc669c89bedfdee926b033b44e0c",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalCapturePermit.php",
+          "captured_sha256": "34ec6c03010ea047d94110af02c5dc23d38fa7011d7d3471ee5125449c42030f",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalConfiguration.php",
+          "captured_sha256": "ebddc4536218313c3cc79a819882ec0ea0eed169d4a6aee0c6b140972f97d155",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalMaterialization.php",
+          "captured_sha256": "bcc2d144323e6bd3d20f8be4654a90330e8cd5f9fb34ee503c5539ce80206ad1",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalReadyToken.php",
+          "captured_sha256": "299e16ea14d814cbd11ba778f074f6c3e9e41f0c44a661fb6b64e522ef208b2d",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalSource.php",
+          "captured_sha256": "8ec58199c0885c4784739261781892d5476b458d55cad01883ff381a93acb1d5",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalSourceClaim.php",
+          "captured_sha256": "cd05ec2586c707a54891a93b30b203855c604bb1e97e20452c7169c93a6464b6",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipBillingEvidence.php",
+          "captured_sha256": "7ba5b6e56d2511cc1b4fd277b83204d33fbe01eea650b86be02af79fd763e189",
+          "reference_sha256": "aea9c888aee8a16d9731eec5c4c4ac4a7b37992136b9e85d8c0e669e68aef824"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipMemberCapture.php",
+          "captured_sha256": "e01c5d4c2f402dd32aff58c4cff27a6145204644e9cad7d00ad76c3d5b667d2a",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipReservationContext.php",
+          "captured_sha256": "76085a558b03e90e7f96adcb81833a498f0cd9035eb0849826cda2bcd15cc596",
+          "reference_sha256": "d2367d8166262a926e03cfd1e832c406dc1e0e621b0ff5df4c3db80203dfa9f6"
+        }
+      ]
+    },
+    {
+      "id": "operation/source-values-initial",
+      "source": "operation/source-values-initial.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "cff76302f11661c44a4583d2f20d5e368b0b6aa1",
+      "require_exact": false,
+      "scope": "Full captured executable/dependency input comparison. Uncommitted unrelated composition drafts and intermediate test changes remain differences, not committed component claims.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 1975,
+      "matched_paths": 1964,
+      "all_captured_paths_match": false,
+      "differences": [
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalCandidate.php",
+          "captured_sha256": "42878e845587d6f550817ac4b26c38dd2110cc669c89bedfdee926b033b44e0c",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalCapturePermit.php",
+          "captured_sha256": "34ec6c03010ea047d94110af02c5dc23d38fa7011d7d3471ee5125449c42030f",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalConfiguration.php",
+          "captured_sha256": "ebddc4536218313c3cc79a819882ec0ea0eed169d4a6aee0c6b140972f97d155",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalMaterialization.php",
+          "captured_sha256": "bcc2d144323e6bd3d20f8be4654a90330e8cd5f9fb34ee503c5539ce80206ad1",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalReadyToken.php",
+          "captured_sha256": "299e16ea14d814cbd11ba778f074f6c3e9e41f0c44a661fb6b64e522ef208b2d",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalSource.php",
+          "captured_sha256": "8ec58199c0885c4784739261781892d5476b458d55cad01883ff381a93acb1d5",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Grants/Member/MemberOriginalSourceClaim.php",
+          "captured_sha256": "cd05ec2586c707a54891a93b30b203855c604bb1e97e20452c7169c93a6464b6",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipBillingEvidence.php",
+          "captured_sha256": "7ba5b6e56d2511cc1b4fd277b83204d33fbe01eea650b86be02af79fd763e189",
+          "reference_sha256": "aea9c888aee8a16d9731eec5c4c4ac4a7b37992136b9e85d8c0e669e68aef824"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipMemberCapture.php",
+          "captured_sha256": "e01c5d4c2f402dd32aff58c4cff27a6145204644e9cad7d00ad76c3d5b667d2a",
+          "reference_sha256": null
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipReservationContext.php",
+          "captured_sha256": "76085a558b03e90e7f96adcb81833a498f0cd9035eb0849826cda2bcd15cc596",
+          "reference_sha256": "d2367d8166262a926e03cfd1e832c406dc1e0e621b0ff5df4c3db80203dfa9f6"
+        },
+        {
+          "path": "tests/Unit/MemberOriginalSourceValuesTest.php",
+          "captured_sha256": "6284ad40e5fdfe05dc936e8f6115048a04ab9f7b3294843c6a6571a62ee0a849",
+          "reference_sha256": "3008d747bfa2be41ccb992b128d6e910a7e9c84921b1fee07406f4a53c146ce9"
+        }
+      ]
+    },
+    {
+      "id": "operation/budget-io-commit-binding",
+      "source": "operation/budget-io-commit-binding.json",
+      "key": [
+        "files"
+      ],
+      "reference": "c7310cdad4154e662270736a4ecaeeef2e7cf64d",
+      "require_exact": true,
+      "scope": "Owner selected-executed dependency/source binding; does not attest unrelated broad-inventory drafts.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 4,
+      "matched_paths": 4,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/budget-io-review-binding",
+      "source": "operation/budget-io-review-binding.json",
+      "key": [
+        "files"
+      ],
+      "reference": "d3aafa1b1563353fe56a1eef54c4f477a50f0d61",
+      "require_exact": true,
+      "scope": "Owner selected-executed dependency/source binding; does not attest unrelated broad-inventory drafts.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 4,
+      "matched_paths": 4,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/native-io-final.commit-binding",
+      "source": "operation/native-io-final.commit-binding.json",
+      "key": [
+        "selected_executed_inputs"
+      ],
+      "reference": "98ca4f0a64e82ee49a7d4b310d60a5095214c3c9",
+      "require_exact": true,
+      "scope": "Owner selected-executed dependency/source binding; does not attest unrelated broad-inventory drafts.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 5,
+      "matched_paths": 5,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/source-values-commit-binding",
+      "source": "operation/source-values-commit-binding.json",
+      "key": [
+        "files"
+      ],
+      "reference": "cff76302f11661c44a4583d2f20d5e368b0b6aa1",
+      "require_exact": true,
+      "scope": "Owner selected-executed dependency/source binding; does not attest unrelated broad-inventory drafts.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 2,
+      "matched_paths": 2,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/finish-boundary-commit-binding",
+      "source": "operation/finish-boundary-commit-binding.json",
+      "key": [
+        "files"
+      ],
+      "reference": "3cc2a0d39ad21a98ca238cffcb76ff7939f18b95",
+      "require_exact": true,
+      "scope": "Owner selected-executed dependency/source binding; does not attest unrelated broad-inventory drafts.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 2,
+      "matched_paths": 2,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "facts-5d6c58da-final",
+      "source": "facts/final-5d6c58da-source.json.gz",
+      "key": [
+        "sha256"
+      ],
+      "reference": "5d6c58da50267a636e393ce3754ef473516923aa",
+      "require_exact": true,
+      "scope": "Complete tracked owner inventory after E9 correction; fixed executed production bytes match commit, external executed probe differs from Pint-formatted repository test by retained exact diff.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 11504,
+      "matched_paths": 11504,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "facts-a7265e8c-final",
+      "source": "facts/timestamp-compatibility/final-source.json.gz",
+      "key": [
+        "sha256"
+      ],
+      "reference": "a7265e8c5365421f2110623f685cbc67d21a99b0",
+      "require_exact": true,
+      "scope": "Complete11,505 tracked owner inventory after catalog timestamp compatibility correction. Exact external probe and its repository formatting diff retained.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 11505,
+      "matched_paths": 11505,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "facts-timestamp-old-dependencies",
+      "source": "facts/timestamp-compatibility/old-source.json",
+      "key": [
+        "sha256"
+      ],
+      "reference": "5d6c58da50267a636e393ce3754ef473516923aa",
+      "require_exact": true,
+      "scope": "Five captured old formatter/document dependencies; external regression file is separately retained, not in committed old source.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 5,
+      "matched_paths": 5,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "root/integrated-pure-4962943d",
+      "source": "root/pure-4962943d/integrated-pure-4962943d.source.json.gz",
+      "key": [
+        "files"
+      ],
+      "reference": "4962943d366b54c9e3b85e16ef1f747bf6eb09c0",
+      "require_exact": true,
+      "scope": "Root exact-source changed-unit selection captured inputs; clean Git state and owner unchanged-source sidecar. Unit execution only.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 1396,
+      "matched_paths": 1396,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/composition-canary-initial",
+      "source": "operation/composition-canary-initial.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "9d8abd4501b75a2577dc6f72a6a2adb4b6afbf5a",
+      "require_exact": true,
+      "scope": "Complete captured input inventory. The native/runtime environment and unlisted dependencies are not supplied by this Git comparison.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 2006,
+      "matched_paths": 2006,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/reservation-wrappers-initial",
+      "source": "operation/reservation-wrappers-initial.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "9d8abd4501b75a2577dc6f72a6a2adb4b6afbf5a",
+      "require_exact": true,
+      "scope": "Complete captured input inventory. The native/runtime environment and unlisted dependencies are not supplied by this Git comparison.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 2006,
+      "matched_paths": 2006,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/composition-canary-timestamp-fixed",
+      "source": "operation/composition-canary-timestamp-fixed.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "43e58632d87977b467f58fde0feeef47b6a89dcc",
+      "require_exact": true,
+      "scope": "Complete captured input inventory. The native/runtime environment and unlisted dependencies are not supplied by this Git comparison.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 2034,
+      "matched_paths": 2034,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/retained-deadline-old-bridge-red",
+      "source": "operation/retained-deadline-old-bridge-red.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "a082d3b394d071538cc65057074c1d06a7f6c994",
+      "require_exact": true,
+      "scope": "Complete captured input inventory. The native/runtime environment and unlisted dependencies are not supplied by this Git comparison. Supporting tree only; exact executed old class is separately bound and overlaid.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 2034,
+      "matched_paths": 2034,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/composition-fifteen-initial",
+      "source": "operation/composition-fifteen-initial.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "a082d3b394d071538cc65057074c1d06a7f6c994",
+      "require_exact": true,
+      "scope": "Complete captured input inventory. The native/runtime environment and unlisted dependencies are not supplied by this Git comparison.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 2034,
+      "matched_paths": 2034,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/composition-facts-callback-corrected",
+      "source": "operation/composition-facts-callback-corrected.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "2cfd9a0db46a806c0a0bd0c83839b5b584fc3627",
+      "require_exact": true,
+      "scope": "Complete captured input inventory. The native/runtime environment and unlisted dependencies are not supplied by this Git comparison. Only MemberOriginalCompositionTest.php differed from captured HEAD; exact tested bytes match this later test-only commit.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 2034,
+      "matched_paths": 2034,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/composition-fifteen-final",
+      "source": "operation/composition-fifteen-final.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "2cfd9a0db46a806c0a0bd0c83839b5b584fc3627",
+      "require_exact": true,
+      "scope": "Complete captured input inventory. The native/runtime environment and unlisted dependencies are not supplied by this Git comparison.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 2034,
+      "matched_paths": 2034,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/reservation-clock-wrapper-final",
+      "source": "operation/reservation-clock-wrapper-final.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "2cfd9a0db46a806c0a0bd0c83839b5b584fc3627",
+      "require_exact": true,
+      "scope": "Complete captured input inventory. The native/runtime environment and unlisted dependencies are not supplied by this Git comparison.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 2034,
+      "matched_paths": 2034,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/retained-deadline-old-inspection",
+      "source": "operation/retained-deadline-red-green-comparison.json",
+      "key": [
+        "red_source"
+      ],
+      "path_key": "path",
+      "hash_key": "sha256",
+      "path_aliases": {
+        "/workspace/runtime/member-original-operation-evidence/retained-deadline-old-inspection.php.txt": "app/Domain/Grants/Member/MemberOriginalInspection.php"
+      },
+      "reference": "5bbebd776ca6cce2be4fd0d427f3baa926c2676d",
+      "require_exact": true,
+      "scope": "Exact single old preloaded class; supporting tree is a082, not an old whole-source run.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 1,
+      "matched_paths": 1,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "quality/source-before",
+      "source": "quality/source-before.json.gz",
+      "key": [
+        "sources"
+      ],
+      "reference": "78ef16be7626c81de49d103d581551b707201eda",
+      "require_exact": true,
+      "scope": "Exact quality/discovery root inventory; no application body execution.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 2254,
+      "matched_paths": 2254,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "root/native-preparation-integration-f4732dbe",
+      "source": "root/native-initial-f4732dbe/native-preparation-integration-f4732dbe.source.json.gz",
+      "key": [
+        "files"
+      ],
+      "reference": "f4732dbe21b9e40eb386b6115be1283ff563f511",
+      "require_exact": true,
+      "scope": "All 1,388 captured application/config/resource/dependency and selected test inputs match exact root f4732dbe; initial failed run, no final acceptance.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 1388,
+      "matched_paths": 1388,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/native-preparation-diagnostic/native-one",
+      "source": "operation/native-preparation-diagnostic/native-one.source.json.gz",
+      "key": [
+        "files"
+      ],
+      "reference": "2cfd9a0db46a806c0a0bd0c83839b5b584fc3627",
+      "require_exact": true,
+      "scope": "Supporting original application/selected input tree only; exact timing-only overlays are separately retained and checked.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 1324,
+      "matched_paths": 1324,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/native-preparation-diagnostic/native-one-v2",
+      "source": "operation/native-preparation-diagnostic/native-one-v2.source.json.gz",
+      "key": [
+        "files"
+      ],
+      "reference": "2cfd9a0db46a806c0a0bd0c83839b5b584fc3627",
+      "require_exact": true,
+      "scope": "Supporting original application/selected input tree only; exact timing-only overlays are separately retained and checked.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 1324,
+      "matched_paths": 1324,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/native-diagnostic-root-equivalence",
+      "source": "operation/native-preparation-diagnostic/root-source-equivalence.json.gz",
+      "key": [
+        "matching_application_and_selected_inputs"
+      ],
+      "reference": "f4732dbe21b9e40eb386b6115be1283ff563f511",
+      "require_exact": true,
+      "scope": "985 original application/selected test/fixture/child paths compare to actual failed root source; four timing-only overlays remain separate.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 985,
+      "matched_paths": 985,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "quality/native-budget-followup",
+      "source": "quality/native-budget-followup/source-before.json.gz",
+      "key": [
+        "sources"
+      ],
+      "reference": "32f083d28db0609a52cade793849a8767a855ae3",
+      "require_exact": true,
+      "scope": "Exact source inventory for 4-file Pint and list-only discovery after private initialization correction. No behavior execution.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 2360,
+      "matched_paths": 2360,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/native-preparation-correction/sqlite-owned-composition",
+      "source": "operation/native-preparation-correction/sqlite-owned-composition.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "9399dd998cc3d972b94f6753e576e2c756438657",
+      "require_exact": true,
+      "scope": "Complete captured inputs at exact correction author commit; original source identity retained, no diagnostic preload.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 2034,
+      "matched_paths": 2034,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/native-preparation-correction/sqlite-owned-composition-root-equivalence",
+      "source": "operation/native-preparation-correction/sqlite-owned-composition.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "32f083d28db0609a52cade793849a8767a855ae3",
+      "require_exact": true,
+      "scope": "Exact captured-path equivalence to integrated root source, not a new root execution.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 2034,
+      "matched_paths": 2034,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/native-preparation-correction/sqlite-public-reservation-proof",
+      "source": "operation/native-preparation-correction/sqlite-public-reservation-proof.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "9399dd998cc3d972b94f6753e576e2c756438657",
+      "require_exact": true,
+      "scope": "Complete captured inputs at exact correction author commit; original source identity retained, no diagnostic preload.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 2034,
+      "matched_paths": 2034,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/native-preparation-correction/sqlite-public-reservation-proof-root-equivalence",
+      "source": "operation/native-preparation-correction/sqlite-public-reservation-proof.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "32f083d28db0609a52cade793849a8767a855ae3",
+      "require_exact": true,
+      "scope": "Exact captured-path equivalence to integrated root source, not a new root execution.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 2034,
+      "matched_paths": 2034,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/native-preparation-correction/native-positive-final",
+      "source": "operation/native-preparation-correction/native-positive-final.source.json.gz",
+      "key": [
+        "files"
+      ],
+      "reference": "9399dd998cc3d972b94f6753e576e2c756438657",
+      "require_exact": true,
+      "scope": "Complete captured inputs at exact correction author commit; original source identity retained, no diagnostic preload.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 1324,
+      "matched_paths": 1324,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/native-preparation-correction/native-positive-final-root-equivalence",
+      "source": "operation/native-preparation-correction/native-positive-final.source.json.gz",
+      "key": [
+        "files"
+      ],
+      "reference": "32f083d28db0609a52cade793849a8767a855ae3",
+      "require_exact": true,
+      "scope": "Exact captured-path equivalence to integrated root source, not a new root execution.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 1324,
+      "matched_paths": 1324,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "root/native-source-withdrawal-ec90cc1a",
+      "source": "root/native-withdrawal-ec90cc1a/native-source-withdrawal-ec90cc1a.source.json.gz",
+      "key": [
+        "files"
+      ],
+      "reference": "ec90cc1a097db8925d87689d0ac62fdff0165c5a",
+      "require_exact": true,
+      "scope": "All1,388 captured inputs at exact frozen root source; actual native withdrawal during real materialization.",
+      "reference_resolution": "direct Git reference",
+      "captured_paths": 1388,
+      "matched_paths": 1388,
+      "all_captured_paths_match": true,
+      "differences": []
+    }
+  ],
+  "frozen_profiles": [
+    {
+      "receipt": "renderer/frozen-profiles-inventory.json",
+      "reference": "483793065c3f7a66057907a777f938f608bf7036",
+      "manifests": 5,
+      "member_entries": 38,
+      "entries_verified_against_baseline_and_reference": 43
+    }
+  ],
+  "new_member_profiles": [
+    {
+      "reference": "483793065c3f7a66057907a777f938f608bf7036",
+      "path": "resources/contracts/production-member-v1/profile-assets.json",
+      "sha256": "caa3218c162ef3c9192785858e6cd9fad89ab828a345466652dda21e74a1c852",
+      "members": {
+        "app/Domain/Grants/Member/MemberOriginalRenderInput.php": "6b470c6d2dfadbb74d24bc7263e347985ce92864c29b236aac50d70bd379e3c7",
+        "app/Domain/Grants/Member/MemberOriginalText.php": "959d90054dfb6513dff278359d4d27709da4b0131faef674e2cdd6a6689902da",
+        "app/Domain/Grants/Member/MemberOriginalPdfRenderer.php": "f3acf36fcf4938b14a8efb742ad46a17dc7c3001a478833d36a48d09ce5c7ed2",
+        "app/Domain/Grants/Member/MemberOriginalRendererProcess.php": "f0470e91b122b23588088a7361971b9e009f2098d86e9d1321a3cea47c610085",
+        "scripts/member-original-renderer-autoload.php": "adca75e6c55194265c0395df088cf77b8aab37a30923435e3b5e2704ada7193c",
+        "scripts/render-member-original.php": "880ec7590bba84b24c0944986b9c71e6484cd0b63f25b0e55add1b6a7f4be0c3"
+      },
+      "member_count": 6
+    }
+  ],
+  "portable_git_checks": [
+    {
+      "original_reference": "10b8cb250438a4f82b3e5657b2c915c4c13a687b",
+      "reachable_default": "8e789888d712a6573ff0d26acb611995b4870d0a",
+      "verified_path_pairs": 2,
+      "overrides": 0,
+      "preserved_absences": 0,
+      "original_path_blob_pairs_sha256": "1b974af690d564e39494de719d05ecc0e41c00ca25d1a0765f3dfcecf253ee8c"
+    },
+    {
+      "original_reference": "15a65e0761382a9ad50c4b279605a644a4eeb285",
+      "reachable_default": "cff3f695140d2f1797f374f91a35f326a2f834af",
+      "verified_path_pairs": 10633,
+      "overrides": 3,
+      "preserved_absences": 0,
+      "original_path_blob_pairs_sha256": "5d656c0a5f6313edb902715443208d42deba9ddeaec4a8b28d499c8e06159aed"
+    },
+    {
+      "original_reference": "1d88e9f0b7c744af1008c8dc4b656c735d96dd2d",
+      "reachable_default": "da253c61ee36943d496df43c70884f6f8a3d0dc2",
+      "verified_path_pairs": 1,
+      "overrides": 0,
+      "preserved_absences": 0,
+      "original_path_blob_pairs_sha256": "331c26b5f06606802ecc15ba851bc7b038d8a125f1ab86a5a782ad5f522f7130"
+    },
+    {
+      "original_reference": "2333b9dae2059e2d79c062f8f635332c67a83acf",
+      "reachable_default": "a0e7a1a2093117ed6428e43a29b930c21faed69f",
+      "verified_path_pairs": 2,
+      "overrides": 0,
+      "preserved_absences": 0,
+      "original_path_blob_pairs_sha256": "0eedef1603c7c3b725ebefd65d455f267932b6e5b0f38de4e92c9eaddcde4548"
+    },
+    {
+      "original_reference": "2cfd9a0db46a806c0a0bd0c83839b5b584fc3627",
+      "reachable_default": "78ef16be7626c81de49d103d581551b707201eda",
+      "verified_path_pairs": 2037,
+      "overrides": 0,
+      "preserved_absences": 0,
+      "original_path_blob_pairs_sha256": "b1edbea156dee4a878fb97af2c2662c03b9027c8751b0128dbe839734214b0cf"
+    },
+    {
+      "original_reference": "32f083d28db0609a52cade793849a8767a855ae3",
+      "reachable_default": "32f083d28db0609a52cade793849a8767a855ae3",
+      "verified_path_pairs": 2360,
+      "overrides": 0,
+      "preserved_absences": 0,
+      "original_path_blob_pairs_sha256": "1898a42dab5c516bc46967cd346f58f4b58968855d94d75f3ca572d4d8aa96a8"
+    },
+    {
+      "original_reference": "3561eee8351d83aec11af996687f4b2d63ea271c",
+      "reachable_default": "910ddf3090a1a9b10eff7861495d37d252ce8e77",
+      "verified_path_pairs": 8,
+      "overrides": 0,
+      "preserved_absences": 0,
+      "original_path_blob_pairs_sha256": "0940137671d4983a6abbe166473ed44a2f08318febb40c88be915f550d0a24ac"
+    },
+    {
+      "original_reference": "3cc2a0d39ad21a98ca238cffcb76ff7939f18b95",
+      "reachable_default": "aa5642fdb4ce381f23746b704555be0bd4a2434f",
+      "verified_path_pairs": 1977,
+      "overrides": 0,
+      "preserved_absences": 8,
+      "original_path_blob_pairs_sha256": "b47b812da9470f1685e4dd302e3e04604493e7e22ac0f2fc44da3ece0e647b5c"
+    },
+    {
+      "original_reference": "43e58632d87977b467f58fde0feeef47b6a89dcc",
+      "reachable_default": "c2a23b86ab9d6b246387df6338a649061f37adf9",
+      "verified_path_pairs": 2034,
+      "overrides": 0,
+      "preserved_absences": 0,
+      "original_path_blob_pairs_sha256": "a89a1eead1f94f306106fc265e5618624707c9ff7c75ed9dbfbdff2f9a5ff05d"
+    },
+    {
+      "original_reference": "483793065c3f7a66057907a777f938f608bf7036",
+      "reachable_default": "0bfacbbc0ad970881a0cd8ddb0044d8a69e0fe90",
+      "verified_path_pairs": 74,
+      "overrides": 0,
+      "preserved_absences": 0,
+      "original_path_blob_pairs_sha256": "ef8078cf2191fb2d3db3d0fb1e3c6f38d52c72cb9ee69960025b73a0b66a41f8"
+    },
+    {
+      "original_reference": "4962943d366b54c9e3b85e16ef1f747bf6eb09c0",
+      "reachable_default": "4962943d366b54c9e3b85e16ef1f747bf6eb09c0",
+      "verified_path_pairs": 1396,
+      "overrides": 0,
+      "preserved_absences": 0,
+      "original_path_blob_pairs_sha256": "e1921c9e78a4d2f0ad467a5928285d63fd94070df0222c8e6b6ab784446dc296"
+    },
+    {
+      "original_reference": "5bbebd776ca6cce2be4fd0d427f3baa926c2676d",
+      "reachable_default": "6cabc6dc7e6f45662223ba5d9bef59e47d1b97c6",
+      "verified_path_pairs": 2003,
+      "overrides": 0,
+      "preserved_absences": 0,
+      "original_path_blob_pairs_sha256": "6bfd7ebbaa1046e40426df12c568e425f1a46a4d15ee5a26682b9b81d8c966ef"
+    },
+    {
+      "original_reference": "5d6c58da50267a636e393ce3754ef473516923aa",
+      "reachable_default": "790b89b6d1779a0ab1b45f1abf40173fe2592f87",
+      "verified_path_pairs": 11504,
+      "overrides": 12,
+      "preserved_absences": 0,
+      "original_path_blob_pairs_sha256": "7515807f203058787ff078b1db65bced985400a1cedb980f9b097deb4c2c8191"
+    },
+    {
+      "original_reference": "6b76eea88c9be83889d0940bd77fa2c6ab70e2b1",
+      "reachable_default": "2d4f4cd34a4160ec5118d9cac2c9876ce51776ca",
+      "verified_path_pairs": 8,
+      "overrides": 0,
+      "preserved_absences": 0,
+      "original_path_blob_pairs_sha256": "3e37df1dfb07d47f7e09c02688bd76ee081c95edd81599d9f0ee7a45b4d08240"
+    },
+    {
+      "original_reference": "78ef16be7626c81de49d103d581551b707201eda",
+      "reachable_default": "78ef16be7626c81de49d103d581551b707201eda",
+      "verified_path_pairs": 2254,
+      "overrides": 0,
+      "preserved_absences": 0,
+      "original_path_blob_pairs_sha256": "938f0a515b47ffa90140e6003da436aac857112c52a3b989b5c85cea9cd51481"
+    },
+    {
+      "original_reference": "7edd614497b930c5bc02141537cc7e24dce6fb27",
+      "reachable_default": "7edd614497b930c5bc02141537cc7e24dce6fb27",
+      "verified_path_pairs": 42,
+      "overrides": 0,
+      "preserved_absences": 0,
+      "original_path_blob_pairs_sha256": "443d988d0ff1ef0e2ecd00240bb2863d440b2677754b4c5d87572380594eaacd"
+    },
+    {
+      "original_reference": "9399dd998cc3d972b94f6753e576e2c756438657",
+      "reachable_default": "32f083d28db0609a52cade793849a8767a855ae3",
+      "verified_path_pairs": 2037,
+      "overrides": 0,
+      "preserved_absences": 0,
+      "original_path_blob_pairs_sha256": "3718d8560ab30706faf50dc93e94b701fd2739034c7cc09e518bf9f329d5e5f6"
+    },
+    {
+      "original_reference": "98ca4f0a64e82ee49a7d4b310d60a5095214c3c9",
+      "reachable_default": "bc58f4fdc5da4792e02b35221bc08b9733719827",
+      "verified_path_pairs": 1297,
+      "overrides": 4,
+      "preserved_absences": 9,
+      "original_path_blob_pairs_sha256": "6df9d61b44b84a8cde9404d30044b2173baeda0dedebac222750c6246508f012"
+    },
+    {
+      "original_reference": "9d8abd4501b75a2577dc6f72a6a2adb4b6afbf5a",
+      "reachable_default": "0add9cd20b1e20a51bc2b68cf8cdf405aae73767",
+      "verified_path_pairs": 2006,
+      "overrides": 0,
+      "preserved_absences": 0,
+      "original_path_blob_pairs_sha256": "c76da71bf313a20431fe03fed0d38c4c7474313fb59e046cae44d69f9638fd9f"
+    },
+    {
+      "original_reference": "a082d3b394d071538cc65057074c1d06a7f6c994",
+      "reachable_default": "1cee974d42adc2c478f443ca3834fed851c2e69c",
+      "verified_path_pairs": 2034,
+      "overrides": 0,
+      "preserved_absences": 0,
+      "original_path_blob_pairs_sha256": "93e2d41eeb0ca055dcebac3532314c1f838bd65b47d948444256cf77652b2dc5"
+    },
+    {
+      "original_reference": "a7265e8c5365421f2110623f685cbc67d21a99b0",
+      "reachable_default": "c2a23b86ab9d6b246387df6338a649061f37adf9",
+      "verified_path_pairs": 11505,
+      "overrides": 12,
+      "preserved_absences": 0,
+      "original_path_blob_pairs_sha256": "b2b7f27535de87d5e83506b4e873187cc706824bf9fbc7eff695fe85ad80a3b6"
+    },
+    {
+      "original_reference": "bd3661ec02e3004fef3ae3d8a990e44ef5c6ce08",
+      "reachable_default": "3b23aa3d4edfc2bbbd0891d9272a9fc3c0ae51e8",
+      "verified_path_pairs": 11503,
+      "overrides": 2,
+      "preserved_absences": 0,
+      "original_path_blob_pairs_sha256": "a6f09fda7ed1ee155e8f79b8f520d275ceecdb7f3de214041150f9ebec501bf8"
+    },
+    {
+      "original_reference": "c7310cdad4154e662270736a4ecaeeef2e7cf64d",
+      "reachable_default": "2620ac862380d88feac61fec15f08312f6328248",
+      "verified_path_pairs": 1956,
+      "overrides": 0,
+      "preserved_absences": 14,
+      "original_path_blob_pairs_sha256": "441098367bfab67f3575df0e92c8464dc18a065587aea1ab82cfb04a50dacec5"
+    },
+    {
+      "original_reference": "cd6aefe91c4272203774448c26f0b753106667fa",
+      "reachable_default": "01f265e723f21d5161f33eb3c63508f397a584b9",
+      "verified_path_pairs": 6,
+      "overrides": 0,
+      "preserved_absences": 0,
+      "original_path_blob_pairs_sha256": "6509280e8047d524430542e12ca10df7a8603e33d31e5f0882d7bd9212a7c8e3"
+    },
+    {
+      "original_reference": "cff76302f11661c44a4583d2f20d5e368b0b6aa1",
+      "reachable_default": "1d8bf12e18cf6156901ec942166fd06be4f81eb3",
+      "verified_path_pairs": 1975,
+      "overrides": 0,
+      "preserved_absences": 8,
+      "original_path_blob_pairs_sha256": "82d7c59bd95d80c5e648346b61ce9d458b8fe723bbe76ec37e4710abb282c91c"
+    },
+    {
+      "original_reference": "d3aafa1b1563353fe56a1eef54c4f477a50f0d61",
+      "reachable_default": "8518ae323536ec67f7eb6656a03806088312a50c",
+      "verified_path_pairs": 1956,
+      "overrides": 2,
+      "preserved_absences": 9,
+      "original_path_blob_pairs_sha256": "2c90b70b694f131540ece466a01a142c47c30eb3a28f667357a1df4ab4d45b89"
+    },
+    {
+      "original_reference": "f4732dbe21b9e40eb386b6115be1283ff563f511",
+      "reachable_default": "f4732dbe21b9e40eb386b6115be1283ff563f511",
+      "verified_path_pairs": 1388,
+      "overrides": 0,
+      "preserved_absences": 0,
+      "original_path_blob_pairs_sha256": "0fd6eee011222404dcfe6078afa40cdc6ed5430acf917585b18334def2f31e2c"
+    }
+  ]
+}

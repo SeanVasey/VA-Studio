@@ -1,0 +1,100 @@
+{
+  "note": "NOT APPLIED. Result of the literal command composer update laravel/framework --with-dependencies, rejected as broader than required; retained for comparison.",
+  "changed": [
+    {
+      "name": "laravel/framework",
+      "before": "v13.35.0",
+      "after": "v13.36.0"
+    },
+    {
+      "name": "laravel/prompts",
+      "before": "v0.3.25",
+      "after": "v0.3.26"
+    },
+    {
+      "name": "league/uri",
+      "before": "7.8.1",
+      "after": "7.9.0"
+    },
+    {
+      "name": "league/uri-interfaces",
+      "before": "7.8.1",
+      "after": "7.9.0"
+    },
+    {
+      "name": "symfony/clock",
+      "before": "v8.0.8",
+      "after": "v8.1.9"
+    },
+    {
+      "name": "symfony/console",
+      "before": "v7.4.20",
+      "after": "v8.1.9"
+    },
+    {
+      "name": "symfony/css-selector",
+      "before": "v8.0.9",
+      "after": "v8.1.6"
+    },
+    {
+      "name": "symfony/error-handler",
+      "before": "v8.0.15",
+      "after": "v8.1.8"
+    },
+    {
+      "name": "symfony/event-dispatcher",
+      "before": "v8.0.15",
+      "after": "v8.1.5"
+    },
+    {
+      "name": "symfony/finder",
+      "before": "v8.0.14",
+      "after": "v8.1.8"
+    },
+    {
+      "name": "symfony/http-kernel",
+      "before": "v8.0.15",
+      "after": "v8.1.9"
+    },
+    {
+      "name": "symfony/mailer",
+      "before": "v8.0.15",
+      "after": "v8.1.7"
+    },
+    {
+      "name": "symfony/mime",
+      "before": "v8.0.15",
+      "after": "v8.1.7"
+    },
+    {
+      "name": "symfony/process",
+      "before": "v8.0.13",
+      "after": "v8.1.9"
+    },
+    {
+      "name": "symfony/routing",
+      "before": "v8.0.15",
+      "after": "v8.1.9"
+    },
+    {
+      "name": "symfony/string",
+      "before": "v8.0.15",
+      "after": "v8.1.9"
+    },
+    {
+      "name": "symfony/translation",
+      "before": "v8.0.14",
+      "after": "v8.1.5"
+    },
+    {
+      "name": "symfony/uid",
+      "before": "v8.0.9",
+      "after": "v8.1.9"
+    },
+    {
+      "name": "symfony/var-dumper",
+      "before": "v8.0.15",
+      "after": "v8.1.9"
+    }
+  ]
+}

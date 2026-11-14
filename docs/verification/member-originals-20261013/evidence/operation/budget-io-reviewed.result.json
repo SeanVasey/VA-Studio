@@ -1,0 +1,15 @@
+{
+  "exit": 0,
+  "seconds": 0.673,
+  "source_count": 1956,
+  "changed_sources": [],
+  "junit": {
+    "name": "CLI Arguments",
+    "tests": "16",
+    "assertions": "61",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "time": "0.424250"
+  }
+}
